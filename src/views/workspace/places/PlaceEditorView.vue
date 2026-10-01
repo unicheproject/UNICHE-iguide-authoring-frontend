@@ -1,0 +1,444 @@
+<script setup lang="ts">
+import { computed, reactive, ref, watch } from "vue";
+import EditorShell from "@/components/editor/EditorShell.vue";
+import TranslationsPanel, { type TextFieldGroup, type TextFieldMeta } from "@/components/editor/TranslationsPanel.vue";
+import { SLUG_PATTERN } from "@/lib/format";
+import {
+  changePlaceStatus,
+  fetchPlaceReferences,
+  fetchPlace,
+  listPlaces,
+  PLACE_TEXT_FIELDS,
+  PLACE_SETTING_LABELS,
+  PLACE_SETTINGS,
+  PLACE_TYPES_BY_SETTING,
+  placeTitle,
+  updatePlace,
+  type Place,
+  type PlaceTranslation,
+  type PlaceSetting,
+  type PlaceType,
+} from "@/platform/places";
+import { useCurrentProject } from "@/workspace/currentProject";
+import {
+  checkCoordinates,
+  describeTranslationPath,
+  ensureTextRows,
+  numberText,
+  optionalNumber,
+  optionalText,
+  textsForApi,
+  textsFrom,
+  type Texts,
+} from "@/workspace/formFields";
+import type { ResourceReference } from "@/platform/references";
+import { referenceLink } from "@/workspace/referenceLinks";
+import { useProjectLanguages } from "@/workspace/useProjectLanguages";
+import { useResourceEditor } from "@/workspace/useResourceEditor";
+import { parentOptions, placeTypeLabel } from "./placeTree";
+import NewFloorPlanDialog from "../maps/NewFloorPlanDialog.vue";
+import NewMapDialog from "../maps/NewMapDialog.vue";
+import { listAssets, type Asset } from "@/platform/assets";
+import { listFloorPlans, type FloorPlan } from "@/platform/floorPlans";
+import { listMaps, type GeoMap } from "@/platform/maps";
+import { fetchSpatialLink, setSpatialLink, type SpatialLink } from "@/platform/places";
+import { showToast } from "@/stores/toast";
+import { ApiError } from "@/platform/api";
+
+const props = defineProps<{ placeId: string }>();
+const project = useCurrentProject();
+const projectId = computed(() => project.value.id);
+const { languages, defaultLanguage, loading: languagesLoading } = useProjectLanguages(projectId);
+const languageCodes = () => languages.value.map((l) => l.languageCode);
+
+type TextKey = keyof PlaceTranslation;
+
+const TEXT_META: Record<TextKey, TextFieldMeta> = {
+  title: { label: "Title", multiline: false },
+  summary: { label: "Summary", multiline: true, helper: "One or two sentences shown in lists and cards." },
+  description: { label: "Description", multiline: true },
+  visitorInformation: { label: "Visitor information", multiline: true, helper: "Opening hours, tickets, how to get there." },
+  accessibilityInformation: { label: "Accessibility information", multiline: true, helper: "Step-free access, surfaces, seating, assistance." },
+};
+const GROUPS: TextFieldGroup[] = [{ id: "main", label: null, keys: [...PLACE_TEXT_FIELDS] }];
+const FIELD_NAMES: Record<string, string> = {
+  slug: "Slug",
+  type: "Type",
+  setting: "Setting",
+  parentPlaceId: "Parent place",
+  latitude: "Latitude",
+  longitude: "Longitude",
+  internalName: "Internal name",
+};
+
+// Other Places, for the "Inside" choice.
+const allPlaces = ref<Place[]>([]);
+
+const form = reactive({
+  slug: "",
+  type: "SITE" as PlaceType,
+  setting: "OUTDOOR" as PlaceSetting,
+  parentPlaceId: "",
+  internalName: "",
+  latitude: "",
+  longitude: "",
+  featured: false,
+  translations: {} as Record<string, Texts<TextKey>>,
+});
+
+const editor = useResourceEditor<Place>({
+  kind: "place",
+  source: () => props.placeId,
+  languages,
+  defaultLanguage,
+  async load() {
+    const [place, places] = await Promise.all([fetchPlace(projectId.value, props.placeId), listPlaces(projectId.value)]);
+    allPlaces.value = places;
+    return place;
+  },
+  async save(place, version) {
+    const saved = await updatePlace(projectId.value, place.id, {
+      version,
+      slug: form.slug,
+      type: form.type,
+      setting: form.setting,
+      parentPlaceId: form.parentPlaceId || null,
+      internalName: optionalText(form.internalName),
+      latitude: optionalNumber(form.latitude),
+      longitude: optionalNumber(form.longitude),
+      featured: form.featured,
+      translations: textsForApi(PLACE_TEXT_FIELDS, languageCodes(), form.translations),
+    });
+    allPlaces.value = allPlaces.value.map((p) => (p.id === saved.id ? saved : p));
+    return saved;
+  },
+  changeStatus: (place, target, version) => changePlaceStatus(projectId.value, place.id, target, version),
+  loadReferences: (place) => fetchPlaceReferences(projectId.value, place.id),
+  resetForm(place) {
+    form.slug = place.slug;
+    form.type = place.type;
+    form.setting = place.setting;
+    form.parentPlaceId = place.parentPlaceId ?? "";
+    form.internalName = place.internalName ?? "";
+    form.latitude = numberText(place.latitude);
+    form.longitude = numberText(place.longitude);
+    form.featured = place.featured;
+    form.translations = Object.fromEntries(
+      Object.entries(place.translations).map(([code, t]) => [code, textsFrom(PLACE_TEXT_FIELDS, t)]),
+    );
+  },
+  ensureLanguageRows: () => ensureTextRows(PLACE_TEXT_FIELDS, languageCodes(), form.translations),
+  formState: () => form,
+  validate() {
+    const found: Record<string, string> = {};
+    if (!SLUG_PATTERN.test(form.slug)) found.slug = "Use lowercase Latin letters, digits, and single hyphens.";
+    checkCoordinates(form.latitude, form.longitude, found);
+    return found;
+  },
+  describePath: (path) => describeTranslationPath(path, languages.value, TEXT_META) ?? FIELD_NAMES[path] ?? path,
+});
+
+const heading = computed(() => (editor.resource ? placeTitle(editor.resource, null, defaultLanguage.value) : "Place"));
+const subtitle = computed(() => (editor.resource ? `${placeTypeLabel(editor.resource.type)} · ${editor.resource.slug}` : ""));
+const parentChoices = computed(() => parentOptions(allPlaces.value, defaultLanguage.value, props.placeId));
+const toReference = (r: ResourceReference) => referenceLink(projectId.value, r);
+const typeChoices = computed(() => {
+  const fitting = PLACE_TYPES_BY_SETTING[form.setting];
+  return fitting.includes(form.type) ? fitting : [form.type, ...fitting];
+});
+const isSub = computed(() => !!form.parentPlaceId);
+
+function chooseSetting(setting: PlaceSetting) {
+  if (!editor.editable || setting === form.setting) return;
+  form.setting = setting;
+  if (!PLACE_TYPES_BY_SETTING[setting].includes(form.type)) form.type = PLACE_TYPES_BY_SETTING[setting][0];
+}
+
+function chooseLevel(sub: boolean) {
+  if (!editor.editable || sub === isSub.value) return;
+  form.parentPlaceId = sub ? parentChoices.value[0]?.id ?? "" : "";
+}
+
+function cardClass(selected: boolean) {
+  return selected ? "border-primary bg-[#f5f0fb]" : "border-gray-200 bg-white hover:border-primary";
+}
+// The map or floor plan the Place's page shows; linking applies at once (mockup place setup).
+const maps = ref<GeoMap[]>([]);
+const floorPlans = ref<FloorPlan[]>([]);
+const link = ref<SpatialLink>({ mapId: null, floorPlanId: null });
+const linking = ref(false);
+const creatingLink = ref(false);
+const libraryAssets = ref<Asset[]>([]);
+
+async function loadSpatial() {
+  try {
+    [maps.value, floorPlans.value, link.value] = await Promise.all([
+      listMaps(projectId.value),
+      listFloorPlans(projectId.value),
+      fetchSpatialLink(projectId.value, props.placeId),
+    ]);
+  } catch (e) {
+    if (!(e instanceof ApiError)) throw e;
+  }
+}
+watch(() => props.placeId, loadSpatial, { immediate: true });
+
+const linkedId = computed(() => (form.setting === "INDOOR" ? link.value.floorPlanId : link.value.mapId) ?? "");
+const linkOptions = computed(() => {
+  const list = form.setting === "INDOOR" ? floorPlans.value : maps.value;
+  return list
+    .filter((x) => x.status !== "ARCHIVED")
+    .map((x) => {
+      const other = x.placeId && x.placeId !== props.placeId ? allPlaces.value.find((p) => p.id === x.placeId) : undefined;
+      return { id: x.id, label: x.internalName + (other ? ` · linked to ${placeTitle(other, null, defaultLanguage.value)}` : "") };
+    });
+});
+const linkNote = computed(() => {
+  if (editor.resource && form.setting !== editor.resource.setting) return "Save the new setting first, then link a " + (form.setting === "INDOOR" ? "floor plan." : "map.");
+  const current = (form.setting === "INDOOR" ? floorPlans.value : maps.value).find((x) => x.id === linkedId.value);
+  if (current) return `Visitors open this place on “${current.internalName}”.`;
+  return form.setting === "INDOOR"
+    ? "Link an existing floor plan, or add a new one, to position indoor Points of Interest."
+    : "Link an existing map, or create one by searching for the area.";
+});
+
+async function changeLink(id: string) {
+  linking.value = true;
+  try {
+    link.value = await setSpatialLink(projectId.value, props.placeId, form.setting === "INDOOR" ? { mapId: null, floorPlanId: id || null } : { mapId: id || null, floorPlanId: null });
+    await loadSpatial();
+    showToast(id ? "Linked" : "Unlinked", id ? "The place page shows it now." : "The place no longer shows a map or floor plan.");
+  } catch (e) {
+    if (!(e instanceof ApiError)) throw e;
+    showToast("The link was not changed", e.platformUnavailable ? "The UNICHE platform is not reachable." : Object.values(e.fieldMessages()).join(" ") || e.message, "error");
+  } finally {
+    linking.value = false;
+  }
+}
+
+async function startNewLink() {
+  if (form.setting === "INDOOR" && !libraryAssets.value.length) libraryAssets.value = await listAssets(projectId.value);
+  creatingLink.value = true;
+}
+
+async function onLinkCreated() {
+  creatingLink.value = false;
+  await loadSpatial();
+  showToast("Created and linked", "The place page shows it now.");
+}
+
+const parentMissing = computed(() => !!form.parentPlaceId && !parentChoices.value.some((o) => o.id === form.parentPlaceId));
+</script>
+
+<template>
+  <EditorShell
+    :editor="editor"
+    back-label="Places"
+    :back-to="{ name: 'places', params: { projectId } }"
+    :title="heading"
+    :subtitle="subtitle"
+    activation-hint="Activate it once the default-language title is set."
+    :reference-link="toReference"
+    :pending="languagesLoading"
+  >
+    <TranslationsPanel
+      v-model:active-language="editor.activeLanguage"
+      :project-id="projectId"
+      :languages="languages"
+      :texts="form.translations"
+      :groups="GROUPS"
+      :meta="TEXT_META"
+      :readonly="!editor.editable"
+      :error-languages="editor.languagesWithErrors"
+      :field-error="editor.fieldError"
+      title-required-hint="Required in the default language before the place can be activated."
+    />
+
+    <section class="overflow-hidden rounded-lg border bg-card">
+      <div class="border-b px-5 py-3.5">
+        <h2 class="text-[11px] font-extrabold uppercase tracking-[0.09em] text-muted-foreground">Place setup</h2>
+      </div>
+      <div class="flex flex-col gap-[18px] px-5 py-[18px]">
+        <div class="flex flex-col gap-2" role="group" aria-labelledby="place-setting-label">
+          <span id="place-setting-label" class="small-label">Setting</span>
+          <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,180px),1fr))] gap-2.5">
+            <button
+              v-for="setting in PLACE_SETTINGS"
+              :key="setting"
+              type="button"
+              :disabled="!editor.editable"
+              :aria-pressed="form.setting === setting"
+              class="flex flex-col gap-0.5 rounded-lg border-[1.5px] px-3.5 py-2.5 text-left disabled:cursor-default"
+              :class="cardClass(form.setting === setting)"
+              @click="chooseSetting(setting)"
+            >
+              <span class="text-[13px] font-bold">{{ PLACE_SETTING_LABELS[setting].label }}</span>
+              <span class="text-xs text-muted-foreground">{{ PLACE_SETTING_LABELS[setting].uses }}</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-2" role="group" aria-labelledby="place-level-label">
+          <span id="place-level-label" class="small-label">Level</span>
+          <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,180px),1fr))] gap-2.5">
+            <button
+              v-for="level in ([[false, 'Top-level place', 'Stands on its own'], [true, 'Sub-place', 'Inside another place']] as const)"
+              :key="String(level[0])"
+              type="button"
+              :disabled="!editor.editable || (level[0] && !parentChoices.length)"
+              :aria-pressed="isSub === level[0]"
+              class="flex flex-col gap-0.5 rounded-lg border-[1.5px] px-3.5 py-2.5 text-left disabled:cursor-default disabled:opacity-60"
+              :class="cardClass(isSub === level[0])"
+              @click="chooseLevel(level[0])"
+            >
+              <span class="text-[13px] font-bold">{{ level[1] }}</span>
+              <span class="text-xs text-muted-foreground">{{ level[2] }}</span>
+            </button>
+          </div>
+          <select
+            v-if="isSub"
+            id="f-parent"
+            v-model="form.parentPlaceId"
+            :disabled="!editor.editable"
+            aria-label="Parent place"
+            class="field-input max-w-[420px]"
+            :class="{ invalid: editor.fieldError('parentPlaceId') }"
+          >
+            <option v-if="parentMissing" :value="form.parentPlaceId">(archived or unavailable place)</option>
+            <option v-for="o in parentChoices" :key="o.id" :value="o.id">{{ o.label }}</option>
+          </select>
+          <span v-if="editor.fieldError('parentPlaceId')" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("parentPlaceId") }}</span>
+        </div>
+
+        <div class="flex flex-wrap gap-3">
+          <div class="flex min-w-[180px] flex-1 flex-col gap-1.5">
+            <label for="f-type" class="small-label">Type</label>
+            <select id="f-type" v-model="form.type" :disabled="!editor.editable" class="field-input">
+              <option v-for="t in typeChoices" :key="t" :value="t">{{ placeTypeLabel(t) }}</option>
+            </select>
+          </div>
+          <div class="flex min-w-[220px] flex-[2] flex-col gap-1.5">
+            <label for="f-link" class="small-label">{{ form.setting === "INDOOR" ? "Floor plan" : "Map" }}</label>
+            <select
+              id="f-link"
+              :value="linkedId"
+              :disabled="linking || !editor.resource || editor.resource.status === 'ARCHIVED' || form.setting !== editor.resource.setting"
+              class="field-input"
+              @change="changeLink(($event.target as HTMLSelectElement).value)"
+            >
+              <option value="">{{ form.setting === "INDOOR" ? "No floor plan" : "No map" }}</option>
+              <option v-for="o in linkOptions" :key="o.id" :value="o.id">{{ o.label }}</option>
+            </select>
+            <span class="text-xs text-muted-foreground">{{ linkNote }}</span>
+            <div v-if="editor.resource && form.setting === editor.resource.setting" class="flex flex-wrap gap-3">
+              <RouterLink
+                v-if="linkedId"
+                :to="form.setting === 'INDOOR' ? { name: 'floor-plan-editor', params: { projectId, planId: linkedId } } : { name: 'map-editor', params: { projectId, mapId: linkedId } }"
+                class="text-[11px] font-bold text-primary no-underline"
+              >
+                Open {{ form.setting === "INDOOR" ? "floor plan" : "map" }}
+              </RouterLink>
+              <button v-else type="button" class="text-[11px] font-bold text-primary" @click="startNewLink">
+                New {{ form.setting === "INDOOR" ? "floor plan" : "map" }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="overflow-hidden rounded-lg border bg-card">
+      <div class="border-b px-5 py-3.5">
+        <h2 class="text-[11px] font-extrabold uppercase tracking-[0.09em] text-muted-foreground">Location</h2>
+      </div>
+      <div class="flex flex-col gap-3.5 px-5 py-[18px]">
+        <div class="flex gap-2.5">
+          <div class="flex min-w-0 flex-1 flex-col gap-1.5">
+            <label for="f-lat" class="small-label">Latitude</label>
+            <input
+              id="f-lat"
+              v-model="form.latitude"
+              :readonly="!editor.editable"
+              inputmode="decimal"
+              placeholder="—"
+              class="field-input font-mono text-[13px]"
+              :class="{ invalid: editor.fieldError('latitude') }"
+            />
+            <span v-if="editor.fieldError('latitude')" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("latitude") }}</span>
+          </div>
+          <div class="flex min-w-0 flex-1 flex-col gap-1.5">
+            <label for="f-lng" class="small-label">Longitude</label>
+            <input
+              id="f-lng"
+              v-model="form.longitude"
+              :readonly="!editor.editable"
+              inputmode="decimal"
+              placeholder="—"
+              class="field-input font-mono text-[13px]"
+              :class="{ invalid: editor.fieldError('longitude') }"
+            />
+            <span v-if="editor.fieldError('longitude')" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("longitude") }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="overflow-hidden rounded-lg border bg-card">
+      <div class="border-b px-5 py-3.5">
+        <h2 class="text-[11px] font-extrabold uppercase tracking-[0.09em] text-muted-foreground">Details</h2>
+      </div>
+      <div class="flex flex-col gap-3.5 px-5 py-[18px]">
+        <div class="flex flex-col gap-1.5">
+          <label for="f-slug" class="small-label">Slug</label>
+          <input
+            id="f-slug"
+            v-model="form.slug"
+            :readonly="!editor.editable"
+            spellcheck="false"
+            class="field-input font-mono text-[13px]"
+            :class="{ invalid: editor.fieldError('slug') }"
+            aria-describedby="f-slug-help"
+          />
+          <span v-if="editor.fieldError('slug')" id="f-slug-help" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("slug") }}</span>
+          <span v-else id="f-slug-help" class="text-xs text-muted-foreground">
+            The place's address in the app and its QR target. Changing it breaks printed QR codes.
+          </span>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="f-internal" class="small-label">Internal name</label>
+          <input id="f-internal" v-model="form.internalName" :readonly="!editor.editable" class="field-input" aria-describedby="f-internal-help" />
+          <span id="f-internal-help" class="text-xs text-muted-foreground">Only authors see it, for example an inventory number.</span>
+        </div>
+        <label class="flex items-center gap-2.5 text-[13px] font-semibold">
+          <input v-model="form.featured" type="checkbox" :disabled="!editor.editable" class="h-4 w-4 accent-primary" />
+          Featured: highlighted in the visitor app's lists
+        </label>
+      </div>
+    </section>
+
+  </EditorShell>
+
+  <NewMapDialog
+    v-if="creatingLink && form.setting === 'OUTDOOR'"
+    :project-id="projectId"
+    :places="allPlaces"
+    :linked-place-ids="maps.flatMap((m) => (m.placeId ? [m.placeId] : []))"
+    :default-language="defaultLanguage"
+    :initial-query="heading"
+    :initial-place-id="placeId"
+    @close="creatingLink = false"
+    @created="onLinkCreated"
+  />
+  <NewFloorPlanDialog
+    v-if="creatingLink && form.setting === 'INDOOR'"
+    :project-id="projectId"
+    :assets="libraryAssets"
+    :places="allPlaces"
+    :linked-place-ids="floorPlans.flatMap((f) => (f.placeId ? [f.placeId] : []))"
+    :default-language="defaultLanguage"
+    :initial-place-id="placeId"
+    @close="creatingLink = false"
+    @created="onLinkCreated"
+    @uploaded="libraryAssets.unshift($event)"
+  />
+</template>
