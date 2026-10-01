@@ -1,0 +1,63 @@
+{
+  "realm": "uniche",
+  "displayName": "UNICHE (local development)",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "accessTokenLifespan": 300,
+  "ssoSessionIdleTimeout": 1800,
+  "clients": [
+    {
+      "clientId": "iguide-web",
+      "name": "iGuide CMS",
+      "enabled": true,
+      "publicClient": true,
+      "protocol": "openid-connect",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "redirectUris": ["http://localhost:5173/*"],
+      "webOrigins": ["http://localhost:5173"],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "http://localhost:5173/*"
+      },
+      "defaultClientScopes": ["basic", "web-origins", "acr", "profile", "roles", "email"],
+      "optionalClientScopes": ["address", "phone", "offline_access", "microprofile-jwt"],
+      "protocolMappers": [
+        {
+          "name": "uniche-platform audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.custom.audience": "uniche-platform",
+            "id.token.claim": "false",
+            "access.token.claim": "true",
+            "introspection.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "id": "0b7f6c6e-6a0c-4c6e-9e7e-5a2f3d9c1a01",
+      "username": "curator",
+      "email": "m.papadaki@example.org",
+      "emailVerified": true,
+      "firstName": "Maria",
+      "lastName": "Papadaki",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "curator",
+          "temporary": false
+        }
+      ]
+    }
+  ]
+}

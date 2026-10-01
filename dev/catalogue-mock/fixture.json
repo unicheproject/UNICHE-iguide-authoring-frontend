@@ -1,0 +1,61 @@
+{
+  "subject": "0b7f6c6e-6a0c-4c6e-9e7e-5a2f3d9c1a01",
+  "organisations": [
+    {
+      "id": "5d1e7a52-3f0b-4b8e-9c61-0e2a7c4b9f10",
+      "name": "Museum of Cycladic Art",
+      "slug": "cycladic-art",
+      "status": "ACTIVE",
+      "managed": true
+    },
+    {
+      "id": "c2b9e4d1-8a7f-4c3e-b5d2-6f1a0e9c8b74",
+      "name": "Syros Historical Archive",
+      "slug": "syros-archive",
+      "status": "ACTIVE",
+      "managed": false
+    }
+  ],
+  "projects": [
+    {
+      "id": "8a3c1f2e-7b4d-4e59-a1c6-2f9d0b7e5c31",
+      "orgId": "5d1e7a52-3f0b-4b8e-9c61-0e2a7c4b9f10",
+      "name": "Cycladic Gallery Guide",
+      "slug": "cycladic-gallery-guide",
+      "status": "ACTIVE",
+      "member": true,
+      "createdAt": "2026-08-12T09:30:00Z",
+      "updatedAt": "2026-09-04T14:10:00Z"
+    },
+    {
+      "id": "3e6d9b10-2c4a-4f7e-8d15-b0a9c7e4f2d6",
+      "orgId": "5d1e7a52-3f0b-4b8e-9c61-0e2a7c4b9f10",
+      "name": "Naxos Quarry Trail",
+      "slug": "naxos-quarry-trail",
+      "status": "ACTIVE",
+      "member": true,
+      "createdAt": "2026-08-30T11:00:00Z",
+      "updatedAt": "2026-09-01T08:45:00Z"
+    },
+    {
+      "id": "f41a7c2e-95b3-4d68-a0e1-7c3b2d9f6e58",
+      "orgId": "c2b9e4d1-8a7f-4c3e-b5d2-6f1a0e9c8b74",
+      "name": "Syros Photo Archive",
+      "slug": "syros-photo-archive",
+      "status": "ACTIVE",
+      "member": true,
+      "createdAt": "2026-07-03T10:00:00Z",
+      "updatedAt": "2026-08-22T16:20:00Z"
+    },
+    {
+      "id": "0d8e5a37-6b1f-4c92-9e4d-a3f7b2c1e605",
+      "orgId": "c2b9e4d1-8a7f-4c3e-b5d2-6f1a0e9c8b74",
+      "name": "Ermoupoli Walking Tour",
+      "slug": "ermoupoli-walking-tour",
+      "status": "ACTIVE",
+      "member": false,
+      "createdAt": "2026-06-15T10:00:00Z",
+      "updatedAt": "2026-06-20T10:00:00Z"
+    }
+  ]
+}

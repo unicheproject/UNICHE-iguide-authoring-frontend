@@ -1,0 +1,47 @@
+# Local stand-ins for the UNICHE platform, for development and testing only.
+#
+#   keycloak   http://localhost:8180  realm "uniche", public client "iguide-web", user curator / curator
+#              admin console: http://localhost:8180/admin (admin / admin)
+#   catalogue  http://localhost:8181  in-memory Catalogue mock (dev/catalogue-mock), resets on restart
+#   s3         http://localhost:9090  S3-compatible store for asset bytes (adobe/s3mock), bucket "iguide-assets";
+#                                     files are lost when the container stops
+#
+# Start:  docker compose -f dev/docker-compose.yml up -d
+# Tokens from this Keycloak are rejected by the live Catalogue, so the backend must point at the stub
+# while using it. See dev/README.md for the matching backend and CMS settings.
+name: iguide-dev
+
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.7.4
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      # Fixed so the token issuer is identical for the browser and the backend.
+      KC_HOSTNAME: http://localhost:8180
+      KC_HEALTH_ENABLED: "true"
+    volumes:
+      - ./keycloak/uniche-realm.json:/opt/keycloak/data/import/uniche-realm.json:ro
+    ports:
+      - "8180:8080"
+
+  catalogue:
+    image: node:22-alpine
+    command: ["node", "/mock/server.mjs"]
+    environment:
+      # Must match the backend's uniche.tool.slug (TOOL_SLUG), which it sends when creating a Project.
+      TOOL_SLUG: museotekbox
+    volumes:
+      - ./catalogue-mock:/mock:ro
+    ports:
+      - "8181:8080"
+
+  s3:
+    image: adobe/s3mock:5.2.3
+    # Files are kept only while the container runs; S3Mock deletes them when it stops.
+    # A persistent store root on a named volume made every request fail with 500 on this setup.
+    environment:
+      COM_ADOBE_TESTING_S3MOCK_STORE_INITIAL_BUCKETS: iguide-assets
+    ports:
+      - "9090:9090"
