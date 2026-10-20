@@ -3,11 +3,13 @@ import { computed, reactive, ref } from "vue";
 import GeoPicker, { type GeoPoint } from "@/components/GeoPicker.vue";
 import EditorShell from "@/components/editor/EditorShell.vue";
 import TranslationsPanel, { type TextFieldGroup, type TextFieldMeta } from "@/components/editor/TranslationsPanel.vue";
+import TriggersCard from "@/components/editor/TriggersCard.vue";
 import MediaSlots, { type MediaSlot } from "@/components/media/MediaSlots.vue";
 import { SLUG_PATTERN } from "@/lib/format";
 import { listAssets, type Asset, type MediaBinding } from "@/platform/assets";
 import { assignableCategories, listCategories, type Category } from "@/platform/categories";
-import { listPlaces, type Place } from "@/platform/places";
+import { listPlaces, placeTitle, type Place } from "@/platform/places";
+import { listPoiTriggers, syncPoiTriggers, triggerToForm, type Trigger, type TriggerForm } from "@/platform/triggers";
 import {
   changePoiStatus,
   fetchPoi,
@@ -34,6 +36,9 @@ import {
   type Texts,
 } from "@/workspace/formFields";
 import { referenceLink } from "@/workspace/referenceLinks";
+import { heroBlock, mediaBlocks, previewLanguages, textBlocks, textIn, type PreviewBlock, type PreviewModel } from "@/workspace/preview";
+import { POI_TEXT_FIELDS } from "@/platform/pois";
+import { filledFields, translationStatus } from "@/workspace/translationStatus";
 import { useProjectLanguages } from "@/workspace/useProjectLanguages";
 import { useResourceEditor } from "@/workspace/useResourceEditor";
 import { parentOptions } from "../places/placeTree";
@@ -103,7 +108,10 @@ const form = reactive({
   featured: false,
   translations: {} as Record<string, Texts<TextKey>>,
   media: [] as MediaBinding[],
+  triggers: [] as TriggerForm[],
 });
+// The triggers as last loaded or saved; the form is reset from them with the POI.
+const savedTriggers = ref<Trigger[]>([]);
 
 const editor = useResourceEditor<Poi>({
   kind: "point of interest",
@@ -111,21 +119,26 @@ const editor = useResourceEditor<Poi>({
   languages,
   defaultLanguage,
   async load() {
-    const [poi, allPlaces, pois, library, allCategories] = await Promise.all([
+    const [poi, allPlaces, pois, library, allCategories, triggers] = await Promise.all([
       fetchPoi(projectId.value, props.poiId),
       listPlaces(projectId.value),
       listPois(projectId.value),
       listAssets(projectId.value),
       listCategories(projectId.value),
+      listPoiTriggers(projectId.value, props.poiId),
     ]);
+    savedTriggers.value = triggers;
     places.value = allPlaces;
     categories.value = allCategories;
     allPois.value = pois;
     assets.value = library;
     return poi;
   },
-  save: (poi, version) =>
-    updatePoi(projectId.value, poi.id, {
+  async save(poi, version) {
+    // Triggers are rows of their own and do not move the POI's version, so they go first: when one is
+    // refused, the POI is not saved either and the form can be corrected and saved again.
+    savedTriggers.value = await syncPoiTriggers(projectId.value, poi.id, form.triggers);
+    const saved = await updatePoi(projectId.value, poi.id, {
       version,
       slug: form.slug,
       placeId: form.placeId || null,
@@ -138,7 +151,9 @@ const editor = useResourceEditor<Poi>({
       featured: form.featured,
       translations: textsForApi(TEXT_KEYS, languageCodes(), form.translations),
       media: form.media.map((m) => ({ ...m })),
-    }),
+    });
+    return saved;
+  },
   changeStatus: (poi, target, version) => changePoiStatus(projectId.value, poi.id, target, version),
   loadReferences: (poi) => fetchPoiReferences(projectId.value, poi.id),
   resetForm(poi) {
@@ -153,6 +168,7 @@ const editor = useResourceEditor<Poi>({
     form.featured = poi.featured;
     form.translations = Object.fromEntries(Object.entries(poi.translations).map(([code, t]) => [code, textsFrom(TEXT_KEYS, t)]));
     form.media = poi.media.map((m) => ({ ...m }));
+    form.triggers = savedTriggers.value.map(triggerToForm);
   },
   ensureLanguageRows: () => ensureTextRows(TEXT_KEYS, languageCodes(), form.translations),
   formState: () => form,
@@ -169,7 +185,7 @@ const editor = useResourceEditor<Poi>({
     return found;
   },
   describePath: (path) =>
-    /^media\[/.test(path) ? "Media" : (describeTranslationPath(path, languages.value, TEXT_META) ?? FIELD_NAMES[path] ?? path),
+    /^media\[/.test(path) ? "Media" : /^triggers\[/.test(path) ? "How visitors reach it" : (describeTranslationPath(path, languages.value, TEXT_META) ?? FIELD_NAMES[path] ?? path),
 });
 
 const toReference = (r: ResourceReference) => referenceLink(projectId.value, r);
@@ -186,6 +202,29 @@ const placeMissing = computed(() => !!form.placeId && !placeChoices.value.some((
 
 // Site map: the other points of interest as dots; the area comes from every saved coordinate in the
 // Project, so it stays put while the author moves this pin.
+// The Point of Interest as visitors would open it, from the live form (`12` §3, DECISIONS.md D-014).
+const preview = computed<PreviewModel | null>(() => {
+  if (!editor.resource) return null;
+  const { language, fallbackName, codes } = previewLanguages(languages.value, editor.activeLanguage, defaultLanguage.value);
+  const place = places.value.find((p) => p.id === form.placeId);
+  const facts = [
+    ...(form.code.trim() ? [{ label: "No.", value: form.code.trim() }] : []),
+    ...(form.estimatedVisitMinutes.trim() ? [{ label: "Visit", value: `${form.estimatedVisitMinutes.trim()} min` }] : []),
+    ...(place ? [{ label: "In", value: placeTitle(place, editor.activeLanguage, defaultLanguage.value) }] : []),
+  ];
+  const blocks: PreviewBlock[] = [
+    ...heroBlock(form.media, assets.value, codes),
+    { type: "facts", items: facts },
+    ...textBlocks(form.translations, [
+      { key: "summary", label: "Summary" },
+      { key: "description", label: "Description" },
+      { key: "instructions", label: "Instructions", heading: "When you are there" },
+      { key: "accessibilityInformation", label: "Accessibility information", heading: "Accessibility" },
+    ], codes),
+    ...mediaBlocks(form.media, assets.value, codes),
+  ];
+  return { kindLabel: "Point of interest", language, fallbackName, title: textIn(form.translations, "title", codes), blocks };
+});
 function toPoint(lat: number | null, lng: number | null, title?: string): GeoPoint[] {
   return lat !== null && lng !== null ? [{ lat, lng, title }] : [];
 }
@@ -202,10 +241,14 @@ function onMapPick(lat: string, lng: string) {
   form.latitude = lat;
   form.longitude = lng;
 }
+
+// The Translations panel counts the fields the content list counts for its completion dots.
+const translationRows = computed(() => translationStatus(languages.value, POI_TEXT_FIELDS.length, (code) => filledFields(form.translations[code], POI_TEXT_FIELDS)));
 </script>
 
 <template>
   <EditorShell
+    tabbed
     :editor="editor"
     back-label="Points of Interest"
     :back-to="{ name: 'pois', params: { projectId } }"
@@ -214,6 +257,8 @@ function onMapPick(lat: string, lng: string) {
     activation-hint="Activate it once the default-language title is set."
     :reference-link="toReference"
     :pending="languagesLoading"
+    :translations="translationRows"
+    :preview="preview"
   >
     <TranslationsPanel
       v-model:active-language="editor.activeLanguage"
@@ -238,6 +283,13 @@ function onMapPick(lat: string, lng: string) {
       :readonly="!editor.editable"
       :field-error="editor.fieldError"
       @uploaded="assets.unshift($event)"
+    />
+
+    <TriggersCard
+      :triggers="form.triggers"
+      :readonly="!editor.editable"
+      :field-error="editor.fieldError"
+      :position="{ latitude: form.latitude, longitude: form.longitude }"
     />
 
     <section class="overflow-hidden rounded-lg border bg-card">

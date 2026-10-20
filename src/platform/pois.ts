@@ -1,7 +1,8 @@
-import { apiRequest } from "./api";
-import type { MediaBinding } from "./assets";
+import { ApiError, apiRequest } from "./api";
+import { syncMedia, toMediaBindings, type MediaBinding, type MediaBindingResponse } from "./assets";
 import type { ResourceStatus } from "./places";
 import type { ResourceReference } from "./references";
+import { setResourceCategory } from "./categories";
 
 export interface PoiTranslation {
   title: string | null;
@@ -73,27 +74,87 @@ export interface UpdatePoiInput {
 
 const base = (projectId: string) => `/projects/${encodeURIComponent(projectId)}/pois`;
 
-export function listPois(projectId: string, signal?: AbortSignal): Promise<Poi[]> {
-  return apiRequest<Poi[]>(base(projectId), { signal });
+/*
+ * Stopgap until the generated client (PLAN.md C0b, C3). The iGuide backend (D-020) pages its lists and
+ * does not store SEO texts (QUESTIONS.md on SEO texts): responses get empty values for them, and a save
+ * that would drop SEO text is refused here, at that field. The Category and the media are bindings
+ * (backend D-024, D-025): read from `categoryIds` and `media`, saved through `.../pois/{id}/categories`
+ * and `.../pois/{id}/resource-assets` after the POI itself.
+ */
+
+type PoiTranslationResponse = Omit<PoiTranslation, "seoTitle" | "seoDescription">;
+type PoiResponse = Omit<Poi, "categoryId" | "media" | "translations"> & {
+  translations: Record<string, PoiTranslationResponse>;
+  categoryIds: string[];
+  media: MediaBindingResponse[];
+};
+
+interface Page<T> {
+  content: T[];
+  totalPages: number;
 }
 
-export function fetchPoi(projectId: string, poiId: string, signal?: AbortSignal): Promise<Poi> {
-  return apiRequest<Poi>(`${base(projectId)}/${encodeURIComponent(poiId)}`, { signal });
+function toPoi({ categoryIds, media, ...response }: PoiResponse): Poi {
+  const translations: Record<string, PoiTranslation> = {};
+  for (const [code, t] of Object.entries(response.translations)) {
+    translations[code] = { ...t, seoTitle: null, seoDescription: null };
+  }
+  return { ...response, categoryId: categoryIds[0] ?? null, media: toMediaBindings(media), translations };
 }
 
-export function createPoi(projectId: string, input: CreatePoiInput): Promise<Poi> {
-  return apiRequest<Poi>(base(projectId), { method: "POST", body: input });
+function unsupported(input: UpdatePoiInput): string[] {
+  const details: string[] = [];
+  for (const [code, t] of Object.entries(input.translations)) {
+    if (t.seoTitle?.trim()) details.push(`translations.${code}.seoTitle: SEO texts are not stored by iGuide.`);
+    if (t.seoDescription?.trim()) details.push(`translations.${code}.seoDescription: SEO texts are not stored by iGuide.`);
+  }
+  return details;
 }
 
-export function updatePoi(projectId: string, poiId: string, input: UpdatePoiInput): Promise<Poi> {
-  return apiRequest<Poi>(`${base(projectId)}/${encodeURIComponent(poiId)}`, { method: "PUT", body: input });
+/** Every Point of Interest of the Project, in order: the backend serves at most 200 per page. */
+export async function listPois(projectId: string, signal?: AbortSignal): Promise<Poi[]> {
+  const pois: Poi[] = [];
+  for (let page = 0; ; page++) {
+    const result = await apiRequest<Page<PoiResponse>>(`${base(projectId)}?size=200&page=${page}`, { signal });
+    pois.push(...result.content.map(toPoi));
+    if (page + 1 >= result.totalPages) return pois;
+  }
 }
 
-export function changePoiStatus(projectId: string, poiId: string, targetStatus: ResourceStatus, version: number): Promise<Poi> {
-  return apiRequest<Poi>(`${base(projectId)}/${encodeURIComponent(poiId)}/status`, {
-    method: "POST",
-    body: { targetStatus, version },
+export async function fetchPoi(projectId: string, poiId: string, signal?: AbortSignal): Promise<Poi> {
+  return toPoi(await apiRequest<PoiResponse>(`${base(projectId)}/${encodeURIComponent(poiId)}`, { signal }));
+}
+
+export async function createPoi(projectId: string, input: CreatePoiInput): Promise<Poi> {
+  return toPoi(await apiRequest<PoiResponse>(base(projectId), { method: "POST", body: input }));
+}
+
+export async function updatePoi(projectId: string, poiId: string, input: UpdatePoiInput): Promise<Poi> {
+  const details = unsupported(input);
+  if (details.length) {
+    throw new ApiError(422, "VALIDATION_ERROR", "Some fields cannot be saved in iGuide yet.", null, details);
+  }
+  const { categoryId, media, translations, ...rest } = input;
+  const texts: Record<string, PoiTranslationResponse> = {};
+  for (const [code, { seoTitle: _title, seoDescription: _description, ...t }] of Object.entries(translations)) {
+    texts[code] = t;
+  }
+  await apiRequest<PoiResponse>(`${base(projectId)}/${encodeURIComponent(poiId)}`, {
+    method: "PUT",
+    body: { ...rest, translations: texts },
   });
+  await setResourceCategory(projectId, "pois", poiId, categoryId);
+  await syncMedia(projectId, "pois", poiId, media);
+  return fetchPoi(projectId, poiId);
+}
+
+export async function changePoiStatus(projectId: string, poiId: string, targetStatus: ResourceStatus, version: number): Promise<Poi> {
+  return toPoi(
+    await apiRequest<PoiResponse>(`${base(projectId)}/${encodeURIComponent(poiId)}/status`, {
+      method: "POST",
+      body: { targetStatus, version },
+    }),
+  );
 }
 
 export function poiTitle(poi: Poi, defaultLanguage: string | null): string {
