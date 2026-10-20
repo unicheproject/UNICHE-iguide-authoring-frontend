@@ -25,6 +25,7 @@ import { showToast } from "@/stores/toast";
 import { useCurrentProject } from "@/workspace/currentProject";
 import { describeTranslationPath, ensureTextRows, textsForApi, textsFrom, type Texts } from "@/workspace/formFields";
 import { referenceLink } from "@/workspace/referenceLinks";
+import { filledFields, translationStatus } from "@/workspace/translationStatus";
 import { useProjectLanguages } from "@/workspace/useProjectLanguages";
 import { useResourceEditor } from "@/workspace/useResourceEditor";
 
@@ -153,10 +154,14 @@ const activationHint = computed(() =>
 function chip(selected: boolean) {
   return selected ? "border-primary bg-primary text-white" : "border-gray-200 bg-white text-gray-700 hover:border-primary";
 }
+
+// The Translations panel counts the fields the content list counts for its completion dots.
+const translationRows = computed(() => translationStatus(languages.value, 2, (code) => filledFields(form.translations[code], ["name", "description"] as const)));
 </script>
 
 <template>
   <EditorShell
+    tabbed
     :editor="editor"
     back-label="Categories"
     :back-to="{ name: 'categories', params: { projectId } }"
@@ -165,6 +170,7 @@ function chip(selected: boolean) {
     :activation-hint="activationHint"
     :reference-link="toReference"
     :pending="languagesLoading"
+    :translations="translationRows"
   >
     <TranslationsPanel
       v-model:active-language="editor.activeLanguage"

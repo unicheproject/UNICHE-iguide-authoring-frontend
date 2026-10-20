@@ -68,8 +68,17 @@ export interface Category {
 
 const base = (projectId: string) => `/projects/${encodeURIComponent(projectId)}/categories`;
 
-export function listCategories(projectId: string, signal?: AbortSignal): Promise<Category[]> {
-  return apiRequest<Category[]>(base(projectId), { signal });
+/** Every Category of the Project, in order: the backend serves at most 200 per page (backend D-024). */
+export async function listCategories(projectId: string, signal?: AbortSignal): Promise<Category[]> {
+  const categories: Category[] = [];
+  for (let page = 0; ; page++) {
+    const result = await apiRequest<{ content: Category[]; totalPages: number }>(
+      `${base(projectId)}?size=200&page=${page}`,
+      { signal },
+    );
+    categories.push(...result.content);
+    if (page + 1 >= result.totalPages) return categories;
+  }
 }
 
 export function fetchCategory(projectId: string, categoryId: string): Promise<Category> {
@@ -159,4 +168,21 @@ export function parentChoices(categories: Category[], scope: CategoryScope, defa
 /** The choices of a Point of Interest's or Route's Category select. */
 export function assignableCategories(categories: Category[], scope: CategoryScope, defaultLanguage: string | null) {
   return categoryTree(categories, scope).map(({ category }) => ({ id: category.id, label: categoryLabel(category, categories, defaultLanguage) }));
+}
+
+/**
+ * Puts a Point of Interest or Route in `categoryId`, or in none, through its `.../categories` bindings
+ * (backend D-024: at most one Category per Resource). Only a DRAFT Resource accepts the change.
+ */
+export async function setResourceCategory(
+  projectId: string,
+  kind: "pois" | "routes",
+  resourceId: string,
+  categoryId: string | null,
+): Promise<void> {
+  const path = `/projects/${encodeURIComponent(projectId)}/${kind}/${encodeURIComponent(resourceId)}/categories`;
+  const current = await apiRequest<{ id: string; categoryId: string }[]>(path);
+  if (current.length === 1 && current[0].categoryId === categoryId) return;
+  for (const binding of current) await apiRequest(`${path}/${encodeURIComponent(binding.id)}`, { method: "DELETE" });
+  if (categoryId) await apiRequest(path, { method: "POST", body: { categoryId } });
 }
