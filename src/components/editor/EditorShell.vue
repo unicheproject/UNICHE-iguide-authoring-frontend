@@ -2,17 +2,20 @@
 /**
  * Page frame of every Resource editor: back link, loading and error states, page head with Save, the
  * read-only banner for ACTIVE and ARCHIVED Resources, the error summary, the two-column layout with the
- * Status panel, and the status-change and version-conflict dialogs. The editor's own fields go in the
+ * Status panel, the optional Preview panel, and the status-change and version-conflict dialogs. The editor's own fields go in the
  * default slot.
  */
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import type { RouteLocationRaw } from "vue-router";
 import AppDialog from "@/components/AppDialog.vue";
 import PageHead from "@/components/PageHead.vue";
 import StatusChangeDialog from "@/components/StatusChangeDialog.vue";
 import { Button } from "@/components/ui/button";
+import ResourcePreview from "@/components/editor/ResourcePreview.vue";
 import { formatDate } from "@/lib/format";
 import type { ResourceReference } from "@/platform/references";
+import type { PreviewModel } from "@/workspace/preview";
+import type { LanguageStatus } from "@/workspace/translationStatus";
 import type { EditableResource, ResourceEditor } from "@/workspace/useResourceEditor";
 
 const props = defineProps<{
@@ -26,7 +29,23 @@ const props = defineProps<{
   referenceLink?: (reference: ResourceReference) => RouteLocationRaw | null;
   /** Something else the page needs is still loading, such as the Project's languages. */
   pending?: boolean;
+  /**
+   * The form opens with the language tabs of `TranslationsPanel`, so the side panels start level with the
+   * first card below the tabs rather than with the tabs themselves.
+   */
+  tabbed?: boolean;
+  /** The Resource as visitors would see it, from the live form; offers the "Preview" action when given. */
+  preview?: PreviewModel | null;
+  /** Per enabled language, how many of the kind's translated fields hold text; shown under Status. */
+  translations?: LanguageStatus[];
 }>();
+
+const languageProgress = (s: LanguageStatus) =>
+  s.filled === 0 ? "Missing" : s.filled === s.total ? "Complete" : `Partial (${s.filled} of ${s.total} fields)`;
+const dotClass = (s: LanguageStatus) =>
+  s.filled === 0 ? "border-2 border-gray-300 bg-white" : s.filled === s.total ? "bg-primary" : "bg-[#b26be3]";
+
+const previewOpen = ref(false);
 
 const editor = computed(() => props.editor);
 const kind = computed(() => props.editor.kind);
@@ -96,6 +115,15 @@ const noLink = () => null;
       <PageHead :title="title" :subtitle="subtitle" :status="editor.resource.status">
         <template #actions>
           <span v-if="editor.dirty" class="text-[11px] font-semibold text-[#9a6200]">Unsaved changes</span>
+          <Button
+            v-if="preview"
+            variant="outline"
+            :aria-pressed="previewOpen"
+            aria-controls="resource-preview"
+            @click="previewOpen = !previewOpen"
+          >
+            {{ previewOpen ? "Close preview" : "Preview" }}
+          </Button>
           <Button :disabled="!editor.editable || !editor.dirty || editor.saving" @click="editor.save()">
             {{ editor.saving ? "Saving…" : "Save" }}
           </Button>
@@ -137,12 +165,20 @@ const noLink = () => null;
         <p v-if="editor.summary.requestId" class="mt-1.5 font-mono text-[11px] text-muted-foreground">Request id {{ editor.summary.requestId }}</p>
       </div>
 
-      <div class="flex flex-wrap items-start gap-5">
-        <div class="flex min-w-[min(100%,420px)] max-w-[760px] flex-1 flex-col gap-[18px]">
+      <!-- The form takes the width the side panels leave; below 1024px the side panels follow it. -->
+      <div class="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_310px]">
+        <div class="flex min-w-0 flex-col gap-[18px]">
           <slot />
         </div>
 
-        <aside class="flex w-[310px] flex-[0_0_310px] flex-col gap-4">
+        <!-- 57px: the language tab row (39px, measured) and the gap below it (18px). -->
+        <aside class="flex min-w-0 flex-col gap-4" :class="{ 'lg:mt-[57px]': tabbed }">
+          <ResourcePreview
+            v-if="preview && previewOpen"
+            id="resource-preview"
+            :model="preview"
+            :dirty="editor.dirty"
+          />
           <section class="overflow-hidden rounded-lg border bg-card">
             <div class="border-b px-3.5 py-[11px]">
               <span class="text-[10px] font-extrabold uppercase tracking-[0.1em] text-muted-foreground">Status</span>
@@ -181,6 +217,30 @@ const noLink = () => null;
                 <dd class="font-mono">{{ editor.resource.version }}</dd>
               </dl>
             </div>
+          </section>
+          <section v-if="translations?.length" class="overflow-hidden rounded-lg border bg-card" aria-labelledby="translations-heading">
+            <div class="border-b px-3.5 py-[11px]">
+              <span id="translations-heading" class="text-[10px] font-extrabold uppercase tracking-[0.1em] text-muted-foreground">Translations</span>
+            </div>
+            <ul class="flex flex-col py-1.5">
+              <li v-for="s in translations" :key="s.language.languageCode">
+                <button
+                  type="button"
+                  class="flex w-full items-center gap-2.5 px-3.5 py-1.5 text-left text-[13px] hover:bg-accent/40"
+                  :aria-current="editor.activeLanguage === s.language.languageCode ? 'true' : undefined"
+                  :title="`Edit the ${s.language.displayName} texts`"
+                  @click="editor.activeLanguage = s.language.languageCode"
+                >
+                  <span class="h-2.5 w-2.5 flex-none rounded-full" :class="dotClass(s)" aria-hidden="true"></span>
+                  <span :class="s.language.isDefault ? 'font-bold' : 'font-semibold'">{{ s.language.displayName }}</span>
+                  <span v-if="s.language.isDefault" class="text-[10px] text-muted-foreground">default</span>
+                  <span v-if="editor.activeLanguage === s.language.languageCode" class="text-[10px] font-bold text-primary">· editing</span>
+                  <span class="ml-auto whitespace-nowrap text-[12px]" :class="s.filled === 0 ? 'text-destructive' : 'text-muted-foreground'">
+                    {{ languageProgress(s) }}
+                  </span>
+                </button>
+              </li>
+            </ul>
           </section>
           <slot name="aside" />
         </aside>
