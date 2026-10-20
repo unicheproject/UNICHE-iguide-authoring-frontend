@@ -9,6 +9,14 @@ export const router = createRouter({
   routes: [
     { path: "/", name: "home", component: HomeView },
     { path: "/projects/new", name: "project-create", component: () => import("@/views/CreateProjectView.vue") },
+    {
+      // "Open in new tab" of the Preview: the visitor app alone, without the CMS chrome (`12` §3 Preview).
+      path: "/projects/:projectId/app-preview",
+      name: "app-preview",
+      component: () => import("@/views/AppPreviewView.vue"),
+      props: (route) => ({ projectId: route.params.projectId, surface: route.query.surface, lang: route.query.lang, mode: route.query.mode }),
+      meta: { bare: true },
+    },
     // Entry route for deep links, including the Platform Portal's (12-cms-experience.md section 4).
     {
       path: "/projects/:projectId",
@@ -132,6 +140,18 @@ export const router = createRouter({
           component: () => import("@/views/workspace/media/AssetEditorView.vue"),
           props: true,
           meta: { section: "media" },
+        },
+        {
+          path: "preview",
+          name: "preview",
+          component: () => import("@/views/workspace/PreviewView.vue"),
+          meta: { section: "preview" },
+        },
+        {
+          path: "overview",
+          name: "overview",
+          component: () => import("@/views/workspace/OverviewView.vue"),
+          meta: { section: "overview" },
         },
         {
           path: "languages",

@@ -121,6 +121,8 @@ const DEDICATED_ROUTES: Record<string, string> = {
   maps: "maps",
   "floor-plans": "floor-plans",
   languages: "project-languages",
+  overview: "overview",
+  preview: "preview",
 };
 
 export function sectionLocation(projectId: string, slug: string) {
