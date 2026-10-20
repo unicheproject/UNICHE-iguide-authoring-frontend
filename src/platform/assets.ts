@@ -1,11 +1,21 @@
-import { apiRequest, apiUpload } from "./api";
+import { ApiError, apiRequest, apiUpload } from "./api";
 import type { ResourceStatus } from "./places";
 import type { ResourceReference } from "./references";
 
 export const ASSET_TYPES = ["IMAGE", "AUDIO", "VIDEO", "DOCUMENT", "THREE_D_MODEL", "FLOOR_PLAN", "OTHER"] as const;
 export type AssetType = (typeof ASSET_TYPES)[number];
 
-export const ASSET_USAGES = ["HERO_IMAGE", "THUMBNAIL", "GALLERY_IMAGE", "VIDEO", "AUDIO_NARRATION", "ATTACHMENT", "MODEL", "INLINE"] as const;
+export const ASSET_USAGES = [
+  "HERO_IMAGE",
+  "THUMBNAIL",
+  "GALLERY_IMAGE",
+  "VIDEO",
+  "AUDIO_NARRATION",
+  "ATTACHMENT",
+  "MODEL",
+  "MODEL_POSTER",
+  "INLINE",
+] as const;
 export type AssetUsage = (typeof ASSET_USAGES)[number];
 
 export interface AssetTranslation {
@@ -56,16 +66,28 @@ export interface AssetLimits {
 
 const base = (projectId: string) => `/projects/${encodeURIComponent(projectId)}/assets`;
 
-export function listAssets(projectId: string, signal?: AbortSignal): Promise<Asset[]> {
-  return apiRequest<Asset[]>(base(projectId), { signal });
+interface Page<T> {
+  content: T[];
+  totalPages: number;
+}
+
+/** Every Asset of the Project, newest first: the backend serves at most 200 per page. */
+export async function listAssets(projectId: string, signal?: AbortSignal): Promise<Asset[]> {
+  const assets: Asset[] = [];
+  for (let page = 0; ; page++) {
+    const result = await apiRequest<Page<Asset>>(`${base(projectId)}?size=200&page=${page}`, { signal });
+    assets.push(...result.content);
+    if (page + 1 >= result.totalPages) return assets;
+  }
 }
 
 export function fetchAsset(projectId: string, assetId: string): Promise<Asset> {
   return apiRequest<Asset>(`${base(projectId)}/${encodeURIComponent(assetId)}`);
 }
 
-export function fetchAssetLimits(projectId: string): Promise<AssetLimits> {
-  return apiRequest<AssetLimits>(`${base(projectId)}/limits`);
+/** The limits the backend enforces (`07` §14 `GET /upload-limits`); not Project-scoped. */
+export function fetchAssetLimits(_projectId: string): Promise<AssetLimits> {
+  return apiRequest<AssetLimits>("/upload-limits");
 }
 
 export function uploadAsset(
@@ -124,6 +146,66 @@ export function fetchAssetDownload(projectId: string, assetId: string): Promise<
   return apiRequest<{ url: string; expiresAt: string }>(`${base(projectId)}/${encodeURIComponent(assetId)}/download`);
 }
 
+/*
+ * Media bindings (backend D-025) are a child collection of the Resource, `.../{kind}/{id}/resource-assets`,
+ * not part of its update body. Reads carry them as `media`; a save goes through `syncMedia` after the
+ * Resource's own `PUT`. INLINE bindings follow the images in rich text and are never written here.
+ */
+
+/** One binding as the backend returns it. */
+export interface MediaBindingResponse {
+  id: string;
+  assetId: string;
+  usage: AssetUsage;
+  languageCode: string | null;
+  sortOrder: number;
+}
+
+export type MediaKind = "pois" | "routes" | "guides" | "events";
+
+export const toMediaBindings = (media: MediaBindingResponse[]): MediaBinding[] =>
+  media.map(({ assetId, usage, languageCode }) => ({ assetId, usage, languageCode }));
+
+const bindingKey = (b: { assetId: string; usage: string; languageCode: string | null }) =>
+  `${b.usage}|${b.languageCode ?? ""}|${b.assetId}`;
+
+/** Re-reports a binding error at the field of the slot that sent it, such as `media[2].assetId`. */
+function atSlot(e: unknown, index: number): unknown {
+  if (!(e instanceof ApiError)) return e;
+  const details = e.details.map((d) => (/^(assetId|usage|languageCode): /.test(d) ? `media[${index}].${d}` : d));
+  if (!details.length) details.push(`media[${index}].assetId: ${e.message}`);
+  return new ApiError(e.status, e.code, e.message, e.requestId, details, e.body);
+}
+
+/**
+ * Makes the Resource's media, INLINE bindings aside, exactly `desired` in that order: removes what is gone,
+ * binds what is new, then sets the order. A model's poster is bound before the model and removed after it.
+ */
+export async function syncMedia(projectId: string, kind: MediaKind, resourceId: string, desired: MediaBinding[]): Promise<void> {
+  const path = `/projects/${encodeURIComponent(projectId)}/${kind}/${encodeURIComponent(resourceId)}/resource-assets`;
+  const current = (await apiRequest<MediaBindingResponse[]>(path)).filter((b) => b.usage !== "INLINE");
+  const wanted = desired.filter((b) => b.usage !== "INLINE");
+  const unmatched = [...current];
+  const ids: (string | null)[] = wanted.map((b) => {
+    const i = unmatched.findIndex((c) => bindingKey(c) === bindingKey(b));
+    return i < 0 ? null : unmatched.splice(i, 1)[0].id;
+  });
+  const removals = [...unmatched].sort((a, b) => Number(b.usage === "MODEL") - Number(a.usage === "MODEL"));
+  for (const binding of removals) await apiRequest(`${path}/${encodeURIComponent(binding.id)}`, { method: "DELETE" });
+  const additions = wanted.map((_, i) => i).filter((i) => ids[i] === null);
+  additions.sort((a, b) => Number(wanted[b].usage === "MODEL_POSTER") - Number(wanted[a].usage === "MODEL_POSTER"));
+  for (const i of additions) {
+    try {
+      ids[i] = (await apiRequest<MediaBindingResponse>(path, { method: "POST", body: wanted[i] })).id;
+    } catch (e) {
+      throw atSlot(e, desired.indexOf(wanted[i]));
+    }
+  }
+  const order = ids as string[];
+  const unchanged = !removals.length && !additions.length && current.every((c, i) => c.id === order[i]);
+  if (!unchanged && order.length) await apiRequest(`${path}:order`, { method: "PUT", body: { ids: order } });
+}
+
 const USAGE_LABELS: Record<AssetUsage | "FLOOR_PLAN_IMAGE", string> = {
   HERO_IMAGE: "primary image",
   THUMBNAIL: "thumbnail",
@@ -132,6 +214,7 @@ const USAGE_LABELS: Record<AssetUsage | "FLOOR_PLAN_IMAGE", string> = {
   AUDIO_NARRATION: "audio narration",
   ATTACHMENT: "attachment",
   MODEL: "3D model",
+  MODEL_POSTER: "3D model poster",
   INLINE: "inline",
   FLOOR_PLAN_IMAGE: "plan image",
 };
