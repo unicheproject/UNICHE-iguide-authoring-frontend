@@ -37,6 +37,8 @@ import {
 } from "@/workspace/formFields";
 import type { ResourceReference } from "@/platform/references";
 import { referenceLink } from "@/workspace/referenceLinks";
+import { heroBlock, mediaBlocks, previewLanguages, storyImage, textBlocks, textIn, type PreviewBlock, type PreviewModel, type StoryNode } from "@/workspace/preview";
+import { filledFields, translationStatus } from "@/workspace/translationStatus";
 import { useProjectLanguages } from "@/workspace/useProjectLanguages";
 import { useResourceEditor } from "@/workspace/useResourceEditor";
 
@@ -205,6 +207,36 @@ const editor = useResourceEditor<Guide>({
 const toReference = (r: ResourceReference) => referenceLink(projectId.value, r);
 const heading = computed(() => (editor.resource ? guideTitle(editor.resource, defaultLanguage.value) : "Guide"));
 const subtitle = computed(() => (editor.resource ? `Guide · ${editor.resource.slug}` : ""));
+// The Guide as visitors would read it, from the live form (`12` §3, DECISIONS.md D-014).
+const preview = computed<PreviewModel | null>(() => {
+  if (!editor.resource) return null;
+  const { language, fallbackName, codes } = previewLanguages(languages.value, editor.activeLanguage, defaultLanguage.value);
+  const own = codes.active ? form.bodies[codes.active] ?? [] : [];
+  const story = own.length ? own : codes.fallback ? form.bodies[codes.fallback] ?? [] : [];
+  const nodes: StoryNode[] = story.flatMap((b): StoryNode[] => {
+    if (b.type === "image") return [{ type: "image", image: storyImage(assets.value, b.assetId, codes) }];
+    return b.text.trim() ? [{ type: b.type, text: b.text.trim() }] : [];
+  });
+  const blocks: PreviewBlock[] = [
+    ...heroBlock(form.media, assets.value, codes),
+    { type: "facts", items: form.estimatedReadingMinutes.trim() ? [{ label: "Reading", value: `${form.estimatedReadingMinutes.trim()} min` }] : [] },
+    ...textBlocks(form.translations, [{ key: "summary", label: "Summary" }], codes),
+  ];
+  if (nodes.length) {
+    if (!own.length && story.length) {
+      blocks.push({ type: "text", label: "Story", value: { text: "The story below is in the default language.", missing: true } });
+    }
+    blocks.push({ type: "story", nodes });
+  }
+  blocks.push({
+    type: "list",
+    heading: "Related",
+    items: form.items.map((item) => ({ title: relatables.value[item.resourceType]?.get(item.resourceId)?.title ?? "Unavailable item", subtitle: item.resourceType })),
+  });
+  blocks.push(...mediaBlocks(form.media, assets.value, codes));
+  return { kindLabel: "Guide", language, fallbackName, title: textIn(form.translations, "title", codes), blocks };
+});
+
 const activeLanguageInfo = computed(() => editor.activeLanguageInfo);
 
 const suggestedMinutes = computed(() => {
@@ -262,10 +294,17 @@ function addItem(resource: Relatable) {
   picking.value = false;
   pickQuery.value = "";
 }
+
+// The Translations panel counts the fields the content list counts for its completion dots.
+const translationRows = computed(() => translationStatus(languages.value, 3, (code) =>
+    filledFields(form.translations[code], ["title", "summary"] as const) +
+    ((form.bodies[code] ?? []).some((b) => b.type === "image" || b.text.trim()) ? 1 : 0),
+  ));
 </script>
 
 <template>
   <EditorShell
+    tabbed
     :editor="editor"
     back-label="Guides"
     :back-to="{ name: 'guides', params: { projectId } }"
@@ -274,6 +313,8 @@ function addItem(resource: Relatable) {
     activation-hint="Activate it once it has a default-language title and story."
     :reference-link="toReference"
     :pending="languagesLoading"
+    :translations="translationRows"
+    :preview="preview"
   >
     <TranslationsPanel
       v-model:active-language="editor.activeLanguage"
