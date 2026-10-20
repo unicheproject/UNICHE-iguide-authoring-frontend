@@ -1,5 +1,5 @@
 import { apiRequest } from "./api";
-import type { MediaBinding } from "./assets";
+import { syncMedia, toMediaBindings, type MediaBinding, type MediaBindingResponse } from "./assets";
 import type { ResourceStatus } from "./places";
 import type { ResourceReference } from "./references";
 
@@ -62,24 +62,77 @@ export interface UpdateEventInput {
 
 const base = (projectId: string) => `/projects/${encodeURIComponent(projectId)}/events`;
 
-export function listEvents(projectId: string, signal?: AbortSignal): Promise<CmsEvent[]> {
-  return apiRequest<CmsEvent[]>(base(projectId), { signal });
+/*
+ * Stopgap until the generated client (PLAN.md C0b, C6). The iGuide backend (D-023) pages its lists and
+ * serves occurrences as the child collection `.../events/{id}/occurrences` instead of part of the event
+ * body. Media are bindings (backend D-025): read from `media`, saved through
+ * `.../events/{id}/resource-assets` after the occurrences.
+ */
+
+type EventResponse = Omit<CmsEvent, "media"> & { media: MediaBindingResponse[] };
+
+interface Page<T> {
+  content: T[];
+  totalPages: number;
 }
 
-export function fetchEvent(projectId: string, eventId: string): Promise<CmsEvent> {
-  return apiRequest<CmsEvent>(`${base(projectId)}/${encodeURIComponent(eventId)}`);
+const toEvent = (event: EventResponse): CmsEvent => ({ ...event, media: toMediaBindings(event.media) });
+
+const occurrencesPath = (projectId: string, eventId: string) => `${base(projectId)}/${encodeURIComponent(eventId)}/occurrences`;
+
+/** Every Event of the Project, in order: the backend serves at most 200 per page. */
+export async function listEvents(projectId: string, signal?: AbortSignal): Promise<CmsEvent[]> {
+  const events: CmsEvent[] = [];
+  for (let page = 0; ; page++) {
+    const result = await apiRequest<Page<EventResponse>>(`${base(projectId)}?size=200&page=${page}`, { signal });
+    events.push(...result.content.map(toEvent));
+    if (page + 1 >= result.totalPages) return events;
+  }
 }
 
-export function createEvent(projectId: string, input: { title: string; slug: string }): Promise<CmsEvent> {
-  return apiRequest<CmsEvent>(base(projectId), { method: "POST", body: input });
+export async function fetchEvent(projectId: string, eventId: string): Promise<CmsEvent> {
+  return toEvent(await apiRequest<EventResponse>(`${base(projectId)}/${encodeURIComponent(eventId)}`));
 }
 
-export function updateEvent(projectId: string, eventId: string, input: UpdateEventInput): Promise<CmsEvent> {
-  return apiRequest<CmsEvent>(`${base(projectId)}/${encodeURIComponent(eventId)}`, { method: "PUT", body: input });
+export async function createEvent(projectId: string, input: { title: string; slug: string }): Promise<CmsEvent> {
+  return toEvent(await apiRequest<EventResponse>(base(projectId), { method: "POST", body: input }));
 }
 
-export function changeEventStatus(projectId: string, eventId: string, targetStatus: ResourceStatus, version: number): Promise<CmsEvent> {
-  return apiRequest<CmsEvent>(`${base(projectId)}/${encodeURIComponent(eventId)}/status`, { method: "POST", body: { targetStatus, version } });
+/**
+ * Saves the Event's own fields, then brings its occurrences in line with `input.occurrences`: removed
+ * ones are deleted, changed ones updated, new ones added.
+ */
+export async function updateEvent(projectId: string, eventId: string, input: UpdateEventInput): Promise<CmsEvent> {
+  const { occurrences, media, ...fields } = input;
+  const saved = await apiRequest<EventResponse>(`${base(projectId)}/${encodeURIComponent(eventId)}`, { method: "PUT", body: fields });
+
+  const path = occurrencesPath(projectId, eventId);
+  const current = new Map(saved.occurrences.map((o) => [o.id, o]));
+  const kept = new Set(occurrences.flatMap((o) => (o.id ? [o.id] : [])));
+  for (const old of saved.occurrences.filter((o) => o.id && !kept.has(o.id))) {
+    await apiRequest(`${path}/${encodeURIComponent(old.id!)}`, { method: "DELETE" });
+  }
+  for (const o of occurrences) {
+    const body = { startsAt: o.startsAt, endsAt: o.endsAt, status: o.status };
+    const before = o.id ? current.get(o.id) : undefined;
+    if (!o.id) {
+      await apiRequest(path, { method: "POST", body });
+    } else if (!before || Date.parse(before.startsAt) !== Date.parse(o.startsAt)
+      || Date.parse(before.endsAt) !== Date.parse(o.endsAt) || before.status !== o.status) {
+      await apiRequest(`${path}/${encodeURIComponent(o.id)}`, { method: "PUT", body });
+    }
+  }
+  await syncMedia(projectId, "events", eventId, media);
+  return fetchEvent(projectId, eventId);
+}
+
+export async function changeEventStatus(projectId: string, eventId: string, targetStatus: ResourceStatus, version: number): Promise<CmsEvent> {
+  return toEvent(
+    await apiRequest<EventResponse>(`${base(projectId)}/${encodeURIComponent(eventId)}/status`, {
+      method: "POST",
+      body: { targetStatus, version },
+    }),
+  );
 }
 
 /** Guides that list the Event; non-empty blocks deactivation and archival. */

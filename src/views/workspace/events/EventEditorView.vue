@@ -26,6 +26,8 @@ import { listRoutes, routeTitle, type Route } from "@/platform/routes";
 import { useCurrentProject } from "@/workspace/currentProject";
 import { describeTranslationPath, ensureTextRows, optionalText, textsForApi, textsFrom, type Texts } from "@/workspace/formFields";
 import { referenceLink } from "@/workspace/referenceLinks";
+import { heroBlock, mediaBlocks, previewLanguages, textBlocks, textIn, type PreviewBlock, type PreviewModel } from "@/workspace/preview";
+import { filledFields, translationStatus } from "@/workspace/translationStatus";
 import { useProjectLanguages } from "@/workspace/useProjectLanguages";
 import { useResourceEditor } from "@/workspace/useResourceEditor";
 import { parentOptions } from "../places/placeTree";
@@ -76,6 +78,36 @@ interface OccurrenceForm {
   endsAt: string;
   status: OccurrenceStatus;
 }
+
+// The Event as visitors would open it, from the live form (`12` §3, DECISIONS.md D-014).
+const preview = computed<PreviewModel | null>(() => {
+  if (!editor.resource) return null;
+  const { language, fallbackName, codes } = previewLanguages(languages.value, editor.activeLanguage, defaultLanguage.value);
+  const when = (o: OccurrenceForm) => {
+    const start = o.startsAt ? new Date(o.startsAt) : null;
+    const end = o.endsAt ? new Date(o.endsAt) : null;
+    const fmt = (d: Date) => d.toLocaleString(language?.languageCode ?? undefined, { dateStyle: "medium", timeStyle: "short" });
+    return start && !Number.isNaN(start.getTime()) ? fmt(start) + (end && !Number.isNaN(end.getTime()) ? ` – ${fmt(end)}` : "") : "Date not set";
+  };
+  const blocks: PreviewBlock[] = [
+    ...heroBlock(form.media, assets.value, codes),
+    ...textBlocks(form.translations, [
+      { key: "summary", label: "Summary" },
+      { key: "locationText", label: "Location text", heading: "Where" },
+      { key: "description", label: "Description" },
+    ], codes),
+    {
+      type: "list",
+      heading: "Dates",
+      items: [...form.occurrences]
+        .sort((a, b) => a.startsAt.localeCompare(b.startsAt))
+        .map((o) => ({ title: when(o), subtitle: o.status === "CANCELLED" ? "Cancelled" : undefined, muted: o.status === "CANCELLED" })),
+    },
+    ...(form.bookingUrl.trim() ? [{ type: "link" as const, label: "Book", url: form.bookingUrl.trim() }] : []),
+    ...mediaBlocks(form.media, assets.value, codes),
+  ];
+  return { kindLabel: "Event", language, fallbackName, title: textIn(form.translations, "title", codes), blocks };
+});
 
 let keyCounter = 0;
 const form = reactive({
@@ -252,10 +284,14 @@ const upcomingCount = computed(() => form.occurrences.filter((o) => !ended(o) &&
 function chipClass(selected: boolean) {
   return selected ? "border-primary bg-primary text-white" : "border-gray-200 bg-white text-gray-700 hover:border-primary";
 }
+
+// The Translations panel counts the fields the content list counts for its completion dots.
+const translationRows = computed(() => translationStatus(languages.value, 3, (code) => filledFields(form.translations[code], ["title", "summary", "description"] as const)));
 </script>
 
 <template>
   <EditorShell
+    tabbed
     :editor="editor"
     back-label="Events"
     :back-to="{ name: 'events', params: { projectId } }"
@@ -264,6 +300,8 @@ function chipClass(selected: boolean) {
     activation-hint="Activate it once the default-language title is set."
     :reference-link="toReference"
     :pending="languagesLoading"
+    :translations="translationRows"
+    :preview="preview"
   >
     <TranslationsPanel
       v-model:active-language="editor.activeLanguage"
