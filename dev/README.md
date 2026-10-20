@@ -36,15 +36,12 @@ Tokens from this Keycloak are rejected by the live Catalogue, so the backend use
 ```text
 IDP_ISSUER_URI=http://localhost:8180/realms/uniche
 CATALOGUE_BASE_URL=http://localhost:8181
-ASSETS_S3_ENDPOINT=http://localhost:9090
-ASSETS_S3_REGION=us-east-1
-ASSETS_S3_BUCKET=iguide-assets
-ASSETS_S3_ACCESS_KEY=local
-ASSETS_S3_SECRET_KEY=local-secret
+TOOL_SLUG=iguide
 ```
 
-The backend refuses to start without the five `ASSETS_S3_*` settings and checks at startup that the bucket
-exists. The mock accepts any access key.
+`TOOL_SLUG` must equal the mock's `TOOL_SLUG` in `docker-compose.yml`; both default to `iguide`. The backend
+does not read asset storage settings yet (it declares them with its assets milestone), so the S3 mock is
+unused until then.
 
 ## Back to the live platform
 

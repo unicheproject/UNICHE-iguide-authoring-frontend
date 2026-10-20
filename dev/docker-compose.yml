@@ -31,7 +31,7 @@ services:
     command: ["node", "/mock/server.mjs"]
     environment:
       # Must match the backend's uniche.tool.slug (TOOL_SLUG), which it sends when creating a Project.
-      TOOL_SLUG: museotekbox
+      TOOL_SLUG: iguide
     volumes:
       - ./catalogue-mock:/mock:ro
     ports:

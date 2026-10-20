@@ -112,7 +112,35 @@ export async function initSession(): Promise<void> {
 }
 
 export function login(): Promise<void> {
-  return requireKeycloak().login({ redirectUri: window.location.href });
+  return requireKeycloak().login({ redirectUri: returnUrl() });
+}
+
+/** Parameters of a sign-in response that keycloak-js appends to the URL fragment. */
+const CALLBACK_PARAMS = [
+  "code",
+  "state",
+  "session_state",
+  "iss",
+  "error",
+  "error_description",
+  "error_uri",
+  "kc_action",
+  "kc_action_status",
+];
+
+/**
+ * The current URL without the parameters of an earlier sign-in response. Keycloak rejects a redirect URI
+ * whose fragment carries `code` ("Invalid parameter: redirect_uri"), so a sign-in started from a URL that
+ * still holds a response would end on Keycloak's error page.
+ */
+function returnUrl(): string {
+  const url = new URL(window.location.href);
+  const fragment = new URLSearchParams(url.hash.slice(1));
+  if (CALLBACK_PARAMS.some((name) => fragment.has(name))) {
+    CALLBACK_PARAMS.forEach((name) => fragment.delete(name));
+    url.hash = fragment.toString();
+  }
+  return url.toString();
 }
 
 export function logout(): Promise<void> {

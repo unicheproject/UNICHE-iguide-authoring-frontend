@@ -2,7 +2,6 @@ import { computed, reactive, readonly } from "vue";
 import { ApiError } from "@/platform/api";
 import { fetchMyAuthorization, type MyAuthorization } from "@/platform/authorization";
 import {
-  fetchOrganisation,
   fetchProject,
   listOrganisationProjects,
   type Organisation,
@@ -93,18 +92,19 @@ function organisationIdsOf(authorization: MyAuthorization): string[] {
 
 async function loadGroup(orgId: string, authorization: MyAuthorization): Promise<OrganisationGroup> {
   const managed = authorization.managedOrganisations.includes(orgId);
-  const [organisation, projects] = await Promise.all([
-    fetchOrganisation(orgId).catch((e) => {
-      // A plain member may not be allowed to read the organisation itself; its Projects still show.
-      if (isDenied(e)) return { id: orgId, name: "Organisation", slug: null, status: null };
-      throw e;
-    }),
-    listOrganisationProjects(orgId).catch((e) => {
-      if (isDenied(e)) return membershipProjects(orgId, authorization);
-      throw e;
-    }),
-  ]);
-  return { organisation, managed, projects: sortByName(projects) };
+  const projects = await listOrganisationProjects(orgId).catch((e) => {
+    if (isDenied(e)) return membershipProjects(orgId, authorization);
+    throw e;
+  });
+  return { organisation: placeholderOrganisation(orgId), managed, projects: sortByName(projects) };
+}
+
+/**
+ * The backend has no organization read yet (backend G-021, M1c), so the name is a placeholder that
+ * still tells several organisations apart.
+ */
+function placeholderOrganisation(orgId: string): Organisation {
+  return { id: orgId, name: `Organisation ${orgId.slice(0, 8)}`, slug: null, status: null };
 }
 
 /** Falls back to reading each membership Project on its own when the organisation list is denied. */

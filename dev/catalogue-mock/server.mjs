@@ -10,7 +10,7 @@ import { readFileSync } from "node:fs";
 import { createServer } from "node:http";
 
 const PORT = Number(process.env.PORT ?? 8080);
-const TOOL_SLUG = process.env.TOOL_SLUG ?? "museotekbox";
+const TOOL_SLUG = process.env.TOOL_SLUG ?? "iguide";
 const fixture = JSON.parse(readFileSync(new URL("./fixture.json", import.meta.url), "utf8"));
 
 const organisations = new Map(fixture.organisations.map((o) => [o.id, o]));

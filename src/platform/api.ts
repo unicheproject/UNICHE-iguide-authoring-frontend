@@ -187,10 +187,23 @@ async function toApiError(response: Response): Promise<ApiError> {
     // Not JSON, e.g. a proxy error page. The status alone still drives the CMS state.
   }
 
-  const code = str(body.code) ?? `HTTP_${response.status}`;
+  // The iGuide backend's envelope names the code `type` and lists `errors[{path, code, message}]`
+  // (backend ErrorEnvelope, until M0a); they are read into the same `code` and "path: message" details.
+  const code = str(body.code) ?? str(body.type) ?? `HTTP_${response.status}`;
   const message = str(body.message) ?? str(body.detail) ?? str(body.title) ?? defaultMessage(response.status);
-  const requestId = str(body.requestId) ?? response.headers.get("X-UNICHE-Request-Id");
-  const details = Array.isArray(body.details) ? body.details.filter((d): d is string => typeof d === "string") : [];
+  const requestId =
+    str(body.requestId) ?? response.headers.get("X-UNICHE-Request-Id") ?? response.headers.get("X-Request-Id");
+  const details = Array.isArray(body.details)
+    ? body.details.filter((d): d is string => typeof d === "string")
+    : Array.isArray(body.errors)
+      ? body.errors.flatMap((e) => {
+          const item = e as { path?: unknown; message?: unknown };
+          const text = str(item.message);
+          if (!text) return [];
+          const path = str(item.path);
+          return [path ? `${path}: ${text}` : text];
+        })
+      : [];
   return new ApiError(response.status, code, message, requestId, details, body);
 }
 
