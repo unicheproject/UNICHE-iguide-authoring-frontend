@@ -24,7 +24,7 @@ No automated test exists, so no screen is proven.
 |---|---|---|---|---|---|
 | C0 | sign-in, picker, creation step 1 with resume, Dashboard shell, error and conflict envelopes, WCAG baseline | `12` §3 Project picker, Dashboard; §4 Create a Project; §5; §6 | Milestone 1 (backend TRACEABILITY.md) | in progress | F3–F6; sign-in code in `src/platform/auth.ts`; G-004, G-006, G-008 |
 | C1 | Template selection, languages and surfaces, theme editor with contrast, first-run checklist | `12` §3 App settings; §4 Create a Project steps 2–3, Add or remove a language, Change surfaces | Milestone 2 | in progress (Languages screen only, unproven) | `LanguagesView.vue` |
-| C2 | asset library, upload with progress and limits, alternative text and decorative flag, translation workspace | `12` §3 Media library, Translation workspace; §5 | Milestone 3 | in progress (media library, unproven) | `MediaView.vue`, `UploadDialog.vue`; G-005 |
+| C2 | asset library, upload with progress and limits, alternative text and decorative flag, translation workspace | `12` §3 Media library, Translation workspace; §5 | Milestone 3 | in progress (media library on the backend's Assets since 2026-10-16, `pnpm run build` green; no tests) | `MediaView.vue`, `UploadDialog.vue`, `assets.ts` `syncMedia`; G-005 |
 | C3 | content libraries, ordering, where-used and archive, place hierarchy, route editor, map and floor plan editors, triggers and QR | `12` §3 Content library, Resource editors, Maps & Floor Plans; §4 Archive or deactivate, Generate a QR code | Milestones 4 and 5 | in progress (editors exist, unproven, no Working Copy) | `views/workspace/*`; G-005, G-007 |
 | C4 | page builder, navigation editor, capability warnings | `12` §3 Page builder, Navigation editor | Milestone 6 | not started | G-009 |
 | C5 | preview iframe and fire-trigger control, working copy apply and discard, readiness, Application activation | `12` §3 Preview, Launch, Visitor app overview; §4 Edit an ACTIVE Resource, Activate or suspend | Milestone 8 | not started | G-007, G-009 |
@@ -48,10 +48,13 @@ denied, S session expired, P stale preview.
 | Content library: Events | in progress | L, E | none |
 | Content library: Categories | in progress | L, E | none |
 | Resource editors (Place, POI, Route, Category, Guide, Event) | in progress (no Working Copy) | L | none |
+| Triggers on POIs ("How visitors reach it") | in progress (QR, beacon, geo-proximity; no QR image; `pnpm run build` green, no tests) | — | none |
+| Preview screen (Visitor app → Preview) | in progress (navigable stand-in, D-015, G-020; `pnpm run build` and a rendered harness check, no tests) | — | none |
+| Preview in app (resource editors) | in progress (CMS-drawn stand-in, D-014, G-020; `pnpm run build` green, no tests) | — | none |
 | Media library and Asset picker | in progress | L, E | none |
 | Translation workspace | not started | — | none |
 | Maps & Floor Plans | in progress | L | none |
-| Visitor app overview | not started | — | none |
+| Visitor app overview | in progress (content counts and languages live, other panels wait for the backend; `pnpm run build` green, no tests) | — | none |
 | Page builder | not started | — | none |
 | Navigation editor | not started | — | none |
 | App settings: Appearance, Surfaces, Features | not started | — | none |

@@ -15,12 +15,12 @@ box against the live Keycloak and Catalogue through the backend. Backend counter
 - Outcome: a fresh clone signs in to the live realm with `iguide-web` and reaches the backend on the dev
   box with the documented configuration.
 - Spec refs: `02` §1, `07` §15, `12` §6 (session expired), specs `CLAUDE.md` inv. 3, 17.
-- Closes: G-003, G-018, G-019 (README pointer only).
+- Closes: G-019 (README pointer only); G-003 and G-018 are closed by the configuration below.
 - Depends on: nothing; the backend runs as in its QUICKSTART.md.
 - Non-goals: the picker data and the generated client (C0b, C0c).
 - Acceptance:
   - `.env.example` points at `http://localhost:8080/iguide/api/v1`; the dev stand-ins use tool slug
-    `iguide`; `dev/README.md` matches the backend's current properties;
+    `iguide`; `dev/README.md` matches the backend's current properties (done);
   - a Playwright test signs in through the live realm with a test user, lands authenticated, and the
     token carries `aud` `uniche-platform` and `azp` `iguide-web`;
   - a reload keeps the session through `check-sso` without a login page;
@@ -60,6 +60,20 @@ box against the live Keycloak and Catalogue through the backend. Backend counter
     show "the UNICHE platform is not reachable" with the `requestId`; `403` shows access denied;
   - "Manage members" links to the Catalogue interface;
   - axe reports no WCAG 2.1 AA violation on the picker, the creation page, and each error state.
+
+### Owner-instructed interim screens (outside the C order)
+
+- 2026-10-16: Visitor app Overview with live content counts and languages; its Pages, Navigation, Theme,
+  Preview, and Launch panels wait for backend M2, M6, M8 (GAPS.md G-009, `OverviewView.vue`).
+- 2026-10-19: "Preview" beside Save in the Place, POI, Route, Guide, and Event editors, a CMS-drawn
+  stand-in from the live form until the runtime can be embedded (DECISIONS.md D-014, GAPS.md G-020).
+- 2026-10-19: Visitor app → Preview as a navigable stand-in app with surfaces, languages, working or
+  live content, fire trigger, and open in new tab (DECISIONS.md D-015, GAPS.md G-020).
+- 2026-10-19: "Translations" panel under Status in the Place, POI, Route, Guide, Event, and Category editors:
+  per language Complete, Partial (n of m fields), or Missing, from the live form, counting the fields the
+  lists count; a row opens that language's tab.
+- 2026-10-19: "How visitors reach it" card in the POI editor (Bluetooth beacon, geo-proximity, QR code;
+  AR scan target greyed as deferred), on backend D-026.
 
 ## Next
 

@@ -164,3 +164,42 @@ the backend's DECISIONS.md.
 - Why: the owner committed the edits on 2026-10-02.
 - Alternatives: none.
 - Affected specs: `02`, `07`, `08`, `10`, `12`, specs `CLAUDE.md`.
+
+## D-014 (2026-10-19) — "Preview" in the resource editors is drawn by the CMS until the runtime exists
+
+- Type: owner decision (2026-10-19) and spec-interpretation
+- Decision: the Place, Point of Interest, Route, Guide, and Event editors have a "Preview" button beside
+  Save (owner's placement). It opens, at the top of the right column, a panel that draws the Resource in a
+  visitor shell on a Mobile, Web, or Kiosk screen, scaled to the panel (`components/editor/ResourcePreview.vue`,
+  `workspace/preview.ts`). It renders the live form, unsaved changes included, in the language of the
+  active tab; a text missing in that language shows the default-language value, as the manifest fills it
+  (`11` §3), outlined and labelled in red. Media follow the runtime's choice: the binding of the previewed
+  language, else the one for every language (`11` §3).
+- Why: `12` §3 asks for the Resource "rendered in the effective theme on the enabled surfaces", which
+  means the web runtime in an iframe fed by `manifest?preview=true` (`12` §3 Preview); neither the runtime
+  nor the backend preview API exists yet. The owner chose a stand-in now over waiting.
+- Consequences: it is an approximation in the default UNICHE theme, shows all three surfaces (no
+  surfaces or theme exist yet), and has no fire-trigger control (GAPS.md G-020). Replaced by the runtime
+  iframe with C5.
+- Alternatives: wait for the runtime; preview the saved version only.
+- Affected specs: `11` §3; `12` §3 Resource editors, Preview.
+
+## D-015 (2026-10-19) — Visitor app → Preview is a navigable stand-in app
+
+- Type: owner decision (2026-10-19) and spec-interpretation
+- Decision: the Preview section (`12` §3 Preview, mockup screen 14) is a CMS-drawn visitor app built on the
+  editors' preview (D-014): surface chips (Web, Mobile, Kiosk), language chips, "Working content" (drafts
+  and active) or "Live content" (active only), a status line counting titles missing in the language, a
+  "Fire trigger" control, and "Open in new tab" (`/projects/{id}/app-preview`, no CMS chrome, the
+  author's own session, nothing shareable). Inside: a shell with a default menu (Home and one item per
+  content kind) standing in for the PRIMARY Navigation, a bottom bar on Mobile, Home (highlights from
+  `featured`, then a row per kind), a list per kind, search over titles, summaries, and exhibit numbers,
+  and detail screens linked to each other (route stops, guide items, event links, sub-places, POIs of a
+  place). A fired QR trigger opens its target with a note; a beacon or geo-proximity trigger only shows a
+  "Nearby" suggestion, as `03` §14 and `13` §7 require. Data comes from the authoring endpoints
+  (`workspace/previewData.ts`), not `manifest?preview=true`.
+- Why: the owner chose the stand-in over waiting for the runtime and the backend manifest.
+- Consequences: no Pages, Navigation, theme, or surfaces are reflected (GAPS.md G-020); the content is
+  loaded once per visit to the screen and reloads with it.
+- Alternatives: the real runtime in an iframe; the backend manifest first.
+- Affected specs: `03` §14; `11` §3, §9; `12` §3 Preview; `13` §7.

@@ -16,8 +16,7 @@ make setup        # pnpm install --frozen-lockfile
 cp .env.example .env.local
 ```
 
-In `.env.local` set the backend API to the iGuide context path (`.env.example` still names MuseotekBox,
-GAPS.md G-003, fixed by PLAN.md C0a):
+`.env.example` holds the live-platform values and the backend's `/iguide` context path:
 
 ```text
 VITE_IDP_URL=https://idp.uniche-eccch.eu
