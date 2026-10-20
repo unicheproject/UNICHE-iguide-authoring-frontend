@@ -45,6 +45,9 @@ import {
 } from "@/workspace/formFields";
 import type { ResourceReference } from "@/platform/references";
 import { referenceLink } from "@/workspace/referenceLinks";
+import { heroBlock, mediaBlocks, previewLanguages, textBlocks, textIn, type PreviewBlock, type PreviewModel } from "@/workspace/preview";
+import { ROUTE_TEXT_FIELDS } from "@/platform/routes";
+import { filledFields, translationStatus } from "@/workspace/translationStatus";
 import { useProjectLanguages } from "@/workspace/useProjectLanguages";
 import { useResourceEditor } from "@/workspace/useResourceEditor";
 
@@ -225,6 +228,36 @@ function stopTitle(stop: StopForm): string {
   return poi ? poiTitle(poi, defaultLanguage.value) : "Unavailable point of interest";
 }
 
+// The Route as visitors would open it, from the live form (`12` §3, DECISIONS.md D-014).
+const preview = computed<PreviewModel | null>(() => {
+  if (!editor.resource) return null;
+  const { language, fallbackName, codes } = previewLanguages(languages.value, editor.activeLanguage, defaultLanguage.value);
+  const facts = [
+    { label: "", value: routeTypeLabel(form.type) },
+    ...(form.estimatedDurationMinutes.trim() ? [{ label: "Duration", value: `${form.estimatedDurationMinutes.trim()} min` }] : []),
+    ...(form.distanceMeters.trim() ? [{ label: "Distance", value: `${(Number(form.distanceMeters) / 1000).toFixed(1)} km` }] : []),
+    ...(form.difficulty ? [{ label: "Difficulty", value: routeDifficultyLabel(form.difficulty) }] : []),
+    ...(form.mode ? [{ label: "", value: routeModeLabel(form.mode) }] : []),
+    ...(form.loop ? [{ label: "", value: "Loop" }] : []),
+  ];
+  const stopText = (stop: StopForm) => {
+    const own = editor.activeLanguage ? stop.translations[editor.activeLanguage]?.description?.trim() : "";
+    return own || undefined;
+  };
+  const blocks: PreviewBlock[] = [
+    ...heroBlock(form.media, assets.value, codes),
+    { type: "facts", items: facts },
+    ...textBlocks(form.translations, [
+      { key: "summary", label: "Summary" },
+      { key: "description", label: "Description" },
+      { key: "instructions", label: "Instructions", heading: "Before you start" },
+    ], codes),
+    { type: "list", heading: "Stops", items: form.stops.map((stop) => ({ title: stopTitle(stop), subtitle: stopText(stop) })) },
+    ...mediaBlocks(form.media, assets.value, codes),
+  ];
+  return { kindLabel: "Route", language, fallbackName, title: textIn(form.translations, "title", codes), blocks };
+});
+
 function stopError(index: number): string | undefined {
   const prefix = `stops[${index}]`;
   const messages = Object.entries(editor.errors).filter(([p]) => p.startsWith(prefix)).map(([, m]) => m);
@@ -282,10 +315,14 @@ function addStop(poi: Poi) {
 function chipClass(selected: boolean) {
   return selected ? "border-primary bg-primary text-white" : "border-gray-200 bg-white text-gray-700 hover:border-primary";
 }
+
+// The Translations panel counts the fields the content list counts for its completion dots.
+const translationRows = computed(() => translationStatus(languages.value, ROUTE_TEXT_FIELDS.length, (code) => filledFields(form.translations[code], ROUTE_TEXT_FIELDS)));
 </script>
 
 <template>
   <EditorShell
+    tabbed
     :editor="editor"
     back-label="Routes"
     :back-to="{ name: 'routes', params: { projectId } }"
@@ -294,6 +331,8 @@ function chipClass(selected: boolean) {
     activation-hint="Activate it once it has a default-language title and an active stop."
     :reference-link="toReference"
     :pending="languagesLoading"
+    :translations="translationRows"
+    :preview="preview"
   >
     <TranslationsPanel
       v-model:active-language="editor.activeLanguage"
