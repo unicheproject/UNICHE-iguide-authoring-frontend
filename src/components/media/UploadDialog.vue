@@ -4,6 +4,7 @@
  * file with its progress, queue state, or reason for failing. The result of each upload is announced to
  * screen readers through a polite live region.
  */
+import { askConfirm } from "@/stores/confirm";
 import { computed, onMounted, ref } from "vue";
 import AppDialog from "@/components/AppDialog.vue";
 import { assetTypeLabel, formatBytes, type Asset, type AssetType } from "@/platform/assets";
@@ -65,8 +66,19 @@ const summary = computed(() => {
   return entries.value.length ? `${done} of ${entries.value.length} uploaded${failed ? ` · ${failed} failed` : ""}` : "";
 });
 
-function close() {
-  if (anyRunning.value && !window.confirm("Some files are still uploading. Cancel them and close?")) return;
+async function close() {
+  if (
+    anyRunning.value &&
+    !(await askConfirm({
+      title: "Stop the uploads?",
+      body: "Some files are still uploading. Closing cancels them; files already uploaded stay in the media library.",
+      confirmLabel: "Cancel uploads and close",
+      cancelLabel: "Keep uploading",
+      danger: true,
+    }))
+  ) {
+    return;
+  }
   cancelRemaining();
   emit("close");
 }

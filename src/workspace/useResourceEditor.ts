@@ -1,4 +1,5 @@
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch, type Ref } from "vue";
+import { askConfirm } from "@/stores/confirm";
 import { onBeforeRouteLeave } from "vue-router";
 import { ApiError } from "@/platform/api";
 import type { ProjectLanguage } from "@/platform/languages";
@@ -280,7 +281,18 @@ export function useResourceEditor<T extends EditableResource>(options: ResourceE
 
   // Leave guard --------------------------------------------------------------------------------------
 
-  onBeforeRouteLeave(() => !dirty.value || window.confirm("You have unsaved changes. Leave without saving?"));
+  onBeforeRouteLeave(
+    () =>
+      !dirty.value ||
+      askConfirm({
+        title: "Leave without saving?",
+        body: `You have unsaved changes to this ${options.kind}. If you leave now, they are lost.`,
+        confirmLabel: "Leave without saving",
+        cancelLabel: "Keep editing",
+        danger: true,
+      }),
+  );
+  // Closing or reloading the tab can only use the browser's own prompt; browsers allow no custom dialog there.
   function onBeforeUnload(event: BeforeUnloadEvent) {
     if (dirty.value) event.preventDefault();
   }

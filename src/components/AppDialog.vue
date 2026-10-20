@@ -1,3 +1,7 @@
+<script lang="ts">
+const openDialogs: symbol[] = [];
+</script>
+
 <script setup lang="ts">
 /**
  * Modal dialog of the CMS mockup. Focus moves into it on open and back to the opener on close; Escape and
@@ -12,6 +16,8 @@ const props = withDefaults(defineProps<{ title: string; width?: string; busy?: b
 const emit = defineEmits<{ close: [] }>();
 
 const panel = ref<HTMLElement | null>(null);
+// Open dialogs, newest last: a confirmation can open over another dialog, and only the top one answers Escape.
+const token = Symbol("dialog");
 const titleId = `dialog-${Math.random().toString(36).slice(2, 9)}`;
 let opener: HTMLElement | null = null;
 
@@ -20,11 +26,12 @@ function close() {
 }
 
 function onKeydown(event: KeyboardEvent) {
-  if (event.key === "Escape") close();
+  if (event.key === "Escape" && openDialogs[openDialogs.length - 1] === token) close();
 }
 
 onMounted(async () => {
   opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  openDialogs.push(token);
   document.addEventListener("keydown", onKeydown);
   await nextTick();
   const first = panel.value?.querySelector<HTMLElement>("input, select, textarea, button:not([disabled])");
@@ -32,6 +39,7 @@ onMounted(async () => {
 });
 
 onBeforeUnmount(() => {
+  openDialogs.splice(openDialogs.indexOf(token), 1);
   document.removeEventListener("keydown", onKeydown);
   opener?.focus();
 });
