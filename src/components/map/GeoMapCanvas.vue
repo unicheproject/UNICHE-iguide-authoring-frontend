@@ -247,15 +247,25 @@ watch(
     if (map && props.bounds) map.fitBounds(L.latLngBounds(props.bounds), { padding: [36, 36] });
   },
 );
+/**
+ * Starting to edit the bounds keeps the author's zoom; the map only jumps to the area when none of it is
+ * on screen, so there is something to drag.
+ */
 watch(
   () => props.editBounds,
   (editing) => {
-    if (editing && map && props.bounds) map.fitBounds(L.latLngBounds(props.bounds), { padding: [40, 40], animate: false });
+    if (!editing || !map || !props.bounds) return;
+    const area = L.latLngBounds(props.bounds);
+    if (!map.getBounds().intersects(area)) map.fitBounds(area, { padding: [40, 40], animate: false });
   },
 );
-/** Follows view changes made outside the map, such as typed coordinates. */
+/**
+ * Follows view changes made outside the map, such as typed coordinates. The source is a string so the
+ * watcher fires only when the numbers change: a parent passing an inline `view` object hands over a new
+ * object on every render, and comparing arrays by identity reset the author's zoom each time.
+ */
 watch(
-  () => [props.view.lat, props.view.lng, props.view.zoom],
+  () => `${props.view.lat},${props.view.lng},${props.view.zoom}`,
   () => {
     if (!map) return;
     const c = map.getCenter();

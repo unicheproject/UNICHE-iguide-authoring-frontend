@@ -346,11 +346,19 @@ function onBoundsChange(b: Bounds) {
 
 function toggleBounds() {
   if (editingBounds.value && bounds.value) {
-    // Done: frame the initial view on the new bounds, as the mockup's fitToBounds does.
+    // Done: the initial view changes only as far as the new bounds require. Its centre must lie inside
+    // them (the backend rejects it otherwise), and visitors cannot zoom out past the bounds anyway.
+    // Re-framing every time zoomed the editor out after each adjustment.
     const [[s, w], [n, e]] = bounds.value;
-    form.lat = ((s + n) / 2).toFixed(6);
-    form.lng = ((w + e) / 2).toFixed(6);
-    form.zoom = String(canvas.value?.zoomFor(bounds.value) ?? form.zoom);
+    const lat = Number(form.lat);
+    const lng = Number(form.lng);
+    if (Number.isNaN(lat) || Number.isNaN(lng) || lat < s || lat > n || lng < w || lng > e) {
+      form.lat = ((s + n) / 2).toFixed(6);
+      form.lng = ((w + e) / 2).toFixed(6);
+    }
+    const fit = canvas.value?.zoomFor(bounds.value);
+    const zoom = Number(form.zoom);
+    if (fit !== undefined && (Number.isNaN(zoom) || zoom < fit - 0.5)) form.zoom = String(fit);
   }
   editingBounds.value = !editingBounds.value;
 }

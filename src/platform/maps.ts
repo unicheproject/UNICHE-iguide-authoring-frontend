@@ -1,6 +1,7 @@
 import { apiRequest } from "./api";
 import type { ResourceStatus } from "./places";
 import type { ResourceReference } from "./references";
+import { listCategories } from "./categories";
 
 /** What can be placed on a map or floor plan. */
 export type PlaceableType = "POI" | "PLACE";
@@ -66,13 +67,121 @@ export type UpdateMapInput = Omit<GeoMap, "id" | "projectId" | "status" | "area"
 
 const base = (projectId: string) => `/projects/${encodeURIComponent(projectId)}/maps`;
 
-export const listMaps = (projectId: string, signal?: AbortSignal) => apiRequest<GeoMap[]>(base(projectId), { signal });
-export const fetchMap = (projectId: string, mapId: string) => apiRequest<GeoMap>(`${base(projectId)}/${encodeURIComponent(mapId)}`);
-export const createMap = (projectId: string, input: CreateMapInput) => apiRequest<GeoMap>(base(projectId), { method: "POST", body: input });
-export const updateMap = (projectId: string, mapId: string, input: UpdateMapInput) =>
-  apiRequest<GeoMap>(`${base(projectId)}/${encodeURIComponent(mapId)}`, { method: "PUT", body: input });
-export const changeMapStatus = (projectId: string, mapId: string, targetStatus: ResourceStatus, version: number) =>
-  apiRequest<GeoMap>(`${base(projectId)}/${encodeURIComponent(mapId)}/status`, { method: "POST", body: { targetStatus, version } });
+/*
+ * Stopgap until the generated client (PLAN.md C0b, C3). The iGuide backend (D-018) differs from the
+ * shape this CMS was built on: lists are paged; `visibility` and `visitorFilterEnabled` replace
+ * `showPois`, `showRoutes`, `hiddenCategoryIds`, `visitorFilter`; placements are a child collection
+ * (`.../maps/{id}/resources`) rather than part of the map body. The functions below keep `GeoMap`.
+ */
+
+interface TypeVisibility {
+  visible: boolean;
+  hiddenCategoryIds: string[];
+}
+
+type MapResponse = Omit<GeoMap, "showPois" | "showRoutes" | "hiddenCategoryIds" | "visitorFilter" | "sortOrder" | "placements"> & {
+  visibility: { POI: TypeVisibility; ROUTE: TypeVisibility };
+  visitorFilterEnabled: boolean;
+};
+
+interface PlacementResponse extends MapPlacement {
+  id: string;
+}
+
+interface Page<T> {
+  content: T[];
+  totalPages: number;
+}
+
+async function allPages<T>(path: string, signal?: AbortSignal): Promise<T[]> {
+  const items: T[] = [];
+  for (let page = 0; ; page++) {
+    const separator = path.includes("?") ? "&" : "?";
+    const result = await apiRequest<Page<T>>(`${path}${separator}size=200&page=${page}`, { signal });
+    items.push(...result.content);
+    if (page + 1 >= result.totalPages) return items;
+  }
+}
+
+const placementsPath = (projectId: string, mapId: string) => `${base(projectId)}/${encodeURIComponent(mapId)}/resources`;
+
+async function toGeoMap(projectId: string, map: MapResponse, signal?: AbortSignal): Promise<GeoMap> {
+  const placements = await apiRequest<PlacementResponse[]>(placementsPath(projectId, map.id), { signal });
+  const { visibility, visitorFilterEnabled, ...rest } = map;
+  return {
+    ...rest,
+    showPois: visibility.POI.visible,
+    showRoutes: visibility.ROUTE.visible,
+    hiddenCategoryIds: [...visibility.POI.hiddenCategoryIds, ...visibility.ROUTE.hiddenCategoryIds],
+    visitorFilter: visitorFilterEnabled,
+    sortOrder: 0,
+    placements: placements.map(({ resourceType, resourceId, latitude, longitude }) => ({ resourceType, resourceId, latitude, longitude })),
+  };
+}
+
+export async function listMaps(projectId: string, signal?: AbortSignal): Promise<GeoMap[]> {
+  const maps = await allPages<MapResponse>(base(projectId), signal);
+  return Promise.all(maps.map((map) => toGeoMap(projectId, map, signal)));
+}
+
+export async function fetchMap(projectId: string, mapId: string): Promise<GeoMap> {
+  return toGeoMap(projectId, await apiRequest<MapResponse>(`${base(projectId)}/${encodeURIComponent(mapId)}`));
+}
+
+export async function createMap(projectId: string, input: CreateMapInput): Promise<GeoMap> {
+  return toGeoMap(projectId, await apiRequest<MapResponse>(base(projectId), { method: "POST", body: input }));
+}
+
+/**
+ * Saves the map, then brings its placements in line with `input.placements`: removed ones are deleted,
+ * moved ones updated, new ones added.
+ */
+export async function updateMap(projectId: string, mapId: string, input: UpdateMapInput): Promise<GeoMap> {
+  const { showPois, showRoutes, hiddenCategoryIds, visitorFilter, placements, ...rest } = input;
+  // The backend keeps hidden Categories per type (backend D-024); each goes under its Category's scope.
+  const scopes = hiddenCategoryIds.length
+    ? new Map((await listCategories(projectId)).map((c) => [c.id, c.scope]))
+    : new Map<string, string>();
+  await apiRequest<MapResponse>(`${base(projectId)}/${encodeURIComponent(mapId)}`, {
+    method: "PUT",
+    body: {
+      ...rest,
+      visibility: {
+        POI: { visible: showPois, hiddenCategoryIds: hiddenCategoryIds.filter((id) => scopes.get(id) !== "ROUTE") },
+        ROUTE: { visible: showRoutes, hiddenCategoryIds: hiddenCategoryIds.filter((id) => scopes.get(id) === "ROUTE") },
+      },
+      visitorFilterEnabled: visitorFilter,
+    },
+  });
+  const path = placementsPath(projectId, mapId);
+  const current = await apiRequest<PlacementResponse[]>(path);
+  const key = (p: { resourceType: string; resourceId: string }) => `${p.resourceType}:${p.resourceId}`;
+  const wanted = new Map(placements.map((p) => [key(p), p]));
+  const existing = new Map(current.map((p) => [key(p), p]));
+  for (const p of current.filter((p) => !wanted.has(key(p)))) {
+    await apiRequest(`${path}/${encodeURIComponent(p.id)}`, { method: "DELETE" });
+  }
+  for (const p of placements) {
+    const before = existing.get(key(p));
+    if (!before) {
+      await apiRequest(path, { method: "POST", body: p });
+    } else if (before.latitude !== p.latitude || before.longitude !== p.longitude) {
+      await apiRequest(`${path}/${encodeURIComponent(before.id)}`, {
+        method: "PUT",
+        body: { latitude: p.latitude, longitude: p.longitude },
+      });
+    }
+  }
+  return fetchMap(projectId, mapId);
+}
+
+export async function changeMapStatus(projectId: string, mapId: string, targetStatus: ResourceStatus, version: number): Promise<GeoMap> {
+  return toGeoMap(
+    projectId,
+    await apiRequest<MapResponse>(`${base(projectId)}/${encodeURIComponent(mapId)}/status`, { method: "POST", body: { targetStatus, version } }),
+  );
+}
+
 export const fetchMapReferences = (projectId: string, mapId: string) =>
   apiRequest<ResourceReference[]>(`${base(projectId)}/${encodeURIComponent(mapId)}/references`);
 

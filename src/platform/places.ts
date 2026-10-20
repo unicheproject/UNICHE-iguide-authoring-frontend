@@ -82,32 +82,65 @@ export interface UpdatePlaceInput {
 
 const base = (projectId: string) => `/projects/${encodeURIComponent(projectId)}/places`;
 
-export function listPlaces(projectId: string, signal?: AbortSignal): Promise<Place[]> {
-  return apiRequest<Place[]>(base(projectId), { signal });
+/*
+ * Stopgap until the generated client (PLAN.md C0b, C3): the backend calls `setting` `environment`
+ * (backend D-018) and pages its lists, so responses and request bodies are translated here.
+ */
+
+/** A Place as the backend returns it. */
+type PlaceResponse = Omit<Place, "setting"> & { environment: PlaceSetting };
+
+interface Page<T> {
+  content: T[];
+  page: number;
+  totalPages: number;
 }
 
-export function fetchPlace(projectId: string, placeId: string, signal?: AbortSignal): Promise<Place> {
-  return apiRequest<Place>(`${base(projectId)}/${encodeURIComponent(placeId)}`, { signal });
+const toPlace = ({ environment, ...rest }: PlaceResponse): Place => ({ ...rest, setting: environment });
+
+function toBody<T extends { setting: PlaceSetting }>({ setting, ...rest }: T) {
+  return { ...rest, environment: setting };
 }
 
-export function createPlace(projectId: string, input: CreatePlaceInput): Promise<Place> {
-  return apiRequest<Place>(base(projectId), { method: "POST", body: input });
+/** Every Place of the Project, in order: the backend serves at most 200 per page. */
+export async function listPlaces(projectId: string, signal?: AbortSignal): Promise<Place[]> {
+  const places: Place[] = [];
+  for (let page = 0; ; page++) {
+    const result = await apiRequest<Page<PlaceResponse>>(`${base(projectId)}?size=200&page=${page}`, { signal });
+    places.push(...result.content.map(toPlace));
+    if (page + 1 >= result.totalPages) return places;
+  }
 }
 
-export function updatePlace(projectId: string, placeId: string, input: UpdatePlaceInput): Promise<Place> {
-  return apiRequest<Place>(`${base(projectId)}/${encodeURIComponent(placeId)}`, { method: "PUT", body: input });
+export async function fetchPlace(projectId: string, placeId: string, signal?: AbortSignal): Promise<Place> {
+  return toPlace(await apiRequest<PlaceResponse>(`${base(projectId)}/${encodeURIComponent(placeId)}`, { signal }));
 }
 
-export function changePlaceStatus(
+export async function createPlace(projectId: string, input: CreatePlaceInput): Promise<Place> {
+  return toPlace(await apiRequest<PlaceResponse>(base(projectId), { method: "POST", body: toBody(input) }));
+}
+
+export async function updatePlace(projectId: string, placeId: string, input: UpdatePlaceInput): Promise<Place> {
+  return toPlace(
+    await apiRequest<PlaceResponse>(`${base(projectId)}/${encodeURIComponent(placeId)}`, {
+      method: "PUT",
+      body: toBody(input),
+    }),
+  );
+}
+
+export async function changePlaceStatus(
   projectId: string,
   placeId: string,
   targetStatus: ResourceStatus,
   version: number,
 ): Promise<Place> {
-  return apiRequest<Place>(`${base(projectId)}/${encodeURIComponent(placeId)}/status`, {
-    method: "POST",
-    body: { targetStatus, version },
-  });
+  return toPlace(
+    await apiRequest<PlaceResponse>(`${base(projectId)}/${encodeURIComponent(placeId)}/status`, {
+      method: "POST",
+      body: { targetStatus, version },
+    }),
+  );
 }
 
 /** Title in the given language, then the default, then the slug. */
@@ -136,11 +169,52 @@ export interface SpatialLink {
   floorPlanId: string | null;
 }
 
-export function fetchSpatialLink(projectId: string, placeId: string): Promise<SpatialLink> {
-  return apiRequest<SpatialLink>(`${base(projectId)}/${encodeURIComponent(placeId)}/spatial-link`);
+/*
+ * The backend has no `spatial-link` endpoint: the link is `placeId` on the map or floor plan
+ * (backend D-018). These two functions keep the editor's shape on top of that.
+ */
+
+type Linkable = Record<string, unknown> & { id: string; placeId: string | null; version: number };
+
+const projectPath = (projectId: string) => `/projects/${encodeURIComponent(projectId)}`;
+
+async function linkedTo(projectId: string, kind: "maps" | "floor-plans", placeId: string): Promise<Linkable[]> {
+  const query = kind === "floor-plans" ? `&placeId=${encodeURIComponent(placeId)}` : "";
+  const page = await apiRequest<Page<Linkable>>(`${projectPath(projectId)}/${kind}?size=200${query}`);
+  return page.content.filter((item) => item.placeId === placeId);
 }
 
-/** Links the map or floor plan at once, moving the link from wherever it was; both null unlinks. */
-export function setSpatialLink(projectId: string, placeId: string, link: SpatialLink): Promise<SpatialLink> {
-  return apiRequest<SpatialLink>(`${base(projectId)}/${encodeURIComponent(placeId)}/spatial-link`, { method: "PUT", body: link });
+export async function fetchSpatialLink(projectId: string, placeId: string): Promise<SpatialLink> {
+  const [maps, plans] = await Promise.all([
+    linkedTo(projectId, "maps", placeId),
+    linkedTo(projectId, "floor-plans", placeId),
+  ]);
+  return { mapId: maps[0]?.id ?? null, floorPlanId: plans[0]?.id ?? null };
+}
+
+/** Re-saves a map or floor plan with another `placeId`; only DRAFT ones can be saved. */
+async function relink(projectId: string, kind: "maps" | "floor-plans", item: Linkable, placeId: string | null) {
+  await apiRequest(`${projectPath(projectId)}/${kind}/${encodeURIComponent(item.id)}`, {
+    method: "PUT",
+    body: { ...item, placeId },
+  });
+}
+
+/** Links the map or floor plan, unlinking whatever the Place showed before; both null unlinks. */
+export async function setSpatialLink(projectId: string, placeId: string, link: SpatialLink): Promise<SpatialLink> {
+  const [maps, plans] = await Promise.all([
+    linkedTo(projectId, "maps", placeId),
+    linkedTo(projectId, "floor-plans", placeId),
+  ]);
+  for (const map of maps.filter((m) => m.id !== link.mapId)) await relink(projectId, "maps", map, null);
+  for (const plan of plans.filter((p) => p.id !== link.floorPlanId)) await relink(projectId, "floor-plans", plan, null);
+  if (link.mapId && !maps.some((m) => m.id === link.mapId)) {
+    const map = await apiRequest<Linkable>(`${projectPath(projectId)}/maps/${encodeURIComponent(link.mapId)}`);
+    await relink(projectId, "maps", map, placeId);
+  }
+  if (link.floorPlanId && !plans.some((p) => p.id === link.floorPlanId)) {
+    const plan = await apiRequest<Linkable>(`${projectPath(projectId)}/floor-plans/${encodeURIComponent(link.floorPlanId)}`);
+    await relink(projectId, "floor-plans", plan, placeId);
+  }
+  return fetchSpatialLink(projectId, placeId);
 }
