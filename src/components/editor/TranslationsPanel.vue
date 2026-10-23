@@ -109,6 +109,8 @@ function error(field: string): string | undefined {
               :dir="active.direction.toLowerCase()"
               class="field-input min-h-[92px] resize-y"
               :class="{ invalid: error(field) }"
+              :data-path="`translations.${active.languageCode}.${field}`"
+              :aria-invalid="error(field) ? 'true' : undefined"
             ></textarea>
             <input
               v-else
@@ -120,6 +122,8 @@ function error(field: string): string | undefined {
               :dir="active.direction.toLowerCase()"
               class="field-input"
               :class="{ invalid: error(field) }"
+              :data-path="`translations.${active.languageCode}.${field}`"
+              :aria-invalid="error(field) ? 'true' : undefined"
             />
             <span v-if="field === (requiredField ?? 'title') && active.isDefault" class="text-xs text-muted-foreground">{{ titleRequiredHint }}</span>
             <span v-else-if="meta[field].helper" class="text-xs text-muted-foreground">{{ meta[field].helper }}</span>

@@ -1,6 +1,6 @@
-import { computed, onBeforeUnmount, onMounted, reactive, ref, watch, type Ref } from "vue";
+import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch, type Ref } from "vue";
 import { askConfirm } from "@/stores/confirm";
-import { onBeforeRouteLeave } from "vue-router";
+import { onBeforeRouteLeave, useRoute } from "vue-router";
 import { ApiError } from "@/platform/api";
 import {
   applyWorkingCopy,
@@ -11,6 +11,7 @@ import {
   type WorkingCopyResponse,
 } from "@/platform/workingCopies";
 import type { ProjectLanguage } from "@/platform/languages";
+import { fetchReadiness, type ReadinessIssue } from "@/platform/readiness";
 import type { ResourceStatus } from "@/platform/places";
 import type { ResourceReference } from "@/platform/references";
 import { showToast } from "@/stores/toast";
@@ -57,6 +58,9 @@ export interface ConflictField {
 /** Fields that describe the row rather than its content; never offered as a conflict choice. */
 const ROW_FIELDS = new Set(["id", "projectId", "status", "version", "createdAt", "updatedAt", "archivedAt",
   "hasWorkingCopy", "workingCopyUpdatedAt", "sortOrder", "blockIds"]);
+
+/** A readiness item of the open Resource, marked blocking or warning (DECISIONS.md D-022). */
+export type ReadinessItem = ReadinessIssue & { blocking: boolean };
 
 export interface ErrorSummary {
   title: string;
@@ -240,7 +244,64 @@ export function useResourceEditor<T extends EditableResource>(options: ResourceE
     if (withErrors.size && activeLanguage.value && !withErrors.has(activeLanguage.value)) {
       activeLanguage.value = [...withErrors][0];
     }
+    const first = Object.keys(found).find((path) => path);
+    void focusField(first ?? "");
   }
+
+  /**
+   * Moves focus to the field of a path, such as `slug`, `translations.en.summary`, or `title` with a language,
+   * opening that language's tab first; falls back to the error summary (spec 12 section 5, DECISIONS.md D-022).
+   */
+  async function focusField(path: string, language?: string | null) {
+    const match = /^translations\.([^.]+)\.(.+)$/.exec(path);
+    const lang = match ? match[1] : language ?? null;
+    if (lang && options.languages.value.some((l) => l.languageCode === lang)) activeLanguage.value = lang;
+    await nextTick();
+    const field = match ? match[2] : path;
+    const plain = field.replace(/\[\d+\]/g, "").split(".");
+    const selectors = path
+      ? [`[data-path="${CSS.escape(path)}"]`, `#f-${CSS.escape(plain[0])}`, `#f-${CSS.escape(plain[plain.length - 1])}`]
+      : [];
+    for (const selector of selectors) {
+      const element = document.querySelector<HTMLElement>(selector);
+      if (element && element.getClientRects().length) {
+        element.scrollIntoView({ block: "center" });
+        element.focus();
+        return;
+      }
+    }
+    document.querySelector<HTMLElement>("[data-error-summary]")?.focus();
+  }
+
+  // Readiness ----------------------------------------------------------------------------------------
+
+  const route = useRoute();
+  const readiness = ref<ReadinessItem[]>([]);
+
+  /** What readiness reports for this Resource; only ACTIVE Resources are evaluated (spec 07 section 14). */
+  async function loadReadiness() {
+    const current = resource.value;
+    const projectId = typeof route.params.projectId === "string" ? route.params.projectId : "";
+    if (!current || current.status !== "ACTIVE" || !projectId) {
+      readiness.value = [];
+      return;
+    }
+    try {
+      const result = await fetchReadiness(projectId);
+      readiness.value = [
+        ...result.blocking.map((issue) => ({ ...issue, blocking: true })),
+        ...result.warnings.map((issue) => ({ ...issue, blocking: false })),
+        // The pending-changes banner already says so.
+      ].filter((issue) => issue.resourceId === current.id && issue.code !== "PENDING_WORKING_COPY");
+    } catch (e) {
+      if (!(e instanceof ApiError)) throw e;
+      readiness.value = [];
+    }
+  }
+  watch(
+    () => [resource.value?.id, resource.value?.status, resource.value?.version, resource.value?.workingCopyUpdatedAt],
+    () => void loadReadiness(),
+  );
 
   // Save ---------------------------------------------------------------------------------------------
 
@@ -569,6 +630,9 @@ export function useResourceEditor<T extends EditableResource>(options: ResourceE
     languagesWithErrors,
     fieldError,
     describePath: options.describePath,
+    focusField,
+    readiness,
+    loadReadiness,
     showErrors,
     saving,
     conflict,

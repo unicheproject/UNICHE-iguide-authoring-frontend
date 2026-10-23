@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import ResourcePreview from "@/components/editor/ResourcePreview.vue";
 import { formatDate } from "@/lib/format";
 import { session } from "@/platform/auth";
+import { describeIssue } from "@/platform/readiness";
 import type { ResourceReference } from "@/platform/references";
 import type { PreviewModel } from "@/workspace/preview";
 import type { LanguageStatus } from "@/workspace/translationStatus";
@@ -78,6 +79,11 @@ const confirmCopy = computed(() =>
         action: "Deactivate",
       },
 );
+/** The language's display name for a readiness item, from the Translations panel's list when given. */
+function languageName(code: string): string {
+  return props.translations?.find((s) => s.language.languageCode === code)?.language.displayName ?? code;
+}
+
 const discardNote = computed(() => (editor.value.workingCopy ? " Its pending changes are discarded." : ""));
 
 /** The last editor of the copy; a name needs the Audit Events of backend Milestone 7 (backend G-034). */
@@ -220,7 +226,7 @@ const noLink = () => null;
         </button>
       </div>
 
-      <div v-if="editor.summary" role="alert" class="mb-5 max-w-[760px] rounded-lg border border-l-[3px] border-l-destructive bg-card px-[18px] py-4">
+      <div v-if="editor.summary" role="alert" data-error-summary tabindex="-1" class="mb-5 max-w-[760px] rounded-lg border border-l-[3px] border-l-destructive bg-card px-[18px] py-4">
         <strong class="mb-2 block text-[13px] font-bold text-destructive">{{ editor.summary.title }}</strong>
         <ul class="flex flex-col gap-1.5">
           <li v-for="item in editor.summary.items" :key="item" class="text-[13px] text-destructive">• {{ item }}</li>
@@ -270,6 +276,30 @@ const noLink = () => null;
                 >
                   Archive
                 </button>
+              </div>
+              <div v-if="editor.resource.status === 'ACTIVE'" class="border-t border-gray-100 pt-3">
+                <h3 class="mb-1.5 text-[11px] font-extrabold uppercase tracking-[0.08em] text-muted-foreground">What needs attention</h3>
+                <p v-if="!editor.readiness.length" class="text-xs text-muted-foreground">Nothing: visitors see a complete {{ kind }}.</p>
+                <ul v-else class="flex flex-col gap-1.5">
+                  <li v-for="(issue, i) in editor.readiness" :key="`${issue.code}-${issue.path}-${issue.languageCode}-${i}`">
+                    <button
+                      type="button"
+                      class="flex w-full items-start gap-2 rounded text-left text-xs hover:bg-accent/40"
+                      @click="editor.focusField(issue.path, issue.languageCode)"
+                    >
+                      <span
+                        class="mt-px whitespace-nowrap rounded-full px-1.5 py-px text-[9px] font-extrabold uppercase tracking-[0.06em]"
+                        :class="issue.blocking ? 'bg-[rgba(192,24,94,0.1)] text-destructive' : 'bg-[rgba(154,98,0,0.1)] text-[#9a6200]'"
+                      >
+                        {{ issue.blocking ? "Blocks" : "Warning" }}
+                      </span>
+                      <span>
+                        {{ describeIssue(issue) }}
+                        <span v-if="issue.languageCode" class="text-muted-foreground">({{ languageName(issue.languageCode) }})</span>
+                      </span>
+                    </button>
+                  </li>
+                </ul>
               </div>
               <dl class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 border-t border-gray-100 pt-3 text-xs">
                 <dt class="text-muted-foreground">Created</dt>
