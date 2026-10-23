@@ -78,7 +78,7 @@ const firable = computed(() => (data.value?.triggers ?? []).filter((t) => t.stat
 function triggerLabel(t: Trigger): string {
   const c = t.configuration;
   const detail = t.triggerType === "QR_CODE" ? String(t.code) : t.triggerType === "BEACON" ? `${c.uuid} / ${c.major} / ${c.minor}` : `${c.radiusMeters} m`;
-  const target = data.value ? titleOf({ data: data.value, language: language.value, defaultLanguage: defaultLanguage.value }, { type: "POI", id: t.targetResourceId }) : "";
+  const target = data.value ? titleOf({ data: data.value, language: language.value, defaultLanguage: defaultLanguage.value }, { type: t.targetResourceType, id: t.targetResourceId }) : "";
   return `${TRIGGER_LABELS[t.triggerType]} ${detail} → ${target}`;
 }
 const fireId = ref("");

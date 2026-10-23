@@ -7,7 +7,7 @@
  */
 import { computed, ref, watch } from "vue";
 import type { Trigger } from "@/platform/triggers";
-import type { PreviewData } from "@/workspace/previewData";
+import { previewHas, type PreviewData } from "@/workspace/previewData";
 import { cardImage, modelFor, summaryOf, titleMissing, titleOf, type PreviewContext } from "@/workspace/previewModels";
 import type { PreviewTarget } from "@/workspace/preview";
 import ResourceContent from "./ResourceContent.vue";
@@ -99,9 +99,10 @@ const screenTitle = computed(() => {
 
 /** A trigger reaching the app, as the runtime's trigger handler would receive it (`12` §3 Preview). */
 function fire(trigger: Trigger) {
-  const target: PreviewTarget = { type: "POI", id: trigger.targetResourceId };
-  if (!props.data.pois.some((p) => p.id === target.id)) {
-    suggestion.value = { target, text: "The trigger's point of interest is not shown in this mode." };
+  // Trigger targets and preview targets name the kinds alike (DECISIONS.md D-018).
+  const target: PreviewTarget = { type: trigger.targetResourceType, id: trigger.targetResourceId };
+  if (!previewHas(props.data, target)) {
+    suggestion.value = { target, text: "What this trigger opens is not shown in this mode." };
     return;
   }
   if (trigger.triggerType === "QR_CODE") {

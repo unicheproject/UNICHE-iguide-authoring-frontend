@@ -60,3 +60,9 @@ export function visibleData(data: PreviewData, mode: PreviewMode): PreviewData {
     triggers: data.triggers.filter((t) => ok(t.status)),
   };
 }
+
+/** Whether the Resource a trigger opens is in the data of the current mode (Live hides drafts). */
+export function previewHas(data: PreviewData, target: { type: "PLACE" | "POI" | "ROUTE" | "GUIDE" | "EVENT"; id: string }): boolean {
+  const lists = { PLACE: data.places, POI: data.pois, ROUTE: data.routes, GUIDE: data.guides, EVENT: data.events };
+  return lists[target.type].some((r) => r.id === target.id);
+}
