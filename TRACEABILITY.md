@@ -40,19 +40,19 @@ denied, S session expired, P stale preview.
 | Project picker | in progress (page, not popover) | L, C, A partly | none |
 | Create a Project (`12` §4) | in progress (step 1 only) | C, field errors | none |
 | Project workspace navigation | in progress | capability "OFF" chips | none |
-| Dashboard | in progress (Catalogue details only) | — | none |
+| Dashboard | in progress (readiness status card since 2026-10-23, D-022; Catalogue details; no tests) | — | none |
 | Content library: Places | in progress (drag-and-drop and keyboard reordering since 2026-10-21, D-017; trigger chips since 2026-10-22, D-018; build green, no tests) | L, E | none |
 | Content library: Points of Interest | in progress (drag-and-drop and keyboard reordering since 2026-10-21, D-017; trigger chips since 2026-10-22; build green, no tests) | L, E | none |
 | Content library: Routes | in progress (drag-and-drop and keyboard reordering since 2026-10-21, D-017; trigger chips since 2026-10-22, D-018; build green, no tests) | L, E | none |
 | Content library: Guides | in progress (drag-and-drop and keyboard reordering since 2026-10-21, D-017; trigger chips since 2026-10-22, D-018; build green, no tests) | L, E | none |
 | Content library: Events | in progress (drag-and-drop and keyboard reordering since 2026-10-21, D-017; trigger chips since 2026-10-22, D-018; build green, no tests) | L, E | none |
 | Content library: Categories | in progress (drag-and-drop and keyboard reordering since 2026-10-21, D-017; build green, no tests) | L, E | none |
-| Resource editors (Place, POI, Route, Category, Guide, Event) | in progress (Working Copy save, apply, discard, apply-conflict choice since 2026-10-21, D-016; `vue-tsc` and build green, no tests) | L | none |
+| Resource editors (Place, POI, Route, Category, Guide, Event) | in progress (Working Copy save, apply, discard, apply-conflict choice since 2026-10-21, D-016; "What needs attention" from readiness and focus on the first invalid field since 2026-10-23, D-022; `vue-tsc` and build green, no tests) | L | none |
 | Triggers ("How visitors reach it") on Places, POIs, Routes, Guides, Events | in progress (QR, beacon, geo-proximity; other kinds than POIs since 2026-10-22, D-018, backend D-028; stand-in QR image and link since 2026-10-22, D-019, G-021; the backend's QR image and runtime URL once the Project has a public address, D-020; `vue-tsc` and build green, no tests) | — | none |
 | Preview screen (Visitor app → Preview) | in progress (navigable stand-in, D-015, G-020; `pnpm run build` and a rendered harness check, no tests) | — | none |
 | Preview in app (resource editors) | in progress (CMS-drawn stand-in, D-014, G-020; `pnpm run build` green, no tests) | — | none |
 | Media library and Asset picker | in progress | L, E | none |
-| Translation workspace | not started | — | none |
+| Translation workspace | in progress (matrix, side-by-side editor with story and stops, next missing, working copies since 2026-10-23, D-021; AI parts wait for the gateway; build green, no tests) | L, E | none |
 | Maps & Floor Plans | in progress (floor plans reorder per Place since 2026-10-21, D-017; build green, no tests) | L | none |
 | Visitor app overview | in progress (content counts and languages live, other panels wait for the backend; `pnpm run build` green, no tests) | — | none |
 | Page builder | not started | — | none |

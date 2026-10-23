@@ -307,3 +307,53 @@ the backend's DECISIONS.md.
 - Alternatives: keep drawing in the CMS with the real URL (rejected: one image source, the backend's, for print).
 - Affected specs: `03` §2, §14; `07` §14; `11` §9; `12` §3 App settings, §4 Change surfaces, Generate a QR code.
 
+## D-021 (2026-10-23) — The Translation workspace
+
+- Type: spec-interpretation and owner decision (2026-10-23: every kind, the Guide story, and Route stops)
+- Decision: Visitor app → Translations (`views/workspace/TranslationsView.vue`, `workspace/translationCatalog.ts`,
+  `platform/translations.ts`) implements the Translation workspace of `12` §3 over the per-language endpoints of
+  backend D-031 and D-032:
+  - a matrix of every non-archived Place, Point of Interest, Route, Guide, Event, Category, and media item by
+    enabled language; each cell shows a dot and its state in words (Complete, "n of m", Missing), counting the
+    fields the lists' dots count, plus a Guide's story; for media: the title, alternative text for a
+    non-decorative image, and the transcript of audio and video; filters by kind, by state in the target
+    language, and by title;
+  - the editor shows the default language read-only beside the target language, field by field; the Guide story
+    in the rich-text editor, saved through its TEXT block; each Route stop's texts as a sub-card; "Save" sends
+    one request per changed part; "Next missing" opens the next listed resource whose target language is not
+    complete; the editor of one resource stands for "across one Resource or a whole kind" by stepping through
+    the kind with "Next missing";
+  - an ACTIVE Resource is translated through its working copy: pending texts are shown, the saves carry the copy's
+    version from `X-Working-Copy-Version`, and a banner says the changes are applied in its editor; a version
+    conflict reloads the resource with a toast; leaving or switching with unsaved text asks first;
+  - "Translate with MuseMind" and the "Unreviewed AI output" filter are shown disabled with the reason: the UNICHE
+    AI gateway is not connected (`09` §16, backend M13).
+- Why: owner priority; the backend endpoints exist (backend D-031, D-032).
+- Consequences: a Guide without a story and a stop added only in pending changes cannot be translated here; the
+  page says so and links to the editor. Archived resources are not listed.
+- Alternatives: saving through each kind's whole update body (rejected: it would rebuild every kind's payload).
+- Affected specs: `12` §3 Translation workspace, §5; `14` §4.
+
+## D-022 (2026-10-23) — Readiness on the Dashboard and the Resource form
+
+- Type: spec-interpretation (owner request 2026-10-23, with backend D-033)
+- Decision: the CMS reads `GET /projects/{id}/readiness` (`platform/readiness.ts`, hand-written types, G-001) and
+  shows the same codes in two places (`12` §5: "the same codes appear in the Dashboard, in activation, and on the
+  Resource form"):
+  - Dashboard: one status card at the top: "Ready for visitors" or "N things block going live", one sentence on
+    the consequence, at most three blocking items with links to the editor that fixes them ("Show all" for the
+    rest), and the warnings in a disclosure; computed on every visit, no recompute button (`12` §3);
+  - Resource form: in the Status panel of an ACTIVE Resource, "What needs attention" lists its own items (blocking
+    or warning, in words, with the language); a click opens that language's tab and focuses the field;
+    `PENDING_WORKING_COPY` is left out there, since the pending-changes banner says it; DRAFT Resources are not
+    evaluated by readiness, so their panel keeps the activation hint;
+  - after any save or activation `422` the editor focuses the first field in error (`data-path` on the translated
+    fields, the `f-<field>` ids elsewhere), falling back to the error summary;
+  - every readiness code of `07` §14 has one plain-language sentence, the not-yet-produced ones included, plus the
+    two Route codes of backend Q-017.
+- Why: `12` §3 Dashboard and §5; the to-do item "Readiness codes".
+- Consequences: a field inside a collapsed group (such as a POI's "Practical details") is not focused until the
+  group is opened; focus then falls back to the error summary.
+- Alternatives: a separate readiness screen (the Launch screen of `12` §3 will hold the full list once it exists).
+- Affected specs: `07` §14; `12` §3 Dashboard, Resource editors, §5; `14` §4.
+

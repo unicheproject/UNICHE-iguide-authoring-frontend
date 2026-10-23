@@ -72,6 +72,10 @@ box against the live Keycloak and Catalogue through the backend. Backend counter
 - 2026-10-19: "Translations" panel under Status in the Place, POI, Route, Guide, Event, and Category editors:
   per language Complete, Partial (n of m fields), or Missing, from the live form, counting the fields the
   lists count; a row opens that language's tab.
+- 2026-10-23: readiness on the Dashboard (status card) and the Resource form ("What needs attention", focus on the
+  first invalid field), on backend D-033 (DECISIONS.md D-022).
+- 2026-10-23: Visitor app → Translations, the Translation workspace: matrix by language, side-by-side editor with
+  the Guide story and Route stops, next missing, ACTIVE through working copies (DECISIONS.md D-021).
 - 2026-10-22: App settings → Surfaces (enable switches, Web public address) and the backend's QR image with its
   runtime URL in the trigger card; the stand-in stays only without an address (DECISIONS.md D-020, backend D-029).
 - 2026-10-22: QR image, link, copy, download, and open in the trigger card, a stand-in opening the CMS preview of
