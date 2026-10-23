@@ -41,6 +41,8 @@ export interface GeoMap {
   createdAt: string;
   updatedAt: string;
   version: number;
+  hasWorkingCopy: boolean;
+  workingCopyUpdatedAt: string | null;
   placements: MapPlacement[];
 }
 
@@ -58,7 +60,7 @@ export interface CreateMapInput {
   osmId: string | null;
 }
 
-export type UpdateMapInput = Omit<GeoMap, "id" | "projectId" | "status" | "area" | "osmId" | "sortOrder" | "archivedAt" | "createdAt" | "updatedAt" | "minLatitude" | "minLongitude" | "maxLatitude" | "maxLongitude"> & {
+export type UpdateMapInput = Omit<GeoMap, "id" | "projectId" | "status" | "area" | "osmId" | "sortOrder" | "archivedAt" | "createdAt" | "updatedAt" | "hasWorkingCopy" | "workingCopyUpdatedAt" | "minLatitude" | "minLongitude" | "maxLatitude" | "maxLongitude"> & {
   minLatitude: number | null;
   minLongitude: number | null;
   maxLatitude: number | null;
@@ -106,7 +108,10 @@ async function allPages<T>(path: string, signal?: AbortSignal): Promise<T[]> {
 const placementsPath = (projectId: string, mapId: string) => `${base(projectId)}/${encodeURIComponent(mapId)}/resources`;
 
 async function toGeoMap(projectId: string, map: MapResponse, signal?: AbortSignal): Promise<GeoMap> {
-  const placements = await apiRequest<PlacementResponse[]>(placementsPath(projectId, map.id), { signal });
+  return withPlacements(map, await apiRequest<PlacementResponse[]>(placementsPath(projectId, map.id), { signal }));
+}
+
+function withPlacements(map: MapResponse, placements: PlacementResponse[]): GeoMap {
   const { visibility, visitorFilterEnabled, ...rest } = map;
   return {
     ...rest,
@@ -137,21 +142,10 @@ export async function createMap(projectId: string, input: CreateMapInput): Promi
  * moved ones updated, new ones added.
  */
 export async function updateMap(projectId: string, mapId: string, input: UpdateMapInput): Promise<GeoMap> {
-  const { showPois, showRoutes, hiddenCategoryIds, visitorFilter, placements, ...rest } = input;
-  // The backend keeps hidden Categories per type (backend D-024); each goes under its Category's scope.
-  const scopes = hiddenCategoryIds.length
-    ? new Map((await listCategories(projectId)).map((c) => [c.id, c.scope]))
-    : new Map<string, string>();
+  const { placements, ...fields } = input;
   await apiRequest<MapResponse>(`${base(projectId)}/${encodeURIComponent(mapId)}`, {
     method: "PUT",
-    body: {
-      ...rest,
-      visibility: {
-        POI: { visible: showPois, hiddenCategoryIds: hiddenCategoryIds.filter((id) => scopes.get(id) !== "ROUTE") },
-        ROUTE: { visible: showRoutes, hiddenCategoryIds: hiddenCategoryIds.filter((id) => scopes.get(id) === "ROUTE") },
-      },
-      visitorFilterEnabled: visitorFilter,
-    },
+    body: await toMapBody(projectId, fields),
   });
   const path = placementsPath(projectId, mapId);
   const current = await apiRequest<PlacementResponse[]>(path);
@@ -174,6 +168,41 @@ export async function updateMap(projectId: string, mapId: string, input: UpdateM
   }
   return fetchMap(projectId, mapId);
 }
+
+/** The map body of the backend from the CMS shape, `version` included when given. */
+async function toMapBody(projectId: string, input: Omit<UpdateMapInput, "placements" | "version"> & { version?: number }) {
+  const { showPois, showRoutes, hiddenCategoryIds, visitorFilter, ...rest } = input;
+  // The backend keeps hidden Categories per type (backend D-024); each goes under its Category's scope.
+  const scopes = hiddenCategoryIds.length
+    ? new Map((await listCategories(projectId)).map((c) => [c.id, c.scope]))
+    : new Map<string, string>();
+  return {
+    ...rest,
+    visibility: {
+      POI: { visible: showPois, hiddenCategoryIds: hiddenCategoryIds.filter((id) => scopes.get(id) !== "ROUTE") },
+      ROUTE: { visible: showRoutes, hiddenCategoryIds: hiddenCategoryIds.filter((id) => scopes.get(id) === "ROUTE") },
+    },
+    visitorFilterEnabled: visitorFilter,
+  };
+}
+
+/**
+ * The working-copy payload of an ACTIVE map (backend D-027): the map body without `version` and its placements
+ * as one list. The backend keeps an existing placement of the same target, so no placement ids are needed.
+ */
+export async function mapWorkingCopyPayload(projectId: string, input: Omit<UpdateMapInput, "version">): Promise<Record<string, unknown>> {
+  const { placements, ...fields } = input;
+  return {
+    ...(await toMapBody(projectId, fields)),
+    placements: placements.map(({ resourceType, resourceId, latitude, longitude }) => ({ resourceType, resourceId, latitude, longitude })),
+  };
+}
+
+/** A map as the backend renders a working copy or an apply: the map with its placements embedded. */
+export const mapFromResponse = (raw: unknown): GeoMap => {
+  const { placements, ...map } = raw as MapResponse & { placements: PlacementResponse[] };
+  return withPlacements(map, placements ?? []);
+};
 
 export async function changeMapStatus(projectId: string, mapId: string, targetStatus: ResourceStatus, version: number): Promise<GeoMap> {
   return toGeoMap(

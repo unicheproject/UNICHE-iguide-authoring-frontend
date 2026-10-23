@@ -113,6 +113,14 @@ function onCreated(m: GeoMap) {
             <div class="mt-[3px] text-[11px] text-gray-400">{{ meta(m) }} · {{ formatDate(m.updatedAt) }}</div>
           </div>
           <span class="rounded-full px-[9px] py-[3px] text-[10px] font-bold uppercase tracking-[0.07em]" :style="statusChipStyle(m.status)">{{ m.status }}</span>
+          <span
+            v-if="m.hasWorkingCopy"
+            class="rounded-full px-[9px] py-[3px] text-[10px] font-bold uppercase tracking-[0.07em]"
+            :style="statusChipStyle('PENDING')"
+            title="Has pending changes that visitors do not see yet"
+          >
+            Pending changes
+          </span>
           <RouterLink :to="{ name: 'map-editor', params: { projectId, mapId: m.id } }" class="text-[10px] font-bold uppercase tracking-[0.06em] text-primary no-underline">Open</RouterLink>
           <button
             type="button"

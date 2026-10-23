@@ -53,6 +53,18 @@ export interface FloorPlan {
   createdAt: string;
   updatedAt: string;
   version: number;
+  hasWorkingCopy: boolean;
+  workingCopyUpdatedAt: string | null;
+  positions: FloorPlanPosition[];
+  connections: FloorPlanConnection[];
+}
+
+/** The editable state of a plan, as the editor sends it. */
+export interface UpdateFloorPlanInput {
+  version: number;
+  internalName: string;
+  assetId: string;
+  placeId: string | null;
   positions: FloorPlanPosition[];
   connections: FloorPlanConnection[];
 }
@@ -80,7 +92,10 @@ interface Page<T> {
 const positionsPath = (projectId: string, planId: string) => `${base(projectId)}/${encodeURIComponent(planId)}/positions`;
 
 async function toFloorPlan(projectId: string, plan: FloorPlanResponse, signal?: AbortSignal): Promise<FloorPlan> {
-  const positions = await apiRequest<PositionResponse[]>(positionsPath(projectId, plan.id), { signal });
+  return withPositions(plan, await apiRequest<PositionResponse[]>(positionsPath(projectId, plan.id), { signal }));
+}
+
+function withPositions(plan: FloorPlanResponse, positions: PositionResponse[]): FloorPlan {
   return {
     ...plan,
     positions: positions.map(({ resourceType, resourceId, x, y, rotation }) => ({ resourceType, resourceId, x, y, rotation })),
@@ -116,14 +131,7 @@ export async function createFloorPlan(
 export async function updateFloorPlan(
   projectId: string,
   planId: string,
-  input: {
-    version: number;
-    internalName: string;
-    assetId: string;
-    placeId: string | null;
-    positions: FloorPlanPosition[];
-    connections: FloorPlanConnection[];
-  },
+  input: UpdateFloorPlanInput,
 ): Promise<FloorPlan> {
   const { positions, connections: _connections, ...rest } = input;
   const plan = await apiRequest<FloorPlanResponse>(`${base(projectId)}/${encodeURIComponent(planId)}`, { method: "PUT", body: rest });
@@ -145,6 +153,24 @@ export async function updateFloorPlan(
   }
   return toFloorPlan(projectId, plan);
 }
+
+/**
+ * The working-copy payload of an ACTIVE plan (backend D-027): the plan body without `version` and its positions
+ * as one list. The backend keeps an existing position of the same target, so no position ids are needed.
+ */
+export function floorPlanWorkingCopyPayload(input: Omit<UpdateFloorPlanInput, "version">): Record<string, unknown> {
+  const { positions, connections: _connections, ...rest } = input;
+  return {
+    ...rest,
+    positions: positions.map(({ resourceType, resourceId, x, y, rotation }) => ({ resourceType, resourceId, x, y, rotation })),
+  };
+}
+
+/** A plan as the backend renders a working copy or an apply: the plan with its positions embedded. */
+export const floorPlanFromResponse = (raw: unknown): FloorPlan => {
+  const { positions, ...plan } = raw as FloorPlanResponse & { positions: PositionResponse[] };
+  return withPositions(plan, positions ?? []);
+};
 
 export async function changeFloorPlanStatus(
   projectId: string,

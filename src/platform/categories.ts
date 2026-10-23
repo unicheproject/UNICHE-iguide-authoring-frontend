@@ -92,20 +92,26 @@ export function createCategory(
   return apiRequest<Category>(base(projectId), { method: "POST", body: input });
 }
 
-export function updateCategory(
-  projectId: string,
-  categoryId: string,
-  input: {
-    version: number;
-    code: string;
-    scope: CategoryScope;
-    parentCategoryId: string | null;
-    icon: string | null;
-    translations: Record<string, CategoryTranslation>;
-  },
-): Promise<Category> {
+export interface UpdateCategoryInput {
+  version: number;
+  code: string;
+  scope: CategoryScope;
+  parentCategoryId: string | null;
+  icon: string | null;
+  translations: Record<string, CategoryTranslation>;
+}
+
+export function updateCategory(projectId: string, categoryId: string, input: UpdateCategoryInput): Promise<Category> {
   return apiRequest<Category>(`${base(projectId)}/${encodeURIComponent(categoryId)}`, { method: "PUT", body: input });
 }
+
+/** The working-copy payload of an ACTIVE Category: the update body without `version` (backend D-027). */
+export function categoryWorkingCopyPayload(input: Omit<UpdateCategoryInput, "version">): Record<string, unknown> {
+  return { ...input };
+}
+
+/** A Category as the backend renders a working copy or an apply; the response is used as is. */
+export const categoryFromResponse = (raw: unknown): Category => raw as Category;
 
 export function changeCategoryStatus(projectId: string, categoryId: string, targetStatus: ResourceStatus, version: number): Promise<Category> {
   return apiRequest<Category>(`${base(projectId)}/${encodeURIComponent(categoryId)}/status`, { method: "POST", body: { targetStatus, version } });

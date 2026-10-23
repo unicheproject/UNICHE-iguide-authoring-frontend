@@ -4,7 +4,17 @@ import CategoryIcon from "@/components/CategoryIcon.vue";
 import EditorShell from "@/components/editor/EditorShell.vue";
 import GeoMapCanvas, { type Bounds, type CanvasMarker, type LatLng } from "@/components/map/GeoMapCanvas.vue";
 import { categoryTree, listCategories, type Category, type CategoryScope } from "@/platform/categories";
-import { changeMapStatus, fetchMap, fetchMapReferences, updateMap, type GeoMap, type PlaceableType } from "@/platform/maps";
+import {
+  changeMapStatus,
+  fetchMap,
+  fetchMapReferences,
+  mapFromResponse,
+  mapWorkingCopyPayload,
+  updateMap,
+  type GeoMap,
+  type PlaceableType,
+  type UpdateMapInput,
+} from "@/platform/maps";
 import { listPlaces, placeTitle, type Place } from "@/platform/places";
 import { listPois, poiTitle, type Poi } from "@/platform/pois";
 import type { ResourceReference } from "@/platform/references";
@@ -65,6 +75,26 @@ const FIELD_NAMES: Record<string, string> = {
   hiddenCategoryIds: "Visibility",
 };
 
+/** The editable state from the form, for a DRAFT save and a working copy alike. */
+function input(): Omit<UpdateMapInput, "version"> {
+  return {
+    internalName: form.internalName.trim(),
+    placeId: form.placeId || null,
+    initialLatitude: Number(form.lat),
+    initialLongitude: Number(form.lng),
+    initialZoom: Number(form.zoom),
+    minLatitude: num(form.minLat),
+    minLongitude: num(form.minLng),
+    maxLatitude: num(form.maxLat),
+    maxLongitude: num(form.maxLng),
+    showPois: form.showPois,
+    showRoutes: form.showRoutes,
+    hiddenCategoryIds: [...form.hiddenCategoryIds],
+    visitorFilter: form.visitorFilter,
+    placements: form.placements.map((p) => ({ resourceType: p.resourceType, resourceId: p.resourceId, latitude: Number(p.lat), longitude: Number(p.lng) })),
+  };
+}
+
 const editor = useResourceEditor<GeoMap>({
   kind: "map",
   source: () => props.mapId,
@@ -84,28 +114,15 @@ const editor = useResourceEditor<GeoMap>({
     categories.value = allCategories;
     return map;
   },
-  save: (map, version) =>
-    updateMap(projectId.value, map.id, {
-      version,
-      internalName: form.internalName.trim(),
-      placeId: form.placeId || null,
-      initialLatitude: Number(form.lat),
-      initialLongitude: Number(form.lng),
-      initialZoom: Number(form.zoom),
-      minLatitude: num(form.minLat),
-      minLongitude: num(form.minLng),
-      maxLatitude: num(form.maxLat),
-      maxLongitude: num(form.maxLng),
-      showPois: form.showPois,
-      showRoutes: form.showRoutes,
-      hiddenCategoryIds: [...form.hiddenCategoryIds],
-      visitorFilter: form.visitorFilter,
-      placements: form.placements.map((p) => ({ resourceType: p.resourceType, resourceId: p.resourceId, latitude: Number(p.lat), longitude: Number(p.lng) })),
-    }),
+  save: (map, version) => updateMap(projectId.value, map.id, { version, ...input() }),
+  workingCopy: {
+    kind: "maps",
+    projectId: () => projectId.value,
+    payload: () => mapWorkingCopyPayload(projectId.value, input()),
+    fromResponse: mapFromResponse,
+  },
   changeStatus: (map, target, version) => changeMapStatus(projectId.value, map.id, target, version),
   loadReferences: (map) => fetchMapReferences(projectId.value, map.id),
-  // A map has no text of its own; it stays editable until archived, like an Asset.
-  isEditable: (map) => map.status !== "ARCHIVED",
   resetForm(map) {
     form.internalName = map.internalName;
     form.placeId = map.placeId ?? "";

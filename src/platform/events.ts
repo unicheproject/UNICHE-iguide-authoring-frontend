@@ -126,6 +126,22 @@ export async function updateEvent(projectId: string, eventId: string, input: Upd
   return fetchEvent(projectId, eventId);
 }
 
+/**
+ * The working-copy payload of an ACTIVE Event (backend D-027): the update body without `version`, with the
+ * occurrences and media as whole lists. Kept occurrences carry their id.
+ */
+export function eventWorkingCopyPayload(input: Omit<UpdateEventInput, "version">): Record<string, unknown> {
+  const { occurrences, media, ...fields } = input;
+  return {
+    ...fields,
+    occurrences: occurrences.map((o) => ({ id: o.id, startsAt: o.startsAt, endsAt: o.endsAt, status: o.status })),
+    media: media.filter((b) => b.usage !== "INLINE").map(({ assetId, usage, languageCode }) => ({ assetId, usage, languageCode })),
+  };
+}
+
+/** An Event as the backend renders a working copy or an apply. */
+export const eventFromResponse = (raw: unknown): CmsEvent => toEvent(raw as EventResponse);
+
 export async function changeEventStatus(projectId: string, eventId: string, targetStatus: ResourceStatus, version: number): Promise<CmsEvent> {
   return toEvent(
     await apiRequest<EventResponse>(`${base(projectId)}/${encodeURIComponent(eventId)}/status`, {

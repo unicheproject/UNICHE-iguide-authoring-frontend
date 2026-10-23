@@ -7,8 +7,10 @@ import { SLUG_PATTERN } from "@/lib/format";
 import {
   CATEGORY_ICONS,
   CATEGORY_SCOPES,
+  categoryFromResponse,
   categoryLabel,
   categoryName,
+  categoryWorkingCopyPayload,
   changeCategoryStatus,
   fetchCategory,
   fetchCategoryReferences,
@@ -19,6 +21,7 @@ import {
   type Category,
   type CategoryScope,
   type CategoryTranslation,
+  type UpdateCategoryInput,
 } from "@/platform/categories";
 import type { ResourceReference } from "@/platform/references";
 import { showToast } from "@/stores/toast";
@@ -55,6 +58,17 @@ const form = reactive({
   translations: {} as Record<string, Texts<TextKey>>,
 });
 
+/** The editable state from the form, for a DRAFT save and a working copy alike. */
+function input(): Omit<UpdateCategoryInput, "version"> {
+  return {
+    code: form.code,
+    scope: form.scope,
+    parentCategoryId: form.parentCategoryId || null,
+    icon: form.icon || null,
+    translations: textsForApi(TEXT_KEYS, languageCodes(), form.translations),
+  };
+}
+
 const editor = useResourceEditor<Category>({
   kind: "category",
   source: () => props.categoryId,
@@ -65,15 +79,13 @@ const editor = useResourceEditor<Category>({
     all.value = categories;
     return category;
   },
-  save: (category, version) =>
-    updateCategory(projectId.value, category.id, {
-      version,
-      code: form.code,
-      scope: form.scope,
-      parentCategoryId: form.parentCategoryId || null,
-      icon: form.icon || null,
-      translations: textsForApi(TEXT_KEYS, languageCodes(), form.translations),
-    }),
+  save: (category, version) => updateCategory(projectId.value, category.id, { version, ...input() }),
+  workingCopy: {
+    kind: "categories",
+    projectId: () => projectId.value,
+    payload: () => categoryWorkingCopyPayload(input()),
+    fromResponse: categoryFromResponse,
+  },
   changeStatus: (category, target, version) => changeCategoryStatus(projectId.value, category.id, target, version),
   loadReferences: (category) => fetchCategoryReferences(projectId.value, category.id),
   resetForm(category) {

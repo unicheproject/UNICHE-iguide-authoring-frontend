@@ -79,7 +79,7 @@ const base = (projectId: string) => `/projects/${encodeURIComponent(projectId)}/
  * does not store SEO texts (QUESTIONS.md on SEO texts): responses get empty values for them, and a save
  * that would drop SEO text is refused here, at that field. The Category and the media are bindings
  * (backend D-024, D-025): read from `categoryIds` and `media`, saved through `.../pois/{id}/categories`
- * and `.../pois/{id}/resource-assets` after the POI itself.
+ * and `.../pois/{id}/resource-assets` after a DRAFT POI itself, or inside the working copy of an ACTIVE one.
  */
 
 type PoiTranslationResponse = Omit<PoiTranslation, "seoTitle" | "seoDescription">;
@@ -102,7 +102,7 @@ function toPoi({ categoryIds, media, ...response }: PoiResponse): Poi {
   return { ...response, categoryId: categoryIds[0] ?? null, media: toMediaBindings(media), translations };
 }
 
-function unsupported(input: UpdatePoiInput): string[] {
+function unsupported(input: Omit<UpdatePoiInput, "version">): string[] {
   const details: string[] = [];
   for (const [code, t] of Object.entries(input.translations)) {
     if (t.seoTitle?.trim()) details.push(`translations.${code}.seoTitle: SEO texts are not stored by iGuide.`);
@@ -129,7 +129,8 @@ export async function createPoi(projectId: string, input: CreatePoiInput): Promi
   return toPoi(await apiRequest<PoiResponse>(base(projectId), { method: "POST", body: input }));
 }
 
-export async function updatePoi(projectId: string, poiId: string, input: UpdatePoiInput): Promise<Poi> {
+/** Refuses locally what iGuide cannot store, then splits the input into the POI body and its bindings. */
+function toBody(input: Omit<UpdatePoiInput, "version">) {
   const details = unsupported(input);
   if (details.length) {
     throw new ApiError(422, "VALIDATION_ERROR", "Some fields cannot be saved in iGuide yet.", null, details);
@@ -139,14 +140,35 @@ export async function updatePoi(projectId: string, poiId: string, input: UpdateP
   for (const [code, { seoTitle: _title, seoDescription: _description, ...t }] of Object.entries(translations)) {
     texts[code] = t;
   }
+  return { body: { ...rest, translations: texts }, categoryId, media };
+}
+
+export async function updatePoi(projectId: string, poiId: string, input: UpdatePoiInput): Promise<Poi> {
+  const { body, categoryId, media } = toBody(input);
   await apiRequest<PoiResponse>(`${base(projectId)}/${encodeURIComponent(poiId)}`, {
     method: "PUT",
-    body: { ...rest, translations: texts },
+    body: { ...body, version: input.version },
   });
   await setResourceCategory(projectId, "pois", poiId, categoryId);
   await syncMedia(projectId, "pois", poiId, media);
   return fetchPoi(projectId, poiId);
 }
+
+/**
+ * The working-copy payload of an ACTIVE Point of Interest (backend D-027): the update body without `version`,
+ * with the Category and the media (INLINE aside, in display order) inside it instead of as separate calls.
+ */
+export function poiWorkingCopyPayload(input: Omit<UpdatePoiInput, "version">): Record<string, unknown> {
+  const { body, categoryId, media } = toBody(input);
+  return {
+    ...body,
+    categoryIds: categoryId ? [categoryId] : [],
+    media: media.filter((b) => b.usage !== "INLINE"),
+  };
+}
+
+/** A Point of Interest as the backend renders a working copy or an apply. */
+export const poiFromResponse = (raw: unknown): Poi => toPoi(raw as PoiResponse);
 
 export async function changePoiStatus(projectId: string, poiId: string, targetStatus: ResourceStatus, version: number): Promise<Poi> {
   return toPoi(

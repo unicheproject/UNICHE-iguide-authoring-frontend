@@ -49,6 +49,13 @@ export interface Guide {
   items: GuideItem[];
   /** Includes INLINE bindings, which follow the images in the body and are never sent back. */
   media: MediaBinding[];
+  /** The backend blocks behind the story and the items, so a working copy keeps the blocks it does not change. */
+  blockIds?: GuideBlockIds;
+}
+
+export interface GuideBlockIds {
+  text: string | null;
+  references: { id: string; resourceType: GuideItemType; resourceId: string }[];
 }
 
 export interface UpdateGuideInput {
@@ -100,6 +107,15 @@ const toApiBody = (body: GuideBody): ApiBody => ({
 });
 
 /** Reports a TEXT block error at the story field, `translations.{code}.body.blocks[i]`. */
+/**
+ * Working-copy errors at the story, which the payload sends as its first block, placed where the DRAFT save
+ * reports them (`atStory`).
+ */
+export function guideWorkingCopyError(e: ApiError): ApiError {
+  const details = e.details.map((d) => d.replace(/^blocks\[0\]\.translations\.([^.]+)\.text(?=[.:])/, "translations.$1.body"));
+  return new ApiError(e.status, e.code, e.message, e.requestId, details, e.body);
+}
+
 function atStory(e: unknown): unknown {
   if (!(e instanceof ApiError)) return e;
   const details = e.details.map((d) => d.replace(/^(translations\.[^.]+)\.text\./, "$1.body."));
@@ -133,7 +149,13 @@ function toGuide({ translations, blocks, media, ...rest }: GuideResponse): Guide
   const items = blocks
     .filter((b) => b.blockType === "REFERENCE" && b.resourceType && b.resourceId)
     .map((b) => ({ resourceType: b.resourceType!, resourceId: b.resourceId! }));
-  return { ...rest, translations: texts, items, media: toMediaBindings(media) };
+  const blockIds: GuideBlockIds = {
+    text: text?.id ?? null,
+    references: blocks
+      .filter((b) => b.blockType === "REFERENCE" && b.resourceType && b.resourceId)
+      .map((b) => ({ id: b.id, resourceType: b.resourceType!, resourceId: b.resourceId! })),
+  };
+  return { ...rest, translations: texts, items, media: toMediaBindings(media), blockIds };
 }
 
 function unsupported(input: UpdateGuideInput): string[] {
@@ -240,6 +262,51 @@ export async function updateGuide(projectId: string, guideId: string, input: Upd
   await syncMedia(projectId, "guides", guideId, input.media);
   return fetchGuide(projectId, guideId);
 }
+
+/**
+ * The working-copy payload of an ACTIVE Guide (backend D-027): the update body without `version`, the blocks as
+ * one ordered list through the same bridge as `updateGuide` (the story as one TEXT block first, the items as
+ * REFERENCE blocks after it), and the media. Blocks the edit keeps carry their id from `guide`; the rest are new.
+ * Errors come back at `blocks[i]`: index 0 is the story when there is one.
+ */
+export function guideWorkingCopyPayload(guide: Guide, input: Omit<UpdateGuideInput, "version">): Record<string, unknown> {
+  const details = unsupported({ ...input, version: 0 });
+  if (details.length) throw new ApiError(422, "VALIDATION_ERROR", "Some fields cannot be saved in iGuide yet.", null, details);
+
+  const titles: Record<string, { title: string | null; summary: string | null }> = {};
+  const stories: Record<string, { text: ApiBody | null; caption: null }> = {};
+  for (const [code, t] of Object.entries(input.translations)) {
+    titles[code] = { title: t.title, summary: t.summary };
+    stories[code] = { text: t.body?.blocks.length ? toApiBody(t.body) : null, caption: null };
+  }
+  const blocks: Record<string, unknown>[] = [];
+  if (Object.values(stories).some((story) => story.text)) {
+    blocks.push({ id: guide.blockIds?.text ?? null, blockType: "TEXT", resourceType: null, resourceId: null, translations: stories });
+  }
+  const unmatched = [...(guide.blockIds?.references ?? [])];
+  for (const item of input.items) {
+    const at = unmatched.findIndex((b) => b.resourceType === item.resourceType && b.resourceId === item.resourceId);
+    blocks.push({
+      id: at >= 0 ? unmatched.splice(at, 1)[0].id : null,
+      blockType: "REFERENCE",
+      resourceType: item.resourceType,
+      resourceId: item.resourceId,
+      translations: {},
+    });
+  }
+  return {
+    slug: input.slug,
+    internalName: input.internalName,
+    estimatedReadingMinutes: input.estimatedReadingMinutes,
+    featured: input.featured,
+    translations: titles,
+    blocks,
+    media: input.media.filter((b) => b.usage !== "INLINE").map(({ assetId, usage, languageCode }) => ({ assetId, usage, languageCode })),
+  };
+}
+
+/** A Guide as the backend renders a working copy or an apply. */
+export const guideFromResponse = (raw: unknown): Guide => toGuide(raw as GuideResponse);
 
 export async function changeGuideStatus(projectId: string, guideId: string, targetStatus: ResourceStatus, version: number): Promise<Guide> {
   return toGuide(

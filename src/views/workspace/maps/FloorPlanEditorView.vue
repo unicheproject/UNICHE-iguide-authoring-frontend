@@ -9,10 +9,13 @@ import {
   connectionTypeLabel,
   fetchFloorPlan,
   fetchFloorPlanReferences,
+  floorPlanFromResponse,
+  floorPlanWorkingCopyPayload,
   listFloorPlans,
   updateFloorPlan,
   type ConnectionType,
   type FloorPlan,
+  type UpdateFloorPlanInput,
 } from "@/platform/floorPlans";
 import type { PlaceableType } from "@/platform/maps";
 import { listPlaces, placeTitle, type Place } from "@/platform/places";
@@ -68,6 +71,33 @@ const form = reactive({
 const str = (v: number | null | undefined) => (v === null || v === undefined ? "" : String(v));
 const unit = (v: string) => Math.min(1, Math.max(0, Number(v) || 0));
 
+/** The editable state from the form, for a DRAFT save and a working copy alike. */
+function input(): Omit<UpdateFloorPlanInput, "version"> {
+  return {
+    internalName: form.internalName.trim(),
+    assetId: form.assetId,
+    placeId: form.placeId || null,
+    positions: form.positions.map((p) => ({
+      resourceType: p.resourceType,
+      resourceId: p.resourceId,
+      x: Number(p.x),
+      y: Number(p.y),
+      rotation: p.rotation.trim() === "" ? null : Number(p.rotation),
+    })),
+    connections: form.connections.map((c) => ({
+      id: c.id,
+      toFloorPlanId: c.toFloorPlanId,
+      fromX: Number(c.fromX),
+      fromY: Number(c.fromY),
+      toX: Number(c.toX),
+      toY: Number(c.toY),
+      connectionType: c.connectionType,
+      bidirectional: c.bidirectional,
+      label: c.label.trim() || null,
+    })),
+  };
+}
+
 const editor = useResourceEditor<FloorPlan>({
   kind: "floor plan",
   source: () => props.planId,
@@ -87,35 +117,15 @@ const editor = useResourceEditor<FloorPlan>({
     assets.value = library;
     return plan;
   },
-  save: (plan, version) =>
-    updateFloorPlan(projectId.value, plan.id, {
-      version,
-      internalName: form.internalName.trim(),
-      assetId: form.assetId,
-      placeId: form.placeId || null,
-      positions: form.positions.map((p) => ({
-        resourceType: p.resourceType,
-        resourceId: p.resourceId,
-        x: Number(p.x),
-        y: Number(p.y),
-        rotation: p.rotation.trim() === "" ? null : Number(p.rotation),
-      })),
-      connections: form.connections.map((c) => ({
-        id: c.id,
-        toFloorPlanId: c.toFloorPlanId,
-        fromX: Number(c.fromX),
-        fromY: Number(c.fromY),
-        toX: Number(c.toX),
-        toY: Number(c.toY),
-        connectionType: c.connectionType,
-        bidirectional: c.bidirectional,
-        label: c.label.trim() || null,
-      })),
-    }),
+  save: (plan, version) => updateFloorPlan(projectId.value, plan.id, { version, ...input() }),
+  workingCopy: {
+    kind: "floor-plans",
+    projectId: () => projectId.value,
+    payload: () => floorPlanWorkingCopyPayload(input()),
+    fromResponse: floorPlanFromResponse,
+  },
   changeStatus: (plan, target, version) => changeFloorPlanStatus(projectId.value, plan.id, target, version),
   loadReferences: (plan) => fetchFloorPlanReferences(projectId.value, plan.id),
-  // Like a map, a floor plan has no text of its own and stays editable until archived.
-  isEditable: (plan) => plan.status !== "ARCHIVED",
   resetForm(plan) {
     form.internalName = plan.internalName;
     form.assetId = plan.assetId;

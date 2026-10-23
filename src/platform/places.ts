@@ -1,4 +1,4 @@
-import { apiRequest } from "./api";
+import { ApiError, apiRequest } from "./api";
 import type { ResourceReference } from "./references";
 
 export type ResourceStatus = "DRAFT" | "ACTIVE" | "ARCHIVED";
@@ -129,6 +129,14 @@ export async function updatePlace(projectId: string, placeId: string, input: Upd
   );
 }
 
+/** The working-copy payload of an ACTIVE Place: the update body without `version` (backend D-027). */
+export function placeWorkingCopyPayload(input: Omit<UpdatePlaceInput, "version">): Record<string, unknown> {
+  return toBody(input);
+}
+
+/** A Place as the backend renders a working copy or an apply. */
+export const placeFromResponse = (raw: unknown): Place => toPlace(raw as PlaceResponse);
+
 export async function changePlaceStatus(
   projectId: string,
   placeId: string,
@@ -193,6 +201,19 @@ export async function fetchSpatialLink(projectId: string, placeId: string): Prom
 }
 
 /** Re-saves a map or floor plan with another `placeId`; only DRAFT ones can be saved. */
+/**
+ * An ACTIVE map or plan changes its Place only through its own working copy (backend D-027), so the link is
+ * refused here with the way to do it, before any other map or plan is touched.
+ */
+function requireDraftLink(kind: "maps" | "floor-plans", items: Linkable[]) {
+  if (items.some((item) => item.status === "ACTIVE")) {
+    const noun = kind === "maps" ? "map" : "floor plan";
+    throw new ApiError(422, "RESOURCE_NOT_EDITABLE",
+      `An active ${noun} is linked through its own editor: open the ${noun}, change its place, and apply the changes.`,
+      null, [], {});
+  }
+}
+
 async function relink(projectId: string, kind: "maps" | "floor-plans", item: Linkable, placeId: string | null) {
   await apiRequest(`${projectPath(projectId)}/${kind}/${encodeURIComponent(item.id)}`, {
     method: "PUT",
@@ -206,15 +227,19 @@ export async function setSpatialLink(projectId: string, placeId: string, link: S
     linkedTo(projectId, "maps", placeId),
     linkedTo(projectId, "floor-plans", placeId),
   ]);
-  for (const map of maps.filter((m) => m.id !== link.mapId)) await relink(projectId, "maps", map, null);
-  for (const plan of plans.filter((p) => p.id !== link.floorPlanId)) await relink(projectId, "floor-plans", plan, null);
-  if (link.mapId && !maps.some((m) => m.id === link.mapId)) {
-    const map = await apiRequest<Linkable>(`${projectPath(projectId)}/maps/${encodeURIComponent(link.mapId)}`);
-    await relink(projectId, "maps", map, placeId);
-  }
-  if (link.floorPlanId && !plans.some((p) => p.id === link.floorPlanId)) {
-    const plan = await apiRequest<Linkable>(`${projectPath(projectId)}/floor-plans/${encodeURIComponent(link.floorPlanId)}`);
-    await relink(projectId, "floor-plans", plan, placeId);
-  }
+  const unlinkMaps = maps.filter((m) => m.id !== link.mapId);
+  const unlinkPlans = plans.filter((p) => p.id !== link.floorPlanId);
+  const newMap = link.mapId && !maps.some((m) => m.id === link.mapId)
+    ? await apiRequest<Linkable>(`${projectPath(projectId)}/maps/${encodeURIComponent(link.mapId)}`)
+    : null;
+  const newPlan = link.floorPlanId && !plans.some((p) => p.id === link.floorPlanId)
+    ? await apiRequest<Linkable>(`${projectPath(projectId)}/floor-plans/${encodeURIComponent(link.floorPlanId)}`)
+    : null;
+  requireDraftLink("maps", [...unlinkMaps, ...(newMap ? [newMap] : [])]);
+  requireDraftLink("floor-plans", [...unlinkPlans, ...(newPlan ? [newPlan] : [])]);
+  for (const map of unlinkMaps) await relink(projectId, "maps", map, null);
+  for (const plan of unlinkPlans) await relink(projectId, "floor-plans", plan, null);
+  if (newMap) await relink(projectId, "maps", newMap, placeId);
+  if (newPlan) await relink(projectId, "floor-plans", newPlan, placeId);
   return fetchSpatialLink(projectId, placeId);
 }

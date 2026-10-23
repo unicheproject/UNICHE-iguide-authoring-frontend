@@ -1,9 +1,10 @@
 <script setup lang="ts" generic="T extends EditableResource">
 /**
- * Page frame of every Resource editor: back link, loading and error states, page head with Save, the
- * read-only banner for ACTIVE and ARCHIVED Resources, the error summary, the two-column layout with the
- * Status panel, the optional Preview panel, and the status-change and version-conflict dialogs. The editor's own fields go in the
- * default slot.
+ * Page frame of every Resource editor: back link, loading and error states, page head with Save (DRAFT) or
+ * Apply changes (ACTIVE), the working-copy banner with Save draft and Discard (spec 12 section 3, Resource editors),
+ * the read-only banner for ARCHIVED Resources, the error summary, the two-column layout with the Status panel,
+ * the optional Preview panel, and the status-change, version-conflict, and apply-conflict dialogs. The editor's
+ * own fields go in the default slot.
  */
 import { computed, ref } from "vue";
 import type { RouteLocationRaw } from "vue-router";
@@ -13,6 +14,7 @@ import StatusChangeDialog from "@/components/StatusChangeDialog.vue";
 import { Button } from "@/components/ui/button";
 import ResourcePreview from "@/components/editor/ResourcePreview.vue";
 import { formatDate } from "@/lib/format";
+import { session } from "@/platform/auth";
 import type { ResourceReference } from "@/platform/references";
 import type { PreviewModel } from "@/workspace/preview";
 import type { LanguageStatus } from "@/workspace/translationStatus";
@@ -55,7 +57,9 @@ const statusText = computed(() => {
     case "DRAFT":
       return `Draft: only authors see it. ${props.activationHint}`;
     case "ACTIVE":
-      return "Active: visible to visitors while the application is live.";
+      return editor.value.workingCopy
+        ? "Active: visitors see the live version. Your pending changes reach them only when you apply them."
+        : "Active: visible to visitors while the application is live.";
     default:
       return "Archived: hidden from visitors and from the default lists.";
   }
@@ -65,15 +69,31 @@ const confirmCopy = computed(() =>
   editor.value.confirmTarget === "ARCHIVED"
     ? {
         heading: `Archive ${props.title}?`,
-        body: `An archived ${kind.value} leaves the visitor app and the default lists. Restoring it makes it a draft again.`,
+        body: `An archived ${kind.value} leaves the visitor app and the default lists. Restoring it makes it a draft again.${discardNote.value}`,
         action: "Archive",
       }
     : {
         heading: `Deactivate ${props.title}?`,
-        body: "Visitors stop seeing it on their next refresh. It becomes a draft you can edit.",
+        body: `Visitors stop seeing it on their next refresh. It becomes a draft you can edit.${discardNote.value}`,
         action: "Deactivate",
       },
 );
+const discardNote = computed(() => (editor.value.workingCopy ? " Its pending changes are discarded." : ""));
+
+/** The last editor of the copy; a name needs the Audit Events of backend Milestone 7 (backend G-034). */
+const copyAuthor = computed(() => {
+  const copy = editor.value.workingCopy;
+  if (!copy) return "";
+  return copy.updatedBySubject === session.user?.subject ? "you" : "another author";
+});
+
+/** A conflicting value as one short line: text as is, lists by their size, anything else as JSON. */
+function conflictValue(value: unknown): string {
+  if (value === null || value === undefined || value === "") return "(empty)";
+  if (Array.isArray(value)) return value.length === 1 ? "1 item" : `${value.length} items`;
+  const text = typeof value === "string" ? value : JSON.stringify(value);
+  return text.length > 120 ? `${text.slice(0, 117)}…` : text;
+}
 
 const noLink = () => null;
 </script>
@@ -124,11 +144,54 @@ const noLink = () => null;
           >
             {{ previewOpen ? "Close preview" : "Preview" }}
           </Button>
-          <Button :disabled="!editor.editable || !editor.dirty || editor.saving" @click="editor.save()">
+          <Button
+            v-if="editor.usesWorkingCopy"
+            :disabled="(!editor.workingCopy && !editor.dirty) || editor.saving || editor.applying"
+            @click="editor.applyChanges(title)"
+          >
+            {{ editor.applying ? "Applying…" : "Apply changes" }}
+          </Button>
+          <Button v-else :disabled="!editor.editable || !editor.dirty || editor.saving" @click="editor.save()">
             {{ editor.saving ? "Saving…" : "Save" }}
           </Button>
         </template>
       </PageHead>
+
+      <div
+        v-if="editor.usesWorkingCopy && (editor.workingCopy || editor.dirty)"
+        role="status"
+        class="mb-5 flex flex-wrap items-center gap-3.5 rounded-lg border-l-[3px] border-l-[#9a6200] bg-[rgba(154,98,0,0.07)] px-[18px] py-3.5 text-[13px]"
+      >
+        <span class="text-[15px]" aria-hidden="true">✎</span>
+        <div class="min-w-[min(100%,260px)] flex-1">
+          <strong class="mb-0.5 block text-[13px] font-bold">You are editing a working copy</strong>
+          <span class="text-gray-700">
+            {{
+              editor.workingCopy
+                ? `Pending changes saved ${formatDate(editor.workingCopy.updatedAt)} by ${copyAuthor}. Visitors see the live version until you apply them.`
+                : "Not saved yet. Visitors see the live version until you apply the changes."
+            }}
+          </span>
+        </div>
+        <div class="flex items-center gap-3">
+          <button
+            type="button"
+            class="whitespace-nowrap text-[11px] font-bold uppercase tracking-[0.06em] text-[#9a6200] disabled:opacity-50"
+            :disabled="!editor.dirty || editor.saving || editor.applying"
+            @click="editor.save()"
+          >
+            {{ editor.saving ? "Saving…" : "Save draft" }}
+          </button>
+          <button
+            type="button"
+            class="whitespace-nowrap text-[11px] font-bold uppercase tracking-[0.06em] text-destructive disabled:opacity-50"
+            :disabled="editor.saving || editor.applying"
+            @click="editor.discardChanges(title)"
+          >
+            Discard changes
+          </button>
+        </div>
+      </div>
 
       <div
         v-if="!editor.editable"
@@ -260,6 +323,41 @@ const noLink = () => null;
       @close="editor.confirmTarget = null"
       @confirm="editor.transition(editor.confirmTarget!)"
     />
+
+    <AppDialog
+      v-if="editor.applyConflict"
+      :title="`${title} changed since your pending changes were started`"
+      width="640px"
+      :busy="editor.saving || editor.applying"
+      @close="editor.applyConflict = null"
+    >
+      <p class="text-[13px] text-gray-700">
+        Someone else applied changes to this {{ kind }}. Choose, field by field, whether to keep yours or the current
+        value. Your choices are saved as pending changes on the current version; apply them again when ready.
+      </p>
+      <p v-if="!editor.applyConflict.fields.length" class="mt-3 text-[13px] text-gray-700">
+        No field differs: saving reopens your pending changes on the current version.
+      </p>
+      <fieldset v-for="field in editor.applyConflict.fields" :key="field.path" class="mt-3 rounded-md border px-3 py-2.5">
+        <legend class="px-1 text-[12px] font-bold">{{ editor.describePath(field.path) }}</legend>
+        <label class="flex items-start gap-2 py-1 text-[13px]">
+          <input v-model="field.choice" type="radio" value="mine" class="mt-0.5" />
+          <span><span class="font-semibold">Mine:</span> {{ conflictValue(field.mine) }}</span>
+        </label>
+        <label class="flex items-start gap-2 py-1 text-[13px]">
+          <input v-model="field.choice" type="radio" value="current" class="mt-0.5" />
+          <span><span class="font-semibold">Current:</span> {{ conflictValue(field.current) }}</span>
+        </label>
+      </fieldset>
+      <template #actions>
+        <button type="button" class="dialog-secondary" :disabled="editor.saving || editor.applying" @click="editor.discardChanges(title)">
+          Discard my changes
+        </button>
+        <button type="button" class="dialog-primary bg-primary" :disabled="editor.saving || editor.applying" @click="editor.resolveApplyConflict()">
+          Save my choices
+        </button>
+      </template>
+    </AppDialog>
 
     <AppDialog v-if="editor.conflict" :title="`Someone else changed this ${kind}`" width="560px" :busy="editor.saving" @close="editor.conflict = null">
       <p class="text-[13px] text-gray-700">

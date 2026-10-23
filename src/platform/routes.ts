@@ -101,7 +101,8 @@ const base = (projectId: string) => `/projects/${encodeURIComponent(projectId)}/
  * `travelMode` for `mode`, difficulty `HARD` for `DEMANDING`, no optional stops, no SEO texts, and stops
  * as a child collection (`.../routes/{id}/stops`, `.../stops:order`) instead of part of the route body.
  * The Category and the media are bindings (backend D-024, D-025): read from `categoryIds` and `media`,
- * saved through `.../routes/{id}/categories` and `.../routes/{id}/resource-assets`. The functions below keep
+ * saved through `.../routes/{id}/categories` and `.../routes/{id}/resource-assets` for a DRAFT Route, or inside
+ * the working copy of an ACTIVE one, with the stops. The functions below keep
  * `Route`; a save carrying SEO text or an optional stop is refused at that field.
  */
 
@@ -152,7 +153,7 @@ function toRoute({ travelMode, difficulty, computedDistanceMeters: _computed, tr
   };
 }
 
-function unsupported(input: UpdateRouteInput): string[] {
+function unsupported(input: Omit<UpdateRouteInput, "version">): string[] {
   const details: string[] = [];
   for (const [code, t] of Object.entries(input.translations)) {
     if (t.seoTitle?.trim()) details.push(`translations.${code}.seoTitle: SEO texts are not stored by iGuide.`);
@@ -184,20 +185,31 @@ export async function createRoute(projectId: string, input: CreateRouteInput): P
   return toRoute(await apiRequest<RouteResponse>(base(projectId), { method: "POST", body: input }));
 }
 
-/**
- * Saves the Route's own fields, then brings its stops in line with `input.stops`: stops left out are
- * removed, saved ones updated, new ones added, and the order set when it changed.
- */
-export async function updateRoute(projectId: string, routeId: string, input: UpdateRouteInput): Promise<Route> {
+/** Refuses locally what iGuide cannot store, then splits the input into the Route body and its children. */
+function toBody(input: Omit<UpdateRouteInput, "version">) {
   const details = unsupported(input);
   if (details.length) throw new ApiError(422, "VALIDATION_ERROR", "Some fields cannot be saved in iGuide yet.", null, details);
 
   const { mode, difficulty, categoryId, media, stops, translations, ...rest } = input;
   const texts: Record<string, RouteTranslationResponse> = {};
   for (const [code, { seoTitle: _t, seoDescription: _d, ...t }] of Object.entries(translations)) texts[code] = t;
+  return {
+    body: { ...rest, travelMode: mode, difficulty: toApiDifficulty(difficulty), translations: texts },
+    categoryId,
+    media,
+    stops,
+  };
+}
+
+/**
+ * Saves the Route's own fields, then brings its stops in line with `input.stops`: stops left out are
+ * removed, saved ones updated, new ones added, and the order set when it changed.
+ */
+export async function updateRoute(projectId: string, routeId: string, input: UpdateRouteInput): Promise<Route> {
+  const { body, categoryId, media, stops } = toBody(input);
   const saved = await apiRequest<RouteResponse>(`${base(projectId)}/${encodeURIComponent(routeId)}`, {
     method: "PUT",
-    body: { ...rest, travelMode: mode, difficulty: toApiDifficulty(difficulty), translations: texts },
+    body: { ...body, version: input.version },
   });
 
   const path = stopsPath(projectId, routeId);
@@ -223,6 +235,23 @@ export async function updateRoute(projectId: string, routeId: string, input: Upd
   await syncMedia(projectId, "routes", routeId, media);
   return fetchRoute(projectId, routeId);
 }
+
+/**
+ * The working-copy payload of an ACTIVE Route (backend D-027): the update body without `version`, with the
+ * ordered stops (a saved stop keeps its `id`), the Category, and the media (INLINE aside) inside it.
+ */
+export function routeWorkingCopyPayload(input: Omit<UpdateRouteInput, "version">): Record<string, unknown> {
+  const { body, categoryId, media, stops } = toBody(input);
+  return {
+    ...body,
+    stops: stops.map((stop) => ({ id: stop.id || null, poiId: stop.poiId, translations: stop.translations })),
+    categoryIds: categoryId ? [categoryId] : [],
+    media: media.filter((b) => b.usage !== "INLINE"),
+  };
+}
+
+/** A Route as the backend renders a working copy or an apply. */
+export const routeFromResponse = (raw: unknown): Route => toRoute(raw as RouteResponse);
 
 export async function changeRouteStatus(projectId: string, routeId: string, targetStatus: ResourceStatus, version: number): Promise<Route> {
   return toRoute(
