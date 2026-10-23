@@ -173,6 +173,13 @@ export const router = createRouter({
           meta: { section: "surfaces" },
         },
         {
+          // Visitor app → Translations (`12` §3 Translation workspace, DECISIONS.md D-021).
+          path: "translations",
+          name: "project-translations",
+          component: () => import("@/views/workspace/TranslationsView.vue"),
+          meta: { section: "translations" },
+        },
+        {
           path: `:section(${sectionPattern})`,
           name: "project-section",
           component: () => import("@/views/workspace/SectionView.vue"),
