@@ -111,6 +111,7 @@ Found in the code (DECISIONS.md D-006, D-007):
 - `src/platform/`: `auth.ts` (keycloak-js), `config.ts` (runtime config), `api.ts` (fetch and XHR upload
   with bearer and `401` retry), and hand-written resource modules (GAPS.md G-001);
 - Leaflet 1.9 with public OpenStreetMap tiles and Nominatim search, prototyping only (`09` §22);
+- `qrcode` 1.5.4 for the stand-in QR images of the trigger card (DECISIONS.md D-019);
 - `dev/`: optional local Keycloak, Catalogue mock, and S3 mock (DECISIONS.md D-010).
 
 Platform coordinates (verified 2026-10-02, backend D-008):
