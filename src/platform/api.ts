@@ -88,6 +88,26 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
 }
 
 /**
+ * Like `apiRequest`, also returning the response headers, for a value an endpoint sends there, such as the working
+ * copy's version after a translation saved into it (`X-Working-Copy-Version`, backend D-031).
+ */
+export async function apiRequestWithHeaders<T>(path: string, options: RequestOptions = {}): Promise<{ body: T; headers: Headers }> {
+  let response = await send(path, options);
+  if (response.status === 401) {
+    await forceTokenRefresh();
+    response = await send(path, options);
+    if (response.status === 401) {
+      await sessionExpired();
+    }
+  }
+  if (!response.ok) {
+    throw await toApiError(response);
+  }
+  const body = response.status === 204 ? (undefined as T) : ((await response.json()) as T);
+  return { body, headers: response.headers };
+}
+
+/**
  * A binary body, such as a QR image, with the same bearer token, single retry after a 401, and error parsing as
  * `apiRequest`. Needed where an `<img src>` cannot carry the token.
  */

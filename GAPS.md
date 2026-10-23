@@ -116,6 +116,8 @@ prototype inventory).
   subtitle in `src/workspace/sections.ts` copies the prototype's per-surface menus (DECISIONS.md D-004 P1)
   and the Preview subtitle says "unpublished".
 - Interim 2026-10-19: Preview has its own screen, a stand-in app (D-015, G-020).
+- Interim 2026-10-23: Translations has its own screen, the Translation workspace (D-021); its MuseMind
+  translation, AI markers, and "mark reviewed" wait for the UNICHE AI gateway (backend M13).
 - Interim 2026-10-16 (owner request): the Overview has its own screen (`OverviewView.vue`) with live
   content counts (active and draft per kind, from `?size=1&status=` on each list, `platform/overview.ts`)
   and the Project languages; its Pages, Navigation, Theme, Preview, and Launch parts show their place with

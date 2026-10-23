@@ -122,6 +122,7 @@ const DEDICATED_ROUTES: Record<string, string> = {
   "floor-plans": "floor-plans",
   languages: "project-languages",
   surfaces: "project-surfaces",
+  translations: "project-translations",
   overview: "overview",
   preview: "preview",
 };

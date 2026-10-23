@@ -95,14 +95,15 @@ type ApiNode =
   | { type: "paragraph"; text: string }
   | { type: "heading"; level: 2 | 3; text: string }
   | { type: "asset"; assetId: string };
-interface ApiBody {
+export interface ApiBody {
   blocks: ApiNode[];
 }
 
 const fromApiBody = (body: ApiBody | null): GuideBody | null =>
   body && { blocks: body.blocks.map((n) => (n.type === "asset" ? { type: "image", assetId: n.assetId } : n)) };
 
-const toApiBody = (body: GuideBody): ApiBody => ({
+/** The story as the backend's rich text, for a save of one block's texts (Translation workspace, D-021). */
+export const toApiBody = (body: GuideBody): ApiBody => ({
   blocks: body.blocks.map((b) => (b.type === "image" ? { type: "asset", assetId: b.assetId } : b)),
 });
 
