@@ -64,6 +64,8 @@ export interface RequestOptions {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   body?: unknown;
   signal?: AbortSignal;
+  /** The `Accept` header; JSON unless a binary body is expected, such as an image. */
+  accept?: string;
 }
 
 export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
@@ -85,10 +87,30 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   return (await response.json()) as T;
 }
 
+/**
+ * A binary body, such as a QR image, with the same bearer token, single retry after a 401, and error parsing as
+ * `apiRequest`. Needed where an `<img src>` cannot carry the token.
+ */
+export async function apiBlob(path: string, options: RequestOptions = {}): Promise<Blob> {
+  const accept = options.accept ?? "*/*, application/json";
+  let response = await send(path, { ...options, accept });
+  if (response.status === 401) {
+    await forceTokenRefresh();
+    response = await send(path, { ...options, accept });
+    if (response.status === 401) {
+      await sessionExpired();
+    }
+  }
+  if (!response.ok) {
+    throw await toApiError(response);
+  }
+  return response.blob();
+}
+
 async function send(path: string, options: RequestOptions): Promise<Response> {
   const token = await getAccessToken();
   const headers: Record<string, string> = {
-    Accept: "application/json",
+    Accept: options.accept ?? "application/json",
     Authorization: `Bearer ${token}`,
   };
   let body: string | undefined;
