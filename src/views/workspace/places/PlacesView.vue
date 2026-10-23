@@ -1,5 +1,10 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from "vue";
+import ReorderControls from "@/components/ReorderControls.vue";
+import TriggerChips from "@/components/TriggerChips.vue";
+import { groupTriggersByTarget, listProjectTriggers, type Trigger } from "@/platform/triggers";
+import { saveOrder } from "@/platform/ordering";
+import { dropLineClass, useReorder } from "@/workspace/useReorder";
 import { useRouter } from "vue-router";
 import PageHead from "@/components/PageHead.vue";
 import StatusChangeDialog from "@/components/StatusChangeDialog.vue";
@@ -33,6 +38,8 @@ const { languages, defaultLanguage, error: languagesError, loading: languagesLoa
 const places = ref<Place[]>([]);
 const loading = ref(true);
 const loadError = ref<ApiError | null>(null);
+/** Non-archived triggers by Resource; null when they could not be read, so no chips show. */
+const triggersByTarget = ref<Map<string, Trigger[]> | null>(null);
 let controller: AbortController | null = null;
 
 async function load() {
@@ -41,7 +48,11 @@ async function load() {
   loading.value = true;
   loadError.value = null;
   try {
-    places.value = await listPlaces(projectId.value, controller.signal);
+    const signal = controller.signal;
+    // The chips are a hint: a failure to read them must not hide the list.
+    const triggers = listProjectTriggers(projectId.value, signal).catch(() => null);
+    places.value = await listPlaces(projectId.value, signal);
+    triggersByTarget.value = groupTriggersByTarget(await triggers, "PLACE");
   } catch (e) {
     if (e instanceof DOMException && e.name === "AbortError") return;
     if (!(e instanceof ApiError)) throw e;
@@ -53,7 +64,7 @@ async function load() {
 watch(projectId, load, { immediate: true });
 onBeforeUnmount(() => controller?.abort());
 
-type StatusFilter = "ALL" | ResourceStatus;
+type StatusFilter = "ALL" | ResourceStatus | "PENDING";
 const statusFilter = ref<StatusFilter>("ALL");
 const query = ref("");
 
@@ -64,7 +75,7 @@ function normalize(text: string): string {
 const rows = computed(() => {
   const q = normalize(query.value.trim());
   return flattenPlaceTree(places.value).filter(({ place }) => {
-    if (statusFilter.value !== "ALL" && place.status !== statusFilter.value) return false;
+    if (statusFilter.value === "PENDING" ? !place.hasWorkingCopy : statusFilter.value !== "ALL" && place.status !== statusFilter.value) return false;
     if (!q) return true;
     const haystack = [place.slug, ...Object.values(place.translations).map((t) => t.title ?? "")];
     return haystack.some((text) => normalize(text).includes(q));
@@ -177,6 +188,16 @@ const confirmCopy = computed(() => {
         action: "Deactivate",
       };
 });
+// Manual order (spec 12 section 3); off while a search or filter hides rows (DECISIONS.md D-017).
+const reorder = useReorder<Place>({
+  items: places,
+  // Siblings as the tree shows them: a Place whose parent is not in the list sits at the top level.
+  siblingKey: (place) => (place.parentPlaceId && places.value.some((p) => p.id === place.parentPlaceId) ? place.parentPlaceId : null),
+  save: (ids) => saveOrder(projectId.value, "places", ids),
+  title: (place) => title(place),
+  canReorder: computed(() => !query.value.trim() && statusFilter.value === "ALL"),
+  reload: load,
+});
 </script>
 
 <template>
@@ -226,7 +247,7 @@ const confirmCopy = computed(() => {
         />
         <div class="flex flex-wrap gap-1.5" role="group" aria-label="Filter by status">
           <button
-            v-for="chip in (['ALL', 'DRAFT', 'ACTIVE', 'ARCHIVED'] as const)"
+            v-for="chip in (['ALL', 'DRAFT', 'ACTIVE', 'ARCHIVED', 'PENDING'] as const)"
             :key="chip"
             type="button"
             class="rounded-full border px-[13px] py-1.5 text-[11px]"
@@ -234,10 +255,13 @@ const confirmCopy = computed(() => {
             :aria-pressed="statusFilter === chip"
             @click="statusFilter = chip"
           >
-            {{ chip === "ALL" ? "All" : chip }}
+            {{ chip === "ALL" ? "All" : chip === "PENDING" ? "Pending changes" : chip }}
           </button>
         </div>
-        <span class="ml-auto text-[11px] text-muted-foreground">Sorted by order</span>
+        <span class="ml-auto text-[11px] text-muted-foreground">
+          {{ reorder.enabled || reorder.saving ? "Sorted by order · drag or use the arrows to reorder" : "Clear the search and filters to reorder" }}
+        </span>
+        <p class="sr-only" aria-live="polite">{{ reorder.announcement }}</p>
       </div>
 
       <div v-if="loading" class="animate-skeleton" aria-busy="true" aria-label="Loading places">
@@ -252,6 +276,7 @@ const confirmCopy = computed(() => {
         <table class="w-full min-w-[560px] table-fixed border-collapse">
           <thead>
             <tr>
+              <th class="th w-[56px] px-2"><span class="sr-only">Order</span></th>
               <th class="th w-[41%] px-[18px]">Title</th>
               <th class="th w-[15%] px-3">Status</th>
               <th class="th w-[14%] px-3">Translations</th>
@@ -259,7 +284,13 @@ const confirmCopy = computed(() => {
             </tr>
           </thead>
           <tbody>
-            <tr v-for="{ place, depth } in rows" :key="place.id" class="hover:bg-muted">
+            <tr v-for="{ place, depth } in rows" :key="place.id"
+              class="hover:bg-muted"
+              :class="dropLineClass(reorder.dropLine(place))"
+              @dragover="reorder.dragOver(place, $event)"
+              @drop="reorder.drop(place, $event)"
+            >
+              <td class="td px-2"><ReorderControls :reorder="reorder" :item="place" :title="title(place)" /></td>
               <td class="td px-[18px]">
                 <div class="flex flex-wrap items-center gap-2" :style="{ paddingLeft: `${depth * 18}px` }">
                   <span v-if="depth" class="text-gray-300" aria-hidden="true">↳</span>
@@ -277,6 +308,9 @@ const confirmCopy = computed(() => {
                 <div class="mt-[3px] break-words text-[11px] text-gray-400" :style="{ paddingLeft: `${depth * 18}px` }">
                   <span class="font-mono">{{ place.slug }}</span> · {{ formatDate(place.updatedAt) }}
                 </div>
+                <div v-if="triggersByTarget" :style="{ paddingLeft: `${depth * 18}px` }">
+                  <TriggerChips :triggers="triggersByTarget.get(place.id) ?? []" />
+                </div>
               </td>
               <td class="td px-3">
                 <span
@@ -284,6 +318,14 @@ const confirmCopy = computed(() => {
                   :style="statusChipStyle(place.status)"
                 >
                   <span class="inline-block h-1.5 w-1.5 rounded-full bg-current"></span>{{ place.status }}
+                </span>
+                <span
+                  v-if="place.hasWorkingCopy"
+                  class="ml-1 inline-flex items-center rounded-full px-[9px] py-[3px] text-[10px] font-bold uppercase tracking-[0.07em]"
+                  :style="statusChipStyle('PENDING')"
+                  title="Has pending changes that visitors do not see yet"
+                >
+                  Pending changes
                 </span>
               </td>
               <td class="td px-3">

@@ -1,10 +1,26 @@
 <script setup lang="ts">
 /*
- * "How visitors reach it" (`12` §3, mockup place and POI editors): the Interaction Triggers of a Resource,
- * edited in its editor and saved with it. Camera recognition is deferred (`08`), so its chip is greyed
+ * "How visitors reach it" (`12` §3, common to every Resource editor): the Interaction Triggers of a Place, Point
+ * of Interest, Route, Guide, or Event, edited in its editor and saved with it (DECISIONS.md D-018). Camera recognition is deferred (`08`), so its chip is greyed
  * with the reason (backend D-026).
  */
-import { blankTrigger, TRIGGER_LABELS, type TriggerForm, type TriggerType } from "@/platform/triggers";
+import { computed } from "vue";
+import BackendQrCode from "@/components/editor/BackendQrCode.vue";
+import QrCodePreview from "@/components/editor/QrCodePreview.vue";
+import { blankTrigger, TRIGGER_CHIP_CLASS as CHIP, TRIGGER_LABELS, type TriggerForm, type TriggerType } from "@/platform/triggers";
+import { useCurrentProject } from "@/workspace/currentProject";
+
+const project = useCurrentProject();
+
+/** The stand-in link of a QR code: the CMS preview of the visitor app with the runtime's `?t=` (DECISIONS.md D-019). */
+function qrUrl(code: string): string {
+  return `${window.location.origin}/projects/${encodeURIComponent(project.value.id)}/app-preview?t=${encodeURIComponent(code)}`;
+}
+
+/** Whether the backend's QR image applies: a saved QR row whose code is unchanged, once the app has an address. */
+function hasBackendImage(t: TriggerForm): boolean {
+  return !!t.id && !!t.runtimeUrl && t.code.trim() === (t.savedCode ?? "");
+}
 
 const props = defineProps<{
   triggers: TriggerForm[];
@@ -12,13 +28,12 @@ const props = defineProps<{
   fieldError: (path: string) => string | undefined;
   /** Where a new geo-proximity area is centred, such as the Point of Interest's position. */
   position?: { latitude: string; longitude: string } | null;
+  /** The button that copies `position` into an area, such as "Use the place's position". */
+  positionLabel?: string;
 }>();
 
-const CHIP: Record<TriggerType, string> = {
-  BEACON: "bg-[#e3ecf7] text-[#1f4e8c]",
-  GEO_PROXIMITY: "bg-[#e1f3ea] text-[#17643f]",
-  QR_CODE: "bg-[#ececef] text-[#374151]",
-};
+/** The Project has a public web address once any saved QR code has a runtime URL. */
+const hasAddress = computed(() => props.triggers.some((t) => !!t.runtimeUrl));
 
 function add(type: TriggerType) {
   const defaults =
@@ -89,7 +104,7 @@ const invalid = (i: number, field: string) => ({ invalid: !!err(i, field) });
               class="text-[11px] font-bold text-primary"
               @click="usePosition(t)"
             >
-              Use this point's position
+              {{ positionLabel ?? "Use this position" }}
             </button>
           </template>
 
@@ -137,8 +152,27 @@ const invalid = (i: number, field: string) => ({ invalid: !!err(i, field) });
           </label>
           <span>Web and mobile, while the app is open.</span>
         </div>
+        <BackendQrCode
+          v-else-if="hasBackendImage(t)"
+          :project-id="project.id"
+          :trigger-id="t.id!"
+          :code="t.code.trim()"
+          :runtime-url="t.runtimeUrl!"
+        />
+        <p v-else-if="hasAddress" class="text-xs text-muted-foreground">
+          {{ t.code.trim() ? "Save to see the QR image for this code." : "Save to get a generated code and its QR image, or type your own code." }}
+        </p>
+        <QrCodePreview v-else-if="t.code.trim()" :url="qrUrl(t.code.trim())" :code="t.code.trim()">
+          <p v-if="t.id" class="text-muted-foreground">
+            Set the public web address in
+            <RouterLink :to="{ name: 'project-surfaces', params: { projectId: project.id } }" class="font-semibold text-primary">
+              App settings → Surfaces
+            </RouterLink>
+            to get the real QR image.
+          </p>
+        </QrCodePreview>
         <p v-else class="text-xs text-muted-foreground">
-          The QR image needs the app's public web address (App settings → Surfaces), which is not available yet.
+          {{ t.id ? "This QR code has no code yet." : "Save to get a generated code and its QR image, or type your own code." }}
         </p>
 
         <ul v-if="rowError(i) || ['code', 'uuid', 'major', 'minor', 'proximityMeters', 'cooldownSeconds', 'latitude', 'longitude', 'radiusMeters'].some((f) => err(i, f))">

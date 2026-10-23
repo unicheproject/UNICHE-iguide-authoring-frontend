@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from "vue";
+import ReorderControls from "@/components/ReorderControls.vue";
+import { saveOrder } from "@/platform/ordering";
+import { dropLineClass, useReorder } from "@/workspace/useReorder";
 import { useRouter } from "vue-router";
 import PageHead from "@/components/PageHead.vue";
 import SectionTabs from "@/components/SectionTabs.vue";
@@ -85,6 +88,17 @@ function onCreated(f: FloorPlan) {
   showToast("Floor plan created", `${f.internalName}. Place Points of Interest on it.`);
   void router.push({ name: "floor-plan-editor", params: { projectId: projectId.value, planId: f.id } });
 }
+// The floor plans of one Place in the order of its floor switcher (spec 12 section 3, DECISIONS.md D-017); plans
+// without a Place reorder among themselves.
+const reorder = useReorder<FloorPlan>({
+  items: plans,
+  siblingKey: (plan) => plan.placeId,
+  save: (ids) => saveOrder(projectId.value, "floor-plans", ids),
+  title: (plan) => plan.internalName,
+  canReorder: computed(() => true),
+  reload: load,
+});
+const ordered = computed(() => [...plans.value].sort((a, b) => a.sortOrder - b.sortOrder));
 </script>
 
 <template>
@@ -103,11 +117,20 @@ function onCreated(f: FloorPlan) {
     </div>
 
     <div v-else class="overflow-hidden rounded-lg border bg-card shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+      <p class="sr-only" aria-live="polite">{{ reorder.announcement }}</p>
       <div v-if="loading" class="animate-skeleton" aria-busy="true" aria-label="Loading floor plans">
         <div v-for="n in 2" :key="n" class="border-b border-gray-100 px-[18px] py-4"><div class="h-[13px] w-1/3 rounded bg-[#e2e3e7]"></div></div>
       </div>
       <ul v-else-if="plans.length">
-        <li v-for="m in plans" :key="m.id" class="flex flex-wrap items-center gap-3 border-b border-gray-100 px-[18px] py-3.5 last:border-b-0 hover:bg-muted">
+        <li
+          v-for="m in ordered"
+          :key="m.id"
+          class="flex flex-wrap items-center gap-3 border-b border-gray-100 px-[18px] py-3.5 last:border-b-0 hover:bg-muted"
+          :class="dropLineClass(reorder.dropLine(m))"
+          @dragover="reorder.dragOver(m, $event)"
+          @drop="reorder.drop(m, $event)"
+        >
+          <ReorderControls :reorder="reorder" :item="m" :title="m.internalName" />
           <div class="min-w-[min(100%,260px)] flex-1">
             <RouterLink :to="{ name: 'floor-plan-editor', params: { projectId, planId: m.id } }" class="text-[13px] font-semibold text-foreground no-underline hover:underline">
               {{ m.internalName }}
@@ -115,6 +138,14 @@ function onCreated(f: FloorPlan) {
             <div class="mt-[3px] text-[11px] text-gray-400">{{ meta(m) }} · {{ formatDate(m.updatedAt) }}</div>
           </div>
           <span class="rounded-full px-[9px] py-[3px] text-[10px] font-bold uppercase tracking-[0.07em]" :style="statusChipStyle(m.status)">{{ m.status }}</span>
+          <span
+            v-if="m.hasWorkingCopy"
+            class="rounded-full px-[9px] py-[3px] text-[10px] font-bold uppercase tracking-[0.07em]"
+            :style="statusChipStyle('PENDING')"
+            title="Has pending changes that visitors do not see yet"
+          >
+            Pending changes
+          </span>
           <RouterLink :to="{ name: 'floor-plan-editor', params: { projectId, planId: m.id } }" class="text-[10px] font-bold uppercase tracking-[0.06em] text-primary no-underline">Open</RouterLink>
           <button
             type="button"

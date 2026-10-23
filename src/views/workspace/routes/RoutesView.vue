@@ -1,5 +1,10 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from "vue";
+import ReorderControls from "@/components/ReorderControls.vue";
+import TriggerChips from "@/components/TriggerChips.vue";
+import { groupTriggersByTarget, listProjectTriggers, type Trigger } from "@/platform/triggers";
+import { saveOrder } from "@/platform/ordering";
+import { dropLineClass, useReorder } from "@/workspace/useReorder";
 import { useRouter } from "vue-router";
 import CategoryFilterSelect from "@/components/CategoryFilterSelect.vue";
 import PageHead from "@/components/PageHead.vue";
@@ -27,6 +32,8 @@ const { languages, defaultLanguage, error: languagesError, loading: languagesLoa
 const routes = ref<Route[]>([]);
 const loading = ref(true);
 const loadError = ref<ApiError | null>(null);
+/** Non-archived triggers by Resource; null when they could not be read, so no chips show. */
+const triggersByTarget = ref<Map<string, Trigger[]> | null>(null);
 let controller: AbortController | null = null;
 
 async function load() {
@@ -35,7 +42,11 @@ async function load() {
   loading.value = true;
   loadError.value = null;
   try {
-    routes.value = await listRoutes(projectId.value, controller.signal);
+    const signal = controller.signal;
+    // The chips are a hint: a failure to read them must not hide the list.
+    const triggers = listProjectTriggers(projectId.value, signal).catch(() => null);
+    routes.value = await listRoutes(projectId.value, signal);
+    triggersByTarget.value = groupTriggersByTarget(await triggers, "ROUTE");
   } catch (e) {
     if (e instanceof DOMException && e.name === "AbortError") return;
     if (!(e instanceof ApiError)) throw e;
@@ -47,7 +58,7 @@ async function load() {
 watch(projectId, load, { immediate: true });
 onBeforeUnmount(() => controller?.abort());
 
-type StatusFilter = "ALL" | ResourceStatus;
+type StatusFilter = "ALL" | ResourceStatus | "PENDING";
 const statusFilter = ref<StatusFilter>("ALL");
 const categoryFilter = useCategoryFilter(projectId, "ROUTE", defaultLanguage);
 const categorySelected = categoryFilter.selected;
@@ -62,7 +73,7 @@ const rows = computed(() => {
   return [...routes.value]
     .sort((a, b) => a.sortOrder - b.sortOrder)
     .filter((route) => {
-      if (statusFilter.value !== "ALL" && route.status !== statusFilter.value) return false;
+      if (statusFilter.value === "PENDING" ? !route.hasWorkingCopy : statusFilter.value !== "ALL" && route.status !== statusFilter.value) return false;
       if (!categoryFilter.matches(route.categoryId)) return false;
       if (!q) return true;
       const haystack = [route.slug, ...Object.values(route.translations).map((t) => t.title ?? "")];
@@ -170,6 +181,14 @@ const confirmCopy = computed(() => {
     ? { heading: `Archive ${title(c.route)}?`, body: "An archived route leaves the visitor app and the default lists. Restoring it makes it a draft again.", action: "Archive" }
     : { heading: `Deactivate ${title(c.route)}?`, body: "Visitors stop seeing it on their next refresh. It becomes a draft you can edit.", action: "Deactivate" };
 });
+// Manual order (spec 12 section 3); off while a search or filter hides rows (DECISIONS.md D-017).
+const reorder = useReorder<Route>({
+  items: routes,
+  save: (ids) => saveOrder(projectId.value, "routes", ids),
+  title: (route) => title(route),
+  canReorder: computed(() => !query.value.trim() && statusFilter.value === "ALL" && categorySelected.value === "ALL"),
+  reload: load,
+});
 </script>
 
 <template>
@@ -214,7 +233,7 @@ const confirmCopy = computed(() => {
         <CategoryFilterSelect v-model="categorySelected" :options="categoryFilter.options.value" />
         <div class="flex flex-wrap gap-1.5" role="group" aria-label="Filter by status">
           <button
-            v-for="chip in (['ALL', 'DRAFT', 'ACTIVE', 'ARCHIVED'] as const)"
+            v-for="chip in (['ALL', 'DRAFT', 'ACTIVE', 'ARCHIVED', 'PENDING'] as const)"
             :key="chip"
             type="button"
             class="rounded-full border px-[13px] py-1.5 text-[11px]"
@@ -222,10 +241,13 @@ const confirmCopy = computed(() => {
             :aria-pressed="statusFilter === chip"
             @click="statusFilter = chip"
           >
-            {{ chip === "ALL" ? "All" : chip }}
+            {{ chip === "ALL" ? "All" : chip === "PENDING" ? "Pending changes" : chip }}
           </button>
         </div>
-        <span class="ml-auto text-[11px] text-muted-foreground">Sorted by order</span>
+        <span class="ml-auto text-[11px] text-muted-foreground">
+          {{ reorder.enabled || reorder.saving ? "Sorted by order · drag or use the arrows to reorder" : "Clear the search and filters to reorder" }}
+        </span>
+        <p class="sr-only" aria-live="polite">{{ reorder.announcement }}</p>
       </div>
 
       <div v-if="loading" class="animate-skeleton" aria-busy="true" aria-label="Loading routes">
@@ -240,6 +262,7 @@ const confirmCopy = computed(() => {
         <table class="w-full min-w-[560px] table-fixed border-collapse">
           <thead>
             <tr>
+              <th class="th w-[56px] px-2"><span class="sr-only">Order</span></th>
               <th class="th w-[41%] px-[18px]">Title</th>
               <th class="th w-[15%] px-3">Status</th>
               <th class="th w-[14%] px-3">Translations</th>
@@ -247,7 +270,13 @@ const confirmCopy = computed(() => {
             </tr>
           </thead>
           <tbody>
-            <tr v-for="route in rows" :key="route.id" class="hover:bg-muted">
+            <tr v-for="route in rows" :key="route.id"
+              class="hover:bg-muted"
+              :class="dropLineClass(reorder.dropLine(route))"
+              @dragover="reorder.dragOver(route, $event)"
+              @drop="reorder.drop(route, $event)"
+            >
+              <td class="td px-2"><ReorderControls :reorder="reorder" :item="route" :title="title(route)" /></td>
               <td class="td px-[18px]">
                 <div class="flex flex-wrap items-center gap-2">
                   <RouterLink
@@ -264,6 +293,7 @@ const confirmCopy = computed(() => {
                 <div class="mt-[3px] break-words text-[11px] text-gray-400">
                   <span class="font-mono">{{ route.slug }}</span> · {{ facts(route) }} · {{ formatDate(route.updatedAt) }}
                 </div>
+                <TriggerChips v-if="triggersByTarget" :triggers="triggersByTarget.get(route.id) ?? []" />
               </td>
               <td class="td px-3">
                 <span
@@ -271,6 +301,14 @@ const confirmCopy = computed(() => {
                   :style="statusChipStyle(route.status)"
                 >
                   <span class="inline-block h-1.5 w-1.5 rounded-full bg-current"></span>{{ route.status }}
+                </span>
+                <span
+                  v-if="route.hasWorkingCopy"
+                  class="ml-1 inline-flex items-center rounded-full px-[9px] py-[3px] text-[10px] font-bold uppercase tracking-[0.07em]"
+                  :style="statusChipStyle('PENDING')"
+                  title="Has pending changes that visitors do not see yet"
+                >
+                  Pending changes
                 </span>
               </td>
               <td class="td px-3">

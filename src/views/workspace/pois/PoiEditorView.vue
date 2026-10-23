@@ -9,17 +9,20 @@ import { SLUG_PATTERN } from "@/lib/format";
 import { listAssets, type Asset, type MediaBinding } from "@/platform/assets";
 import { assignableCategories, listCategories, type Category } from "@/platform/categories";
 import { listPlaces, placeTitle, type Place } from "@/platform/places";
-import { listPoiTriggers, syncPoiTriggers, triggerToForm, type Trigger, type TriggerForm } from "@/platform/triggers";
+import { listTargetTriggers, syncTriggers, triggerToForm, type Trigger, type TriggerForm } from "@/platform/triggers";
 import {
   changePoiStatus,
   fetchPoi,
   fetchPoiReferences,
   listPois,
   POI_CODE_PATTERN,
+  poiFromResponse,
   poiTitle,
+  poiWorkingCopyPayload,
   updatePoi,
   type Poi,
   type PoiTranslation,
+  type UpdatePoiInput,
 } from "@/platform/pois";
 import type { ResourceReference } from "@/platform/references";
 import { useCurrentProject } from "@/workspace/currentProject";
@@ -113,6 +116,23 @@ const form = reactive({
 // The triggers as last loaded or saved; the form is reset from them with the POI.
 const savedTriggers = ref<Trigger[]>([]);
 
+/** The editable state from the form, for a DRAFT save and a working copy alike. */
+function input(): Omit<UpdatePoiInput, "version"> {
+  return {
+    slug: form.slug,
+    placeId: form.placeId || null,
+    categoryId: form.categoryId || null,
+    code: optionalText(form.code),
+    internalName: optionalText(form.internalName),
+    latitude: optionalNumber(form.latitude),
+    longitude: optionalNumber(form.longitude),
+    estimatedVisitMinutes: optionalNumber(form.estimatedVisitMinutes),
+    featured: form.featured,
+    translations: textsForApi(TEXT_KEYS, languageCodes(), form.translations),
+    media: form.media.map((m) => ({ ...m })),
+  };
+}
+
 const editor = useResourceEditor<Poi>({
   kind: "point of interest",
   source: () => props.poiId,
@@ -125,7 +145,7 @@ const editor = useResourceEditor<Poi>({
       listPois(projectId.value),
       listAssets(projectId.value),
       listCategories(projectId.value),
-      listPoiTriggers(projectId.value, props.poiId),
+      listTargetTriggers(projectId.value, "POI", props.poiId),
     ]);
     savedTriggers.value = triggers;
     places.value = allPlaces;
@@ -137,22 +157,20 @@ const editor = useResourceEditor<Poi>({
   async save(poi, version) {
     // Triggers are rows of their own and do not move the POI's version, so they go first: when one is
     // refused, the POI is not saved either and the form can be corrected and saved again.
-    savedTriggers.value = await syncPoiTriggers(projectId.value, poi.id, form.triggers);
-    const saved = await updatePoi(projectId.value, poi.id, {
-      version,
-      slug: form.slug,
-      placeId: form.placeId || null,
-      categoryId: form.categoryId || null,
-      code: optionalText(form.code),
-      internalName: optionalText(form.internalName),
-      latitude: optionalNumber(form.latitude),
-      longitude: optionalNumber(form.longitude),
-      estimatedVisitMinutes: optionalNumber(form.estimatedVisitMinutes),
-      featured: form.featured,
-      translations: textsForApi(TEXT_KEYS, languageCodes(), form.translations),
-      media: form.media.map((m) => ({ ...m })),
-    });
-    return saved;
+    savedTriggers.value = await syncTriggers(projectId.value, "POI", poi.id, form.triggers);
+    return updatePoi(projectId.value, poi.id, { version, ...input() });
+  },
+  workingCopy: {
+    kind: "pois",
+    projectId: () => projectId.value,
+    async payload(poi) {
+      // Triggers have a lifecycle of their own (backend D-026) and are not in the working copy: "Save draft"
+      // saves them live, first, as a DRAFT save does; a refused one stops the save at `triggers[i]`.
+      const body = poiWorkingCopyPayload(input());
+      savedTriggers.value = await syncTriggers(projectId.value, "POI", poi.id, form.triggers);
+      return body;
+    },
+    fromResponse: poiFromResponse,
   },
   changeStatus: (poi, target, version) => changePoiStatus(projectId.value, poi.id, target, version),
   loadReferences: (poi) => fetchPoiReferences(projectId.value, poi.id),
@@ -290,6 +308,7 @@ const translationRows = computed(() => translationStatus(languages.value, POI_TE
       :readonly="!editor.editable"
       :field-error="editor.fieldError"
       :position="{ latitude: form.latitude, longitude: form.longitude }"
+      position-label="Use this point's position"
     />
 
     <section class="overflow-hidden rounded-lg border bg-card">

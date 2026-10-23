@@ -72,6 +72,17 @@ box against the live Keycloak and Catalogue through the backend. Backend counter
 - 2026-10-19: "Translations" panel under Status in the Place, POI, Route, Guide, Event, and Category editors:
   per language Complete, Partial (n of m fields), or Missing, from the live form, counting the fields the
   lists count; a row opens that language's tab.
+- 2026-10-22: App settings → Surfaces (enable switches, Web public address) and the backend's QR image with its
+  runtime URL in the trigger card; the stand-in stays only without an address (DECISIONS.md D-020, backend D-029).
+- 2026-10-22: QR image, link, copy, download, and open in the trigger card, a stand-in opening the CMS preview of
+  the visitor app with `?t=` until the app has its public web address (DECISIONS.md D-019, GAPS.md G-021).
+- 2026-10-22: triggers on Places, Routes, Guides, and Events: the "How visitors reach it" card in their editors and
+  chips in their lists (DECISIONS.md D-018, backend D-028).
+- 2026-10-22: trigger chips under each POI row, or "No trigger, only reachable by browsing" (`12` §3).
+- 2026-10-21: drag-and-drop reordering, with Move up / Move down buttons, in the Places, POIs, Routes, Guides,
+  Events, Categories, and Floor plans lists (DECISIONS.md D-017).
+- 2026-10-21: ACTIVE Resources edited through their working copy in the eight content editors, with
+  "Pending changes" in the lists (DECISIONS.md D-016, GAPS.md G-007, backend M8w).
 - 2026-10-19: "How visitors reach it" card in the POI editor (Bluetooth beacon, geo-proximity, QR code;
   AR scan target greyed as deferred), on backend D-026.
 

@@ -1,5 +1,10 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from "vue";
+import ReorderControls from "@/components/ReorderControls.vue";
+import TriggerChips from "@/components/TriggerChips.vue";
+import { groupTriggersByTarget, listProjectTriggers, type Trigger } from "@/platform/triggers";
+import { saveOrder } from "@/platform/ordering";
+import { dropLineClass, useReorder } from "@/workspace/useReorder";
 import { useRouter } from "vue-router";
 import StatusChangeDialog from "@/components/StatusChangeDialog.vue";
 import CategoryFilterSelect from "@/components/CategoryFilterSelect.vue";
@@ -27,6 +32,8 @@ const { languages, defaultLanguage, error: languagesError, loading: languagesLoa
 
 const pois = ref<Poi[]>([]);
 const places = ref<Place[]>([]);
+/** Non-archived triggers by POI; null when they could not be read, so the list shows no trigger line at all. */
+const triggersByPoi = ref<Map<string, Trigger[]> | null>(null);
 const loading = ref(true);
 const loadError = ref<ApiError | null>(null);
 let controller: AbortController | null = null;
@@ -37,10 +44,12 @@ async function load() {
   loading.value = true;
   loadError.value = null;
   try {
-    [pois.value, places.value] = await Promise.all([
-      listPois(projectId.value, controller.signal),
-      listPlaces(projectId.value, controller.signal),
-    ]);
+    const signal = controller.signal;
+    // The chips are a hint: a failure to read them must not hide the list (and must not go unhandled when the
+    // list itself fails first).
+    const triggers = listProjectTriggers(projectId.value, signal).catch(() => null);
+    [pois.value, places.value] = await Promise.all([listPois(projectId.value, signal), listPlaces(projectId.value, signal)]);
+    triggersByPoi.value = groupTriggersByTarget(await triggers, "POI");
   } catch (e) {
     if (e instanceof DOMException && e.name === "AbortError") return;
     if (!(e instanceof ApiError)) throw e;
@@ -50,9 +59,10 @@ async function load() {
   }
 }
 watch(projectId, load, { immediate: true });
+
 onBeforeUnmount(() => controller?.abort());
 
-type StatusFilter = "ALL" | ResourceStatus;
+type StatusFilter = "ALL" | ResourceStatus | "PENDING";
 const statusFilter = ref<StatusFilter>("ALL");
 const categoryFilter = useCategoryFilter(projectId, "POI", defaultLanguage);
 const categorySelected = categoryFilter.selected;
@@ -69,7 +79,7 @@ const rows = computed(() => {
   return [...pois.value]
     .sort((a, b) => a.sortOrder - b.sortOrder)
     .filter((poi) => {
-      if (statusFilter.value !== "ALL" && poi.status !== statusFilter.value) return false;
+      if (statusFilter.value === "PENDING" ? !poi.hasWorkingCopy : statusFilter.value !== "ALL" && poi.status !== statusFilter.value) return false;
       if (!categoryFilter.matches(poi.categoryId)) return false;
       if (!q) return true;
       const haystack = [poi.slug, poi.code ?? "", ...Object.values(poi.translations).map((t) => t.title ?? "")];
@@ -179,6 +189,14 @@ const confirmCopy = computed(() => {
         action: "Deactivate",
       };
 });
+// Manual order (spec 12 section 3); off while a search or filter hides rows (DECISIONS.md D-017).
+const reorder = useReorder<Poi>({
+  items: pois,
+  save: (ids) => saveOrder(projectId.value, "pois", ids),
+  title: (poi) => title(poi),
+  canReorder: computed(() => !query.value.trim() && statusFilter.value === "ALL" && categorySelected.value === "ALL"),
+  reload: load,
+});
 </script>
 
 <template>
@@ -230,7 +248,7 @@ const confirmCopy = computed(() => {
         <CategoryFilterSelect v-model="categorySelected" :options="categoryFilter.options.value" />
         <div class="flex flex-wrap gap-1.5" role="group" aria-label="Filter by status">
           <button
-            v-for="chip in (['ALL', 'DRAFT', 'ACTIVE', 'ARCHIVED'] as const)"
+            v-for="chip in (['ALL', 'DRAFT', 'ACTIVE', 'ARCHIVED', 'PENDING'] as const)"
             :key="chip"
             type="button"
             class="rounded-full border px-[13px] py-1.5 text-[11px]"
@@ -238,10 +256,13 @@ const confirmCopy = computed(() => {
             :aria-pressed="statusFilter === chip"
             @click="statusFilter = chip"
           >
-            {{ chip === "ALL" ? "All" : chip }}
+            {{ chip === "ALL" ? "All" : chip === "PENDING" ? "Pending changes" : chip }}
           </button>
         </div>
-        <span class="ml-auto text-[11px] text-muted-foreground">Sorted by order</span>
+        <span class="ml-auto text-[11px] text-muted-foreground">
+          {{ reorder.enabled || reorder.saving ? "Sorted by order · drag or use the arrows to reorder" : "Clear the search and filters to reorder" }}
+        </span>
+        <p class="sr-only" aria-live="polite">{{ reorder.announcement }}</p>
       </div>
 
       <div v-if="loading" class="animate-skeleton" aria-busy="true" aria-label="Loading points of interest">
@@ -256,6 +277,7 @@ const confirmCopy = computed(() => {
         <table class="w-full min-w-[560px] table-fixed border-collapse">
           <thead>
             <tr>
+              <th class="th w-[56px] px-2"><span class="sr-only">Order</span></th>
               <th class="th w-[41%] px-[18px]">Title</th>
               <th class="th w-[15%] px-3">Status</th>
               <th class="th w-[14%] px-3">Translations</th>
@@ -263,7 +285,13 @@ const confirmCopy = computed(() => {
             </tr>
           </thead>
           <tbody>
-            <tr v-for="poi in rows" :key="poi.id" class="hover:bg-muted">
+            <tr v-for="poi in rows" :key="poi.id"
+              class="hover:bg-muted"
+              :class="dropLineClass(reorder.dropLine(poi))"
+              @dragover="reorder.dragOver(poi, $event)"
+              @drop="reorder.drop(poi, $event)"
+            >
+              <td class="td px-2"><ReorderControls :reorder="reorder" :item="poi" :title="title(poi)" /></td>
               <td class="td px-[18px]">
                 <div class="flex flex-wrap items-center gap-2">
                   <RouterLink
@@ -286,6 +314,11 @@ const confirmCopy = computed(() => {
                   <template v-if="poi.placeId"> · in {{ placeNames.get(poi.placeId) ?? "an unavailable place" }}</template>
                   · {{ formatDate(poi.updatedAt) }}
                 </div>
+                <TriggerChips
+                  v-if="triggersByPoi"
+                  :triggers="triggersByPoi.get(poi.id) ?? []"
+                  empty-text="No trigger, only reachable by browsing"
+                />
               </td>
               <td class="td px-3">
                 <span
@@ -293,6 +326,14 @@ const confirmCopy = computed(() => {
                   :style="statusChipStyle(poi.status)"
                 >
                   <span class="inline-block h-1.5 w-1.5 rounded-full bg-current"></span>{{ poi.status }}
+                </span>
+                <span
+                  v-if="poi.hasWorkingCopy"
+                  class="ml-1 inline-flex items-center rounded-full px-[9px] py-[3px] text-[10px] font-bold uppercase tracking-[0.07em]"
+                  :style="statusChipStyle('PENDING')"
+                  title="Has pending changes that visitors do not see yet"
+                >
+                  Pending changes
                 </span>
               </td>
               <td class="td px-3">

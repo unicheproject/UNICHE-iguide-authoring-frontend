@@ -67,7 +67,11 @@ prototype inventory).
 - Interim 2026-10-19: the POI editor's "How visitors reach it" card reads `.../triggers` by target and
   `syncPoiTriggers` (`platform/triggers.ts`) saves it before the POI: new rows are created and
   activated, changed rows updated, removed rows archived (backend D-026). The QR image is not offered
-  (backend G-033); the list rows do not yet show trigger chips (`12` §3).
+  (backend G-033). Since 2026-10-22 the POI list shows the triggers as chips under the slug, or "No trigger, only
+  reachable by browsing" (`12` §3), from one `GET .../triggers` per list load.
+- Interim 2026-10-22 (D-018, backend D-028): `syncTriggers` and `listTargetTriggers` take the target kind; the
+  Place, Route, Guide, and Event editors have the card and their lists show the chips (without the "No trigger"
+  text, which `12` §3 asks of POIs only).
 - Closed by: C0c on the generated client.
 
 ### G-005 — Calls to endpoints outside `07` §14
@@ -91,7 +95,11 @@ prototype inventory).
 - Found: no editor calls `working-copy`, `working-copy:apply`, or shows the pending banner's actions
   against the API; saves of `ACTIVE` Resources would go to the live row.
 - Spec: `03` §1, `12` §3 Resource editors, §4 Edit an ACTIVE Resource, specs `CLAUDE.md` inv. 9.
-- Closed by: the C5 working-copy slice after backend M8, with Playwright tests per `12` §4.
+- Interim 2026-10-21 (owner request, D-016): the eight content editors save an ACTIVE Resource into its
+  working copy, apply, discard, and resolve an apply conflict field by field, on backend D-027; lists show
+  "Pending changes". `vue-tsc` and `vite build` green; no Playwright test and no run against the live realm
+  yet. Not covered: browser-storage autosave (`12` §5), the last editor's name (backend G-034), Assets.
+- Closed by: Playwright tests per `12` §4 against the backend.
 
 ### G-008 — C0 and C1 screens differ from `12`
 
@@ -161,6 +169,17 @@ prototype inventory).
 
 - Found: `README.md` describes the Vue + Vite template only.
 - Closed by: the status pointer (bootstrap) and a project README with C0a.
+
+### G-021 — The QR image encodes the CMS stand-in, not the visitor app
+
+- Found 2026-10-22: the QR images of the trigger card (D-019) are drawn by the CMS and encode
+  `/projects/{id}/app-preview?t={code}`, the CMS's stand-in visitor app, instead of the app's absolute URL from
+  the backend's `qr.png` (`11` §9). They open only for signed-in authors on a device that reaches the CMS, and
+  must not be printed for visitors.
+- Spec: `03` §14, `11` §9, `12` §4 Generate a QR code.
+- Narrowed 2026-10-22 (D-020): once App settings → Surfaces gives the enabled WEB surface a public web address,
+  the card shows the backend's `qr.png` and runtime URL; the stand-in remains only for Projects without one.
+- Closed by: every Project having an address (a platform-hosted default, `09` §17) or the stand-in removed.
 
 ### G-020 — The editors' preview is a stand-in
 

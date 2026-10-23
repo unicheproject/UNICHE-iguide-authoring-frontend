@@ -6,16 +6,22 @@ import StoryEditor from "@/components/editor/StoryEditor.vue";
 import { blocksForApi, blocksToForm, type StoryBlockForm } from "@/components/editor/StoryEditor";
 import TranslationsPanel, { type TextFieldGroup, type TextFieldMeta } from "@/components/editor/TranslationsPanel.vue";
 import MediaSlots, { type MediaSlot } from "@/components/media/MediaSlots.vue";
+import TriggersCard from "@/components/editor/TriggersCard.vue";
+import { listTargetTriggers, syncTriggers, triggerToForm, type Trigger, type TriggerForm } from "@/platform/triggers";
 import { SLUG_PATTERN, statusChipStyle } from "@/lib/format";
 import { listAssets, type Asset, type MediaBinding } from "@/platform/assets";
 import {
   changeGuideStatus,
   fetchGuide,
   fetchGuideReferences,
+  guideFromResponse,
   guideTitle,
+  guideWorkingCopyError,
+  guideWorkingCopyPayload,
   readingMinutes,
   updateGuide,
   type Guide,
+  type UpdateGuideInput,
   type GuideItemType,
   type GuideTranslation,
 } from "@/platform/guides";
@@ -122,7 +128,34 @@ const form = reactive({
   bodies: {} as Record<string, StoryBlockForm[]>,
   items: [] as ItemForm[],
   media: [] as MediaBinding[],
+  triggers: [] as TriggerForm[],
 });
+// The triggers as last loaded or saved; the form is reset from them with the Guide.
+const savedTriggers = ref<Trigger[]>([]);
+
+/** The editable state from the form, for a DRAFT save and a working copy alike. */
+function input(): Omit<UpdateGuideInput, "version"> {
+  const texts = textsForApi(TEXT_KEYS, languageCodes(), form.translations);
+  const translations = Object.fromEntries(
+    Object.entries(texts).map(([code, t]) => {
+      const blocks = blocksForApi(form.bodies[code] ?? []);
+      return [code, { ...t, body: blocks.length ? { blocks } : null }];
+    }),
+  );
+  return {
+    slug: form.slug,
+    internalName: optionalText(form.internalName),
+    estimatedReadingMinutes: optionalNumber(form.estimatedReadingMinutes),
+    featured: form.featured,
+    translations,
+    items: form.items.map(({ resourceType, resourceId }) => ({ resourceType, resourceId })),
+    // INLINE bindings follow the story's images; the backend derives them.
+    media: form.media.map((m) => ({ ...m })),
+  };
+}
+
+/** Whether the form has a story, which takes block 0 in a working-copy payload. */
+const hasStory = () => Object.values(form.bodies).some((b) => blocksForApi(b ?? []).length > 0);
 
 const editor = useResourceEditor<Guide>({
   kind: "guide",
@@ -130,14 +163,16 @@ const editor = useResourceEditor<Guide>({
   languages,
   defaultLanguage,
   async load() {
-    const [guide, allPois, allRoutes, allPlaces, allEvents, library] = await Promise.all([
+    const [guide, allPois, allRoutes, allPlaces, allEvents, library, triggers] = await Promise.all([
       fetchGuide(projectId.value, props.guideId),
       listPois(projectId.value),
       listRoutes(projectId.value),
       listPlaces(projectId.value),
       listEvents(projectId.value),
       listAssets(projectId.value),
+      listTargetTriggers(projectId.value, "GUIDE", props.guideId),
     ]);
+    savedTriggers.value = triggers;
     pois.value = allPois;
     routes.value = allRoutes;
     places.value = allPlaces;
@@ -145,25 +180,22 @@ const editor = useResourceEditor<Guide>({
     assets.value = library;
     return guide;
   },
-  save(guide, version) {
-    const texts = textsForApi(TEXT_KEYS, languageCodes(), form.translations);
-    const translations = Object.fromEntries(
-      Object.entries(texts).map(([code, t]) => {
-        const blocks = blocksForApi(form.bodies[code] ?? []);
-        return [code, { ...t, body: blocks.length ? { blocks } : null }];
-      }),
-    );
-    return updateGuide(projectId.value, guide.id, {
-      version,
-      slug: form.slug,
-      internalName: optionalText(form.internalName),
-      estimatedReadingMinutes: optionalNumber(form.estimatedReadingMinutes),
-      featured: form.featured,
-      translations,
-      items: form.items.map(({ resourceType, resourceId }) => ({ resourceType, resourceId })),
-      // INLINE bindings follow the story's images; the backend derives them.
-      media: form.media.map((m) => ({ ...m })),
-    });
+  async save(guide, version) {
+    // Triggers are rows of their own and do not move the Guide's version, so they go first (as for POIs).
+    savedTriggers.value = await syncTriggers(projectId.value, "GUIDE", guide.id, form.triggers);
+    return updateGuide(projectId.value, guide.id, { version, ...input() });
+  },
+  workingCopy: {
+    kind: "guides",
+    projectId: () => projectId.value,
+    async payload(guide) {
+      // Triggers are not in the working copy (backend D-026): "Save draft" saves them live, after the body.
+      const body = guideWorkingCopyPayload(guide, input());
+      savedTriggers.value = await syncTriggers(projectId.value, "GUIDE", guide.id, form.triggers);
+      return body;
+    },
+    fromResponse: guideFromResponse,
+    mapError: guideWorkingCopyError,
   },
   changeStatus: (guide, target, version) => changeGuideStatus(projectId.value, guide.id, target, version),
   loadReferences: (guide) => fetchGuideReferences(projectId.value, guide.id),
@@ -176,6 +208,7 @@ const editor = useResourceEditor<Guide>({
     form.bodies = Object.fromEntries(Object.entries(guide.translations).map(([code, t]) => [code, blocksToForm(t.body?.blocks)]));
     form.items = guide.items.map((i) => ({ key: `i-${++keyCounter}`, ...i }));
     form.media = guide.media.filter((m) => m.usage !== "INLINE").map((m) => ({ ...m }));
+    form.triggers = savedTriggers.value.map(triggerToForm);
   },
   ensureLanguageRows() {
     ensureTextRows(TEXT_KEYS, languageCodes(), form.translations);
@@ -192,6 +225,15 @@ const editor = useResourceEditor<Guide>({
     return found;
   },
   describePath(path) {
+    if (/^triggers\[/.test(path)) return "How visitors reach it";
+    // Working-copy payload paths: block 0 is the story when there is one, the items follow (guides.ts).
+    const story = /^blocks\[(\d+)\]\.translations\.([^.]+)\.text/.exec(path);
+    if (story) {
+      const language = languages.value.find((l) => l.languageCode === story[2])?.displayName ?? story[2];
+      return `Story (${language})`;
+    }
+    const payloadBlock = /^blocks\[(\d+)\]/.exec(path);
+    if (payloadBlock) return `Related item ${Number(payloadBlock[1]) - (hasStory() ? 1 : 0) + 1}`;
     const item = /^items\[(\d+)\]/.exec(path);
     if (item) return `Related item ${Number(item[1]) + 1}`;
     if (/^media\[/.test(path)) return "Media";
@@ -340,6 +382,8 @@ const translationRows = computed(() => translationStatus(languages.value, 3, (co
       :field-error="editor.fieldError"
       @uploaded="assets.unshift($event)"
     />
+
+    <TriggersCard :triggers="form.triggers" :readonly="!editor.editable" :field-error="editor.fieldError" />
 
     <MediaSlots
       :project-id="projectId"

@@ -2,6 +2,8 @@
 import { computed, reactive, ref, watch } from "vue";
 import EditorShell from "@/components/editor/EditorShell.vue";
 import TranslationsPanel, { type TextFieldGroup, type TextFieldMeta } from "@/components/editor/TranslationsPanel.vue";
+import TriggersCard from "@/components/editor/TriggersCard.vue";
+import { listTargetTriggers, syncTriggers, triggerToForm, type Trigger, type TriggerForm } from "@/platform/triggers";
 import { SLUG_PATTERN } from "@/lib/format";
 import {
   changePlaceStatus,
@@ -11,10 +13,13 @@ import {
   PLACE_TEXT_FIELDS,
   PLACE_SETTING_LABELS,
   PLACE_TYPES_BY_SETTING,
+  placeFromResponse,
   placeTitle,
+  placeWorkingCopyPayload,
   updatePlace,
   type Place,
   type PlaceTranslation,
+  type UpdatePlaceInput,
   type PlaceSetting,
   type PlaceType,
 } from "@/platform/places";
@@ -22,6 +27,7 @@ import { useCurrentProject } from "@/workspace/currentProject";
 import {
   describeTranslationPath,
   ensureTextRows,
+  numberText,
   optionalText,
   textsForApi,
   textsFrom,
@@ -79,7 +85,26 @@ const form = reactive({
   internalName: "",
   featured: false,
   translations: {} as Record<string, Texts<TextKey>>,
+  triggers: [] as TriggerForm[],
 });
+// The triggers as last loaded or saved; the form is reset from them with the Place.
+const savedTriggers = ref<Trigger[]>([]);
+
+/** The editable state from the form, for a DRAFT save and a working copy alike. */
+function input(place: Place): Omit<UpdatePlaceInput, "version"> {
+  return {
+    slug: form.slug,
+    type: form.type,
+    setting: form.setting,
+    parentPlaceId: form.parentPlaceId || null,
+    internalName: optionalText(form.internalName),
+    // Places are located through their map, not by coordinates of their own; stored values pass through.
+    latitude: place.latitude,
+    longitude: place.longitude,
+    featured: form.featured,
+    translations: textsForApi(PLACE_TEXT_FIELDS, languageCodes(), form.translations),
+  };
+}
 
 const editor = useResourceEditor<Place>({
   kind: "place",
@@ -87,26 +112,32 @@ const editor = useResourceEditor<Place>({
   languages,
   defaultLanguage,
   async load() {
-    const [place, places] = await Promise.all([fetchPlace(projectId.value, props.placeId), listPlaces(projectId.value)]);
+    const [place, places, triggers] = await Promise.all([
+      fetchPlace(projectId.value, props.placeId),
+      listPlaces(projectId.value),
+      listTargetTriggers(projectId.value, "PLACE", props.placeId),
+    ]);
     allPlaces.value = places;
+    savedTriggers.value = triggers;
     return place;
   },
   async save(place, version) {
-    const saved = await updatePlace(projectId.value, place.id, {
-      version,
-      slug: form.slug,
-      type: form.type,
-      setting: form.setting,
-      parentPlaceId: form.parentPlaceId || null,
-      internalName: optionalText(form.internalName),
-      // Places are located through their map, not by coordinates of their own; stored values pass through.
-      latitude: place.latitude,
-      longitude: place.longitude,
-      featured: form.featured,
-      translations: textsForApi(PLACE_TEXT_FIELDS, languageCodes(), form.translations),
-    });
+    // Triggers are rows of their own and do not move the Place's version, so they go first (as for POIs).
+    savedTriggers.value = await syncTriggers(projectId.value, "PLACE", place.id, form.triggers);
+    const saved = await updatePlace(projectId.value, place.id, { version, ...input(place) });
     allPlaces.value = allPlaces.value.map((p) => (p.id === saved.id ? saved : p));
     return saved;
+  },
+  workingCopy: {
+    kind: "places",
+    projectId: () => projectId.value,
+    async payload(place) {
+      // Triggers are not in the working copy (backend D-026): "Save draft" saves them live, after the body.
+      const body = placeWorkingCopyPayload(input(place));
+      savedTriggers.value = await syncTriggers(projectId.value, "PLACE", place.id, form.triggers);
+      return body;
+    },
+    fromResponse: placeFromResponse,
   },
   changeStatus: (place, target, version) => changePlaceStatus(projectId.value, place.id, target, version),
   loadReferences: (place) => fetchPlaceReferences(projectId.value, place.id),
@@ -120,6 +151,7 @@ const editor = useResourceEditor<Place>({
     form.translations = Object.fromEntries(
       Object.entries(place.translations).map(([code, t]) => [code, textsFrom(PLACE_TEXT_FIELDS, t)]),
     );
+    form.triggers = savedTriggers.value.map(triggerToForm);
   },
   ensureLanguageRows: () => ensureTextRows(PLACE_TEXT_FIELDS, languageCodes(), form.translations),
   formState: () => form,
@@ -128,7 +160,8 @@ const editor = useResourceEditor<Place>({
     if (!SLUG_PATTERN.test(form.slug)) found.slug = "Use lowercase Latin letters, digits, and single hyphens.";
     return found;
   },
-  describePath: (path) => describeTranslationPath(path, languages.value, TEXT_META) ?? FIELD_NAMES[path] ?? path,
+  describePath: (path) =>
+    /^triggers\[/.test(path) ? "How visitors reach it" : describeTranslationPath(path, languages.value, TEXT_META) ?? FIELD_NAMES[path] ?? path,
 });
 
 const heading = computed(() => (editor.resource ? placeTitle(editor.resource, null, defaultLanguage.value) : "Place"));
@@ -296,6 +329,14 @@ const translationRows = computed(() => translationStatus(languages.value, PLACE_
       :error-languages="editor.languagesWithErrors"
       :field-error="editor.fieldError"
       title-required-hint="Required in the default language before the place can be activated."
+    />
+
+    <TriggersCard
+      :triggers="form.triggers"
+      :readonly="!editor.editable"
+      :field-error="editor.fieldError"
+      :position="{ latitude: numberText(editor.resource?.latitude), longitude: numberText(editor.resource?.longitude) }"
+      position-label="Use the place's position"
     />
 
     <section class="overflow-hidden rounded-lg border bg-card" aria-labelledby="place-link-heading">

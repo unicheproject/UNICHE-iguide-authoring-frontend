@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from "vue";
+import ReorderControls from "@/components/ReorderControls.vue";
+import { saveOrder } from "@/platform/ordering";
+import { dropLineClass, useReorder } from "@/workspace/useReorder";
 import { useRouter } from "vue-router";
 import PageHead from "@/components/PageHead.vue";
 import StatusChangeDialog from "@/components/StatusChangeDialog.vue";
@@ -58,7 +61,7 @@ async function load() {
 watch(projectId, load, { immediate: true });
 onBeforeUnmount(() => controller?.abort());
 
-const statusFilter = ref<"ALL" | ResourceStatus>("ALL");
+const statusFilter = ref<"ALL" | ResourceStatus | "PENDING">("ALL");
 const scopeFilter = ref<"ALL" | CategoryScope>("ALL");
 const query = ref("");
 const normalize = (text: string) => text.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
@@ -71,7 +74,7 @@ const rows = computed(() => {
   const nodes = scopes.flatMap((scope) => categoryTree(categories.value, scope, true));
   if (!q && statusFilter.value === "ALL") return nodes;
   return nodes
-    .filter(({ category }) => statusFilter.value === "ALL" || category.status === statusFilter.value)
+    .filter(({ category }) => statusFilter.value === "ALL" || (statusFilter.value === "PENDING" ? !!category.hasWorkingCopy : category.status === statusFilter.value))
     .filter(({ category }) => !q || [category.code, ...Object.values(category.translations).map((t) => t.name ?? "")].some((t) => normalize(t).includes(q)))
     .map(({ category }) => ({ category, depth: 0 }));
 });
@@ -126,6 +129,17 @@ const countText = computed(() => {
   const total = categories.value.length;
   const noun = total === 1 ? "category" : "categories";
   return rows.value.length === total ? `${total} ${noun}` : `${rows.value.length} of ${total} ${noun}`;
+});
+// Manual order (spec 12 section 3); off while a search or filter hides rows (DECISIONS.md D-017).
+const reorder = useReorder<Category>({
+  items: categories,
+  // Siblings as the tree shows them: the same scope and parent; a subcategory whose parent is missing is top level.
+  siblingKey: (category) =>
+    `${category.scope}:${category.parentCategoryId && categories.value.some((c) => c.id === category.parentCategoryId) ? category.parentCategoryId : ""}`,
+  save: (ids) => saveOrder(projectId.value, "categories", ids),
+  title: (category) => name(category),
+  canReorder: computed(() => !query.value.trim() && statusFilter.value === "ALL"),
+  reload: load,
 });
 </script>
 
@@ -182,7 +196,7 @@ const countText = computed(() => {
         </div>
         <div class="flex flex-wrap gap-1.5" role="group" aria-label="Filter by status">
           <button
-            v-for="chip in (['ALL', 'DRAFT', 'ACTIVE', 'ARCHIVED'] as const)"
+            v-for="chip in (['ALL', 'DRAFT', 'ACTIVE', 'ARCHIVED', 'PENDING'] as const)"
             :key="chip"
             type="button"
             class="rounded-full border px-[13px] py-1.5 text-[11px]"
@@ -190,10 +204,13 @@ const countText = computed(() => {
             :aria-pressed="statusFilter === chip"
             @click="statusFilter = chip"
           >
-            {{ chip === "ALL" ? "All" : chip }}
+            {{ chip === "ALL" ? "All" : chip === "PENDING" ? "Pending changes" : chip }}
           </button>
         </div>
-        <span class="ml-auto text-[11px] text-muted-foreground">{{ query || statusFilter !== "ALL" ? "Matches" : "Tree" }}</span>
+        <span class="ml-auto text-[11px] text-muted-foreground">
+          {{ query || statusFilter !== "ALL" ? "Matches · clear the search and filters to reorder" : "Tree · drag or use the arrows to reorder" }}
+        </span>
+        <p class="sr-only" aria-live="polite">{{ reorder.announcement }}</p>
       </div>
 
       <div v-if="loading" class="animate-skeleton" aria-busy="true" aria-label="Loading categories">
@@ -206,6 +223,7 @@ const countText = computed(() => {
         <table class="w-full min-w-[620px] table-fixed border-collapse">
           <thead>
             <tr>
+              <th class="th w-[56px] px-2"><span class="sr-only">Order</span></th>
               <th class="th w-[40%] px-[18px]">Name</th>
               <th class="th w-[13%] px-3">Status</th>
               <th class="th w-[17%] px-3">Translations</th>
@@ -213,7 +231,13 @@ const countText = computed(() => {
             </tr>
           </thead>
           <tbody>
-            <tr v-for="{ category, depth } in rows" :key="category.id" class="hover:bg-muted">
+            <tr v-for="{ category, depth } in rows" :key="category.id"
+              class="hover:bg-muted"
+              :class="dropLineClass(reorder.dropLine(category))"
+              @dragover="reorder.dragOver(category, $event)"
+              @drop="reorder.drop(category, $event)"
+            >
+              <td class="td px-2"><ReorderControls :reorder="reorder" :item="category" :title="name(category)" /></td>
               <td class="td px-[18px]">
                 <div class="flex items-center gap-2" :style="{ paddingLeft: `${depth * 18}px` }">
                   <span v-if="depth" class="text-gray-300" aria-hidden="true">└</span>
@@ -244,6 +268,14 @@ const countText = computed(() => {
                   :style="statusChipStyle(category.status)"
                 >
                   <span class="inline-block h-1.5 w-1.5 rounded-full bg-current"></span>{{ category.status }}
+                </span>
+                <span
+                  v-if="category.hasWorkingCopy"
+                  class="ml-1 inline-flex items-center rounded-full px-[9px] py-[3px] text-[10px] font-bold uppercase tracking-[0.07em]"
+                  :style="statusChipStyle('PENDING')"
+                  title="Has pending changes that visitors do not see yet"
+                >
+                  Pending changes
                 </span>
               </td>
               <td class="td px-3">

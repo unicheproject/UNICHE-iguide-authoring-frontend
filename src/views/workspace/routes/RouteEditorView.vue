@@ -5,6 +5,8 @@ import RouteMap, { type RouteMapStop } from "@/components/RouteMap.vue";
 import EditorShell from "@/components/editor/EditorShell.vue";
 import TranslationsPanel, { type TextFieldGroup, type TextFieldMeta } from "@/components/editor/TranslationsPanel.vue";
 import MediaSlots, { type MediaSlot } from "@/components/media/MediaSlots.vue";
+import TriggersCard from "@/components/editor/TriggersCard.vue";
+import { listTargetTriggers, syncTriggers, triggerToForm, type Trigger, type TriggerForm } from "@/platform/triggers";
 import { SLUG_PATTERN, statusChipStyle } from "@/lib/format";
 import { listAssets, type Asset, type MediaBinding } from "@/platform/assets";
 import { assignableCategories, listCategories, type Category } from "@/platform/categories";
@@ -18,9 +20,11 @@ import {
   ROUTE_TYPES,
   ROUTE_TYPE_HINTS,
   routeDifficultyLabel,
+  routeFromResponse,
   routeTitle,
   routeModeLabel,
   routeTypeLabel,
+  routeWorkingCopyPayload,
   updateRoute,
   type Route,
   type RouteDifficulty,
@@ -29,6 +33,7 @@ import {
   type RouteStopTranslation,
   type RouteTranslation,
   type RouteType,
+  type UpdateRouteInput,
 } from "@/platform/routes";
 import { useCurrentProject } from "@/workspace/currentProject";
 import {
@@ -120,7 +125,10 @@ const form = reactive({
   translations: {} as Record<string, Texts<RouteTextKey>>,
   stops: [] as StopForm[],
   media: [] as MediaBinding[],
+  triggers: [] as TriggerForm[],
 });
+// The triggers as last loaded or saved; the form is reset from them with the Route.
+const savedTriggers = ref<Trigger[]>([]);
 
 function toStopForm(stop: RouteStop): StopForm {
   return {
@@ -132,46 +140,66 @@ function toStopForm(stop: RouteStop): StopForm {
   };
 }
 
+/** The editable state from the form, for a DRAFT save and a working copy alike. */
+function input(): Omit<UpdateRouteInput, "version"> {
+  return {
+    slug: form.slug,
+    type: form.type,
+    difficulty: form.difficulty,
+    mode: form.mode,
+    categoryId: form.categoryId || null,
+    loop: form.loop,
+    estimatedDurationMinutes: optionalNumber(form.estimatedDurationMinutes),
+    distanceMeters: optionalNumber(form.distanceMeters),
+    internalName: optionalText(form.internalName),
+    featured: form.featured,
+    translations: textsForApi(ROUTE_TEXT_KEYS, languageCodes(), form.translations),
+    stops: form.stops.map((s, i) => ({
+      id: s.id,
+      poiId: s.poiId,
+      position: i,
+      optional: s.optional,
+      translations: textsForApi(STOP_TEXT_KEYS, languageCodes(), s.translations),
+    })),
+    media: form.media.map((m) => ({ ...m })),
+  };
+}
+
 const editor = useResourceEditor<Route>({
   kind: "route",
   source: () => props.routeId,
   languages,
   defaultLanguage,
   async load() {
-    const [route, allPois, library, allCategories] = await Promise.all([
+    const [route, allPois, library, allCategories, triggers] = await Promise.all([
       fetchRoute(projectId.value, props.routeId),
       listPois(projectId.value),
       listAssets(projectId.value),
       listCategories(projectId.value),
+      listTargetTriggers(projectId.value, "ROUTE", props.routeId),
     ]);
+    savedTriggers.value = triggers;
     pois.value = allPois;
     assets.value = library;
     categories.value = allCategories;
     return route;
   },
-  save: (route, version) =>
-    updateRoute(projectId.value, route.id, {
-      version,
-      slug: form.slug,
-      type: form.type,
-      difficulty: form.difficulty,
-      mode: form.mode,
-      categoryId: form.categoryId || null,
-      loop: form.loop,
-      estimatedDurationMinutes: optionalNumber(form.estimatedDurationMinutes),
-      distanceMeters: optionalNumber(form.distanceMeters),
-      internalName: optionalText(form.internalName),
-      featured: form.featured,
-      translations: textsForApi(ROUTE_TEXT_KEYS, languageCodes(), form.translations),
-      stops: form.stops.map((s, i) => ({
-        id: s.id,
-        poiId: s.poiId,
-        position: i,
-        optional: s.optional,
-        translations: textsForApi(STOP_TEXT_KEYS, languageCodes(), s.translations),
-      })),
-      media: form.media.map((m) => ({ ...m })),
-    }),
+  async save(route, version) {
+    // Triggers are rows of their own and do not move the Route's version, so they go first (as for POIs).
+    savedTriggers.value = await syncTriggers(projectId.value, "ROUTE", route.id, form.triggers);
+    return updateRoute(projectId.value, route.id, { version, ...input() });
+  },
+  workingCopy: {
+    kind: "routes",
+    projectId: () => projectId.value,
+    async payload(route) {
+      // Triggers are not in the working copy (backend D-026): "Save draft" saves them live, after the body.
+      const body = routeWorkingCopyPayload(input());
+      savedTriggers.value = await syncTriggers(projectId.value, "ROUTE", route.id, form.triggers);
+      return body;
+    },
+    fromResponse: routeFromResponse,
+  },
   changeStatus: (route, target, version) => changeRouteStatus(projectId.value, route.id, target, version),
   loadReferences: (route) => fetchRouteReferences(projectId.value, route.id),
   resetForm(route) {
@@ -188,6 +216,7 @@ const editor = useResourceEditor<Route>({
     form.translations = Object.fromEntries(Object.entries(route.translations).map(([code, t]) => [code, textsFrom(ROUTE_TEXT_KEYS, t)]));
     form.stops = route.stops.map(toStopForm);
     form.media = route.media.map((m) => ({ ...m }));
+    form.triggers = savedTriggers.value.map(triggerToForm);
   },
   ensureLanguageRows() {
     ensureTextRows(ROUTE_TEXT_KEYS, languageCodes(), form.translations);
@@ -207,6 +236,7 @@ const editor = useResourceEditor<Route>({
     const stop = /^stops\[(\d+)\]/.exec(path);
     if (stop) return `Stop ${Number(stop[1]) + 1}`;
     if (/^media\[/.test(path)) return "Media";
+    if (/^triggers\[/.test(path)) return "How visitors reach it";
     return describeTranslationPath(path, languages.value, TEXT_META) ?? FIELD_NAMES[path] ?? path;
   },
 });
@@ -280,6 +310,14 @@ function removeStop(index: number) {
 const categoryChoices = computed(() => assignableCategories(categories.value, "ROUTE", defaultLanguage.value));
 const categoryMissing = computed(() => !!form.categoryId && !categoryChoices.value.some((o) => o.id === form.categoryId));
 const hasActiveStop = computed(() => form.stops.some((s) => poiById.value.get(s.poiId)?.status === "ACTIVE"));
+
+/** Where a new geo-proximity area starts: the first stop's point of interest, when it has a position. */
+const firstStopPosition = computed(() => {
+  const poi = form.stops.length ? poiById.value.get(form.stops[0].poiId) : undefined;
+  return poi && poi.latitude !== null && poi.longitude !== null
+    ? { latitude: String(poi.latitude), longitude: String(poi.longitude) }
+    : null;
+});
 
 const mapStops = computed<RouteMapStop[]>(() =>
   form.stops.map((s, i) => {
@@ -357,6 +395,14 @@ const translationRows = computed(() => translationStatus(languages.value, ROUTE_
       :readonly="!editor.editable"
       :field-error="editor.fieldError"
       @uploaded="assets.unshift($event)"
+    />
+
+    <TriggersCard
+      :triggers="form.triggers"
+      :readonly="!editor.editable"
+      :field-error="editor.fieldError"
+      :position="firstStopPosition"
+      position-label="Use the first stop's position"
     />
 
     <section class="overflow-hidden rounded-lg border bg-card">

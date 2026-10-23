@@ -14,7 +14,14 @@ export const router = createRouter({
       path: "/projects/:projectId/app-preview",
       name: "app-preview",
       component: () => import("@/views/AppPreviewView.vue"),
-      props: (route) => ({ projectId: route.params.projectId, surface: route.query.surface, lang: route.query.lang, mode: route.query.mode }),
+      props: (route) => ({
+        projectId: route.params.projectId,
+        surface: route.query.surface,
+        lang: route.query.lang,
+        mode: route.query.mode,
+        // A QR code's `?t=` (`11` §9): the stand-in app fires that trigger once loaded (DECISIONS.md D-019).
+        t: route.query.t,
+      }),
       meta: { bare: true },
     },
     // Entry route for deep links, including the Platform Portal's (12-cms-experience.md section 4).
@@ -158,6 +165,12 @@ export const router = createRouter({
           name: "project-languages",
           component: () => import("@/views/workspace/LanguagesView.vue"),
           meta: { section: "languages" },
+        },
+        {
+          path: "surfaces",
+          name: "project-surfaces",
+          component: () => import("@/views/workspace/SurfacesView.vue"),
+          meta: { section: "surfaces" },
         },
         {
           path: `:section(${sectionPattern})`,

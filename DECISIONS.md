@@ -203,3 +203,107 @@ the backend's DECISIONS.md.
   loaded once per visit to the screen and reloads with it.
 - Alternatives: the real runtime in an iframe; the backend manifest first.
 - Affected specs: `03` §14; `11` §3, §9; `12` §3 Preview; `13` §7.
+
+## D-016 (2026-10-21) — Editing ACTIVE Resources through their working copy
+
+- Type: spec-interpretation and owner decision (2026-10-20: all eight content kinds, with backend D-027)
+- Decision: the Place, POI, Route, Guide, Event, Category, map, and floor plan editors edit an `ACTIVE` Resource
+  through its working copy (`12` §3 Resource editors, §4 Edit an ACTIVE Resource):
+  - `useResourceEditor` loads the copy when the Resource has one and fills the form from `resource`, the
+    backend's rendering of the copy; saves of an ACTIVE Resource go to `PUT .../working-copy` with the whole
+    state (`platform/workingCopies.ts`; each adapter builds the payload from the same input as its DRAFT
+    save); "Apply changes" in the header saves pending edits first, then applies after a confirmation naming
+    the Resource; "Save draft" and "Discard changes" sit in the amber banner;
+  - after an apply `409` the CMS reads the live row and lists the fields that differ, scalar fields by name
+    and translated fields as `translations.<lang>.<field>`, anything else (lists, rich text) as a whole, each
+    with "Mine" or "Current"; "Save my choices" reopens the copy on the current version (backend D-027), and
+    the author applies again. The CMS computes the paths itself, since the backend sends no
+    `conflictingFields` yet (backend G-034);
+  - the banner names the last editor "you" or "another author" from the copy's subject until Audit Events
+    give a display name;
+  - POI triggers stay rows of their own (backend D-026): a "Save draft" of an ACTIVE POI saves trigger changes
+    live, as before;
+  - lists show a "Pending changes" badge and a "Pending changes" filter chip from `hasWorkingCopy`.
+- Why: AGENTS.md §4 rule 6; owner priority.
+- Consequences: deactivating or archiving discards the copy, and the confirmation says so; the editors'
+  preview stand-in (D-014) shows the form, which is the copy.
+- Alternatives: per-field merge in the backend (`07` §15 leaves it to the CMS); read-only ACTIVE editors until
+  the generated client (rejected by the owner).
+- Affected specs: `03` §1; `07` §14–15; `12` §3, §4, §5.
+
+## D-017 (2026-10-21) — Manual reordering in the content lists
+
+- Type: spec-interpretation (owner request 2026-10-21)
+- Decision: the Places, Points of Interest, Routes, Guides, Events, Categories, and Floor plans lists reorder by
+  drag and drop on a handle, persisted through `PUT .../{kind}:order` (`12` §3 Content library), in
+  `workspace/useReorder.ts`, `components/ReorderControls.vue`, and `platform/ordering.ts`:
+  - a row moves only among its siblings: the same parent in the Place and Category trees (Categories also per
+    scope), the same Place for floor plans (the order of its floor switcher, `12` §3 Maps & Floor Plans), and
+    every row in the flat lists; the siblings take back the positions they held, so no other row moves and the
+    request lists every id of the Project, as the backend requires;
+  - "Move up" and "Move down" buttons on every row are the keyboard path (AGENTS.md §4 rule 7); a polite live
+    region announces the new position;
+  - reordering is off while a search, a status chip other than All, or a Category filter is active, since a
+    move among the visible rows would not say where hidden rows go; the list says so;
+  - the new order shows at once and is saved; a failed save restores it, and `INCOMPLETE_ORDER` (a row added or
+    removed meanwhile) reloads the list;
+  - `sortOrder` changes never touch `version` (backend D-019), so reordering works on ACTIVE Resources and their
+    working copies alike.
+- Why: `12` §3 names drag and drop and the order endpoint but not trees, filters, or the keyboard path.
+- Alternatives: moving across parents by drag (rejected: changing the parent is an edit with its own rules, done
+  in the editor); a reorder mode with its own Save (rejected: one action per move is simpler to undo).
+- Affected specs: `12` §3; `14` §4.
+
+## D-018 (2026-10-22) — Triggers on every content kind
+
+- Type: spec-interpretation (owner request 2026-10-22, with backend D-028)
+- Decision: the "How visitors reach it" card and the list chips cover Places, Routes, Guides, and Events as well as
+  Points of Interest (`12` §3 lists the card under "Common to every kind"):
+  - `platform/triggers.ts` takes the target kind (`listTargetTriggers`, `syncTriggers`, `groupTriggersByTarget`);
+    triggers stay rows of their own, saved live before a DRAFT save and with "Save draft" of an ACTIVE Resource,
+    never in its working copy (D-016, backend D-026);
+  - the geo-proximity default is the Resource's position where it has one: a POI's own, a Place's stored
+    coordinates, a Route's first stop's POI, an Event's chosen POI else its Place; a Guide has none;
+  - the lists show chips under the slug; only the POI list says "No trigger, only reachable by browsing", since
+    `12` §3 asks it of Points of Interest only;
+  - the preview stand-in (D-015) fires a trigger on its own target kind, not only on POIs.
+- Why: the backend accepts these targets since backend D-028; `12` §3 and `03` §14 set no kind limit.
+- Consequences: an active trigger keeps its target in use, so deactivating or archiving it shows the where-used
+  block naming the trigger. A Route Stop has no trigger of its own; it is reached by its POI's triggers (`03` §14).
+- Alternatives: a trigger screen of its own (rejected by `12` §3); the "No trigger" text on every list (not asked).
+- Affected specs: `03` §14; `11` §9; `12` §3.
+
+## D-019 (2026-10-22) — The QR image is drawn by the CMS until the app has its public web address
+
+- Type: owner decision (2026-10-22) and stand-in, like D-014 and D-015
+- Decision: every QR code row of the "How visitors reach it" card shows a QR image, the link it encodes, and
+  "Copy link", "Download PNG", and "Open" (`components/editor/QrCodePreview.vue`, the `qrcode` 1.5.4 package):
+  - the link is the CMS's stand-in visitor app, `/projects/{id}/app-preview?t={code}`, with the `?t=` of the
+    runtime URL scheme (`11` §9); `AppPreviewView` fires the QR trigger with that code once the content is loaded,
+    so the stand-in app opens its target, or says no such code exists;
+  - the image follows the code as typed; a new row without a code says that saving generates one.
+- Why: the backend's `qr.png` answers `422 NO_PUBLIC_BASE_URL` until App settings → Surfaces exists (backend
+  G-033), the visitor app does not exist yet, and the owner wants to see and try the QR now.
+- Consequences: the image is not the one to print for visitors: it opens the CMS, for signed-in authors on a device
+  that reaches it (GAPS.md G-021). The card states this.
+- Alternatives: a configured temporary base URL in the backend's `qr.png` (rejected: it would print codes for an
+  address that does not exist yet); waiting for Milestone 2.
+- Affected specs: `03` §14; `11` §9; `12` §3 Resource editors, Preview; §4 Generate a QR code.
+
+## D-020 (2026-10-22) — Surfaces tab and the backend's QR image
+
+- Type: owner decision (2026-10-22, with backend D-029); supersedes D-019 where the Project has a public web address
+- Decision:
+  - App settings → Surfaces (`views/workspace/SurfacesView.vue`, `platform/surfaces.ts`) lists Web, Mobile, and
+    Kiosk with an enable switch each and the Web surface's public web address, saved together with
+    `PUT .../surfaces` (`12` §4 Change surfaces); all three are offered while Templates do not exist (backend
+    M2a), and the address rules are the backend's (https origin, http only for localhost);
+  - a saved QR code whose trigger has a `runtimeUrl` shows the backend's `qr.png`, fetched with the author's
+    token as a blob (`apiBlob`, `components/editor/BackendQrCode.vue`), with the runtime URL, Copy link, Download
+    PNG, and Open (`12` §4 Generate a QR code); an unsaved or changed code says to save first;
+  - without an address the stand-in of D-019 stays, with a link to App settings → Surfaces.
+- Why: the backend renders the real QR once the WEB surface has `publicBaseUrl` (`03` §2, `07` §14, `11` §9).
+- Consequences: the address decides every printed QR, so the tab warns that changing it breaks printed codes.
+- Alternatives: keep drawing in the CMS with the real URL (rejected: one image source, the backend's, for print).
+- Affected specs: `03` §2, §14; `07` §14; `11` §9; `12` §3 App settings, §4 Change surfaces, Generate a QR code.
+

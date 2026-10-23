@@ -1,4 +1,4 @@
-import { ApiError, apiRequest } from "./api";
+import { ApiError, apiBlob, apiRequest } from "./api";
 import type { ResourceStatus } from "./places";
 
 /*
@@ -9,10 +9,18 @@ import type { ResourceStatus } from "./places";
 
 export type TriggerType = "QR_CODE" | "BEACON" | "GEO_PROXIMITY";
 
+/** The kinds a trigger can open (backend D-028); a Route Stop is opened by the triggers of its POI. */
+export type TriggerTargetType = "POI" | "PLACE" | "ROUTE" | "GUIDE" | "EVENT";
+
 export interface Trigger {
   id: string;
+  /**
+   * The absolute runtime URL a QR code encodes (`11` §9): null for other types, and while the Project's WEB surface
+   * has no public web address (backend D-029).
+   */
+  runtimeUrl?: string | null;
   triggerType: TriggerType;
-  targetResourceType: "POI";
+  targetResourceType: TriggerTargetType;
   targetResourceId: string;
   code: string | null;
   supportedSurfaces: string[] | null;
@@ -36,6 +44,9 @@ export interface TriggerForm {
   latitude: string;
   longitude: string;
   radiusMeters: string;
+  /** As last saved: the code the backend's QR image encodes, and its runtime URL; null for a new row. */
+  savedCode: string | null;
+  runtimeUrl: string | null;
 }
 
 interface Page<T> {
@@ -62,6 +73,8 @@ export function blankTrigger(type: TriggerType, defaults: Partial<TriggerForm> =
     latitude: "",
     longitude: "",
     radiusMeters: type === "GEO_PROXIMITY" ? "30" : "",
+    savedCode: null,
+    runtimeUrl: null,
     ...defaults,
   };
 }
@@ -80,15 +93,22 @@ export function triggerToForm(t: Trigger): TriggerForm {
     latitude: text(c.latitude),
     longitude: text(c.longitude),
     radiusMeters: text(c.radiusMeters),
+    savedCode: t.code,
+    runtimeUrl: t.runtimeUrl ?? null,
   };
 }
 
-/** The non-archived triggers of a Point of Interest, in their order. */
-export async function listPoiTriggers(projectId: string, poiId: string): Promise<Trigger[]> {
+/** The backend's QR image of a saved QR code trigger (`GET .../triggers/{id}/qr.png`), as a PNG blob. */
+export function fetchQrImage(projectId: string, triggerId: string, signal?: AbortSignal): Promise<Blob> {
+  return apiBlob(`${base(projectId)}/${encodeURIComponent(triggerId)}/qr.png`, { signal, accept: "image/png, application/json" });
+}
+
+/** The non-archived triggers of one Resource, in their order. */
+export async function listTargetTriggers(projectId: string, type: TriggerTargetType, id: string): Promise<Trigger[]> {
   const triggers: Trigger[] = [];
   for (let page = 0; ; page++) {
     const result = await apiRequest<Page<Trigger>>(
-      `${base(projectId)}?targetResourceType=POI&targetResourceId=${encodeURIComponent(poiId)}&size=200&page=${page}`,
+      `${base(projectId)}?targetResourceType=${type}&targetResourceId=${encodeURIComponent(id)}&size=200&page=${page}`,
     );
     triggers.push(...result.content.filter((t) => t.status !== "ARCHIVED"));
     if (page + 1 >= result.totalPages) return triggers;
@@ -103,6 +123,17 @@ export async function listProjectTriggers(projectId: string, signal?: AbortSigna
     triggers.push(...result.content);
     if (page + 1 >= result.totalPages) return triggers;
   }
+}
+
+/** The non-archived triggers of each Resource of one kind, by Resource id and in their order, for list chips. */
+export function groupTriggersByTarget(triggers: Trigger[] | null, type: TriggerTargetType): Map<string, Trigger[]> | null {
+  if (!triggers) return null;
+  const byTarget = new Map<string, Trigger[]>();
+  for (const t of [...triggers].sort((a, b) => a.sortOrder - b.sortOrder)) {
+    if (t.status === "ARCHIVED" || t.targetResourceType !== type) continue;
+    byTarget.set(t.targetResourceId, [...(byTarget.get(t.targetResourceId) ?? []), t]);
+  }
+  return byTarget;
 }
 
 const num = (value: string) => (value.trim() === "" ? null : Number.isNaN(Number(value)) ? value.trim() : Number(value));
@@ -147,12 +178,17 @@ function atRow(e: unknown, index: number): unknown {
 }
 
 /**
- * Makes the Point of Interest's triggers exactly `desired`: new rows are created and activated (a trigger
+ * Makes the Resource's triggers exactly `desired`: new rows are created and activated (a trigger
  * opens its target only when both are ACTIVE), changed rows updated, removed rows archived, so a printed
  * QR code still lands on the Resource (`11` §9).
  */
-export async function syncPoiTriggers(projectId: string, poiId: string, desired: TriggerForm[]): Promise<Trigger[]> {
-  const current = await listPoiTriggers(projectId, poiId);
+export async function syncTriggers(
+  projectId: string,
+  type: TriggerTargetType,
+  id: string,
+  desired: TriggerForm[],
+): Promise<Trigger[]> {
+  const current = await listTargetTriggers(projectId, type, id);
   // A new row identical to a trigger nobody kept is that trigger: a save that failed half-way created it.
   const unclaimed = current.filter((t) => !desired.some((d) => d.id === t.id));
   desired = desired.map((d) => {
@@ -175,7 +211,7 @@ export async function syncPoiTriggers(projectId: string, poiId: string, desired:
       if (!form.id) {
         const created = await apiRequest<Trigger>(base(projectId), {
           method: "POST",
-          body: { targetResourceType: "POI", targetResourceId: poiId, triggerType: form.type, ...body },
+          body: { targetResourceType: type, targetResourceId: id, triggerType: form.type, ...body },
         });
         await apiRequest(`${base(projectId)}/${encodeURIComponent(created.id)}/status`, {
           method: "POST",
@@ -196,7 +232,7 @@ export async function syncPoiTriggers(projectId: string, poiId: string, desired:
       throw atRow(e, index);
     }
   }
-  return listPoiTriggers(projectId, poiId);
+  return listTargetTriggers(projectId, type, id);
 }
 
 export const TRIGGER_LABELS: Record<TriggerType, string> = {
@@ -204,3 +240,23 @@ export const TRIGGER_LABELS: Record<TriggerType, string> = {
   GEO_PROXIMITY: "Geo-proximity",
   QR_CODE: "QR code",
 };
+
+/** The colour of a trigger type's chip, in the editor card and in the lists alike. */
+export const TRIGGER_CHIP_CLASS: Record<TriggerType, string> = {
+  BEACON: "bg-[#e3ecf7] text-[#1f4e8c]",
+  GEO_PROXIMITY: "bg-[#e1f3ea] text-[#17643f]",
+  QR_CODE: "bg-[#ececef] text-[#374151]",
+};
+
+/** A trigger in a few characters for a list chip: "QR · K7F2A9QX", "Beacon · 12/3", "Geo · 30 m". */
+export function triggerLabel(trigger: Trigger): string {
+  const c = trigger.configuration;
+  switch (trigger.triggerType) {
+    case "QR_CODE":
+      return trigger.code ? `QR · ${trigger.code}` : "QR";
+    case "BEACON":
+      return c.major !== undefined && c.minor !== undefined ? `Beacon · ${text(c.major)}/${text(c.minor)}` : "Beacon";
+    case "GEO_PROXIMITY":
+      return c.radiusMeters !== undefined ? `Geo · ${text(c.radiusMeters)} m` : "Geo";
+  }
+}

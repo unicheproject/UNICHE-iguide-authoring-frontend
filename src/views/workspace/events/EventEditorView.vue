@@ -3,12 +3,16 @@ import { computed, nextTick, reactive, ref } from "vue";
 import EditorShell from "@/components/editor/EditorShell.vue";
 import TranslationsPanel, { type TextFieldGroup, type TextFieldMeta } from "@/components/editor/TranslationsPanel.vue";
 import MediaSlots, { type MediaSlot } from "@/components/media/MediaSlots.vue";
+import TriggersCard from "@/components/editor/TriggersCard.vue";
+import { listTargetTriggers, syncTriggers, triggerToForm, type Trigger, type TriggerForm } from "@/platform/triggers";
 import { SLUG_PATTERN } from "@/lib/format";
 import { listAssets, type Asset, type MediaBinding } from "@/platform/assets";
 import {
   changeEventStatus,
   displayTimeZone,
+  eventFromResponse,
   eventTitle,
+  eventWorkingCopyPayload,
   fetchEvent,
   fetchEventReferences,
   fromLocalInput,
@@ -18,6 +22,7 @@ import {
   type CmsEvent,
   type EventTranslation,
   type OccurrenceStatus,
+  type UpdateEventInput,
 } from "@/platform/events";
 import { listPlaces, placeTitle, type Place } from "@/platform/places";
 import { listPois, poiTitle, type Poi } from "@/platform/pois";
@@ -121,7 +126,31 @@ const form = reactive({
   translations: {} as Record<string, Texts<TextKey>>,
   occurrences: [] as OccurrenceForm[],
   media: [] as MediaBinding[],
+  triggers: [] as TriggerForm[],
 });
+// The triggers as last loaded or saved; the form is reset from them with the Event.
+const savedTriggers = ref<Trigger[]>([]);
+
+/** The editable state from the form, for a DRAFT save and a working copy alike. */
+function input(): Omit<UpdateEventInput, "version"> {
+  return {
+    slug: form.slug,
+    placeId: form.placeId || null,
+    poiId: form.poiId || null,
+    routeId: form.routeId || null,
+    bookingUrl: optionalText(form.bookingUrl),
+    internalName: optionalText(form.internalName),
+    featured: form.featured,
+    translations: textsForApi(TEXT_KEYS, languageCodes(), form.translations),
+    occurrences: form.occurrences.map((o) => ({
+      id: o.id,
+      startsAt: fromLocalInput(o.startsAt)!,
+      endsAt: fromLocalInput(o.endsAt)!,
+      status: o.status,
+    })),
+    media: form.media.map((m) => ({ ...m })),
+  };
+}
 
 const editor = useResourceEditor<CmsEvent>({
   kind: "event",
@@ -129,38 +158,37 @@ const editor = useResourceEditor<CmsEvent>({
   languages,
   defaultLanguage,
   async load() {
-    const [event, allPlaces, allPois, allRoutes, library] = await Promise.all([
+    const [event, allPlaces, allPois, allRoutes, library, triggers] = await Promise.all([
       fetchEvent(projectId.value, props.eventId),
       listPlaces(projectId.value),
       listPois(projectId.value),
       listRoutes(projectId.value),
       listAssets(projectId.value),
+      listTargetTriggers(projectId.value, "EVENT", props.eventId),
     ]);
+    savedTriggers.value = triggers;
     places.value = allPlaces;
     pois.value = allPois;
     routes.value = allRoutes;
     assets.value = library;
     return event;
   },
-  save: (event, version) =>
-    updateEvent(projectId.value, event.id, {
-      version,
-      slug: form.slug,
-      placeId: form.placeId || null,
-      poiId: form.poiId || null,
-      routeId: form.routeId || null,
-      bookingUrl: optionalText(form.bookingUrl),
-      internalName: optionalText(form.internalName),
-      featured: form.featured,
-      translations: textsForApi(TEXT_KEYS, languageCodes(), form.translations),
-      occurrences: form.occurrences.map((o) => ({
-        id: o.id,
-        startsAt: fromLocalInput(o.startsAt)!,
-        endsAt: fromLocalInput(o.endsAt)!,
-        status: o.status,
-      })),
-      media: form.media.map((m) => ({ ...m })),
-    }),
+  async save(event, version) {
+    // Triggers are rows of their own and do not move the Event's version, so they go first (as for POIs).
+    savedTriggers.value = await syncTriggers(projectId.value, "EVENT", event.id, form.triggers);
+    return updateEvent(projectId.value, event.id, { version, ...input() });
+  },
+  workingCopy: {
+    kind: "events",
+    projectId: () => projectId.value,
+    async payload(event) {
+      // Triggers are not in the working copy (backend D-026): "Save draft" saves them live, after the body.
+      const body = eventWorkingCopyPayload(input());
+      savedTriggers.value = await syncTriggers(projectId.value, "EVENT", event.id, form.triggers);
+      return body;
+    },
+    fromResponse: eventFromResponse,
+  },
   changeStatus: (event, target, version) => changeEventStatus(projectId.value, event.id, target, version),
   loadReferences: (event) => fetchEventReferences(projectId.value, event.id),
   resetForm(event) {
@@ -180,6 +208,7 @@ const editor = useResourceEditor<CmsEvent>({
       status: o.status,
     }));
     form.media = event.media.map((m) => ({ ...m }));
+    form.triggers = savedTriggers.value.map(triggerToForm);
   },
   ensureLanguageRows: () => ensureTextRows(TEXT_KEYS, languageCodes(), form.translations),
   formState: () => form,
@@ -201,6 +230,7 @@ const editor = useResourceEditor<CmsEvent>({
     const occurrence = /^occurrences\[(\d+)\]/.exec(path);
     if (occurrence) return `Occurrence ${Number(occurrence[1]) + 1}`;
     if (/^media\[/.test(path)) return "Media";
+    if (/^triggers\[/.test(path)) return "How visitors reach it";
     return describeTranslationPath(path, languages.value, TEXT_META) ?? FIELD_NAMES[path] ?? path;
   },
 });
@@ -228,6 +258,15 @@ const placeChoices = computed(() => {
   }
   return options;
 });
+/** Where a new geo-proximity area starts: the chosen point of interest's position, else the chosen place's. */
+const eventPosition = computed(() => {
+  const poi = pois.value.find((p) => p.id === form.poiId);
+  const place = places.value.find((p) => p.id === form.placeId);
+  const at = poi && poi.latitude !== null && poi.longitude !== null ? poi
+    : place && place.latitude !== null && place.longitude !== null ? place : null;
+  return at ? { latitude: String(at.latitude), longitude: String(at.longitude) } : null;
+});
+
 const poiChoices = computed(() => choices(pois.value, form.poiId, (p) => poiTitle(p, defaultLanguage.value)));
 const routeChoices = computed(() => choices(routes.value, form.routeId, (r) => routeTitle(r, defaultLanguage.value)));
 
@@ -436,6 +475,14 @@ const translationRows = computed(() => translationStatus(languages.value, 3, (co
       :readonly="!editor.editable"
       :field-error="editor.fieldError"
       @uploaded="assets.unshift($event)"
+    />
+
+    <TriggersCard
+      :triggers="form.triggers"
+      :readonly="!editor.editable"
+      :field-error="editor.fieldError"
+      :position="eventPosition"
+      :position-label="form.poiId ? 'Use the point of interest\'s position' : 'Use the place\'s position'"
     />
 
     <section class="overflow-hidden rounded-lg border bg-card">
