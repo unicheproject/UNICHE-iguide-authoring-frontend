@@ -357,3 +357,19 @@ the backend's DECISIONS.md.
 - Alternatives: a separate readiness screen (the Launch screen of `12` §3 will hold the full list once it exists).
 - Affected specs: `07` §14; `12` §3 Dashboard, Resource editors, §5; `14` §4.
 
+## D-023 (2026-10-23) — Resource editors arranged as the prototype
+
+- Type: owner decision (2026-10-23, from a side-by-side comparison with the prototype)
+- Decision: `EditorShell.vue`, shared by every Resource editor, follows the prototype's arrangement (AGENTS.md §2, §6):
+  - a 760px form column beside a 310px side column, within 1090px, instead of a form stretched across the screen
+    with the side column at the far edge;
+  - the head carries the status chip and, while a working copy exists, a "Pending changes · edited by …" chip on the
+    title's line, and the meta line ends with the version;
+  - the side column holds, in order: a "Preview in app" button with the preview below it (was a header button),
+    "Status and visibility" (Status, Slug, Version, Last updated, Created; full-width Activate/Deactivate/Restore
+    and an Archive outline button; the readiness list of D-022), Translations, and "Used in (n)" from the same
+    `GET .../references` as the archive check, linking to each referrer.
+- Consequences: the prototype's "By" row is left out: the read DTOs carry no last editor and names wait for Audit
+  Events (backend G-034). No editor's fields or behaviour change.
+- Affected specs: `12` §3 Resource editors; prototype `iGuide CMS.html`.
+

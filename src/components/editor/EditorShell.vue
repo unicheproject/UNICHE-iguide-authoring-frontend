@@ -1,12 +1,13 @@
 <script setup lang="ts" generic="T extends EditableResource">
 /**
- * Page frame of every Resource editor: back link, loading and error states, page head with Save (DRAFT) or
- * Apply changes (ACTIVE), the working-copy banner with Save draft and Discard (spec 12 section 3, Resource editors),
- * the read-only banner for ARCHIVED Resources, the error summary, the two-column layout with the Status panel,
- * the optional Preview panel, and the status-change, version-conflict, and apply-conflict dialogs. The editor's
- * own fields go in the default slot.
+ * Page frame of every Resource editor, arranged as the prototype's (AGENTS.md section 6, DECISIONS.md D-023): back
+ * link, loading and error states, page head with the status and pending-changes chips and Save (DRAFT) or Apply
+ * changes (ACTIVE), the working-copy banner with Save draft and Discard (spec 12 section 3, Resource editors), the
+ * read-only banner for ARCHIVED Resources, the error summary, then a 760px form column beside a 310px side column:
+ * Preview in app, Status and visibility, Translations, and Used in. Also the status-change, version-conflict, and
+ * apply-conflict dialogs. The editor's own fields go in the default slot.
  */
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import type { RouteLocationRaw } from "vue-router";
 import AppDialog from "@/components/AppDialog.vue";
 import PageHead from "@/components/PageHead.vue";
@@ -102,6 +103,49 @@ function conflictValue(value: unknown): string {
 }
 
 const noLink = () => null;
+
+/** "Point of interest · slug · version 14": the editor's subtitle, then the row's version. */
+const meta = computed(() => {
+  const resource = editor.value.resource;
+  return resource ? `${props.subtitle} · version ${resource.version}` : props.subtitle;
+});
+
+/** The pending-changes chip of the head, while a working copy exists. */
+const pendingChip = computed(() => {
+  const copy = editor.value.workingCopy;
+  return copy ? `Pending changes · edited by ${copyAuthor.value}, ${formatDate(copy.updatedAt)}` : undefined;
+});
+
+const statusLabel: Record<string, string> = { DRAFT: "Draft", ACTIVE: "Active", ARCHIVED: "Archived" };
+const slug = computed(() => {
+  const value = (editor.value.resource as { slug?: unknown } | null)?.slug;
+  return typeof value === "string" && value ? value : null;
+});
+
+// Used in -----------------------------------------------------------------------------------------------------
+// The where-used list (`GET .../references`) the archive check already reads, shown as the prototype's last card.
+
+const usedIn = ref<ResourceReference[] | null>(null);
+watch(
+  () => [editor.value.resource?.id, editor.value.resource?.version, editor.value.resource?.status, editor.value.loadReferences] as const,
+  async ([id], _old, onCleanup) => {
+    let stale = false;
+    onCleanup(() => (stale = true));
+    const load = editor.value.loadReferences;
+    if (!id || !load) {
+      usedIn.value = null;
+      return;
+    }
+    try {
+      const found = await load();
+      if (!stale) usedIn.value = found;
+    } catch {
+      if (!stale) usedIn.value = null;
+    }
+  },
+  { immediate: true },
+);
+const kindLabel = (type: string) => type.charAt(0) + type.slice(1).toLowerCase().replace(/_/g, " ");
 </script>
 
 <template>
@@ -138,18 +182,10 @@ const noLink = () => null;
     </div>
 
     <template v-else>
-      <PageHead :title="title" :subtitle="subtitle" :status="editor.resource.status">
+      <div class="max-w-[1090px]">
+      <PageHead :title="title" :subtitle="meta" :status="editor.resource.status" :pending="pendingChip">
         <template #actions>
           <span v-if="editor.dirty" class="text-[11px] font-semibold text-[#9a6200]">Unsaved changes</span>
-          <Button
-            v-if="preview"
-            variant="outline"
-            :aria-pressed="previewOpen"
-            aria-controls="resource-preview"
-            @click="previewOpen = !previewOpen"
-          >
-            {{ previewOpen ? "Close preview" : "Preview" }}
-          </Button>
           <Button
             v-if="editor.usesWorkingCopy"
             :disabled="(!editor.workingCopy && !editor.dirty) || editor.saving || editor.applying"
@@ -234,43 +270,75 @@ const noLink = () => null;
         <p v-if="editor.summary.requestId" class="mt-1.5 font-mono text-[11px] text-muted-foreground">Request id {{ editor.summary.requestId }}</p>
       </div>
 
-      <!-- The form takes the width the side panels leave; below 1024px the side panels follow it. -->
-      <div class="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_310px]">
+      <!-- A 760px form beside the 310px side column, as in the prototype; below 1024px the side column follows. -->
+      <div class="grid items-start gap-5 lg:grid-cols-[minmax(0,760px)_310px]">
         <div class="flex min-w-0 flex-col gap-[18px]">
           <slot />
         </div>
 
-        <!-- 57px: the language tab row (39px, measured) and the gap below it (18px). -->
-        <aside class="flex min-w-0 flex-col gap-4" :class="{ 'lg:mt-[57px]': tabbed }">
-          <ResourcePreview
-            v-if="preview && previewOpen"
-            id="resource-preview"
-            :model="preview"
-            :dirty="editor.dirty"
-          />
-          <section class="overflow-hidden rounded-lg border bg-card">
-            <div class="border-b px-3.5 py-[11px]">
-              <span class="text-[10px] font-extrabold uppercase tracking-[0.1em] text-muted-foreground">Status</span>
+        <!-- The side column starts level with the form's first card: below the language tab row (39px) and its
+             gap (18px). With a preview, its button takes that row, as in the prototype. -->
+        <aside class="flex min-w-0 flex-col gap-4" :class="{ 'lg:mt-[57px]': tabbed && !preview }">
+          <div v-if="preview" class="flex flex-col gap-4" :class="{ 'lg:min-h-[41px]': tabbed }">
+            <button
+              type="button"
+              class="self-start rounded-full border bg-card px-4 py-2 text-[11px] font-bold uppercase tracking-[0.06em] text-primary shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:bg-accent/40"
+              :aria-expanded="previewOpen"
+              aria-controls="resource-preview"
+              @click="previewOpen = !previewOpen"
+            >
+              <span aria-hidden="true">⧉</span> {{ previewOpen ? "Close preview" : "Preview in app" }}
+            </button>
+            <ResourcePreview
+              v-if="previewOpen"
+              id="resource-preview"
+              :model="preview"
+              :dirty="editor.dirty"
+            />
+          </div>
+          <section class="overflow-hidden rounded-lg border bg-card" aria-labelledby="status-heading">
+            <div class="px-4 pb-1 pt-4">
+              <h2 id="status-heading" class="text-[11px] font-extrabold uppercase tracking-[0.1em] text-gray-700">Status and visibility</h2>
             </div>
-            <div class="flex flex-col gap-3 px-3.5 py-3.5 text-[13px]">
-              <p class="text-gray-700">{{ statusText }}</p>
-              <div class="flex flex-wrap gap-2">
-                <Button v-if="editor.resource.status === 'DRAFT'" size="sm" :disabled="editor.transitioning" @click="editor.requestTransition('ACTIVE')">
+            <div class="flex flex-col gap-3 px-4 pb-4 pt-2 text-[13px]">
+              <dl class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2 text-[13px]">
+                <dt class="text-muted-foreground">Status</dt>
+                <dd class="text-right font-semibold uppercase tracking-[0.03em]">{{ statusLabel[editor.resource.status] ?? editor.resource.status }}</dd>
+                <template v-if="slug">
+                  <dt class="text-muted-foreground">Slug</dt>
+                  <dd class="break-all text-right font-semibold">{{ slug }}</dd>
+                </template>
+                <dt class="text-muted-foreground">Version</dt>
+                <dd class="text-right font-semibold">{{ editor.resource.version }}</dd>
+                <dt class="text-muted-foreground">Last updated</dt>
+                <dd class="text-right font-semibold">{{ formatDate(editor.resource.updatedAt) }}</dd>
+                <dt class="text-muted-foreground">Created</dt>
+                <dd class="text-right">{{ formatDate(editor.resource.createdAt) }}</dd>
+              </dl>
+              <p class="text-xs text-gray-700">{{ statusText }}</p>
+              <div class="flex flex-col gap-2">
+                <button
+                  v-if="editor.resource.status === 'DRAFT'"
+                  type="button"
+                  class="w-full rounded-full bg-primary px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.08em] text-white hover:opacity-90 disabled:opacity-50"
+                  :disabled="editor.transitioning"
+                  @click="editor.requestTransition('ACTIVE')"
+                >
                   Activate
-                </Button>
-                <Button
-                  v-if="editor.resource.status !== 'DRAFT'"
-                  size="sm"
-                  variant="outline"
+                </button>
+                <button
+                  v-else
+                  type="button"
+                  class="w-full rounded-full bg-primary px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.08em] text-white hover:opacity-90 disabled:opacity-50"
                   :disabled="editor.transitioning"
                   @click="editor.requestTransition('DRAFT')"
                 >
                   {{ editor.resource.status === "ACTIVE" ? "Deactivate" : "Restore" }}
-                </Button>
+                </button>
                 <button
                   v-if="editor.resource.status !== 'ARCHIVED'"
                   type="button"
-                  class="px-2 text-[10px] font-bold uppercase tracking-[0.06em] text-destructive"
+                  class="w-full rounded-full border border-destructive px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.08em] text-destructive hover:bg-[rgba(192,24,94,0.05)] disabled:opacity-50"
                   :disabled="editor.transitioning"
                   @click="editor.requestTransition('ARCHIVED')"
                 >
@@ -301,14 +369,6 @@ const noLink = () => null;
                   </li>
                 </ul>
               </div>
-              <dl class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 border-t border-gray-100 pt-3 text-xs">
-                <dt class="text-muted-foreground">Created</dt>
-                <dd>{{ formatDate(editor.resource.createdAt) }}</dd>
-                <dt class="text-muted-foreground">Updated</dt>
-                <dd>{{ formatDate(editor.resource.updatedAt) }}</dd>
-                <dt class="text-muted-foreground">Version</dt>
-                <dd class="font-mono">{{ editor.resource.version }}</dd>
-              </dl>
             </div>
           </section>
           <section v-if="translations?.length" class="overflow-hidden rounded-lg border bg-card" aria-labelledby="translations-heading">
@@ -335,8 +395,30 @@ const noLink = () => null;
               </li>
             </ul>
           </section>
+          <section v-if="usedIn" class="overflow-hidden rounded-lg border bg-card" aria-labelledby="used-in-heading">
+            <div class="px-4 pb-1 pt-4">
+              <h2 id="used-in-heading" class="text-[11px] font-extrabold uppercase tracking-[0.1em] text-gray-700">
+                Used in ({{ usedIn.length }})
+              </h2>
+            </div>
+            <p v-if="!usedIn.length" class="px-4 pb-4 pt-1 text-xs text-muted-foreground">Not used anywhere yet.</p>
+            <ul v-else class="flex flex-col gap-1.5 px-4 pb-4 pt-1 text-[13px]">
+              <li v-for="r in usedIn" :key="`${r.resourceType}-${r.resourceId}`">
+                <RouterLink
+                  v-if="referenceLink?.(r)"
+                  :to="referenceLink(r)!"
+                  class="text-primary no-underline hover:underline"
+                >
+                  {{ r.title }}
+                </RouterLink>
+                <span v-else>{{ r.title }}</span>
+                <span class="text-muted-foreground"> · {{ kindLabel(r.resourceType) }}</span>
+              </li>
+            </ul>
+          </section>
           <slot name="aside" />
         </aside>
+      </div>
       </div>
     </template>
 

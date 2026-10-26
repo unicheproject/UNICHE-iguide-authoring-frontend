@@ -72,6 +72,8 @@ box against the live Keycloak and Catalogue through the backend. Backend counter
 - 2026-10-19: "Translations" panel under Status in the Place, POI, Route, Guide, Event, and Category editors:
   per language Complete, Partial (n of m fields), or Missing, from the live form, counting the fields the
   lists count; a row opens that language's tab.
+- 2026-10-23: Resource editors arranged as the prototype: form and side column together, pending chip in the head,
+  Preview in app, Status and visibility, Used in (DECISIONS.md D-023).
 - 2026-10-23: readiness on the Dashboard (status card) and the Resource form ("What needs attention", focus on the
   first invalid field), on backend D-033 (DECISIONS.md D-022).
 - 2026-10-23: Visitor app → Translations, the Translation workspace: matrix by language, side-by-side editor with
