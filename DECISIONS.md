@@ -373,3 +373,97 @@ the backend's DECISIONS.md.
   Events (backend G-034). No editor's fields or behaviour change.
 - Affected specs: `12` §3 Resource editors; prototype `iGuide CMS.html`.
 
+## D-024 (2026-10-26) — Unsaved form state kept in browser storage
+
+- Type: spec-interpretation (owner request 2026-10-26; `12` §5, §6 session expired; AGENTS.md §4 rule 11 [ARC_5.8])
+- Decision: `useResourceEditor` keeps an editor's unsaved form in `localStorage`, for every Resource editor:
+  - the key is `iguide:draft:<author's subject>:<editor path>`, so a draft belongs to one author and one Resource;
+    the value is the form state, the time, and the Resource's version it started from; nothing is sent to the
+    backend before the author saves, and no token or other session data is stored;
+  - it is written 0.6 s after typing stops and again when the page is hidden or unloaded (a reload, a closed tab,
+    the login redirect after a failed refresh);
+  - opening the same editor with a stored draft that differs from what was loaded shows "Unsaved changes from
+    <time> are kept in this browser" with Restore and Discard; when the Resource's version changed meanwhile, the
+    banner says so, and saving then meets the usual version conflict;
+  - the draft is removed when the form is saved, applied, discarded, or back to its saved state, when the author
+    discards it, and when the author confirms "Leave without saving";
+  - storage that is full or blocked is ignored; the leave guard still protects the form.
+- Why: "a lost session does not lose an hour of writing" (`12` §5).
+- Alternatives: `sessionStorage` (rejected: lost with the tab, which is what the rule guards against).
+- Affected specs: `12` §5, §6.
+
+## D-025 (2026-10-26) — Problem details read as specified, and a field-by-field DRAFT save conflict
+
+- Type: spec-interpretation (owner request 2026-10-26, with backend D-034; `07` §15, `12` §5)
+- Decision:
+  - `ApiError` reads RFC 7807 problem details: `code` from `code`, else the suffix of the URN `type`
+    (`urn:uniche:iguide:problem:<CODE>`), else an earlier bare `type`; the message from `detail`, then `title`;
+    `errors[{path, code, message}]` kept with their codes as `fieldErrors` beside the "path: message" `details`
+    the forms and adapters already use; `requestId` from the body, else `X-UNICHE-Request-Id`, else
+    `X-Request-Id`. Requests accept `application/problem+json`. Both the earlier envelope and the new one read
+    the same, so the CMS works before and after the backend change;
+  - a `409 VERSION_CONFLICT` on a DRAFT save opens the same field-by-field choice as an apply conflict (D-016):
+    the CMS reads the current row, compares its form state with the author's (scalar fields by name,
+    `translations.<lang>.<field>` per field, lists and rich text whole), and "Save my choices" saves the merged
+    form on the current version; "Reload their version" stays. The working-copy save conflict keeps its own path.
+- Why: G-006; `12` §5 asks for "mine" or "current" per conflicting field and no automatic merge.
+- Consequences: the paths are computed by the CMS, since the backend sends no `conflictingFields` yet, and the
+  dialog names no last editor until Audit Events exist (backend G-034).
+- Affected specs: `07` §15; `12` §5, §6.
+
+
+## D-026 (2026-10-26) — MuseMind translation, AI markers, and "mark reviewed"
+
+- Type: spec-interpretation (owner choice 2026-10-26: all of it, on a mock gateway; with backend D-035; `12` §3
+  Translation workspace, `03` §1 Content provenance)
+- Decision:
+  - the CMS never calls the AI gateway: `src/platform/ai.ts` calls the backend's `GET /ai/status`,
+    `POST …/translations/{lang}:translate`, `POST …/translations/{lang}:mark-reviewed`, and
+    `GET /projects/{p}/ai-provenance`;
+  - "Translate with MuseMind" works on the open Resource and target language when the status is `MOCK` or
+    `AVAILABLE`; `MOCK` shows a "Mock" badge and says so in the toast, `DISABLED` (or an unreadable status) keeps
+    the button off with the reason, and media items say they are not machine-translated yet. When the target
+    language has text, or the form has unsaved changes, the author confirms first. The response is applied as a
+    save is (versions, `X-Working-Copy-Version`, pending changes for an ACTIVE Resource). Only the plain fields are
+    translated; the Guide story, Route stops, and media items stay by hand (since D-027 they are translated too);
+  - markers come from the provenance list, keyed by kind, Resource, and language: "AI · unreviewed" (amber) or
+    "AI · reviewed" (grey), with "· pending" when the text is only in the pending changes, as text in the matrix
+    cells and the editor, never colour alone. The editor shows the open language's service, source language,
+    generation and review times, and the citations ("No citations returned." when there are none), plus the
+    other languages' markers by name;
+  - "Mark reviewed" records the review without changing the text; saving changed text of an AI language counts
+    as a review on the backend, so the CMS re-reads the provenance after such a save;
+  - the "Unreviewed AI output" filter lists Resources with any unreviewed AI language, pending ones included;
+    the chip shows how many;
+  - the status and the provenance load beside the matrix; if either fails the workspace still works without them.
+- Why: `12` §3 asks for the action, the marker with citations, "mark reviewed", and the filter; AGENTS.md §4 keeps
+  the gateway behind the backend; the gateway API does not exist yet (`08` Milestone 13), hence the mock.
+- Consequences: the `CONTENT_REVIEWED` Audit Event waits for backend Milestone 7; the Resource editors show no AI
+  markers yet; the real gateway adapter follows (to-do list); children, Assets, and the story came with D-027.
+- Affected specs: `03` §1; `12` §3.
+
+## D-027 (2026-10-26) — MuseMind for Route stops, the Guide story, and media items
+
+- Type: spec-interpretation (to-do follow-up of D-026; with backend D-036; `12` §3 Translation workspace, `03` §1)
+- Decision:
+  - "Translate with MuseMind" translates the whole open item into the target language, part by part: the
+    Resource's own texts, then each stop that exists live (`POST …/routes/{r}/stops/{s}/translations/{lang}:translate`),
+    then the story's block (`POST …/guides/{g}/blocks/{b}/translations/{lang}:translate`, the rich text with its
+    headings and images kept); a media item through `POST …/assets/{a}/translations/{lang}:translate` (in place, by
+    its version). Each part is saved as it returns, so the versions chain as in a save;
+  - a part whose default language is empty (`NOTHING_TO_TRANSLATE`) is skipped and named in the toast; the first
+    other failure stops the rest, keeps what was done, and the error summary names the part it stopped at and
+    what was translated before it; a version conflict reloads as a save conflict does;
+  - the confirmation asks before overwriting whenever any part of the target language has text, or the form has
+    unsaved changes;
+  - markers are keyed by item, part, and language (`entryLocation` in `platform/ai.ts` reads `parentType` and
+    `parentId` of stop and block entries); the matrix cell and the "Other languages" line summarise every part of
+    a language ("unreviewed" while any part is, "pending" while any part is), and the "Unreviewed AI output" filter
+    counts an item when any part is unreviewed;
+  - the editor shows a marker with its own "Mark reviewed" for the Resource's texts (at the top), for each stop
+    (under its title), and for the story (above it), in `components/editor/AiMarker.vue`.
+- Why: `12` §3 offers MuseMind "per cell or Resource"; the parts are the Resource's in the matrix, so one action
+  per item keeps the cell and the action aligned.
+- Consequences: stops that exist only in the pending changes are not translated (they cannot be edited here
+  either, D-021); a stop or block replaced when its pending changes are applied loses its marker (backend D-036).
+- Affected specs: `03` §1; `12` §3.

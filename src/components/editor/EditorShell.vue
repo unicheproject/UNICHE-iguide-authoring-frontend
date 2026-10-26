@@ -200,6 +200,41 @@ const kindLabel = (type: string) => type.charAt(0) + type.slice(1).toLowerCase()
       </PageHead>
 
       <div
+        v-if="editor.pendingDraft"
+        role="status"
+        class="mb-5 flex flex-wrap items-center gap-3.5 rounded-lg border-l-[3px] border-l-primary bg-[rgba(76,29,139,0.06)] px-[18px] py-3.5 text-[13px]"
+      >
+        <span class="text-[15px]" aria-hidden="true">↺</span>
+        <div class="min-w-[min(100%,260px)] flex-1">
+          <strong class="mb-0.5 block text-[13px] font-bold">Unsaved changes from {{ formatDate(editor.pendingDraft.savedAt) }} are kept in this browser</strong>
+          <span class="text-gray-700">
+            {{
+              editor.draftOutdated
+                ? `The ${kind} has changed since then: restore them only if you still want them, and check before saving.`
+                : "Restore them to carry on where you left off, or discard them."
+            }}
+          </span>
+        </div>
+        <div class="flex items-center gap-3">
+          <button
+            type="button"
+            class="whitespace-nowrap text-[11px] font-bold uppercase tracking-[0.06em] text-primary disabled:opacity-50"
+            :disabled="!editor.editable"
+            @click="editor.restoreDraft()"
+          >
+            Restore
+          </button>
+          <button
+            type="button"
+            class="whitespace-nowrap text-[11px] font-bold uppercase tracking-[0.06em] text-destructive"
+            @click="editor.discardDraft()"
+          >
+            Discard
+          </button>
+        </div>
+      </div>
+
+      <div
         v-if="editor.usesWorkingCopy && (editor.workingCopy || editor.dirty)"
         role="status"
         class="mb-5 flex flex-wrap items-center gap-3.5 rounded-lg border-l-[3px] border-l-[#9a6200] bg-[rgba(154,98,0,0.07)] px-[18px] py-3.5 text-[13px]"
@@ -471,8 +506,34 @@ const kindLabel = (type: string) => type.charAt(0) + type.slice(1).toLowerCase()
       </template>
     </AppDialog>
 
-    <AppDialog v-if="editor.conflict" :title="`Someone else changed this ${kind}`" width="560px" :busy="editor.saving" @close="editor.conflict = null">
-      <p class="text-[13px] text-gray-700">
+    <AppDialog
+      v-if="editor.conflict"
+      :title="`Someone else changed this ${kind}`"
+      :width="editor.saveConflict ? '640px' : '560px'"
+      :busy="editor.saving"
+      @close="editor.closeConflict()"
+    >
+      <template v-if="editor.saveConflict">
+        <p class="text-[13px] text-gray-700">
+          It was saved by someone else while you were editing (it is now version {{ editor.saveConflict.current.version }}).
+          Choose, field by field, whether to keep yours or the current value, then save on top of their version.
+        </p>
+        <p v-if="!editor.saveConflict.fields.length" class="mt-3 text-[13px] text-gray-700">
+          No field you can edit differs: saving puts your values on top of their version.
+        </p>
+        <fieldset v-for="field in editor.saveConflict.fields" :key="field.path" class="mt-3 rounded-md border px-3 py-2.5">
+          <legend class="px-1 text-[12px] font-bold">{{ editor.describePath(field.path) }}</legend>
+          <label class="flex items-start gap-2 py-1 text-[13px]">
+            <input v-model="field.choice" type="radio" value="mine" class="mt-0.5" />
+            <span><span class="font-semibold">Mine:</span> {{ conflictValue(field.mine) }}</span>
+          </label>
+          <label class="flex items-start gap-2 py-1 text-[13px]">
+            <input v-model="field.choice" type="radio" value="current" class="mt-0.5" />
+            <span><span class="font-semibold">Current:</span> {{ conflictValue(field.current) }}</span>
+          </label>
+        </fieldset>
+      </template>
+      <p v-else class="text-[13px] text-gray-700">
         It was saved by someone else while you were editing
         {{ editor.conflict.currentVersion !== null ? `(it is now version ${editor.conflict.currentVersion})` : "" }}. Reload to
         see their version and lose your changes, or keep your changes and save them over theirs.
@@ -482,7 +543,16 @@ const kindLabel = (type: string) => type.charAt(0) + type.slice(1).toLowerCase()
           Reload their version
         </button>
         <button
-          v-if="editor.conflict.currentVersion !== null"
+          v-if="editor.saveConflict"
+          type="button"
+          class="dialog-primary bg-primary"
+          :disabled="editor.saving"
+          @click="editor.resolveSaveConflict()"
+        >
+          {{ editor.saveConflict.fields.length ? "Save my choices" : "Save on top" }}
+        </button>
+        <button
+          v-else-if="editor.conflict.currentVersion !== null"
           type="button"
           class="dialog-primary bg-primary"
           :disabled="editor.saving"
