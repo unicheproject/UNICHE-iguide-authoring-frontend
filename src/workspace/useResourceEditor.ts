@@ -2,6 +2,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch, t
 import { askConfirm } from "@/stores/confirm";
 import { onBeforeRouteLeave, useRoute } from "vue-router";
 import { ApiError } from "@/platform/api";
+import { session } from "@/platform/auth";
 import {
   applyWorkingCopy,
   discardWorkingCopy,
@@ -24,6 +25,9 @@ import { showToast } from "@/stores/toast";
  * leave guard. An editor supplies only its API calls, how to fill and snapshot its form, and how to name its
  * fields.
  */
+
+/** Asks the panel holding a field to show it, e.g. by opening its collapsed group, before focus moves there. */
+export const REVEAL_FIELD_EVENT = "iguide:reveal-field";
 
 export interface EditableResource {
   id: string;
@@ -128,6 +132,7 @@ export function useResourceEditor<T extends EditableResource>(options: ResourceE
           );
         }
       }
+      offerDraft();
     } catch (e) {
       if (!(e instanceof ApiError)) throw e;
       loadError.value = e;
@@ -257,6 +262,10 @@ export function useResourceEditor<T extends EditableResource>(options: ResourceE
     const lang = match ? match[1] : language ?? null;
     if (lang && options.languages.value.some((l) => l.languageCode === lang)) activeLanguage.value = lang;
     await nextTick();
+    // A field inside a collapsed group is not rendered; its panel opens the group first.
+    const fullPath = match ? path : lang ? `translations.${lang}.${path}` : path;
+    window.dispatchEvent(new CustomEvent(REVEAL_FIELD_EVENT, { detail: { path: fullPath } }));
+    await nextTick();
     const field = match ? match[2] : path;
     const plain = field.replace(/\[\d+\]/g, "").split(".");
     const selectors = path
@@ -338,6 +347,7 @@ export function useResourceEditor<T extends EditableResource>(options: ResourceE
     if (e.code === "VERSION_CONFLICT") {
       const current = e.body.currentVersion;
       conflict.value = { currentVersion: typeof current === "number" ? current : null };
+      if (!usesWorkingCopy.value) void openSaveConflict();
     } else if (e.code === "DUPLICATE_VALUE") {
       const field = Object.keys(e.fieldMessages())[0] || "slug";
       const name = options.describePath(field).toLowerCase();
@@ -492,12 +502,14 @@ export function useResourceEditor<T extends EditableResource>(options: ResourceE
     if (!confirmed) return;
     applyConflict.value = null;
     if (!workingCopy.value) {
+      clearDraft();
       if (live.value) apply(live.value);
       return;
     }
     applying.value = true;
     try {
       await discardWorkingCopy(support.projectId(), support.kind, current.id);
+      clearDraft();
       snapshot.value = "";
       await load();
       showToast("Changes discarded", `The ${kind} is as visitors see it.`, "warning");
@@ -510,8 +522,68 @@ export function useResourceEditor<T extends EditableResource>(options: ResourceE
     }
   }
 
+  // DRAFT save conflict (spec 07 section 15, 12 section 5; DECISIONS.md D-025) ------------------------------------
+  // Someone saved the DRAFT first: the current row is read, its form state compared with the author's field by
+  // field (lists and rich text whole), and the author keeps "mine" or takes "current" per field before saving
+  // again on the current version. The backend sends no `conflictingFields` yet, so the CMS computes them.
+
+  const saveConflict = ref<{ current: T; fields: ConflictField[] } | null>(null) as Ref<{
+    current: T;
+    fields: ConflictField[];
+  } | null>;
+
+  async function openSaveConflict() {
+    saveConflict.value = null;
+    let current: T;
+    try {
+      current = await options.load();
+    } catch (e) {
+      if (!(e instanceof ApiError)) throw e;
+      return; // The plain choice, reload or keep mine, stays available.
+    }
+    const mineJson = serialize();
+    options.resetForm(current);
+    options.ensureLanguageRows();
+    const theirs = JSON.parse(serialize()) as object;
+    Object.assign(options.formState() as object, JSON.parse(mineJson));
+    options.ensureLanguageRows();
+    const mine = JSON.parse(mineJson) as object;
+    saveConflict.value = {
+      current,
+      fields: differingFields(mine, theirs).map((path) => ({
+        path,
+        mine: valueAt(mine, path),
+        current: valueAt(theirs, path),
+        choice: "mine" as const,
+      })),
+    };
+  }
+
+  /** Saves the author's choices on top of the version someone else saved. */
+  async function resolveSaveConflict() {
+    const pending = saveConflict.value;
+    if (!pending) return;
+    const merged = JSON.parse(serialize()) as object;
+    for (const field of pending.fields) {
+      if (field.choice === "current") setValueAt(merged, field.path, field.current);
+    }
+    Object.assign(options.formState() as object, merged);
+    options.ensureLanguageRows();
+    saveConflict.value = null;
+    conflict.value = null;
+    resource.value = pending.current;
+    await save(pending.current.version);
+  }
+
+  function closeConflict() {
+    conflict.value = null;
+    saveConflict.value = null;
+  }
+
   async function reloadDiscardingChanges() {
     conflict.value = null;
+    saveConflict.value = null;
+    clearDraft();
     snapshot.value = "";
     await load();
   }
@@ -592,30 +664,147 @@ export function useResourceEditor<T extends EditableResource>(options: ResourceE
     return loader && current ? () => loader(current) : undefined;
   });
 
+  // Unsaved form state in browser storage ----------------------------------------------------------------
+  // Spec 12 section 5 and section 6 (session expired), AGENTS.md section 4 rule 11, DECISIONS.md D-024: while the
+  // form has unsaved changes it is kept in this browser, per author and per editor page, never sent anywhere before
+  // the author saves, and offered back when the same author opens the same editor again, e.g. after a lost session.
+
+  interface StoredDraft {
+    savedAt: string;
+    /** The Resource's version the changes started from; a newer one means it changed meanwhile. */
+    version: number;
+    state: unknown;
+  }
+
+  const draftRoute = useRoute();
+  /** Unsaved changes found in storage when the editor opened, waiting for Restore or Discard. */
+  const pendingDraft = ref<StoredDraft | null>(null);
+  let draftTimer: ReturnType<typeof setTimeout> | null = null;
+  /** Set once the author chose to leave without saving: nothing is kept after that. */
+  let abandoned = false;
+
+  function draftKey(): string | null {
+    const subject = session.user?.subject;
+    return subject ? `iguide:draft:${subject}:${draftRoute.path}` : null;
+  }
+
+  function readDraft(): StoredDraft | null {
+    try {
+      const key = draftKey();
+      const raw = key ? window.localStorage.getItem(key) : null;
+      return raw ? (JSON.parse(raw) as StoredDraft) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function writeDraft() {
+    if (draftTimer) clearTimeout(draftTimer);
+    draftTimer = null;
+    const key = draftKey();
+    if (!key || abandoned || !resource.value || !dirty.value || pendingDraft.value) return;
+    const draft: StoredDraft = { savedAt: new Date().toISOString(), version: resource.value.version, state: options.formState() };
+    try {
+      window.localStorage.setItem(key, JSON.stringify(draft));
+    } catch {
+      // Storage full or blocked: the leave guard still protects the form.
+    }
+  }
+
+  function clearDraft() {
+    if (draftTimer) clearTimeout(draftTimer);
+    draftTimer = null;
+    try {
+      const key = draftKey();
+      if (key) window.localStorage.removeItem(key);
+    } catch {
+      // Nothing to clear when storage is blocked.
+    }
+  }
+
+  /** After a load: offers stored changes that differ from what was loaded. */
+  function offerDraft() {
+    const stored = readDraft();
+    pendingDraft.value = stored && JSON.stringify(stored.state) !== snapshot.value ? stored : null;
+    if (stored && !pendingDraft.value) clearDraft();
+  }
+
+  /** Puts the stored changes back into the form; they stay unsaved until the author saves. */
+  function restoreDraft() {
+    const stored = pendingDraft.value;
+    if (!stored) return;
+    pendingDraft.value = null;
+    Object.assign(options.formState() as object, JSON.parse(JSON.stringify(stored.state)));
+    options.ensureLanguageRows();
+    writeDraft();
+  }
+
+  function discardDraft() {
+    pendingDraft.value = null;
+    clearDraft();
+  }
+
+  /** Whether the stored changes started from an older version than the one loaded. */
+  const draftOutdated = computed(() =>
+    !!pendingDraft.value && !!resource.value && pendingDraft.value.version !== resource.value.version,
+  );
+
+  // Every change of the form: kept a moment after typing stops; a form back to its saved state drops it.
+  watch(serialize, () => {
+    if (loading.value || !resource.value || pendingDraft.value) return;
+    if (!dirty.value) {
+      clearDraft();
+      return;
+    }
+    if (draftTimer) clearTimeout(draftTimer);
+    draftTimer = setTimeout(writeDraft, 600);
+  });
+
   // Leave guard --------------------------------------------------------------------------------------
 
-  onBeforeRouteLeave(
-    () =>
-      !dirty.value ||
-      askConfirm({
-        title: "Leave without saving?",
-        body: `You have unsaved changes to this ${options.kind}. If you leave now, they are lost.`,
-        confirmLabel: "Leave without saving",
-        cancelLabel: "Keep editing",
-        danger: true,
-      }),
-  );
+  onBeforeRouteLeave(async () => {
+    if (!dirty.value) return true;
+    const leave = await askConfirm({
+      title: "Leave without saving?",
+      body: `You have unsaved changes to this ${options.kind}. If you leave now, they are lost.`,
+      confirmLabel: "Leave without saving",
+      cancelLabel: "Keep editing",
+      danger: true,
+    });
+    if (leave) {
+      abandoned = true;
+      clearDraft();
+    }
+    return leave;
+  });
   // Closing or reloading the tab can only use the browser's own prompt; browsers allow no custom dialog there.
+  // The changes are written to storage first, so a reload or a login redirect does not lose them.
   function onBeforeUnload(event: BeforeUnloadEvent) {
-    if (dirty.value) event.preventDefault();
+    if (!dirty.value) return;
+    writeDraft();
+    event.preventDefault();
   }
-  onMounted(() => window.addEventListener("beforeunload", onBeforeUnload));
-  onBeforeUnmount(() => window.removeEventListener("beforeunload", onBeforeUnload));
+  function onPageHide() {
+    if (dirty.value) writeDraft();
+  }
+  onMounted(() => {
+    window.addEventListener("beforeunload", onBeforeUnload);
+    window.addEventListener("pagehide", onPageHide);
+  });
+  onBeforeUnmount(() => {
+    window.removeEventListener("beforeunload", onBeforeUnload);
+    window.removeEventListener("pagehide", onPageHide);
+    if (dirty.value) writeDraft();
+  });
 
   return reactive({
     kind,
     resource,
     live,
+    pendingDraft,
+    draftOutdated,
+    restoreDraft,
+    discardDraft,
     workingCopy,
     usesWorkingCopy,
     loading,
@@ -636,6 +825,9 @@ export function useResourceEditor<T extends EditableResource>(options: ResourceE
     showErrors,
     saving,
     conflict,
+    saveConflict,
+    resolveSaveConflict,
+    closeConflict,
     save,
     reloadDiscardingChanges,
     overwrite,

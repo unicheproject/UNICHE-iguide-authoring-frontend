@@ -72,6 +72,18 @@ box against the live Keycloak and Catalogue through the backend. Backend counter
 - 2026-10-19: "Translations" panel under Status in the Place, POI, Route, Guide, Event, and Category editors:
   per language Complete, Partial (n of m fields), or Missing, from the live form, counting the fields the
   lists count; a row opens that language's tab.
+- 2026-10-26: Translation workspace → "Translate with MuseMind" for the open Resource and language (a "mock"
+  badge on the dev box's mock gateway), AI markers ("AI · unreviewed" / "AI · reviewed", pending) in the matrix
+  and the editor with service, time, and citations, "Mark reviewed", and a working "Unreviewed AI output" filter
+  (DECISIONS.md D-026, backend D-035).
+- 2026-10-26: "Translate with MuseMind" covers the whole open item: own texts, each stop, the Guide story (rich
+  text), and media items, with a marker and "Mark reviewed" per part (DECISIONS.md D-027, backend D-036).
+- 2026-10-26: problem details read as specified (code, URN type, structured field errors, X-UNICHE-Request-Id)
+  and a field-by-field choice on a DRAFT save conflict (DECISIONS.md D-025, backend D-034).
+- 2026-10-26: unsaved form state kept in browser storage per author and editor, offered back with Restore or
+  Discard (DECISIONS.md D-024).
+- 2026-10-26: a collapsed field group opens by itself when one of its fields has an error or is the target of
+  "What needs attention", so focus reaches the field (completes DECISIONS.md D-022).
 - 2026-10-23: Resource editors arranged as the prototype: form and side column together, pending chip in the head,
   Preview in app, Status and visibility, Used in (DECISIONS.md D-023).
 - 2026-10-23: readiness on the Dashboard (status card) and the Resource form ("What needs attention", focus on the

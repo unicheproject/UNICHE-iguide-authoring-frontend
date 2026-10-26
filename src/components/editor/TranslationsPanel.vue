@@ -4,7 +4,8 @@
  * always open and the others collapsible with a filled count, as in the mockup. Every field takes the
  * language's `lang` and text direction. Without Project languages it explains where to add them.
  */
-import { computed, reactive } from "vue";
+import { computed, onBeforeUnmount, onMounted, reactive, watch } from "vue";
+import { REVEAL_FIELD_EVENT } from "@/workspace/useResourceEditor";
 import type { ProjectLanguage } from "@/platform/languages";
 
 export interface TextFieldMeta {
@@ -42,6 +43,29 @@ const activeLanguage = defineModel<string | null>("activeLanguage", { required: 
 const active = computed(() => props.languages.find((l) => l.languageCode === activeLanguage.value) ?? null);
 const current = computed(() => (active.value ? props.texts[active.value.languageCode] : undefined));
 const openGroups = reactive<Record<string, boolean>>(Object.fromEntries(props.groups.map((g) => [g.id, g.open ?? true])));
+
+/** Opens the collapsible group holding a field, so it can be focused or shows its error. */
+function revealField(field: string) {
+  const group = props.groups.find((g) => g.label && g.keys.includes(field));
+  if (group) openGroups[group.id] = true;
+}
+
+// A group with an error in the language on screen opens by itself: a collapsed group renders no fields, so neither
+// the message nor the focus could reach them otherwise.
+watch(
+  () => props.groups.flatMap((g) => g.keys.filter((k) => error(k))),
+  (fields) => fields.forEach(revealField),
+  { immediate: true },
+);
+
+// The editor asks before moving focus to a field (`focusField`), e.g. from a readiness item.
+function onReveal(event: Event) {
+  const path = (event as CustomEvent<{ path: string }>).detail?.path ?? "";
+  const field = /^translations\.[^.]+\.([^.[]+)/.exec(path)?.[1];
+  if (field) revealField(field);
+}
+onMounted(() => window.addEventListener(REVEAL_FIELD_EVENT, onReveal));
+onBeforeUnmount(() => window.removeEventListener(REVEAL_FIELD_EVENT, onReveal));
 
 function filledSummary(keys: string[]): string {
   const filled = current.value ? keys.filter((k) => current.value![k]?.trim()).length : 0;
