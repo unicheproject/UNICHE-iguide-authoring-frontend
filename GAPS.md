@@ -89,6 +89,9 @@ prototype inventory).
 - Found: `src/platform/api.ts` reads `details: string[]` ("path: message"); the spec envelope carries
   `errors: [{path, code, message}]` (`07` §15). `requestId` falls back to the header correctly.
 - Closed by: C0c, with a test per error shape.
+- Closed 2026-10-26 in code (D-025): problem details read with `code`, URN `type`, `detail`, structured
+  `fieldErrors`, and `X-UNICHE-Request-Id`; `vue-tsc -b` and `pnpm run build` green. The per-shape tests wait for a
+  test runner (G-013).
 
 ### G-007 — No Working Copy flow
 
@@ -116,8 +119,11 @@ prototype inventory).
   subtitle in `src/workspace/sections.ts` copies the prototype's per-surface menus (DECISIONS.md D-004 P1)
   and the Preview subtitle says "unpublished".
 - Interim 2026-10-19: Preview has its own screen, a stand-in app (D-015, G-020).
-- Interim 2026-10-23: Translations has its own screen, the Translation workspace (D-021); its MuseMind
-  translation, AI markers, and "mark reviewed" wait for the UNICHE AI gateway (backend M13).
+- Interim 2026-10-23: Translations has its own screen, the Translation workspace (D-021).
+- Interim 2026-10-26: MuseMind translation, AI markers, and "mark reviewed" work against the backend's mock gateway
+  (D-026, backend D-035), for stops, the Guide story, and media items too (D-027, backend D-036). Still open: the real gateway (backend G-037, M13); citations are shown as the backend
+  passes them through (a string, or an object with a title and a link; a link opens in a new tab), since their shape
+  is open in `09` §16; the AI markers are missing in the Resource editors' language tabs.
 - Interim 2026-10-16 (owner request): the Overview has its own screen (`OverviewView.vue`) with live
   content counts (active and draft per kind, from `?size=1&status=` on each list, `platform/overview.ts`)
   and the Project languages; its Pages, Navigation, Theme, Preview, and Launch parts show their place with

@@ -9,11 +9,25 @@ import { forceTokenRefresh, getAccessToken, platformConfig, sessionExpired } fro
  * `401`.
  */
 
+/** One field error of a problem body (spec 07 section 15): the field's path, a stable code, and a message. */
+export interface FieldError {
+  path: string;
+  code: string;
+  message: string;
+}
+
+/** The URN prefix of a problem `type`; the rest is the code (spec 07 section 15). */
+const PROBLEM_TYPE_PREFIX = "urn:uniche:iguide:problem:";
+
 export class ApiError extends Error {
   readonly status: number;
+  /** The problem's `code`, e.g. VALIDATION_ERROR or VERSION_CONFLICT; clients match on it, never on the URN. */
   readonly code: string;
   readonly requestId: string | null;
+  /** The field errors as "path: message", the form callers rewrite paths in. */
   readonly details: string[];
+  /** The field errors with their codes; built from `details` when an error was made locally. */
+  readonly fieldErrors: FieldError[];
   /** The parsed error body, for fields specific to one error such as `currentVersion` on a 409. */
   readonly body: Record<string, unknown>;
 
@@ -24,6 +38,7 @@ export class ApiError extends Error {
     requestId: string | null,
     details: string[],
     body: Record<string, unknown> = {},
+    fieldErrors?: FieldError[],
   ) {
     super(message);
     this.name = "ApiError";
@@ -32,6 +47,12 @@ export class ApiError extends Error {
     this.requestId = requestId;
     this.details = details;
     this.body = body;
+    this.fieldErrors = fieldErrors ?? details.map((detail) => {
+      const separator = detail.indexOf(": ");
+      return separator > 0
+        ? { path: detail.slice(0, separator), code: "", message: detail.slice(separator + 2) }
+        : { path: "", code: "", message: detail };
+    });
   }
 
   /**
@@ -112,7 +133,7 @@ export async function apiRequestWithHeaders<T>(path: string, options: RequestOpt
  * `apiRequest`. Needed where an `<img src>` cannot carry the token.
  */
 export async function apiBlob(path: string, options: RequestOptions = {}): Promise<Blob> {
-  const accept = options.accept ?? "*/*, application/json";
+  const accept = options.accept ?? "*/*, application/json, application/problem+json";
   let response = await send(path, { ...options, accept });
   if (response.status === 401) {
     await forceTokenRefresh();
@@ -130,7 +151,8 @@ export async function apiBlob(path: string, options: RequestOptions = {}): Promi
 async function send(path: string, options: RequestOptions): Promise<Response> {
   const token = await getAccessToken();
   const headers: Record<string, string> = {
-    Accept: options.accept ?? "application/json",
+    // Problem details (`application/problem+json`, spec 07 section 15) answer errors.
+    Accept: options.accept ?? "application/json, application/problem+json",
     Authorization: `Bearer ${token}`,
   };
   let body: string | undefined;
@@ -199,7 +221,7 @@ async function sendUpload(
     const xhr = new XMLHttpRequest();
     xhr.open("POST", `${platformConfig().apiBaseUrl}${path}`);
     xhr.setRequestHeader("Authorization", `Bearer ${token}`);
-    xhr.setRequestHeader("Accept", "application/json");
+    xhr.setRequestHeader("Accept", "application/json, application/problem+json");
     xhr.upload.onprogress = (event) => {
       if (event.lengthComputable) onProgress?.(event.loaded / event.total);
     };
@@ -229,24 +251,28 @@ async function toApiError(response: Response): Promise<ApiError> {
     // Not JSON, e.g. a proxy error page. The status alone still drives the CMS state.
   }
 
-  // The iGuide backend's envelope names the code `type` and lists `errors[{path, code, message}]`
-  // (backend ErrorEnvelope, until M0a); they are read into the same `code` and "path: message" details.
-  const code = str(body.code) ?? str(body.type) ?? `HTTP_${response.status}`;
-  const message = str(body.message) ?? str(body.detail) ?? str(body.title) ?? defaultMessage(response.status);
+  // RFC 7807 problem details (spec 07 section 15, backend D-034): `code` beside a URN `type`, `detail`, and
+  // `errors[{path, code, message}]`. The earlier envelope, whose `type` was the bare code and whose `title` was the
+  // message, reads the same way.
+  const type = str(body.type);
+  const code =
+    str(body.code) ??
+    (type?.startsWith(PROBLEM_TYPE_PREFIX) ? type.slice(PROBLEM_TYPE_PREFIX.length) : type && !type.includes(":") ? type : null) ??
+    `HTTP_${response.status}`;
+  const message = str(body.detail) ?? str(body.title) ?? str(body.message) ?? defaultMessage(response.status);
   const requestId =
     str(body.requestId) ?? response.headers.get("X-UNICHE-Request-Id") ?? response.headers.get("X-Request-Id");
+  const fieldErrors: FieldError[] = Array.isArray(body.errors)
+    ? body.errors.flatMap((e) => {
+        const item = e as { path?: unknown; code?: unknown; message?: unknown };
+        const text = str(item.message);
+        return text ? [{ path: str(item.path) ?? "", code: str(item.code) ?? "", message: text }] : [];
+      })
+    : [];
   const details = Array.isArray(body.details)
     ? body.details.filter((d): d is string => typeof d === "string")
-    : Array.isArray(body.errors)
-      ? body.errors.flatMap((e) => {
-          const item = e as { path?: unknown; message?: unknown };
-          const text = str(item.message);
-          if (!text) return [];
-          const path = str(item.path);
-          return [path ? `${path}: ${text}` : text];
-        })
-      : [];
-  return new ApiError(response.status, code, message, requestId, details, body);
+    : fieldErrors.map((e) => (e.path ? `${e.path}: ${e.message}` : e.message));
+  return new ApiError(response.status, code, message, requestId, details, body, fieldErrors.length ? fieldErrors : undefined);
 }
 
 function str(value: unknown): string | null {
