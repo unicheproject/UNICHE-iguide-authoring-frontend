@@ -31,6 +31,11 @@ const props = withDefaults(
     editBounds?: boolean;
     /** Keep the map inside the bounds, as visitors see it. */
     limitToBounds?: boolean;
+    /**
+     * Show the whole bounds whatever the canvas size, instead of the saved initial view, whose zoom was chosen in
+     * the editor's wider canvas: the visitor preview, drawn at phone, web, or kiosk width.
+     */
+    fitToBounds?: boolean;
     markers?: CanvasMarker[];
     lines?: LatLng[][];
     height?: string;
@@ -39,7 +44,7 @@ const props = withDefaults(
     /** Accessible name of the map region. */
     label: string;
   }>(),
-  { editBounds: false, limitToBounds: false, markers: () => [], lines: () => [], height: "460px", fitKey: "" },
+  { editBounds: false, limitToBounds: false, fitToBounds: false, markers: () => [], lines: () => [], height: "460px", fitKey: "" },
 );
 const emit = defineEmits<{
   boundsChange: [bounds: Bounds];
@@ -51,6 +56,7 @@ const host = ref<HTMLDivElement | null>(null);
 let map: L.Map | null = null;
 let layer: L.LayerGroup | null = null;
 let dragging = false;
+let resizeObserver: ResizeObserver | null = null;
 
 const TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
 const ATTRIBUTION = '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
@@ -68,13 +74,30 @@ onMounted(() => {
   });
   redraw();
   applyLimits();
-  setTimeout(() => map?.invalidateSize(), 60);
+  fitIfAsked();
+  // Leaflet measures its box once; the box changes when a panel opens, a preview surface changes, or a scaled
+  // frame settles, so it measures again on every size change and, in the preview, fits the bounds again.
+  resizeObserver = new ResizeObserver(() => {
+    if (!map) return;
+    map.invalidateSize({ animate: false });
+    applyLimits();
+    fitIfAsked();
+  });
+  resizeObserver.observe(host.value);
 });
 
 onBeforeUnmount(() => {
+  resizeObserver?.disconnect();
+  resizeObserver = null;
   map?.remove();
   map = null;
 });
+
+function fitIfAsked() {
+  if (map && props.fitToBounds && props.bounds && !props.editBounds) {
+    map.fitBounds(L.latLngBounds(props.bounds), { padding: [6, 6], animate: false });
+  }
+}
 
 function round(value: number, digits: number): number {
   const f = 10 ** digits;
@@ -240,7 +263,10 @@ function redraw() {
 }
 
 watch(() => [props.bounds, props.editBounds, props.markers, props.lines], redraw, { deep: true });
-watch(() => [props.bounds, props.editBounds, props.limitToBounds], applyLimits, { deep: true });
+watch(() => [props.bounds, props.editBounds, props.limitToBounds], () => {
+  applyLimits();
+  fitIfAsked();
+}, { deep: true });
 watch(
   () => props.fitKey,
   () => {
@@ -267,7 +293,7 @@ watch(
 watch(
   () => `${props.view.lat},${props.view.lng},${props.view.zoom}`,
   () => {
-    if (!map) return;
+    if (!map || props.fitToBounds) return;
     const c = map.getCenter();
     if (Math.abs(c.lat - props.view.lat) > 0.00006 || Math.abs(c.lng - props.view.lng) > 0.00006 || Math.abs(map.getZoom() - props.view.zoom) > 0.011) {
       map.setView([props.view.lat, props.view.lng], props.view.zoom, { animate: false });

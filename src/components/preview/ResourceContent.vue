@@ -102,7 +102,7 @@ const hero = computed(() => props.model.blocks.find((b) => b.type === "hero"));
       </div>
 
       <div v-else-if="block.type === 'map'" class="pointer-events-none overflow-hidden rounded-[0.5em]">
-        <GeoMapCanvas :view="block.view" :bounds="block.bounds" :markers="block.markers" limit-to-bounds :height="wide ? '22em' : '14em'" label="Map" />
+        <GeoMapCanvas :view="block.view" :bounds="block.bounds" :markers="block.markers" limit-to-bounds fit-to-bounds :height="wide ? '22em' : '14em'" label="Map" />
       </div>
     </template>
   </div>
