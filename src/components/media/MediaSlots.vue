@@ -2,7 +2,9 @@
 /**
  * The media slots of a Resource, as in the CMS mockup: one card per slot. A single slot holds one Asset; a
  * `multiple` slot is an ordered list; a `perLanguage` slot holds one Asset per Project language, such as an
- * audio narration (iGuide spec 03, section 4). Edits the given `media` list in place, so they count as
+ * audio narration, plus an "All languages" one without a language that visitors get when their language has
+ * none (iGuide spec 03 section 4, 11 lines 169-171). A slot that `requires` another, such as a 3D model and its
+ * poster image (03 lines 521-531), warns while the other is empty. Edits the given `media` list in place, so they count as
  * unsaved changes of the Resource and are saved with it.
  */
 import { computed, ref } from "vue";
@@ -26,6 +28,10 @@ export interface MediaSlot {
   multiple?: boolean;
   perLanguage?: boolean;
   recommended?: boolean;
+  /** Another slot that must hold an Asset whenever this one does. */
+  requires?: AssetUsage;
+  /** One line under the slot's title. */
+  hint?: string;
 }
 
 const props = defineProps<{
@@ -41,6 +47,20 @@ const props = defineProps<{
 const emit = defineEmits<{ uploaded: [asset: Asset] }>();
 
 const assetById = computed(() => new Map(props.assets.map((a) => [a.id, a])));
+
+/** The rows of a per-language slot: "All languages" first, then each Project language. */
+const languageRows = computed(() => [
+  { languageCode: null as string | null, displayName: "All languages" },
+  ...props.languages.map((l) => ({ languageCode: l.languageCode as string | null, displayName: l.displayName })),
+]);
+
+/** The warning of a slot that requires another one that is still empty. */
+function missingRequired(slot: MediaSlot): string | null {
+  if (!slot.requires || !bindingsOf(slot).length) return null;
+  if (props.media.some((b) => b.usage === slot.requires)) return null;
+  const other = props.slots.find((s) => s.usage === slot.requires);
+  return `Add the ${other ? other.label.toLowerCase() : "required image"} too; visitors see it before the ${slot.label.toLowerCase()} loads.`;
+}
 
 function bindingsOf(slot: MediaSlot, languageCode: string | null = null) {
   return props.media
@@ -110,10 +130,12 @@ function requirement(slot: MediaSlot): string {
         <div class="border-b bg-muted px-3 py-[9px] text-[10px] font-extrabold uppercase tracking-[0.08em] text-muted-foreground">
           {{ slot.label }}
         </div>
+        <p v-if="slot.hint" class="border-b border-gray-100 px-3 py-2 text-[11px] text-muted-foreground">{{ slot.hint }}</p>
+        <p v-if="missingRequired(slot)" class="border-b border-gray-100 px-3 py-2 text-[11px] font-semibold text-[#9a6200]">⚠ {{ missingRequired(slot) }}</p>
 
         <!-- One asset per language -->
         <ul v-if="slot.perLanguage" class="flex flex-col">
-          <li v-for="l in languages" :key="l.languageCode" class="border-b border-gray-100 px-3 py-2.5 last:border-b-0">
+          <li v-for="l in languageRows" :key="l.languageCode ?? 'all'" class="border-b border-gray-100 px-3 py-2.5 last:border-b-0">
             <template v-for="{ binding, index } in bindingsOf(slot, l.languageCode)" :key="index">
               <div class="flex items-center gap-2 text-xs">
                 <span class="w-16 flex-none text-[10px] font-bold uppercase tracking-[0.06em] text-muted-foreground">{{ l.displayName }}</span>
@@ -128,7 +150,7 @@ function requirement(slot: MediaSlot): string {
               <button v-if="!readonly" type="button" class="text-[11px] font-bold text-primary" @click="choose(slot, l.languageCode)">Choose</button>
             </div>
           </li>
-          <li v-if="!languages.length" class="px-3 py-2.5 text-[11px] text-muted-foreground">Add a Project language first.</li>
+          <li class="px-3 py-2 text-[11px] text-muted-foreground">"All languages" plays when a language has none of its own.</li>
         </ul>
 
         <!-- Ordered list -->
