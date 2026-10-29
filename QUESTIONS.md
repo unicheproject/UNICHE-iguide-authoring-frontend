@@ -46,6 +46,16 @@ None. Backend dependencies are tracked in PLAN.md and the backend's PLAN.md.
   `http://localhost:5173`, and is the `UNICHEidp` realm export updated?
 - Consequence: deployment of the CMS (G-015); nothing blocks development.
 
+### Q-005 — Media of a Place
+
+- Kind: spec-change-request
+- Source: to-do A33 (2026-10-27); owner choice: not now, record it.
+- Question: `12` §3 Place lists no media, and the CMS's Place editor has none; but `11` lines 181-183 give every
+  Resource its own `assets`, and the kiosk attract loop uses the hero images of featured Resources (`13`
+  line 232), so a featured Place contributes nothing there. Should a Place take a hero image and a gallery
+  (as Guides do), or should `13` say the attract loop skips Places?
+- Consequence: none for now; a featured Place shows no image in the attract loop.
+
 ### Open decisions of `09` that shape CMS steps
 
 | `09` | Shapes |
