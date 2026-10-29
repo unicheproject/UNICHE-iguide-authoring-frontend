@@ -467,3 +467,158 @@ the backend's DECISIONS.md.
 - Consequences: stops that exist only in the pending changes are not translated (they cannot be edited here
   either, D-021); a stop or block replaced when its pending changes are applied loses its marker (backend D-036).
 - Affected specs: `03` §1; `12` §3.
+
+## D-028 (2026-10-27) — Content screens stop offering what the specs removed
+
+- Type: spec-alignment (owner request 2026-10-27, "Content" quick fixes A1, A3, A4, A8, A9, A13 of the to-do list,
+  after a full re-read of the specs)
+- Decision:
+  - Route stops have no "Optional" checkbox; `RouteStop` loses `optional` (`03` §9: optional stops, per-stop
+    duration, and stop triggers were removed on 2026-10-01; the backend never stored them, D-021 refused them);
+  - POI, Route, and Guide editors have no "Search and sharing" (SEO) fields; `PoiTranslation`,
+    `RouteTranslation`, and `GuideTranslation` lose `seoTitle`/`seoDescription`, and the clients send and read the
+    backend's translations as they are (`12` §3 Page builder: SEO fields do not exist; `03` §6, §9, §11 list none);
+  - the Floor plan editor has no "Connections" card and `FloorPlan` no `connections` (`03` §8, removed
+    2026-10-01; floors switch by `sortOrder`); the Floor plans list no longer counts them;
+  - the POI's instructions and accessibility information sit in a collapsed "Practical details" group with its
+    filled count (`12` §3 Point of Interest); a field in it with an error or a readiness target still opens it
+    (D-022);
+  - the Route editor warns, without blocking, when the Route has fewer than two stops (`12` §3 Route, `03` §9;
+    backend `ROUTE_FEW_STOPS`), and the Route map lists by name the stops it cannot draw (`12` §3 Route);
+  - the Place creation dialog points to the editor's Place setup for the map or floor plan link.
+- Why: the specs removed these fields and the backend refused them, so the CMS offered inputs it could never save.
+- Consequences: the local "cannot be saved in iGuide yet" refusals for SEO texts and optional stops are gone; the
+  Guide's refusal of Page items stays (until Pages exist).
+- Affected specs: `03` §6, §8, §9, §11; `12` §3.
+
+## D-029 (2026-10-27) — Route stops: drag and drop, position, and warnings
+
+- Type: spec-interpretation (owner request 2026-10-27, "finish Route": to-do A2, A30, A31, A32)
+- Decision:
+  - stops reorder by drag and drop on a handle, by Move up / Move down, and by a position list per stop, the
+    keyboard way `14` lines 179-181 ask for; each move is announced in a polite live region. Stops are part of the
+    form, so the order is saved with the Route (DRAFT) or its working copy (ACTIVE), not on drop as in the lists
+    (D-017);
+  - each stop whose point of interest is not ACTIVE says so under its row: a draft is not seen until activated, an
+    archived or missing one should be removed (`DANGLING_REFERENCE`, `07` §14);
+  - on an ACTIVE Route, when the stops' order differs from what visitors see now, a warning says that stop links
+    follow the position (`/routes/{slug}/stops/{n}`, `11` line 292), so links and QR codes to a stop number lead
+    elsewhere after apply; a stop added at the end or the last one removed moves no other link and does not warn;
+  - the walking instructions get a visible label with "shown to visitors who cannot use the map" (`14` lines
+    174, 225), and the narration hint adds "stays under three minutes" (`14` lines 225-227).
+- Why: `12` §3 Route asks for drag-and-drop stops; `14` asks for keyboard alternatives and visible labels.
+- Consequences: the backend refuses an apply that would leave new blocking issues, such as a Route without an
+  ACTIVE stop (backend D-037, 2026-10-27); the editor then heads its error summary "The changes were not applied"
+  and keeps the pending changes.
+- Affected specs: `11` line 292; `12` §3; `14`.
+
+## D-030 (2026-10-27) — Place setup editable: setting, level, and the map or floor plan
+
+- Type: spec-alignment (owner choice 2026-10-27, replacing the owner decision of 2026-10-16 that fixed the setting
+  and level after creation; to-do A6, A7)
+- Decision:
+  - the Place editor's "Place setup" card shows the creation dialog's steps, editable: 1 · Setting (Indoor or
+    Outdoor), 2 · Level (top-level, or sub-place with its parent), 3 · the map or floor plan link (`12` §3 Place);
+  - a sub-place picks its own setting (`03` §5); the parent list leaves out the Place itself, the Places inside
+    it, and archived Places, so no cycle can be chosen; choosing "Sub-place" without a parent is refused at the
+    field;
+  - the setting cannot change while a map or floor plan is linked: the other choice is disabled with "unlink the
+    map / floor plan below first" (the backend refuses it with `LINKED` at `environment`, shown at the setting);
+  - the link step follows the saved setting, because linking applies at once: after the setting changes, the link
+    is disabled until the Place is saved;
+  - a linked Place offers "Open map" or "Open floor plan" (`12` §3 Place); before, an outdoor Place had none;
+  - on an ACTIVE Place the changes go into its working copy like every other field.
+- Why: `12` §3 says the setup shows the three choices editable; the backend already accepted both changes.
+- Alternatives: keep them fixed (the 2026-10-16 choice), which made a wrong setting cost an archive and a re-create.
+- Consequences: Place media stay out (QUESTIONS.md Q-005).
+- Affected specs: `03` §5; `12` §3.
+
+## D-031 (2026-10-27) — The Guide story as ordered blocks of text and references
+
+- Type: spec-alignment (owner request 2026-10-27, to-do A10, A11; `12` §3 Guide, `03` §11; replaces the bridge of
+  2026-10-15, GAPS.md G-004)
+- Decision:
+  - the Guide editor's "Story" card lists the Guide's blocks as the backend stores them (backend D-022): TEXT blocks
+    (rich text per language) and REFERENCE blocks (a POI, Route, Place, or Event with an optional caption per
+    language), freely interleaved, several TEXT blocks allowed, the same target allowed in several blocks; the
+    separate "Related" list is gone;
+  - blocks reorder by a drag handle, Move up / Move down, and a position list, announced in a live region (the Route
+    stop pattern, D-029); "+ Text" and "+ Reference" add at the end, "+ after" inserts after a block; a reference
+    whose target is a draft, archived, or gone says so; "Change" picks another target;
+  - a DRAFT saves through the block endpoints (deleted, updated, created, then `:order` with every id); an ACTIVE
+    Guide sends every block in order in its working copy; each block carries every enabled language, `null` clearing
+    one. This fixes two bridge losses: extra TEXT blocks moved to the end on a DRAFT save and dropped from a working
+    copy. Errors land at `blocks[i]…` (a DRAFT block's own request is prefixed by the client), focus reaches them
+    (`data-path`), and a nested `translations.<lang>` opens its language tab;
+  - A11: the spec's "paragraph block" is the TEXT block; its rich text holds images inline as before. The text
+    editor now inserts a node after any node, shows each image's alternative text in the language (or "decorative",
+    or the missing warning), and offers headings at levels 2 and 3 only (`14` lines 82-83);
+  - the preview renders the blocks in the order written: text with heading levels, a reference as a card with its
+    caption, a text block or caption missing in the previewed language marked and shown in the default language;
+  - the Translation workspace lists every block (text through the text editor, reference through its caption),
+    saves changed blocks one by one, and MuseMind translates them as one part each; the story counts towards
+    completeness when the Guide has TEXT blocks, as "every TEXT block written" (also in the lists' dots);
+  - Page references stay refused at their field until Pages exist (backend M6).
+- Why: `12` §3 asks for "a story editor of ordered blocks: a paragraph block, or a reference block … with an optional
+  caption"; the backend already had the model.
+- Consequences: the backend's readiness still warns `MISSING_TRANSLATION` only for the first TEXT block and never for
+  captions, and an image-only TEXT block fails activation (GAPS.md G-004).
+- Affected specs: `03` §11; `12` §3; `14`.
+
+## D-032 (2026-10-27) — One upload behaviour everywhere; a visible Category scope lock
+
+- Type: spec-alignment (owner request 2026-10-27, to-do A12, A26-A29, A37; `12` §3 Media library and §5, `14` §2-§3,
+  `03` §1)
+- Decision:
+  - every upload path (the upload dialog, the Asset picker's "Upload new", and "Replace file") goes through
+    `useAssetUpload`: the size limits come from `GET /upload-limits` and are checked before any bytes leave the
+    browser, against the type's own limit and the global `maxUploadBytes` (`sizeProblem`); while the limits cannot be
+    loaded nothing is sent and the file fails with a Retry; every result (done, failed, cancelled) is announced in a
+    polite live region; each file shows one `UploadEntryRow` (state, progress bar, reason, Retry — disabled when the
+    file is too large — and Cancel); `UploadLimits` shows the per-type limits and the global one before upload;
+  - the Asset picker takes several files, by the file chooser or dropped onto the dialog, selects the first one that
+    fits the field, uploads images as floor plans when the field takes floor plans, and its tiles show the type and
+    "Used in n" (mockup C-04);
+  - "Replace file" is offered only for a DRAFT Asset: for an ACTIVE one it is disabled with "Visitors may be seeing
+    this file … upload a new file and use it instead" (`03` §1, which the backend enforces too);
+  - the media detail page keeps one "Used in" card, the shell's from `GET .../assets/{id}/references` (the spec's
+    endpoint, `07` §14); the `/usages` card and its client call are gone;
+  - a floor-plan image takes alternative text and the decorative flag like an image, with the hint that its text
+    summarises the plan (`14` §2); the picker and the media lists warn when it has none; only an IMAGE requires the
+    text before activation, as the backend checks;
+  - ticking "Decorative" asks for confirmation (`14` §2: a primary image of an exhibit is never decorative); the
+    alternative-text and transcript helpers carry the `14` §2 guidelines;
+  - a Category in use shows the other "Applies to" choice disabled, with "Used by n … Remove it from them before
+    changing what it applies to." under the chips (`12` §3 Category).
+- Why: `12` §5 rejects an over-limit upload before any bytes leave the browser and asks for progress and retry on
+  every upload; `14` §3 announces long operations; the picker was single-file without retry, and Replace had neither
+  a limit check nor progress.
+- Consequences: the backend neither requires nor reports missing alternative text on FLOOR_PLAN Assets
+  (`AssetReadiness` checks IMAGE only), so for plans it stays a CMS warning.
+- Affected specs: `03` §1, §4; `07` §14; `12` §3, §5; `14` §2, §3.
+
+## D-033 (2026-10-27) — A 3D model with its poster on Points of Interest; media for all languages
+
+- Type: spec-alignment (to-do A34, A35)
+- Decision:
+  - the POI editor's media gain "3D model" (a THREE_D_MODEL Asset, GLB, view only) and "3D model poster" (an image
+    whose alternative text describes the object): a model without a poster is refused at the model's slot before
+    saving, and the model slot warns while the poster is empty (`03` lines 521-531, kept by the MVP review; the
+    backend binds the poster first and refuses `MODEL_POSTER_REQUIRED` otherwise); the picker offers `.glb` files;
+  - a per-language slot, such as the audio narration, has an "All languages" row first: a binding without a
+    language, which visitors get when their language has none of its own (`03` lines 510-512, `11` lines 169-171).
+- Why: the spec keeps the 3D viewer and the language fallback; the backend already supports both.
+- Consequences: only Points of Interest offer a model, as exhibits do; other kinds can add the same slots later.
+- Affected specs: `03` §4; `11` §5.
+
+## D-034 (2026-10-27) — Pan and zoom set a map's initial view
+
+- Type: spec-alignment (to-do A14; `12` §3 Maps: "pan and zoom update the initial view")
+- Decision: in the map editor, a move the author makes (drag, mouse wheel, keys, the zoom buttons) writes the map's
+  centre and zoom into its initial view, which visitors open the map at; moves the map makes itself, such as fitting
+  the bounds when it loads, change nothing. The "Set initial view" button is gone; the Latitude, Longitude, and
+  Zoom fields stay, so the view can be typed without pointing (`14` lines 184-185). While the bounds are edited,
+  the view is left alone.
+- Why: the spec asks for it; the button step was easy to forget before saving.
+- Affected specs: `12` §3; `14`.
+

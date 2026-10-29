@@ -145,7 +145,7 @@ async function submit() {
               ? "Indoor places position their Points of Interest on a floor plan."
               : "Outdoor places position their Points of Interest on a geographic map."
           }}
-          Link one in the editor once Maps & Floor Plans are available.
+          Link one in the editor's Place setup.
         </p>
       <div class="flex flex-col gap-1.5">
         <label for="place-title" class="field-label">3 · {{ titleLabel }}</label>

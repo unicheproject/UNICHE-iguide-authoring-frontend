@@ -64,7 +64,7 @@ const languageCodes = () => languages.value.map((l) => l.languageCode);
 
 type RouteTextKey = keyof RouteTranslation;
 type StopTextKey = keyof RouteStopTranslation;
-const ROUTE_TEXT_KEYS: RouteTextKey[] = ["title", "summary", "description", "instructions", "seoTitle", "seoDescription"];
+const ROUTE_TEXT_KEYS: RouteTextKey[] = ["title", "summary", "description", "instructions"];
 const STOP_TEXT_KEYS: StopTextKey[] = ["titleOverride", "description", "navigationInstructions", "narrative"];
 
 const TEXT_META: Record<RouteTextKey, TextFieldMeta> = {
@@ -72,13 +72,10 @@ const TEXT_META: Record<RouteTextKey, TextFieldMeta> = {
   summary: { label: "Summary", multiline: true, helper: "Short text shown in lists: what the visitor will see and for how long." },
   description: { label: "Description", multiline: true },
   instructions: { label: "Instructions", multiline: true, helper: "Where it starts and what to bring." },
-  seoTitle: { label: "Title for search and sharing", multiline: false, helper: "Leave empty to use the title." },
-  seoDescription: { label: "Description for search and sharing", multiline: true, helper: "Leave empty to use the summary." },
 };
 const GROUPS: TextFieldGroup[] = [
   { id: "main", label: null, keys: ["title", "summary", "description"] },
   { id: "secondary", label: "More texts", keys: ["instructions"], open: true },
-  { id: "seo", label: "Search and sharing", keys: ["seoTitle", "seoDescription"], open: false },
 ];
 // The mockup's media slot of a Route.
 const MEDIA_SLOTS: MediaSlot[] = [{ usage: "HERO_IMAGE", label: "Primary image", accept: ["IMAGE"] }];
@@ -106,7 +103,6 @@ interface StopForm {
   key: string;
   id: string | null;
   poiId: string;
-  optional: boolean;
   translations: Record<string, Texts<StopTextKey>>;
 }
 
@@ -135,7 +131,6 @@ function toStopForm(stop: RouteStop): StopForm {
     key: stop.id ?? `new-${++keyCounter}`,
     id: stop.id,
     poiId: stop.poiId,
-    optional: stop.optional,
     translations: Object.fromEntries(Object.entries(stop.translations).map(([code, t]) => [code, textsFrom(STOP_TEXT_KEYS, t)])),
   };
 }
@@ -158,7 +153,6 @@ function input(): Omit<UpdateRouteInput, "version"> {
       id: s.id,
       poiId: s.poiId,
       position: i,
-      optional: s.optional,
       translations: textsForApi(STOP_TEXT_KEYS, languageCodes(), s.translations),
     })),
     media: form.media.map((m) => ({ ...m })),
@@ -179,6 +173,7 @@ const editor = useResourceEditor<Route>({
       listTargetTriggers(projectId.value, "ROUTE", props.routeId),
     ]);
     savedTriggers.value = triggers;
+    liveStopIds.value = route.stops.flatMap((s) => (s.id ? [s.id] : []));
     pois.value = allPois;
     assets.value = library;
     categories.value = allCategories;
@@ -294,13 +289,77 @@ function stopError(index: number): string | undefined {
   return messages.length ? messages.join(" ") : undefined;
 }
 
-/** Moves a stop and keeps keyboard focus on the same button, so repeated presses keep moving it. */
-function moveStop(index: number, delta: number) {
-  const target = index + delta;
-  if (target < 0 || target >= form.stops.length) return;
+/**
+ * Stop order (`12` §3 Route, `14` lines 179-181): drag and drop by the handle, with Move up / Move down and a
+ * position choice as the keyboard ways. Every move is announced. Stops are part of the form, so the order is saved
+ * with the Route.
+ */
+const stopAnnouncement = ref("");
+
+function moveStopTo(index: number, target: number, focusId?: (key: string) => string) {
+  if (target < 0 || target >= form.stops.length || target === index) return;
   const [stop] = form.stops.splice(index, 1);
   form.stops.splice(target, 0, stop);
-  void nextTick(() => document.getElementById(`stop-move-${stop.key}-${delta < 0 ? "up" : "down"}`)?.focus());
+  stopAnnouncement.value = `Moved ${stopTitle(stop)} to position ${target + 1} of ${form.stops.length}.`;
+  if (focusId) void nextTick(() => document.getElementById(focusId(stop.key))?.focus());
+}
+
+/** Moves a stop and keeps keyboard focus on the same button, so repeated presses keep moving it. */
+function moveStop(index: number, delta: number) {
+  moveStopTo(index, index + delta, (key) => `stop-move-${key}-${delta < 0 ? "up" : "down"}`);
+}
+
+function setStopPosition(index: number, event: Event) {
+  moveStopTo(index, Number((event.target as HTMLSelectElement).value) - 1, (key) => `stop-position-${key}`);
+}
+
+const draggingStop = ref<string | null>(null);
+const stopDropTarget = ref<{ key: string; after: boolean } | null>(null);
+
+function stopDragStart(key: string, event: DragEvent) {
+  draggingStop.value = key;
+  event.dataTransfer?.setData("text/plain", key);
+  if (event.dataTransfer) event.dataTransfer.effectAllowed = "move";
+}
+
+function stopDragOver(key: string, event: DragEvent) {
+  if (!draggingStop.value || draggingStop.value === key) return;
+  event.preventDefault();
+  const box = (event.currentTarget as HTMLElement).getBoundingClientRect();
+  stopDropTarget.value = { key, after: event.clientY > box.top + box.height / 2 };
+}
+
+function stopDrop() {
+  const from = form.stops.findIndex((s) => s.key === draggingStop.value);
+  const drop = stopDropTarget.value;
+  stopDragEnd();
+  if (from < 0 || !drop) return;
+  let target = form.stops.findIndex((s) => s.key === drop.key) + (drop.after ? 1 : 0);
+  if (from < target) target--;
+  moveStopTo(from, target);
+}
+
+function stopDragEnd() {
+  draggingStop.value = null;
+  stopDropTarget.value = null;
+}
+
+/** The live order of the saved stops: on an ACTIVE Route a stop's link is its position (`11` line 292). */
+const liveStopIds = ref<string[]>([]);
+const stopLinksChange = computed(() => {
+  if (editor.resource?.status !== "ACTIVE") return false;
+  // A stop added at the end or the last one removed moves no other stop's link.
+  return form.stops.some((s, i) => s.id !== (liveStopIds.value[i] ?? null));
+});
+
+/** A stop whose point of interest visitors cannot see (`DANGLING_REFERENCE` on an ACTIVE Route). */
+function stopPoiWarning(stop: StopForm): string | null {
+  const poi = poiById.value.get(stop.poiId);
+  if (!poi) return "The point of interest is no longer available. Remove the stop or bind another one.";
+  if (poi.status === "ACTIVE") return null;
+  return poi.status === "ARCHIVED"
+    ? "The point of interest is archived: visitors don't see this stop. Remove the stop or restore it."
+    : "The point of interest is a draft: visitors don't see this stop until it is activated.";
 }
 
 function removeStop(index: number) {
@@ -322,7 +381,7 @@ const firstStopPosition = computed(() => {
 const mapStops = computed<RouteMapStop[]>(() =>
   form.stops.map((s, i) => {
     const poi = poiById.value.get(s.poiId);
-    return { number: i + 1, title: stopTitle(s), lat: poi?.latitude ?? null, lng: poi?.longitude ?? null, optional: s.optional };
+    return { number: i + 1, title: stopTitle(s), lat: poi?.latitude ?? null, lng: poi?.longitude ?? null };
   }),
 );
 
@@ -342,7 +401,6 @@ function addStop(poi: Poi) {
     key: `new-${++keyCounter}`,
     id: null,
     poiId: poi.id,
-    optional: false,
     translations: Object.fromEntries(languageCodes().map((code) => [code, blankTexts(STOP_TEXT_KEYS)])),
   };
   form.stops.push(stop);
@@ -518,12 +576,42 @@ const translationRows = computed(() => translationStatus(languages.value, ROUTE_
       <p v-if="!hasActiveStop" class="border-b border-gray-100 px-5 py-3 text-xs font-semibold text-destructive">
         ⚠ At least one stop must be an ACTIVE point of interest before the route can be activated.
       </p>
+      <p v-if="form.stops.length < 2" class="border-b border-gray-100 px-5 py-3 text-xs font-semibold text-[#9a6200]">
+        ⚠ A route usually has at least two stops. It can still be activated with one.
+      </p>
+      <p v-if="stopLinksChange" class="border-b border-gray-100 px-5 py-3 text-xs font-semibold text-[#9a6200]">
+        ⚠ The stops are in a different order than visitors see now. A stop's link follows its position, so after you
+        apply, links and QR codes that point to a stop number lead to another stop.
+      </p>
+      <p class="sr-only" aria-live="polite">{{ stopAnnouncement }}</p>
       <p v-if="editor.fieldError('stops')" class="border-b border-gray-100 px-5 py-3 text-xs font-semibold text-destructive">
         ⚠ {{ editor.fieldError("stops") }}
       </p>
       <ol>
-        <li v-for="(stop, index) in form.stops" :key="stop.key" class="border-b border-gray-100 px-5 py-3.5">
+        <li
+          v-for="(stop, index) in form.stops"
+          :key="stop.key"
+          class="border-b border-gray-100 px-5 py-3.5"
+          :class="{
+            'opacity-50': draggingStop === stop.key,
+            'shadow-[inset_0_2px_0_#4c1d8b]': stopDropTarget?.key === stop.key && !stopDropTarget.after,
+            'shadow-[inset_0_-2px_0_#4c1d8b]': stopDropTarget?.key === stop.key && stopDropTarget.after,
+          }"
+          @dragover="stopDragOver(stop.key, $event)"
+          @dragleave="stopDropTarget?.key === stop.key && (stopDropTarget = null)"
+          @drop.prevent="stopDrop"
+        >
           <div class="flex flex-wrap items-center gap-2.5">
+            <span
+              v-if="editor.editable && form.stops.length > 1"
+              class="cursor-grab select-none text-[15px] leading-none text-gray-400 hover:text-gray-700 active:cursor-grabbing"
+              draggable="true"
+              aria-hidden="true"
+              title="Drag to reorder"
+              @dragstart="stopDragStart(stop.key, $event)"
+              @dragend="stopDragEnd"
+              >⠿</span
+            >
             <span class="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary text-[11px] font-extrabold text-white" aria-hidden="true">
               {{ index + 1 }}
             </span>
@@ -538,11 +626,17 @@ const translationRows = computed(() => translationStatus(languages.value, ROUTE_
             >
               {{ poiById.get(stop.poiId)!.status }}
             </span>
-            <label class="flex items-center gap-[7px] text-[11px] font-bold uppercase tracking-[0.06em] text-muted-foreground">
-              <input v-model="stop.optional" type="checkbox" :disabled="!editor.editable" class="h-4 w-4 accent-primary" />
-              Optional
-            </label>
             <template v-if="editor.editable">
+              <select
+                v-if="form.stops.length > 1"
+                :id="`stop-position-${stop.key}`"
+                :value="index + 1"
+                :aria-label="`Position of stop ${index + 1}, ${stopTitle(stop)}`"
+                class="field-input stop-position"
+                @change="setStopPosition(index, $event)"
+              >
+                <option v-for="n in form.stops.length" :key="n" :value="n">{{ n }}</option>
+              </select>
               <button
                 :id="`stop-move-${stop.key}-up`"
                 type="button"
@@ -566,14 +660,23 @@ const translationRows = computed(() => translationStatus(languages.value, ROUTE_
               <button type="button" class="px-1 text-[13px] text-destructive" :aria-label="`Remove stop ${index + 1}`" @click="removeStop(index)">✕</button>
             </template>
           </div>
-          <div v-if="activeLanguageInfo && stop.translations[activeLanguageInfo.languageCode]" class="mt-2.5 flex flex-wrap gap-2.5">
+          <p v-if="stopPoiWarning(stop)" class="mt-1.5 pl-[34px] text-xs font-semibold text-[#9a6200]">⚠ {{ stopPoiWarning(stop) }}</p>
+          <label
+            v-if="activeLanguageInfo && stop.translations[activeLanguageInfo.languageCode]"
+            :for="`stop-walk-${stop.key}`"
+            class="small-label mt-2.5 block"
+          >
+            Walking instructions to this stop
+            <span class="font-normal normal-case tracking-normal text-muted-foreground">· shown to visitors who cannot use the map</span>
+          </label>
+          <div v-if="activeLanguageInfo && stop.translations[activeLanguageInfo.languageCode]" class="mt-1 flex flex-wrap gap-2.5">
             <input
+              :id="`stop-walk-${stop.key}`"
               v-model="stop.translations[activeLanguageInfo.languageCode].navigationInstructions"
               :readonly="!editor.editable"
-              :aria-label="`Walking instructions to stop ${index + 1}, ${activeLanguageInfo.displayName}`"
               :lang="activeLanguageInfo.languageCode"
               :dir="activeLanguageInfo.direction.toLowerCase()"
-              placeholder="Walking instructions to this stop"
+              placeholder="Turn left after the fountain…"
               class="field-input stop-input w-auto min-w-[180px] flex-1"
             />
             <button
@@ -617,7 +720,10 @@ const translationRows = computed(() => translationStatus(languages.value, ROUTE_
               :dir="activeLanguageInfo.direction.toLowerCase()"
               class="field-input stop-input min-h-[64px] resize-y"
             ></textarea>
-            <span class="text-xs text-muted-foreground">Narration starts with the stop title, so a visitor listening only knows where they are.</span>
+            <span class="text-xs text-muted-foreground">
+              Narration starts with the stop title, so a visitor listening only knows where they are, and stays under three
+              minutes.
+            </span>
           </div>
           <p v-if="stopError(index)" class="mt-2 text-xs font-semibold text-destructive">⚠ {{ stopError(index) }}</p>
         </li>
@@ -699,6 +805,11 @@ const translationRows = computed(() => translationStatus(languages.value, ROUTE_
 
 <style scoped>
 /* Stop rows are denser than the main fields. */
+.stop-position {
+  width: auto;
+  padding: 2px 6px;
+  font-size: 12px;
+}
 .stop-input {
   padding: 8px 10px;
   font-size: 13px;

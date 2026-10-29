@@ -37,23 +37,24 @@ prototype inventory).
   maps `environment` to `setting`, and emulates `spatial-link` over the map and floor plan `placeId`
   (backend D-018), which works only while that map or plan is DRAFT. `maps.ts` and `floorPlans.ts` read paged
   lists, translate `visibility`/`visitorFilterEnabled`, and sync placements and positions through their
-  child endpoints; floor plan connections are always empty. Assets, POIs, Routes, and Categories lists
+  child endpoints; floor plans have no connections (removed from the spec, D-028). Assets, POIs, Routes, and Categories lists
   read as empty on the map and place screens until the backend serves them (`emptyIfMissing`).
-- Interim 2026-10-14: `src/platform/pois.ts` reads the paged POI list and fills `categoryId`, `media`,
-  `seoTitle`, `seoDescription` with empty values; a save carrying any of them is refused at that field,
-  since the backend has no Categories or media yet and does not store SEO texts (backend D-020, Q-012).
+- Interim 2026-10-14: `src/platform/pois.ts` reads the paged POI list and fills `categoryId` and `media`
+  from their bindings (backend D-020, D-024, D-025). SEO texts were dropped from the editors on 2026-10-27:
+  the spec has none (D-028).
 - Interim 2026-10-15: `src/platform/routes.ts` reads the paged Route list, maps `travelMode`/`mode` and
   `HARD`/`DEMANDING`, and saves stops through the backend's `.../stops` child endpoints after the Route
-  `PUT`; a save carrying a Category, media, SEO text, or an optional stop is refused at that field
-  (backend D-021).
-- Interim 2026-10-15: `src/platform/guides.ts` bridges the guide editor onto the backend's block model
-  (backend D-022): each language's story is one TEXT block placed first, related items are REFERENCE
-  blocks after it. The editor cannot yet interleave references inside the story (`12` §3); story
-  images, media, SEO texts, and Page items are refused at their field (Event items allowed since the
-  backend has Events, D-023).
+  `PUT` (backend D-021). Optional stops and SEO texts were dropped from the editor on 2026-10-27: the
+  spec removed them (D-028).
+- Interim 2026-10-15: `src/platform/guides.ts` bridged the guide editor onto the backend's block model
+  (backend D-022). Since 2026-10-27 the editor works on the blocks themselves, TEXT and REFERENCE
+  interleaved with captions (D-031). Still open on the backend: readiness warns `MISSING_TRANSLATION` only
+  for the first TEXT block and never for reference captions (`GuideReadiness`); an image-only TEXT block
+  fails activation (`RichText.hasText`); Page references are refused until Pages exist (M6).
 - Interim 2026-10-15: `src/platform/events.ts` reads the paged Event list and saves occurrences through
-  the backend's `.../occurrences` child endpoints after the Event `PUT`; a save with media is refused at
-  its field (backend D-023). Times stay in the browser's timezone until the Project has one.
+  the backend's `.../occurrences` child endpoints after the Event `PUT` (backend D-023); media are bindings
+  since backend D-025. Times stay in the browser's timezone until the Project has one (backend M2), and the
+  occurrences card says so (to-do A36, 2026-10-27).
 - Interim 2026-10-15: Categories are live (backend D-024). `categories.ts` reads the paged list and
   `setResourceCategory` saves a POI's or Route's Category through `.../{kind}/{id}/categories` after its
   `PUT`; `pois.ts` and `routes.ts` read it from `categoryIds`; `maps.ts` splits hidden Categories into

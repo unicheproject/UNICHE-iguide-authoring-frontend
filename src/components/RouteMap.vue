@@ -1,8 +1,8 @@
 <script setup lang="ts">
 /**
  * Schematic map of a Route, as in the CMS mockup: numbered pins in stop order joined by a dashed line. Stops
- * whose Point of Interest has no coordinates are left out and counted in the note. Display only; the
- * stop list next to it is where the order changes.
+ * whose Point of Interest has no coordinates are left out of the drawing and listed by name under it (`12` §3
+ * Route). Display only; the stop list next to it is where the order changes.
  */
 import { computed } from "vue";
 
@@ -11,7 +11,6 @@ export interface RouteMapStop {
   title: string;
   lat: number | null;
   lng: number | null;
-  optional: boolean;
 }
 
 const props = defineProps<{ stops: RouteMapStop[]; loop: boolean }>();
@@ -46,11 +45,12 @@ const line = computed(() => {
   return coords.join(" ");
 });
 
+const unplaced = computed(() => props.stops.filter((s) => s.lat === null || s.lng === null));
+
 const note = computed(() => {
-  const missing = props.stops.length - placed.value.length;
   if (!props.stops.length) return { text: "Add stops to draw the route.", warn: false };
-  if (!placed.value.length) return { text: "None of the stops has coordinates yet. Set them on each point of interest.", warn: true };
-  if (missing) return { text: `${missing} of ${props.stops.length} stops have no coordinates and are not drawn.`, warn: true };
+  if (!placed.value.length) return { text: "None of the stops has coordinates yet. Set them on each point of interest:", warn: true };
+  if (unplaced.value.length) return { text: "Not drawn, because their point of interest has no coordinates:", warn: true };
   return { text: props.loop ? "The route returns to its first stop." : "Stops are drawn in order.", warn: false };
 });
 </script>
@@ -76,15 +76,17 @@ const note = computed(() => {
       <span
         v-for="pin in pins"
         :key="pin.number"
-        :title="`${pin.number}. ${pin.title}${pin.optional ? ' (optional)' : ''}`"
-        class="absolute -ml-2.5 -mt-2.5 flex h-5 w-5 items-center justify-center rounded-full border-2 border-white text-[10px] font-extrabold shadow-[0_2px_6px_rgba(0,0,0,0.28)]"
-        :class="pin.optional ? 'bg-white text-primary outline outline-2 -outline-offset-4 outline-primary' : 'bg-primary text-white'"
+        :title="`${pin.number}. ${pin.title}`"
+        class="absolute -ml-2.5 -mt-2.5 flex h-5 w-5 items-center justify-center rounded-full border-2 border-white bg-primary text-[10px] font-extrabold text-white shadow-[0_2px_6px_rgba(0,0,0,0.28)]"
         :style="{ left: `${pin.x}%`, top: `${pin.y}%` }"
       >
         {{ pin.number }}
       </span>
     </div>
     <p class="mt-2 text-[11px]" :class="note.warn ? 'text-[#9a6200]' : 'text-muted-foreground'">{{ note.text }}</p>
+    <ul v-if="unplaced.length" class="mt-1 flex flex-col gap-0.5 text-[11px] text-[#9a6200]">
+      <li v-for="stop in unplaced" :key="stop.number">{{ stop.number }}. {{ stop.title }}</li>
+    </ul>
   </div>
 </template>
 

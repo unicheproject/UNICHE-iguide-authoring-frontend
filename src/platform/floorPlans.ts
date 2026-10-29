@@ -12,30 +12,6 @@ export interface FloorPlanPosition {
   rotation: number | null;
 }
 
-export const CONNECTION_TYPES = ["STAIRS", "ELEVATOR", "RAMP", "ESCALATOR", "DOOR", "OTHER"] as const;
-export type ConnectionType = (typeof CONNECTION_TYPES)[number];
-const CONNECTION_LABELS: Record<ConnectionType, string> = {
-  STAIRS: "Stairs",
-  ELEVATOR: "Lift",
-  RAMP: "Ramp",
-  ESCALATOR: "Escalator",
-  DOOR: "Door",
-  OTHER: "Other",
-};
-export const connectionTypeLabel = (t: ConnectionType) => CONNECTION_LABELS[t];
-
-export interface FloorPlanConnection {
-  id: string | null;
-  toFloorPlanId: string;
-  fromX: number;
-  fromY: number;
-  toX: number;
-  toY: number;
-  connectionType: ConnectionType;
-  bidirectional: boolean;
-  label: string | null;
-}
-
 /** A Floor Plan (iGuide spec 03, section 8). */
 export interface FloorPlan {
   id: string;
@@ -56,7 +32,6 @@ export interface FloorPlan {
   hasWorkingCopy: boolean;
   workingCopyUpdatedAt: string | null;
   positions: FloorPlanPosition[];
-  connections: FloorPlanConnection[];
 }
 
 /** The editable state of a plan, as the editor sends it. */
@@ -66,7 +41,6 @@ export interface UpdateFloorPlanInput {
   assetId: string;
   placeId: string | null;
   positions: FloorPlanPosition[];
-  connections: FloorPlanConnection[];
 }
 
 const base = (projectId: string) => `/projects/${encodeURIComponent(projectId)}/floor-plans`;
@@ -74,11 +48,10 @@ const base = (projectId: string) => `/projects/${encodeURIComponent(projectId)}/
 /*
  * Stopgap until the generated client (PLAN.md C0b, C3). The iGuide backend (D-018) pages its lists,
  * serves positions as a child collection (`.../floor-plans/{id}/positions`), and has no connections
- * between floor plans (removed by spec `03` section 8; floors switch by `sortOrder`). The functions below
- * keep `FloorPlan`, with `connections` always empty.
+ * between floor plans (removed by spec `03` section 8 on 2026-10-01; floors switch by `sortOrder`).
  */
 
-type FloorPlanResponse = Omit<FloorPlan, "positions" | "connections">;
+type FloorPlanResponse = Omit<FloorPlan, "positions">;
 
 interface PositionResponse extends FloorPlanPosition {
   id: string;
@@ -99,7 +72,6 @@ function withPositions(plan: FloorPlanResponse, positions: PositionResponse[]): 
   return {
     ...plan,
     positions: positions.map(({ resourceType, resourceId, x, y, rotation }) => ({ resourceType, resourceId, x, y, rotation })),
-    connections: [],
   };
 }
 
@@ -125,15 +97,14 @@ export async function createFloorPlan(
 }
 
 /**
- * Saves the plan, then brings its positions in line with `input.positions`. `connections` are not sent:
- * the backend has none.
+ * Saves the plan, then brings its positions in line with `input.positions`.
  */
 export async function updateFloorPlan(
   projectId: string,
   planId: string,
   input: UpdateFloorPlanInput,
 ): Promise<FloorPlan> {
-  const { positions, connections: _connections, ...rest } = input;
+  const { positions, ...rest } = input;
   const plan = await apiRequest<FloorPlanResponse>(`${base(projectId)}/${encodeURIComponent(planId)}`, { method: "PUT", body: rest });
   const path = positionsPath(projectId, planId);
   const current = await apiRequest<PositionResponse[]>(path);
@@ -159,7 +130,7 @@ export async function updateFloorPlan(
  * as one list. The backend keeps an existing position of the same target, so no position ids are needed.
  */
 export function floorPlanWorkingCopyPayload(input: Omit<UpdateFloorPlanInput, "version">): Record<string, unknown> {
-  const { positions, connections: _connections, ...rest } = input;
+  const { positions, ...rest } = input;
   return {
     ...rest,
     positions: positions.map(({ resourceType, resourceId, x, y, rotation }) => ({ resourceType, resourceId, x, y, rotation })),

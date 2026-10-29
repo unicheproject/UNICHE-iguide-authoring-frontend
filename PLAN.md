@@ -72,6 +72,23 @@ box against the live Keycloak and Catalogue through the backend. Backend counter
 - 2026-10-19: "Translations" panel under Status in the Place, POI, Route, Guide, Event, and Category editors:
   per language Complete, Partial (n of m fields), or Missing, from the live form, counting the fields the
   lists count; a row opens that language's tab.
+- 2026-10-27: uploads alike everywhere (limits checked first incl. the global one, progress rows, Retry, Cancel,
+  announcements), multi-file picker with drop, Replace only for DRAFT Assets, one "Used in" card, floor-plan alt
+  text, decorative confirmed; Category "Applies to" lock shown (DECISIONS.md D-032).
+- 2026-10-27: Guide story as ordered blocks: text and references interleaved, captions, drag / position
+  reordering, insert after any block or text node, alt text shown under story images; the Translation workspace
+  shows every block (DECISIONS.md D-031).
+- 2026-10-27: pan and zoom in the map editor set the map's initial view (DECISIONS.md D-034).
+- 2026-10-27: POI "3D model" with its required poster, and an "All languages" row in per-language media such as
+  the audio narration (DECISIONS.md D-033).
+- 2026-10-27: Place setup editable (setting, level with parent, map or floor plan) and "Open map" for outdoor
+  Places (DECISIONS.md D-030).
+- 2026-10-27: Route stops reorder by drag and drop, Move up / down, or a position list; per-stop warning when
+  its point of interest is not ACTIVE; warning that stop links change on an ACTIVE Route; walking instructions
+  labelled (DECISIONS.md D-029).
+- 2026-10-27: Content quick fixes: no "Optional" on Route stops, no SEO fields in the POI, Route, and Guide
+  editors, no floor-plan "Connections"; POI "Practical details" collapsed; a warning for Routes with fewer than
+  two stops; the Route map lists the stops it can't draw; the Place creation hint fixed (DECISIONS.md D-028).
 - 2026-10-26: Translation workspace → "Translate with MuseMind" for the open Resource and language (a "mock"
   badge on the dev box's mock gateway), AI markers ("AI · unreviewed" / "AI · reviewed", pending) in the matrix
   and the editor with service, time, and citations, "Mark reviewed", and a working "Unreviewed AI output" filter

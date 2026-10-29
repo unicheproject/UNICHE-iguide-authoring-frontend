@@ -1,4 +1,4 @@
-import { ApiError, apiRequest } from "./api";
+import { apiRequest } from "./api";
 import { syncMedia, toMediaBindings, type MediaBinding, type MediaBindingResponse } from "./assets";
 import type { ResourceStatus } from "./places";
 import type { ResourceReference } from "./references";
@@ -19,11 +19,9 @@ export interface RouteTranslation {
   summary: string | null;
   description: string | null;
   instructions: string | null;
-  seoTitle: string | null;
-  seoDescription: string | null;
 }
 
-/** Fields that count towards translation completeness; the SEO fields are optional extras. */
+/** Fields that count towards translation completeness. */
 export const ROUTE_TEXT_FIELDS = ["title", "summary", "description", "instructions"] as const;
 
 export interface RouteStopTranslation {
@@ -39,7 +37,6 @@ export interface RouteStop {
   id: string | null;
   poiId: string;
   position: number;
-  optional: boolean;
   translations: Record<string, RouteStopTranslation>;
 }
 
@@ -98,16 +95,15 @@ const base = (projectId: string) => `/projects/${encodeURIComponent(projectId)}/
 
 /*
  * Stopgap until the generated client (PLAN.md C0b, C3). The iGuide backend (D-021) follows `03` §9:
- * `travelMode` for `mode`, difficulty `HARD` for `DEMANDING`, no optional stops, no SEO texts, and stops
+ * `travelMode` for `mode`, difficulty `HARD` for `DEMANDING`, and stops
  * as a child collection (`.../routes/{id}/stops`, `.../stops:order`) instead of part of the route body.
  * The Category and the media are bindings (backend D-024, D-025): read from `categoryIds` and `media`,
  * saved through `.../routes/{id}/categories` and `.../routes/{id}/resource-assets` for a DRAFT Route, or inside
- * the working copy of an ACTIVE one, with the stops. The functions below keep
- * `Route`; a save carrying SEO text or an optional stop is refused at that field.
+ * the working copy of an ACTIVE one, with the stops. Stops carry no optional flag and Routes no SEO texts
+ * (both removed from `03` on 2026-10-01, DECISIONS.md D-028).
  */
 
 type ApiDifficulty = "EASY" | "MODERATE" | "HARD";
-type RouteTranslationResponse = Omit<RouteTranslation, "seoTitle" | "seoDescription">;
 type StopTranslationResponse = RouteStopTranslation;
 
 interface StopResponse {
@@ -117,11 +113,10 @@ interface StopResponse {
   translations: Record<string, StopTranslationResponse>;
 }
 
-type RouteResponse = Omit<Route, "mode" | "difficulty" | "categoryId" | "media" | "translations" | "stops"> & {
+type RouteResponse = Omit<Route, "mode" | "difficulty" | "categoryId" | "media" | "stops"> & {
   travelMode: RouteMode | null;
   difficulty: ApiDifficulty | null;
   computedDistanceMeters: number | null;
-  translations: Record<string, RouteTranslationResponse>;
   stops: StopResponse[];
   categoryIds: string[];
   media: MediaBindingResponse[];
@@ -136,33 +131,18 @@ const fromApiDifficulty = (d: ApiDifficulty | null): RouteDifficulty | null => (
 const toApiDifficulty = (d: RouteDifficulty | null): ApiDifficulty | null => (d === "DEMANDING" ? "HARD" : d);
 
 function toStop(stop: StopResponse): RouteStop {
-  return { id: stop.id, poiId: stop.poiId, position: stop.position, optional: false, translations: stop.translations };
+  return { id: stop.id, poiId: stop.poiId, position: stop.position, translations: stop.translations };
 }
 
-function toRoute({ travelMode, difficulty, computedDistanceMeters: _computed, translations, stops, categoryIds, media, ...rest }: RouteResponse): Route {
-  const texts: Record<string, RouteTranslation> = {};
-  for (const [code, t] of Object.entries(translations)) texts[code] = { ...t, seoTitle: null, seoDescription: null };
+function toRoute({ travelMode, difficulty, computedDistanceMeters: _computed, stops, categoryIds, media, ...rest }: RouteResponse): Route {
   return {
     ...rest,
     mode: travelMode,
     difficulty: fromApiDifficulty(difficulty),
     categoryId: categoryIds[0] ?? null,
     media: toMediaBindings(media),
-    translations: texts,
     stops: stops.map(toStop),
   };
-}
-
-function unsupported(input: Omit<UpdateRouteInput, "version">): string[] {
-  const details: string[] = [];
-  for (const [code, t] of Object.entries(input.translations)) {
-    if (t.seoTitle?.trim()) details.push(`translations.${code}.seoTitle: SEO texts are not stored by iGuide.`);
-    if (t.seoDescription?.trim()) details.push(`translations.${code}.seoDescription: SEO texts are not stored by iGuide.`);
-  }
-  input.stops.forEach((stop, i) => {
-    if (stop.optional) details.push(`stops[${i}].optional: Every stop is part of the route; optional stops are not supported.`);
-  });
-  return details;
 }
 
 const stopsPath = (projectId: string, routeId: string) => `${base(projectId)}/${encodeURIComponent(routeId)}/stops`;
@@ -185,16 +165,11 @@ export async function createRoute(projectId: string, input: CreateRouteInput): P
   return toRoute(await apiRequest<RouteResponse>(base(projectId), { method: "POST", body: input }));
 }
 
-/** Refuses locally what iGuide cannot store, then splits the input into the Route body and its children. */
+/** Splits the input into the Route body and its children. */
 function toBody(input: Omit<UpdateRouteInput, "version">) {
-  const details = unsupported(input);
-  if (details.length) throw new ApiError(422, "VALIDATION_ERROR", "Some fields cannot be saved in iGuide yet.", null, details);
-
-  const { mode, difficulty, categoryId, media, stops, translations, ...rest } = input;
-  const texts: Record<string, RouteTranslationResponse> = {};
-  for (const [code, { seoTitle: _t, seoDescription: _d, ...t }] of Object.entries(translations)) texts[code] = t;
+  const { mode, difficulty, categoryId, media, stops, ...rest } = input;
   return {
-    body: { ...rest, travelMode: mode, difficulty: toApiDifficulty(difficulty), translations: texts },
+    body: { ...rest, travelMode: mode, difficulty: toApiDifficulty(difficulty) },
     categoryId,
     media,
     stops,

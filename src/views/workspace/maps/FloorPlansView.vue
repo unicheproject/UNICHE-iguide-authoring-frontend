@@ -68,8 +68,7 @@ function meta(f: FloorPlan): string {
   const place = placeName(f.placeId);
   const size = f.width && f.height ? ` · ${f.width} × ${f.height} px` : "";
   const placements = f.positions.length === 1 ? "1 placement" : `${f.positions.length} placements`;
-  const connections = f.connections.length === 1 ? "1 floor connection" : `${f.connections.length} floor connections`;
-  return `${place ? `Place: ${place} · ` : ""}${placements} · ${connections}${size}`;
+  return `${place ? `Place: ${place} · ` : ""}${placements}${size}`;
 }
 
 const actions = useStatusActions<FloorPlan>({

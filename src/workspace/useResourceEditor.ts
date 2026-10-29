@@ -61,7 +61,7 @@ export interface ConflictField {
 
 /** Fields that describe the row rather than its content; never offered as a conflict choice. */
 const ROW_FIELDS = new Set(["id", "projectId", "status", "version", "createdAt", "updatedAt", "archivedAt",
-  "hasWorkingCopy", "workingCopyUpdatedAt", "sortOrder", "blockIds"]);
+  "hasWorkingCopy", "workingCopyUpdatedAt", "sortOrder"]);
 
 /** A readiness item of the open Resource, marked blocking or warning (DECISIONS.md D-022). */
 export type ReadinessItem = ReadinessIssue & { blocking: boolean };
@@ -259,11 +259,13 @@ export function useResourceEditor<T extends EditableResource>(options: ResourceE
    */
   async function focusField(path: string, language?: string | null) {
     const match = /^translations\.([^.]+)\.(.+)$/.exec(path);
-    const lang = match ? match[1] : language ?? null;
+    // A child's texts, such as a Guide block's `blocks[2].translations.en.text`, open their language too.
+    const nested = /\.translations\.([^.]+)(?:\.|$)/.exec(path);
+    const lang = match ? match[1] : nested?.[1] ?? language ?? null;
     if (lang && options.languages.value.some((l) => l.languageCode === lang)) activeLanguage.value = lang;
     await nextTick();
     // A field inside a collapsed group is not rendered; its panel opens the group first.
-    const fullPath = match ? path : lang ? `translations.${lang}.${path}` : path;
+    const fullPath = match || nested ? path : lang ? `translations.${lang}.${path}` : path;
     window.dispatchEvent(new CustomEvent(REVEAL_FIELD_EVENT, { detail: { path: fullPath } }));
     await nextTick();
     const field = match ? match[2] : path;
@@ -343,7 +345,7 @@ export function useResourceEditor<T extends EditableResource>(options: ResourceE
     }
   }
 
-  function handleSaveError(e: ApiError) {
+  function handleSaveError(e: ApiError, failed = `The ${kind} was not saved`) {
     if (e.code === "VERSION_CONFLICT") {
       const current = e.body.currentVersion;
       conflict.value = { currentVersion: typeof current === "number" ? current : null };
@@ -353,7 +355,7 @@ export function useResourceEditor<T extends EditableResource>(options: ResourceE
       const name = options.describePath(field).toLowerCase();
       showErrors("Check the highlighted fields", { [field]: `Another ${kind} in this Project already uses this ${name}.` }, e.requestId);
     } else if (e.status === 422 || e.status === 400) {
-      const title = e.code === "RESOURCE_NOT_EDITABLE" ? `This ${kind} can no longer be edited` : `The ${kind} was not saved`;
+      const title = e.code === "RESOURCE_NOT_EDITABLE" ? `This ${kind} can no longer be edited` : failed;
       showErrors(title, e.fieldMessages(), e.requestId);
     } else {
       summary.value = {
@@ -449,7 +451,8 @@ export function useResourceEditor<T extends EditableResource>(options: ResourceE
     } catch (e) {
       if (!(e instanceof ApiError)) throw e;
       if (e.code === "VERSION_CONFLICT") await openApplyConflict();
-      else handleSaveError(e);
+      // A refused apply (backend D-037): the pending changes are kept, and the summary names what blocks them.
+      else handleSaveError(e, "The changes were not applied: visitors would meet a problem");
     } finally {
       applying.value = false;
     }

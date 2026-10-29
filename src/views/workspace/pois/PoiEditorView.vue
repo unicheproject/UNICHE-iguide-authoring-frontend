@@ -53,7 +53,7 @@ const { languages, defaultLanguage, loading: languagesLoading } = useProjectLang
 const languageCodes = () => languages.value.map((l) => l.languageCode);
 
 type TextKey = keyof PoiTranslation;
-const TEXT_KEYS: TextKey[] = ["title", "summary", "description", "instructions", "accessibilityInformation", "seoTitle", "seoDescription"];
+const TEXT_KEYS: TextKey[] = ["title", "summary", "description", "instructions", "accessibilityInformation"];
 
 const TEXT_META: Record<TextKey, TextFieldMeta> = {
   title: { label: "Title", multiline: false },
@@ -65,13 +65,11 @@ const TEXT_META: Record<TextKey, TextFieldMeta> = {
     multiline: true,
     helper: "Physical access, sensory conditions, quiet spaces, assistance, what is not accessible.",
   },
-  seoTitle: { label: "Title for search and sharing", multiline: false, helper: "Leave empty to use the title." },
-  seoDescription: { label: "Description for search and sharing", multiline: true, helper: "Leave empty to use the summary." },
 };
 const GROUPS: TextFieldGroup[] = [
   { id: "main", label: null, keys: ["title", "summary", "description"] },
-  { id: "secondary", label: "More texts", keys: ["instructions", "accessibilityInformation"], open: true },
-  { id: "seo", label: "Search and sharing", keys: ["seoTitle", "seoDescription"], open: false },
+  // `12` §3: instructions and accessibility information sit in a collapsed "Practical details" card.
+  { id: "practical", label: "Practical details", keys: ["instructions", "accessibilityInformation"], open: false },
 ];
 // The mockup's media slots of a Point of Interest.
 const MEDIA_SLOTS: MediaSlot[] = [
@@ -79,6 +77,20 @@ const MEDIA_SLOTS: MediaSlot[] = [
   { usage: "VIDEO", label: "Video", accept: ["VIDEO"] },
   { usage: "AUDIO_NARRATION", label: "Audio narration", accept: ["AUDIO"], perLanguage: true },
   { usage: "GALLERY_IMAGE", label: "Gallery", accept: ["IMAGE"], multiple: true },
+  // `03` lines 521-531: a 3D model (GLB, view only) always comes with a poster image describing the object.
+  {
+    usage: "MODEL",
+    label: "3D model",
+    accept: ["THREE_D_MODEL"],
+    requires: "MODEL_POSTER",
+    hint: "A GLB file visitors can turn in a viewer.",
+  },
+  {
+    usage: "MODEL_POSTER",
+    label: "3D model poster",
+    accept: ["IMAGE"],
+    hint: "Shown while the model loads; its alternative text describes the object.",
+  },
 ];
 
 const FIELD_NAMES: Record<string, string> = {
@@ -200,6 +212,10 @@ const editor = useResourceEditor<Poi>({
     checkCoordinates(form.latitude, form.longitude, found);
     const minutes = form.estimatedVisitMinutes.trim();
     if (minutes && !isWholeNumber(minutes, 1, 1440)) found.estimatedVisitMinutes = "A whole number of minutes between 1 and 1440.";
+    const model = form.media.findIndex((m) => m.usage === "MODEL");
+    if (model >= 0 && !form.media.some((m) => m.usage === "MODEL_POSTER")) {
+      found[`media[${model}].usage`] = "Add a 3D model poster image too.";
+    }
     return found;
   },
   describePath: (path) =>
