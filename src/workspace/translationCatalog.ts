@@ -2,7 +2,7 @@ import type { RouteLocationRaw } from "vue-router";
 import { listAssets, type Asset } from "@/platform/assets";
 import { categoryFromResponse, categoryName, listCategories, type Category } from "@/platform/categories";
 import { eventFromResponse, eventTitle, listEvents, type CmsEvent } from "@/platform/events";
-import { guideFromResponse, guideTitle, listGuides, storyWords, type Guide, type GuideBody } from "@/platform/guides";
+import { guideFromResponse, guideTitle, listGuides, storyComplete, type Guide, type GuideBody, type GuideBlockType } from "@/platform/guides";
 import { listPlaces, placeFromResponse, placeTitle, type Place, type ResourceStatus } from "@/platform/places";
 import { listPois, poiFromResponse, poiTitle, type Poi } from "@/platform/pois";
 import { listRoutes, routeFromResponse, routeTitle, type Route } from "@/platform/routes";
@@ -36,6 +36,16 @@ export interface StopTexts {
   texts: Record<string, LanguageTexts>;
 }
 
+/** One block of a Guide's story: a TEXT block's rich text, or a REFERENCE block's caption, per language. */
+export interface GuideBlockTexts {
+  id: string;
+  type: GuideBlockType;
+  /** A reference's target in the default language; empty for a text block. */
+  title: string;
+  bodies: Record<string, GuideBody | null>;
+  captions: Record<string, string | null>;
+}
+
 export interface TranslationItem {
   kind: CatalogKind;
   id: string;
@@ -46,8 +56,8 @@ export interface TranslationItem {
   version: number;
   fields: TextField[];
   texts: Record<string, LanguageTexts>;
-  /** Guides: the story, the first TEXT block, saved through its block. */
-  story?: { blockId: string | null; bodies: Record<string, GuideBody | null> };
+  /** Guides: the story's blocks in order, each saved through its block (DECISIONS.md D-031). */
+  blocks?: GuideBlockTexts[];
   /** Routes: the stops' own texts, which do not count towards the Route's completeness. */
   stops?: StopTexts[];
   /** Assets only: what decides which fields count. */
@@ -129,12 +139,19 @@ export async function loadItems(projectId: string, defaultLanguage: string | nul
     listAssets(projectId, signal),
   ]);
   const poiTitles = new Map(pois.map((p) => [p.id, poiTitle(p, defaultLanguage)]));
+  // A Guide reference's heading: its target's title, by "TYPE:id".
+  const targetTitles = new Map<string, string>([
+    ...places.map((p) => [`PLACE:${p.id}`, placeTitle(p, null, defaultLanguage)] as [string, string]),
+    ...pois.map((p) => [`POI:${p.id}`, poiTitle(p, defaultLanguage)] as [string, string]),
+    ...routes.map((r) => [`ROUTE:${r.id}`, routeTitle(r, defaultLanguage)] as [string, string]),
+    ...events.map((e) => [`EVENT:${e.id}`, eventTitle(e, defaultLanguage)] as [string, string]),
+  ]);
   const bySort = <T extends { sortOrder: number }>(rows: T[]) => [...rows].sort((a, b) => a.sortOrder - b.sortOrder);
   return [
     ...bySort(places).map((p) => fromPlace(p, defaultLanguage)),
     ...bySort(pois).map((p) => fromPoi(p, defaultLanguage)),
     ...bySort(routes).map((r) => fromRoute(r, defaultLanguage, poiTitles)),
-    ...bySort(guides).map((g) => fromGuide(g, defaultLanguage)),
+    ...bySort(guides).map((g) => fromGuide(g, defaultLanguage, targetTitles)),
     ...bySort(events).map((e) => fromEvent(e, defaultLanguage)),
     ...bySort(categories).map((c) => fromCategory(c, defaultLanguage)),
     ...assets.map((a) => fromAsset(a, defaultLanguage)),
@@ -154,8 +171,12 @@ export function itemFromResponse(kind: CatalogKind, raw: unknown, defaultLanguag
       const titles = new Map(route.stops.map((s) => [s.poiId, poiTitles.get(s.id ?? "") ?? ""]));
       return fromRoute(route, defaultLanguage, titles);
     }
-    case "guides":
-      return fromGuide(guideFromResponse(raw), defaultLanguage);
+    case "guides": {
+      const guide = guideFromResponse(raw);
+      const titles = new Map((previous?.blocks ?? []).map((b) => [b.id, b.title]));
+      const targets = new Map(guide.blocks.flatMap((b) => (b.id && b.resourceType ? [[`${b.resourceType}:${b.resourceId}`, titles.get(b.id) ?? ""]] : [])) as [string, string][]);
+      return fromGuide(guide, defaultLanguage, targets);
+    }
     case "events":
       return fromEvent(eventFromResponse(raw), defaultLanguage);
     case "categories":
@@ -204,17 +225,24 @@ function fromRoute(r: Route, def: string | null, poiTitles: Map<string, string>)
   };
 }
 
-function fromGuide(g: Guide, def: string | null): TranslationItem {
+function fromGuide(g: Guide, def: string | null, targetTitles: Map<string, string>): TranslationItem {
   return {
     ...base(g),
     kind: "guides",
     title: guideTitle(g, def),
     fields: FIELDS.guides,
     texts: textsOf(g.translations, FIELDS.guides),
-    story: {
-      blockId: g.blockIds?.text ?? null,
-      bodies: Object.fromEntries(Object.entries(g.translations).map(([code, t]) => [code, t.body])),
-    },
+    blocks: g.blocks.flatMap((b) =>
+      b.id
+        ? [{
+            id: b.id,
+            type: b.blockType,
+            title: b.blockType === "REFERENCE" ? targetTitles.get(`${b.resourceType}:${b.resourceId}`) || "Unavailable item" : "",
+            bodies: Object.fromEntries(Object.entries(b.translations).map(([code, t]) => [code, t.text])),
+            captions: Object.fromEntries(Object.entries(b.translations).map(([code, t]) => [code, t.caption])),
+          }]
+        : [],
+    ),
   };
 }
 
@@ -258,15 +286,19 @@ export function countedFields(item: TranslationItem): string[] {
   return keys;
 }
 
-/** How much of one language is written: the counted fields, plus a Guide's story. */
+/** How much of one language is written: the counted fields, plus a Guide's story (every text block written). */
 export function itemProgress(item: TranslationItem, language: string): { state: ItemState; filled: number; total: number } {
   const texts = item.texts[language];
   const keys = countedFields(item);
   let filled = keys.filter((key) => texts?.[key]?.trim()).length;
   let total = keys.length;
-  if (item.story) {
+  const story = item.blocks
+    ? storyComplete({ blocks: item.blocks.map((b) => ({ id: b.id, blockType: b.type, resourceType: null, resourceId: null,
+        translations: { [language]: { text: b.bodies[language] ?? null, caption: null } } })) }, language)
+    : null;
+  if (story !== null) {
     total += 1;
-    if (storyWords(item.story.bodies[language]?.blocks ?? []) > 0) filled += 1;
+    if (story) filled += 1;
   }
   return { state: filled === 0 ? "missing" : filled === total ? "complete" : "partial", filled, total };
 }

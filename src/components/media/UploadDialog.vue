@@ -1,25 +1,23 @@
 <script setup lang="ts">
 /**
- * "Upload files" (mockup C-02): a drop zone, the per-type limits before anything starts, and one row per
- * file with its progress, queue state, or reason for failing. The result of each upload is announced to
- * screen readers through a polite live region.
+ * "Upload files" (mockup C-02): a drop zone, the size limits before anything starts, and one row per file with
+ * its progress, queue state, or reason for failing. Every result, failures included, is announced to screen readers
+ * through a polite live region (`14` §3, DECISIONS.md D-032).
  */
 import { askConfirm } from "@/stores/confirm";
 import { computed, onMounted, ref } from "vue";
 import AppDialog from "@/components/AppDialog.vue";
-import { assetTypeLabel, formatBytes, type Asset, type AssetType } from "@/platform/assets";
-import { useAssetUpload, type UploadEntry } from "@/workspace/useAssetUpload";
+import { ASSET_TYPES, type Asset } from "@/platform/assets";
+import { useAssetUpload } from "@/workspace/useAssetUpload";
+import UploadEntryRow from "./UploadEntryRow.vue";
+import UploadLimits from "./UploadLimits.vue";
 
 const props = defineProps<{ projectId: string; initialFiles?: File[] }>();
 const emit = defineEmits<{ close: []; uploaded: [asset: Asset] }>();
 
-const announcement = ref("");
-const { entries, upload, retry, cancelRemaining, ensureLimits, limits, busy } = useAssetUpload(
+const { entries, upload, retry, cancel, cancelRemaining, ensureLimits, limits, limitsFailed, announcement, busy } = useAssetUpload(
   computed(() => props.projectId),
-  (asset) => {
-    announcement.value = `${asset.originalFilename} uploaded.`;
-    emit("uploaded", asset);
-  },
+  (asset) => emit("uploaded", asset),
 );
 
 const fileInput = ref<HTMLInputElement | null>(null);
@@ -42,22 +40,6 @@ function onDrop(event: DragEvent) {
   if (event.dataTransfer?.files.length) void upload(event.dataTransfer.files, { floorPlan: asFloorPlan.value });
 }
 
-const LIMIT_ROWS: AssetType[] = ["IMAGE", "AUDIO", "VIDEO", "DOCUMENT", "THREE_D_MODEL"];
-
-function stateText(entry: UploadEntry): string {
-  switch (entry.state) {
-    case "queued":
-      return "Queued";
-    case "uploading":
-      return `${Math.round(entry.progress * 100)} %`;
-    case "done":
-      return "Done";
-    case "cancelled":
-      return "Cancelled";
-    default:
-      return "Failed";
-  }
-}
 
 const anyRunning = computed(() => busy());
 const summary = computed(() => {
@@ -112,67 +94,15 @@ async function close() {
       </label>
     </div>
 
-    <table v-if="limits" class="mt-3 w-full text-[11px] text-muted-foreground">
-      <caption class="sr-only">Largest file per type</caption>
-      <tbody class="flex flex-wrap gap-x-4 gap-y-1">
-        <tr v-for="t in LIMIT_ROWS" :key="t" class="flex gap-1.5">
-          <th scope="row" class="font-semibold">{{ assetTypeLabel(t) }}</th>
-          <td>{{ formatBytes(limits.perType[t]) }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="mt-3">
+      <UploadLimits :limits="limits" :failed="limitsFailed" :types="ASSET_TYPES" @reload="ensureLimits" />
+    </div>
 
     <ul v-if="entries.length" class="mt-4 max-h-[300px] overflow-y-auto rounded-lg border">
-      <li v-for="entry in entries" :key="entry.key" class="border-b border-gray-100 px-3.5 py-2.5 text-xs last:border-b-0">
-        <div class="flex items-center gap-3">
-          <span
-            class="flex h-5 w-5 flex-none items-center justify-center rounded-full text-[11px] font-bold"
-            :class="{
-              'bg-[#0f7a6e] text-white': entry.state === 'done',
-              'bg-destructive text-white': entry.state === 'error',
-              'bg-muted text-muted-foreground': entry.state === 'queued' || entry.state === 'cancelled' || entry.state === 'uploading',
-            }"
-            aria-hidden="true"
-          >
-            {{ entry.state === "done" ? "✓" : entry.state === "error" ? "!" : "" }}
-          </span>
-          <span class="min-w-0 flex-1">
-            <span class="block truncate font-semibold">{{ entry.file.name }}</span>
-            <span class="block text-[11px] text-muted-foreground">{{ assetTypeLabel(entry.type) }} · {{ formatBytes(entry.file.size) }}</span>
-          </span>
-          <span
-            class="w-16 text-right tabular-nums"
-            :class="entry.state === 'error' ? 'font-bold text-destructive' : entry.state === 'done' ? 'font-bold text-[#0f7a6e]' : 'text-muted-foreground'"
-          >
-            {{ stateText(entry) }}
-          </span>
-          <button
-            v-if="entry.state === 'error' || entry.state === 'cancelled'"
-            type="button"
-            class="text-[11px] font-bold text-primary disabled:cursor-not-allowed disabled:text-gray-300"
-            :disabled="entry.tooLarge"
-            :title="entry.tooLarge ? 'The file must be smaller to upload' : undefined"
-            @click="retry(entry)"
-          >
-            Retry
-          </button>
-        </div>
-        <div
-          v-if="entry.state === 'uploading'"
-          class="mt-1.5 h-1 overflow-hidden rounded bg-muted"
-          role="progressbar"
-          :aria-label="`Uploading ${entry.file.name}`"
-          :aria-valuenow="Math.round(entry.progress * 100)"
-          aria-valuemin="0"
-          aria-valuemax="100"
-        >
-          <div class="h-full bg-primary transition-[width]" :style="{ width: `${entry.progress * 100}%` }"></div>
-        </div>
-        <p v-if="entry.message && entry.state === 'error'" class="mt-1 pl-8 font-semibold text-destructive">{{ entry.message }}</p>
-      </li>
+      <UploadEntryRow v-for="entry in entries" :key="entry.key" :entry="entry" @retry="retry(entry)" @cancel="cancel(entry)" />
     </ul>
 
-    <!-- Announces each finished upload; the visible list carries the same information. -->
+    <!-- Announces each result; the visible list carries the same information. -->
     <p class="sr-only" aria-live="polite">{{ announcement }}</p>
 
     <template #actions>

@@ -2,8 +2,9 @@
 /**
  * Chooses an Asset for a field (mockup C-04): only the accepted types and never archived ones, searchable
  * by name, file name, and title, filtered by status and by what the Resource already uses, with an
- * "Upload new" tile. A click selects; the bottom bar shows whether the selected image has alternative
- * text before it is used.
+ * "Upload new" tile that takes several files, also dropped onto the dialog, with the size limits, progress,
+ * Retry, and announcements of the upload dialog (DECISIONS.md D-032). A click selects; the bottom bar shows whether
+ * the selected image has alternative text before it is used.
  */
 import { computed, ref } from "vue";
 import AppDialog from "@/components/AppDialog.vue";
@@ -11,6 +12,8 @@ import { statusChipStyle } from "@/lib/format";
 import { assetMatches, assetMeta, assetTypeLabel, missingAlternativeText, type Asset, type AssetType } from "@/platform/assets";
 import { useAssetUpload } from "@/workspace/useAssetUpload";
 import AssetThumb from "./AssetThumb.vue";
+import UploadEntryRow from "./UploadEntryRow.vue";
+import UploadLimits from "./UploadLimits.vue";
 
 const props = defineProps<{
   projectId: string;
@@ -33,10 +36,14 @@ const onlyUsed = ref(false);
 const selectedId = ref<string | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
 
-const { entries, upload } = useAssetUpload(
+const { entries, upload, retry, cancel, ensureLimits, limits, limitsFailed, announcement } = useAssetUpload(
   computed(() => props.projectId),
   (asset) => emit("uploaded", asset),
 );
+void ensureLimits();
+const dragging = ref(false);
+// A floor-plan field uploads its images as floor plans, so they get the floor-plan type and limit.
+const asFloorPlan = computed(() => props.accept.includes("FLOOR_PLAN"));
 
 const choices = computed(() => {
   const excluded = new Set(props.excludeIds ?? []);
@@ -61,22 +68,33 @@ const altMissing = computed(() => (selected.value ? missingAlternativeText(selec
 
 const acceptAttribute = computed(() =>
   props.accept
-    .map((t) => ({ IMAGE: "image/*", FLOOR_PLAN: "image/*", AUDIO: "audio/*", VIDEO: "video/*" })[t as string] ?? "")
+    .map((t) => ({ IMAGE: "image/*", FLOOR_PLAN: "image/*", AUDIO: "audio/*", VIDEO: "video/*", THREE_D_MODEL: ".glb,model/gltf-binary" })[t as string] ?? "")
     .filter(Boolean)
     .join(","),
 );
 
-async function onFiles(event: Event) {
+/** Uploads every file; the first one that fits the field is selected once it is in. */
+async function uploadFiles(files: File[]) {
+  if (!files.length) return;
+  const done = await upload(files, { floorPlan: asFloorPlan.value });
+  const fitting = done.map((e) => e.asset).find((a): a is Asset => !!a && props.accept.includes(a.type));
+  if (fitting && !selectedId.value) selectedId.value = fitting.id;
+}
+
+function onFiles(event: Event) {
   const input = event.target as HTMLInputElement;
-  if (!input.files?.length) return;
-  const files = Array.from(input.files);
+  const files = Array.from(input.files ?? []);
   input.value = "";
-  const done = await upload([files[0]]);
-  const asset = done[0]?.asset;
-  if (asset && props.accept.includes(asset.type)) selectedId.value = asset.id;
+  void uploadFiles(files);
+}
+
+function onDrop(event: DragEvent) {
+  dragging.value = false;
+  void uploadFiles(Array.from(event.dataTransfer?.files ?? []));
 }
 
 const uploadingEntries = computed(() => entries.value.filter((e) => e.state !== "done"));
+const usedText = (asset: Asset) => (asset.usageCount ? `Used in ${asset.usageCount}` : "Not used yet");
 
 function confirm() {
   if (selected.value) emit("pick", selected.value);
@@ -89,7 +107,13 @@ function chip(selectedValue: boolean) {
 
 <template>
   <AppDialog :title="title" width="960px" @close="emit('close')">
-    <div class="flex flex-wrap gap-5">
+    <div
+      class="flex flex-wrap gap-5 rounded-lg"
+      :class="{ 'outline-dashed outline-2 outline-offset-4 outline-primary': dragging }"
+      @dragover.prevent="dragging = true"
+      @dragleave.self="dragging = false"
+      @drop.prevent="onDrop"
+    >
       <!-- Filters -->
       <aside class="flex w-[200px] flex-none flex-col gap-4 text-xs">
         <div class="flex flex-col gap-1.5">
@@ -145,20 +169,13 @@ function chip(selectedValue: boolean) {
           placeholder="Search by name, filename or title"
           class="mb-3 w-full rounded-lg border-[1.5px] px-3 py-[9px] text-[13px] focus:border-primary focus:outline-none"
         />
-        <ul v-if="uploadingEntries.length" class="mb-3 flex flex-col gap-1.5">
-          <li v-for="entry in uploadingEntries" :key="entry.key" class="text-xs">
-            <div class="flex justify-between gap-2">
-              <span class="truncate font-semibold">{{ entry.file.name }}</span>
-              <span :class="entry.state === 'error' ? 'text-destructive' : 'text-muted-foreground'">
-                {{ entry.state === "uploading" ? `${Math.round(entry.progress * 100)} %` : entry.state === "queued" ? "Queued" : "Failed" }}
-              </span>
-            </div>
-            <div v-if="entry.state === 'uploading'" class="mt-1 h-1 overflow-hidden rounded bg-muted">
-              <div class="h-full bg-primary transition-[width]" :style="{ width: `${entry.progress * 100}%` }"></div>
-            </div>
-            <p v-if="entry.message" role="alert" class="mt-0.5 text-destructive">{{ entry.message }}</p>
-          </li>
+        <div class="mb-3">
+          <UploadLimits :limits="limits" :failed="limitsFailed" :types="accept" @reload="ensureLimits" />
+        </div>
+        <ul v-if="uploadingEntries.length" class="mb-3 max-h-[180px] overflow-y-auto rounded-lg border">
+          <UploadEntryRow v-for="entry in uploadingEntries" :key="entry.key" :entry="entry" @retry="retry(entry)" @cancel="cancel(entry)" />
         </ul>
+        <p class="sr-only" aria-live="polite">{{ announcement }}</p>
         <ul class="grid max-h-[400px] grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-2.5 overflow-y-auto p-0.5" role="listbox" :aria-label="title">
           <li>
             <button
@@ -168,8 +185,9 @@ function chip(selectedValue: boolean) {
             >
               <span class="text-lg" aria-hidden="true">+</span>
               Upload new
+              <span class="text-[10px] font-normal text-muted-foreground">or drop files here</span>
             </button>
-            <input ref="fileInput" type="file" class="sr-only" :accept="acceptAttribute || undefined" tabindex="-1" @change="onFiles" />
+            <input ref="fileInput" type="file" multiple class="sr-only" :accept="acceptAttribute || undefined" tabindex="-1" @change="onFiles" />
           </li>
           <li v-for="asset in choices" :key="asset.id" role="option" :aria-selected="selectedId === asset.id">
             <button
@@ -192,6 +210,11 @@ function chip(selectedValue: boolean) {
                 <span class="truncate">{{ assetMeta(asset) }}</span>
                 <span class="ml-auto rounded-full px-1.5 py-px text-[8px] font-extrabold uppercase" :style="statusChipStyle(asset.status)">{{ asset.status }}</span>
               </span>
+              <span class="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                <span class="font-semibold">{{ assetTypeLabel(asset.type) }}</span>
+                <span aria-hidden="true">·</span>
+                <span>{{ usedText(asset) }}</span>
+              </span>
             </button>
           </li>
         </ul>
@@ -205,7 +228,7 @@ function chip(selectedValue: boolean) {
       <div class="mr-auto flex min-w-0 items-center gap-2 self-center text-xs">
         <template v-if="selected">
           <span class="truncate font-bold">{{ selected.internalName }}</span>
-          <span v-if="selected.type === 'IMAGE' && defaultLanguage" :class="altMissing ? 'font-semibold text-destructive' : 'text-[#0f7a6e]'">
+          <span v-if="(selected.type === 'IMAGE' || selected.type === 'FLOOR_PLAN') && defaultLanguage" :class="altMissing ? 'font-semibold text-destructive' : 'text-[#0f7a6e]'">
             {{ altMissing ? `⚠ Alt text (${defaultLanguage}): missing` : `✓ Alt text (${defaultLanguage}): present` }}
           </span>
         </template>

@@ -117,6 +117,13 @@ const subtitle = computed(() =>
 const children = computed(() => all.value.filter((c) => c.parentCategoryId === props.categoryId && c.status !== "ARCHIVED"));
 const parents = computed(() => parentChoices(all.value, form.scope, defaultLanguage.value, props.categoryId));
 const used = computed(() => editor.resource?.resourceCount ?? 0);
+/** A Category in use keeps what it applies to (`12` §3 Category): the other choice is disabled with the reason. */
+const scopeLocked = computed(() => used.value > 0 && !!editor.resource);
+const scopeLockReason = computed(() => {
+  const poi = editor.resource?.scope === "POI";
+  const noun = used.value === 1 ? (poi ? "point of interest" : "route") : poi ? "points of interest" : "routes";
+  return `Used by ${used.value} ${noun}. Remove it from them before changing what it applies to.`;
+});
 
 function chooseScope(scope: CategoryScope) {
   if (scope === form.scope || readonly.value) return;
@@ -210,16 +217,18 @@ const translationRows = computed(() => translationStatus(languages.value, 2, (co
               v-for="s in CATEGORY_SCOPES"
               :key="s"
               type="button"
-              :disabled="readonly"
+              :disabled="readonly || (scopeLocked && s !== editor.resource?.scope)"
               :aria-pressed="form.scope === s"
+              aria-describedby="cat-scope-help"
               class="rounded-full border-[1.5px] px-3.5 py-[7px] text-[11px] font-bold disabled:cursor-default"
-              :class="chip(form.scope === s)"
+              :class="[chip(form.scope === s), { 'opacity-50': scopeLocked && s !== editor.resource?.scope }]"
               @click="chooseScope(s)"
             >
               {{ scopeLabel(s) }}
             </button>
           </div>
-          <span v-if="editor.fieldError('scope')" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("scope") }}</span>
+          <span v-if="editor.fieldError('scope')" id="cat-scope-help" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("scope") }}</span>
+          <span v-else-if="scopeLocked" id="cat-scope-help" class="text-xs text-muted-foreground">{{ scopeLockReason }}</span>
         </div>
 
         <div class="flex flex-col gap-2" role="group" aria-labelledby="cat-level-label">

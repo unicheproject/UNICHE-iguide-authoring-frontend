@@ -60,8 +60,21 @@ export interface MediaBinding {
 }
 
 export interface AssetLimits {
+  /** The largest request the backend takes, whatever the type. */
   maxUploadBytes: number;
-  perType: Record<AssetType, number>;
+  /** The largest file per type; a type without an entry is bound by `maxUploadBytes` only. */
+  perType: Partial<Record<AssetType, number>>;
+}
+
+/**
+ * Why a file may not be sent, or null when it fits (`12` §5: an upload over the limit is rejected before any bytes
+ * leave the browser). The type's own limit and the global request limit both apply.
+ */
+export function sizeProblem(size: number, type: AssetType, limits: AssetLimits): string | null {
+  const own = limits.perType[type];
+  if (own !== undefined && size > own) return `Exceeds the ${formatBytes(own)} limit for ${assetTypeLabel(type).toLowerCase()} files.`;
+  if (size > limits.maxUploadBytes) return `Exceeds the ${formatBytes(limits.maxUploadBytes)} limit for any upload.`;
+  return null;
 }
 
 const base = (projectId: string) => `/projects/${encodeURIComponent(projectId)}/assets`;
@@ -117,28 +130,22 @@ export function fetchAssetReferences(projectId: string, assetId: string): Promis
   return apiRequest<ResourceReference[]>(`${base(projectId)}/${encodeURIComponent(assetId)}/references`);
 }
 
-/** Replaces the file of an Asset with one of the same type, keeping its texts and every binding. */
+/**
+ * Replaces the file of a DRAFT Asset with one of the same type, keeping its texts and every binding. The backend
+ * refuses it for an ACTIVE Asset (`03` §1: upload a new Asset and bind it instead).
+ */
 export function replaceAssetFile(
   projectId: string,
   assetId: string,
   file: File,
   version: number,
   onProgress?: (fraction: number) => void,
+  signal?: AbortSignal,
 ): Promise<Asset> {
   const form = new FormData();
   form.append("file", file, file.name);
   form.append("version", String(version));
-  return apiUpload<Asset>(`${base(projectId)}/${encodeURIComponent(assetId)}/file`, form, onProgress);
-}
-
-/** One Resource that uses the Asset, with the roles it has there. */
-export interface AssetUsageEntry {
-  resource: ResourceReference;
-  usages: { usage: AssetUsage | "FLOOR_PLAN_IMAGE"; languageCode: string | null }[];
-}
-
-export function fetchAssetUsages(projectId: string, assetId: string): Promise<AssetUsageEntry[]> {
-  return apiRequest<AssetUsageEntry[]>(`${base(projectId)}/${encodeURIComponent(assetId)}/usages`);
+  return apiUpload<Asset>(`${base(projectId)}/${encodeURIComponent(assetId)}/file`, form, onProgress, signal);
 }
 
 /** A short-lived link that downloads the file under its original name. */
@@ -206,20 +213,6 @@ export async function syncMedia(projectId: string, kind: MediaKind, resourceId: 
   if (!unchanged && order.length) await apiRequest(`${path}:order`, { method: "PUT", body: { ids: order } });
 }
 
-const USAGE_LABELS: Record<AssetUsage | "FLOOR_PLAN_IMAGE", string> = {
-  HERO_IMAGE: "primary image",
-  THUMBNAIL: "thumbnail",
-  GALLERY_IMAGE: "gallery",
-  VIDEO: "video",
-  AUDIO_NARRATION: "audio narration",
-  ATTACHMENT: "attachment",
-  MODEL: "3D model",
-  MODEL_POSTER: "3D model poster",
-  INLINE: "inline",
-  FLOOR_PLAN_IMAGE: "plan image",
-};
-export const usageLabel = (usage: AssetUsage | "FLOOR_PLAN_IMAGE") => USAGE_LABELS[usage];
-
 /** "03:12" for a duration in seconds. */
 export function formatDuration(seconds: number): string {
   const total = Math.round(seconds);
@@ -280,8 +273,11 @@ export function isImage(asset: Asset): boolean {
   return asset.type === "IMAGE" || asset.type === "FLOOR_PLAN";
 }
 
-/** An image that visitors would meet without a text alternative in the given language. */
+/**
+ * An image that visitors would meet without a text alternative in the given language. A floor plan is an image too:
+ * its text summarises the plan (`14` §2 Alternative text), though only an IMAGE blocks activation without one.
+ */
 export function missingAlternativeText(asset: Asset, languageCode: string | null): boolean {
-  if (asset.type !== "IMAGE" || asset.decorative || !languageCode) return false;
+  if (!isImage(asset) || asset.decorative || !languageCode) return false;
   return !asset.translations[languageCode]?.alternativeText?.trim();
 }

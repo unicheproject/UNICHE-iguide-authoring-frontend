@@ -86,7 +86,9 @@ const countText = computed(() => {
 });
 
 function facts(guide: Guide): string {
-  const parts = [guide.items.length === 1 ? "1 related item" : `${guide.items.length} related items`];
+  const refs = guide.blocks.filter((b) => b.blockType === "REFERENCE").length;
+  const texts = guide.blocks.length - refs;
+  const parts = [`${texts === 1 ? "1 text block" : `${texts} text blocks`}, ${refs === 1 ? "1 reference" : `${refs} references`}`];
   if (guide.estimatedReadingMinutes) parts.push(`${guide.estimatedReadingMinutes} min read`);
   if (guide.featured) parts.push("featured");
   return parts.join(" · ");
@@ -346,7 +348,7 @@ const reorder = useReorder<Guide>({
           {{
             guides.length
               ? "No guide matches the search or the filters."
-              : "Guides are article-like reading pieces, such as the story of a collection, with related points of interest and routes."
+              : "Guides are article-like reading pieces, such as the story of a collection, with references to points of interest and routes inside the story."
           }}
         </p>
         <Button v-if="!guides.length" variant="brand" :disabled="!defaultLanguageInfo" @click="creating = true">New guide</Button>

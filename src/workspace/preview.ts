@@ -1,5 +1,6 @@
 import type { Bounds, CanvasMarker } from "@/components/map/GeoMapCanvas.vue";
 import type { Asset, AssetUsage, MediaBinding } from "@/platform/assets";
+import type { GuideBlock } from "@/platform/guides";
 import type { ProjectLanguage } from "@/platform/languages";
 
 /*
@@ -21,7 +22,7 @@ export interface PreviewImage {
 
 export type StoryNode =
   | { type: "paragraph"; text: string }
-  | { type: "heading"; text: string }
+  | { type: "heading"; text: string; level?: 2 | 3 }
   | { type: "image"; image: PreviewImage | null };
 
 /** A Resource another screen of the preview app opens. */
@@ -43,7 +44,10 @@ export type PreviewBlock =
   | { type: "text"; heading?: string; value: PreviewText; label: string }
   | { type: "facts"; items: { label: string; value: string }[] }
   | { type: "list"; heading: string; items: PreviewListItem[] }
-  | { type: "story"; nodes: StoryNode[] }
+  /** `missing`: the previewed language has none of it, so the default language shows. */
+  | { type: "story"; nodes: StoryNode[]; missing?: boolean }
+  /** One Guide REFERENCE block: its target as a card, with its caption. */
+  | { type: "reference"; item: PreviewListItem; captionMissing?: boolean }
   | { type: "gallery"; images: PreviewImage[] }
   | { type: "audio" | "video"; heading: string; url: string }
   | { type: "link"; label: string; url: string }
@@ -127,6 +131,39 @@ export function mediaBlocks(media: MediaBinding[], assets: Asset[], langs: Previ
 export function storyImage(assets: Asset[], assetId: string, langs: PreviewLanguages): PreviewImage | null {
   const asset = assets.find((a) => a.id === assetId);
   return asset ? imageOf(asset, langs.active) : null;
+}
+
+/**
+ * A Guide's blocks in the order written (`12` §3 Guide): each TEXT block's rich text in the previewed language,
+ * falling back to the default language and marked missing; each REFERENCE block as a card of its target with its
+ * caption. `reference` names a target, or returns null for one the preview cannot show.
+ */
+export function guideStoryBlocks(
+  blocks: GuideBlock[],
+  assets: Asset[],
+  langs: PreviewLanguages,
+  reference: (block: GuideBlock) => PreviewListItem | null,
+): PreviewBlock[] {
+  const result: PreviewBlock[] = [];
+  for (const block of blocks) {
+    if (block.blockType === "TEXT") {
+      const own = langs.active ? block.translations[langs.active]?.text?.blocks ?? [] : [];
+      const fallback = langs.fallback ? block.translations[langs.fallback]?.text?.blocks ?? [] : [];
+      const nodes = (own.length ? own : fallback).flatMap((b): StoryNode[] => {
+        if (b.type === "image") return [{ type: "image", image: storyImage(assets, b.assetId, langs) }];
+        if (!b.text.trim()) return [];
+        return [b.type === "heading" ? { type: "heading", text: b.text.trim(), level: b.level } : { type: "paragraph", text: b.text.trim() }];
+      });
+      if (nodes.length) result.push({ type: "story", nodes, missing: !own.length });
+      continue;
+    }
+    const item = reference(block);
+    if (!item) continue;
+    const own = langs.active ? block.translations[langs.active]?.caption?.trim() : undefined;
+    const fallback = langs.fallback ? block.translations[langs.fallback]?.caption?.trim() : undefined;
+    result.push({ type: "reference", item: { ...item, subtitle: own || fallback || item.subtitle }, captionMissing: !own && !!fallback });
+  }
+  return result;
 }
 
 /** Text blocks for the given keys, with the labels the editor shows; values in no language are left out. */

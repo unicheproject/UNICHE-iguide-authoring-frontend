@@ -75,13 +75,32 @@ const hero = computed(() => props.model.blocks.find((b) => b.type === "hero"));
         </ol>
       </div>
 
-      <div v-else-if="block.type === 'story'" class="flex flex-col gap-[0.8em]">
+      <div v-else-if="block.type === 'story'" class="flex flex-col gap-[0.8em]" :class="{ missing: block.missing }">
+        <span v-if="block.missing" class="missing-label">Story · Missing in {{ languageName }}{{ model.fallbackName ? `; shows ${model.fallbackName}` : "" }}</span>
         <template v-for="(node, n) in block.nodes" :key="n">
-          <h2 v-if="node.type === 'heading'" class="text-[1.2em] font-bold">{{ node.text }}</h2>
+          <h3 v-if="node.type === 'heading' && node.level === 3" class="text-[1.05em] font-bold">{{ node.text }}</h3>
+          <h2 v-else-if="node.type === 'heading'" class="text-[1.2em] font-bold">{{ node.text }}</h2>
           <p v-else-if="node.type === 'paragraph'" class="whitespace-pre-line leading-relaxed">{{ node.text }}</p>
           <img v-else-if="node.image" :src="node.image.url" :alt="node.image.alt" class="w-full rounded-[0.5em]" />
           <div v-else class="missing rounded-[0.5em] p-[1em] text-[0.8em] text-[#b91c1c]">Unavailable image</div>
         </template>
+      </div>
+
+      <div v-else-if="block.type === 'reference'">
+        <component
+          :is="navigable && block.item.target ? 'button' : 'div'"
+          :type="navigable && block.item.target ? 'button' : undefined"
+          class="flex w-full gap-[0.7em] rounded-[0.5em] border border-[#e5e7eb] px-[0.8em] py-[0.6em] text-start"
+          :class="[{ 'opacity-50': block.item.muted }, navigable && block.item.target ? 'hover:border-[#4c1d8b]' : '']"
+          @click="navigable && block.item.target && emit('open', block.item.target)"
+        >
+          <span class="min-w-0 flex-1">
+            <span class="block font-semibold">{{ block.item.title }}</span>
+            <span v-if="block.item.subtitle" class="block text-[0.85em] text-[#6b7280]" :class="{ missing: block.captionMissing }">{{ block.item.subtitle }}</span>
+          </span>
+          <span v-if="navigable && block.item.target" class="text-[#4c1d8b]" aria-hidden="true">›</span>
+        </component>
+        <span v-if="block.captionMissing" class="missing-label">Caption · Missing in {{ languageName }}{{ model.fallbackName ? `; shows ${model.fallbackName}` : "" }}</span>
       </div>
 
       <div v-else-if="block.type === 'gallery'" class="grid gap-[0.4em]" :class="wide ? 'grid-cols-4' : 'grid-cols-3'">

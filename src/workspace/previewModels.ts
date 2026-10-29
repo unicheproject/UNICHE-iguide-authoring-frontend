@@ -9,10 +9,10 @@ import { routeDifficultyLabel, routeModeLabel, routeTitle, routeTypeLabel, type 
 import { placeTypeLabel } from "@/views/workspace/places/placeTree";
 import type { PreviewData } from "./previewData";
 import {
+  guideStoryBlocks,
   heroBlock,
   mediaBlocks,
   previewLanguages,
-  storyImage,
   textBlocks,
   textIn,
   type PreviewBlock,
@@ -20,7 +20,6 @@ import {
   type PreviewModel,
   type PreviewTarget,
   type PreviewText,
-  type StoryNode,
 } from "./preview";
 
 /*
@@ -214,31 +213,16 @@ const GUIDE_TARGETS: Record<string, PreviewTarget["type"] | undefined> = {
 
 function guideModel(ctx: PreviewContext, guide: Guide): PreviewModel {
   const { language, fallbackName, codes } = langs(ctx);
-  const own = ctx.language ? guide.translations[ctx.language]?.body?.blocks ?? [] : [];
-  const fallback = ctx.defaultLanguage ? guide.translations[ctx.defaultLanguage]?.body?.blocks ?? [] : [];
-  const story = own.length ? own : fallback;
-  const nodes: StoryNode[] = story.flatMap((b): StoryNode[] => {
-    if (b.type === "image") return [{ type: "image", image: storyImage(ctx.data.assets, b.assetId, codes) }];
-    return b.text.trim() ? [{ type: b.type, text: b.text.trim() }] : [];
-  });
   const blocks: PreviewBlock[] = [
     ...heroBlock(guide.media, ctx.data.assets, codes),
     { type: "facts", items: guide.estimatedReadingMinutes ? [{ label: "Reading", value: `${guide.estimatedReadingMinutes} min` }] : [] },
     ...textBlocks(guide.translations, [{ key: "summary", label: "Summary" }], codes),
-  ];
-  if (nodes.length) {
-    if (!own.length) blocks.push({ type: "text", label: "Story", value: { text: "The story below is in the default language.", missing: true } });
-    blocks.push({ type: "story", nodes });
-  }
-  blocks.push({
-    type: "list",
-    heading: "Related",
-    items: guide.items.flatMap((item) => {
-      const type = GUIDE_TARGETS[item.resourceType];
-      return type ? [linkItem(ctx, { type, id: item.resourceId })] : [];
+    ...guideStoryBlocks(guide.blocks, ctx.data.assets, codes, (block) => {
+      const type = block.resourceType ? GUIDE_TARGETS[block.resourceType] : undefined;
+      return type && block.resourceId ? linkItem(ctx, { type, id: block.resourceId }) : null;
     }),
-  });
-  blocks.push(...mediaBlocks(guide.media, ctx.data.assets, codes));
+    ...mediaBlocks(guide.media, ctx.data.assets, codes),
+  ];
   return { kindLabel: "Guide", language, fallbackName, title: textIn(guide.translations, "title", codes), blocks };
 }
 

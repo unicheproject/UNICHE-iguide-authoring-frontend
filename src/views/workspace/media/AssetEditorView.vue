@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from "vue";
+import { computed, reactive, ref } from "vue";
 import EditorShell from "@/components/editor/EditorShell.vue";
+import UploadEntryRow from "@/components/media/UploadEntryRow.vue";
+import UploadLimits from "@/components/media/UploadLimits.vue";
 import TranslationsPanel, { type TextFieldGroup, type TextFieldMeta } from "@/components/editor/TranslationsPanel.vue";
 import { formatDate } from "@/lib/format";
 import {
@@ -9,17 +11,16 @@ import {
   fetchAsset,
   fetchAssetDownload,
   fetchAssetReferences,
-  fetchAssetUsages,
   formatBytes,
   formatDuration,
   replaceAssetFile,
-  usageLabel,
   isImage,
   updateAsset,
   type Asset,
   type AssetTranslation,
-  type AssetUsageEntry,
 } from "@/platform/assets";
+import { askConfirm } from "@/stores/confirm";
+import { useAssetUpload } from "@/workspace/useAssetUpload";
 import { ApiError } from "@/platform/api";
 import { showToast } from "@/stores/toast";
 import type { ResourceReference } from "@/platform/references";
@@ -41,12 +42,19 @@ const TEXT_META: Record<TextKey, TextFieldMeta> = {
   alternativeText: {
     label: "Alternative text",
     multiline: true,
-    helper: "What the image shows, for visitors who cannot see it. Describe its purpose, not the file.",
+    // `14` §2 Alternative text.
+    helper:
+      "What the image shows and why it is here, in one or two sentences; don't begin with \"image of\". For an object, name it, its material, and the detail to notice.",
   },
   title: { label: "Title", multiline: false },
   caption: { label: "Caption", multiline: true, helper: "Shown under the media in the visitor app." },
   credits: { label: "Credits", multiline: false, helper: "Photographer, rights holder, licence." },
-  transcript: { label: "Transcript", multiline: true, helper: "Everything that is said or heard, for visitors who cannot listen." },
+  transcript: {
+    label: "Transcript",
+    multiline: true,
+    // `14` §2 Audio narration and transcripts.
+    helper: "Every spoken word, and the sounds that carry meaning, for visitors who cannot listen.",
+  },
 };
 
 const form = reactive({
@@ -87,7 +95,11 @@ const editor = useResourceEditor<Asset>({
 const toReference = (r: ResourceReference) => referenceLink(projectId.value, r);
 
 const asset = computed(() => editor.resource);
-const image = computed(() => (asset.value ? asset.value.type === "IMAGE" : false));
+// A floor plan is an image too: it takes alternative text (a summary of the plan) and the decorative flag, though only
+// an IMAGE needs the text before activation (backend AssetReadiness; `14` §2 Alternative text).
+const image = computed(() => (asset.value ? isImage(asset.value) : false));
+const plainImage = computed(() => asset.value?.type === "IMAGE");
+const floorPlan = computed(() => asset.value?.type === "FLOOR_PLAN");
 const timed = computed(() => asset.value?.type === "AUDIO" || asset.value?.type === "VIDEO");
 
 // Only the texts that apply to this kind of file.
@@ -112,29 +124,32 @@ const facts = computed(() => {
   ];
 });
 
-// Where it is used ----------------------------------------------------------------------------------------
-
-const usages = ref<AssetUsageEntry[] | null>(null);
-const usagesFailed = ref(false);
-async function loadUsages() {
-  usagesFailed.value = false;
-  try {
-    usages.value = await fetchAssetUsages(projectId.value, props.assetId);
-  } catch (e) {
-    if (!(e instanceof ApiError)) throw e;
-    usagesFailed.value = true;
-  }
-}
-watch(() => props.assetId, loadUsages, { immediate: true });
-
-function rolesText(entry: AssetUsageEntry): string {
-  return entry.usages.map((u) => (u.languageCode ? `${usageLabel(u.usage)}, ${u.languageCode}` : usageLabel(u.usage))).join(" · ");
-}
-
 // Replace and download --------------------------------------------------------------------------------------
 
+/*
+ * "Replace file" (DECISIONS.md D-032): only for a DRAFT Asset, since visitors may be seeing the file of an ACTIVE one
+ * (`03` §1: upload a new Asset and bind it instead; the backend refuses it too). It runs through the upload queue, so
+ * the size limit is checked before sending, and progress, Retry, and the announcement are the upload dialog's.
+ */
 const replaceInput = ref<HTMLInputElement | null>(null);
-const replacing = ref<number | null>(null);
+const replaceBlocked = computed(() =>
+  asset.value?.status === "ACTIVE"
+    ? "Visitors may be seeing this file, so it can't be replaced. Upload a new file and use it instead."
+    : null,
+);
+const replacer = useAssetUpload(
+  projectId,
+  async () => {
+    await editor.load();
+    showToast("File replaced", "Every place that uses the asset now shows the new file. Its texts are unchanged.");
+  },
+  {
+    uploader: (entry, onProgress, signal) =>
+      replaceAssetFile(projectId.value, props.assetId, entry.file, editor.resource!.version, onProgress, signal),
+  },
+);
+const replaceEntries = replacer.entries;
+const replacing = computed(() => replacer.busy());
 
 function chooseReplacement() {
   if (editor.dirty) {
@@ -144,23 +159,13 @@ function chooseReplacement() {
   replaceInput.value?.click();
 }
 
-async function onReplacement(event: Event) {
+function onReplacement(event: Event) {
   const input = event.target as HTMLInputElement;
   const file = input.files?.[0];
   input.value = "";
   if (!file || !asset.value) return;
-  replacing.value = 0;
-  try {
-    await replaceAssetFile(projectId.value, asset.value.id, file, asset.value.version, (f) => (replacing.value = f));
-    await editor.load();
-    showToast("File replaced", "Every place that uses the asset now shows the new file. Its texts are unchanged.");
-  } catch (e) {
-    if (!(e instanceof ApiError)) throw e;
-    const message = e.code === "VERSION_CONFLICT" ? "Someone else changed the asset meanwhile. Reload it and try again." : e.fieldMessages().file ?? e.message;
-    showToast("The file was not replaced", e.platformUnavailable ? "The UNICHE platform is not reachable." : message, "error");
-  } finally {
-    replacing.value = null;
-  }
+  replacer.dismissFinished();
+  void replacer.upload([file], { type: asset.value.type });
 }
 
 const downloading = ref(false);
@@ -184,8 +189,25 @@ const replaceAccept = computed(() => {
 });
 
 const activationHint = computed(() =>
-  image.value ? "Activate it once it has alternative text in the default language, or mark it decorative." : "Activate it when it is ready to be used.",
+  plainImage.value ? "Activate it once it has alternative text in the default language, or mark it decorative." : "Activate it when it is ready to be used.",
 );
+
+/** Marking an image decorative is confirmed (`14` §2): screen readers then skip it. */
+async function setDecorative(event: Event) {
+  const box = event.target as HTMLInputElement;
+  if (!box.checked) {
+    form.decorative = false;
+    return;
+  }
+  const confirmed = await askConfirm({
+    title: "Mark the image decorative?",
+    body: "Screen readers will skip it and it needs no alternative text. Choose this only when removing the image would lose nothing; a primary image of an exhibit is never decorative.",
+    confirmLabel: "Mark decorative",
+    cancelLabel: "Keep it described",
+  });
+  form.decorative = confirmed;
+  box.checked = confirmed;
+}
 </script>
 
 <template>
@@ -216,10 +238,11 @@ const activationHint = computed(() =>
         <button
           type="button"
           class="rounded-full border bg-muted px-4 py-2 text-[10px] font-bold uppercase tracking-[0.06em] text-gray-700 disabled:opacity-50"
-          :disabled="!editor.editable || replacing !== null"
+          :disabled="!editor.editable || !!replaceBlocked || replacing"
+          aria-describedby="replace-help"
           @click="chooseReplacement"
         >
-          {{ replacing !== null ? `Replacing… ${Math.round(replacing * 100)} %` : "Replace file" }}
+          {{ replacing ? "Replacing…" : "Replace file" }}
         </button>
         <input ref="replaceInput" type="file" class="sr-only" tabindex="-1" :accept="replaceAccept" @change="onReplacement" />
         <button
@@ -230,10 +253,24 @@ const activationHint = computed(() =>
         >
           Download
         </button>
-        <span class="text-xs text-muted-foreground">
+        <span v-if="replaceBlocked" id="replace-help" class="text-xs text-muted-foreground">{{ replaceBlocked }}</span>
+        <span v-else id="replace-help" class="text-xs text-muted-foreground">
           A replacement must be {{ assetTypeLabel(asset.type).toLowerCase() }} too; texts and every use are kept.
         </span>
       </div>
+      <div v-if="replaceEntries.length" class="border-t border-gray-100 px-5 py-3">
+        <UploadLimits :limits="replacer.limits.value" :failed="replacer.limitsFailed.value" :types="[asset.type]" @reload="replacer.ensureLimits" />
+        <ul class="mt-2 rounded-lg border">
+          <UploadEntryRow
+            v-for="entry in replaceEntries"
+            :key="entry.key"
+            :entry="entry"
+            @retry="replacer.retry(entry)"
+            @cancel="replacer.cancel(entry)"
+          />
+        </ul>
+      </div>
+      <p class="sr-only" aria-live="polite">{{ replacer.announcement.value }}</p>
     </section>
 
     <TranslationsPanel
@@ -248,7 +285,7 @@ const activationHint = computed(() =>
       :readonly="!editor.editable"
       :error-languages="editor.languagesWithErrors"
       :field-error="editor.fieldError"
-      :required-field="image && !form.decorative ? 'alternativeText' : ''"
+      :required-field="plainImage && !form.decorative ? 'alternativeText' : ''"
       title-required-hint="Required in the default language before the image can be activated, unless it is decorative."
     />
 
@@ -271,38 +308,26 @@ const activationHint = computed(() =>
           <span v-else id="f-name-help" class="text-xs text-muted-foreground">Only authors see it; it is what the media library searches.</span>
         </div>
         <label v-if="image" class="flex items-start gap-2.5 text-[13px] font-semibold">
-          <input v-model="form.decorative" type="checkbox" :disabled="!editor.editable" class="mt-0.5 h-4 w-4 accent-primary" />
+          <input
+            :checked="form.decorative"
+            type="checkbox"
+            :disabled="!editor.editable"
+            class="mt-0.5 h-4 w-4 accent-primary"
+            @change="setDecorative"
+          />
           <span>
             Decorative: the image carries no information
-            <span class="block text-xs font-normal text-muted-foreground">Screen readers skip it, and it needs no alternative text.</span>
+            <span class="block text-xs font-normal text-muted-foreground">
+              Screen readers skip it, and it needs no alternative text. Only when removing it would lose nothing.
+            </span>
           </span>
         </label>
+        <p v-if="floorPlan" class="text-xs text-muted-foreground">
+          For a floor plan, the alternative text summarises what the plan shows and points visitors to the list of what
+          is on it.
+        </p>
       </div>
     </section>
 
-    <template #aside>
-      <section class="overflow-hidden rounded-lg border bg-card">
-        <div class="border-b px-3.5 py-[11px]">
-          <span class="text-[10px] font-extrabold uppercase tracking-[0.1em] text-muted-foreground">
-            Used in{{ usages ? ` (${usages.length})` : "" }}
-          </span>
-        </div>
-        <div class="px-3.5 py-3">
-          <p v-if="usagesFailed" class="text-xs text-[#9a6200]">
-            Where it is used could not be loaded.
-            <button type="button" class="font-bold text-primary" @click="loadUsages">Try again</button>
-          </p>
-          <p v-else-if="!usages" class="animate-skeleton text-xs text-muted-foreground">Loading…</p>
-          <p v-else-if="!usages.length" class="text-xs text-muted-foreground">Not used yet. It can be archived freely.</p>
-          <ul v-else class="flex flex-col gap-2">
-            <li v-for="entry in usages" :key="`${entry.resource.resourceType}-${entry.resource.resourceId}`" class="text-xs">
-              <RouterLink v-if="toReference(entry.resource)" :to="toReference(entry.resource)!" class="font-bold">{{ entry.resource.title }} ↗</RouterLink>
-              <span v-else class="font-bold">{{ entry.resource.title }}</span>
-              <span class="block text-[11px] text-muted-foreground">{{ rolesText(entry) }}</span>
-            </li>
-          </ul>
-        </div>
-      </section>
-    </template>
   </EditorShell>
 </template>

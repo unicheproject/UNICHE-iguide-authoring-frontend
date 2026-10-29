@@ -1,8 +1,10 @@
 <script setup lang="ts">
 /**
- * The body of a Guide in one language, as an ordered list of blocks: paragraphs, headings (level 2 or 3),
- * and images from the media library. Edits the given `blocks` list in place, so the changes count as
- * unsaved changes of the Guide. Images are saved as INLINE media of the Guide by the backend.
+ * The rich text of one Guide TEXT block in one language, as an ordered list of nodes: paragraphs, headings (level 2
+ * or 3, `14` lines 82-83), and images from the media library shown inline with their alternative text (`12` §3
+ * Guide). A node can be inserted after any other. Edits the given `blocks` list in place, so the changes count as
+ * unsaved changes of the Guide. Images are saved as INLINE media of the Guide by the backend. `embedded` drops the
+ * card frame, for a block inside the Guide's story list.
  */
 import { computed, nextTick, ref } from "vue";
 import AssetPickerDialog from "@/components/media/AssetPickerDialog.vue";
@@ -26,6 +28,8 @@ const props = defineProps<{
   heading?: string;
   /** Shown while there are no blocks. */
   emptyText?: string;
+  /** Inside another card: no frame and no heading. */
+  embedded?: boolean;
 }>();
 const emit = defineEmits<{ uploaded: [asset: Asset] }>();
 
@@ -37,13 +41,18 @@ function blockError(index: number): string | undefined {
   return ["", ".text", ".level", ".assetId"].map((s) => props.fieldError(at + s)).filter(Boolean).join(" ") || undefined;
 }
 
+/** Where the next node goes: after the node at `insertAt - 1`, or at the end while null. */
+const insertAt = ref<number | null>(null);
+
 async function add(type: StoryBlock["type"]) {
+  const at = insertAt.value ?? props.blocks.length;
+  insertAt.value = null;
   if (type === "image") {
-    picking.value = { index: null };
+    picking.value = { index: null, at };
     return;
   }
   const key = newBlockKey();
-  props.blocks.push(type === "heading" ? { key, type, level: 2, text: "" } : { key, type, text: "" });
+  props.blocks.splice(at, 0, type === "heading" ? { key, type, level: 2, text: "" } : { key, type, text: "" });
   await nextTick();
   document.getElementById(`block-${key}`)?.focus();
 }
@@ -63,8 +72,8 @@ function remove(index: number) {
 
 // Images ------------------------------------------------------------------------------------------------
 
-/** Null index adds a new image block at the end; a number replaces that block's image. */
-const picking = ref<{ index: number | null } | null>(null);
+/** Null index inserts a new image node at `at`; a number replaces that node's image. */
+const picking = ref<{ index: number | null; at?: number } | null>(null);
 
 function onPick(asset: Asset) {
   const target = picking.value;
@@ -72,7 +81,12 @@ function onPick(asset: Asset) {
   if (!target) return;
   const block = target.index === null ? undefined : props.blocks[target.index];
   if (block?.type === "image") block.assetId = asset.id;
-  else props.blocks.push({ key: newBlockKey(), type: "image", assetId: asset.id });
+  else props.blocks.splice(target.at ?? props.blocks.length, 0, { key: newBlockKey(), type: "image", assetId: asset.id });
+}
+
+/** What visitors who cannot see the image get in this language. */
+function altText(asset: Asset): string | null {
+  return asset.translations[props.language.languageCode]?.alternativeText?.trim() || null;
 }
 
 const words = computed(() =>
@@ -81,8 +95,8 @@ const words = computed(() =>
 </script>
 
 <template>
-  <section class="overflow-hidden rounded-lg border bg-card">
-    <div class="flex items-center gap-2.5 border-b px-5 py-3.5">
+  <section :class="embedded ? 'story-embedded' : 'overflow-hidden rounded-lg border bg-card'" :data-path="basePath" tabindex="-1">
+    <div v-if="!embedded" class="flex items-center gap-2.5 border-b px-5 py-3.5">
       <h2 class="flex-1 text-[11px] font-extrabold uppercase tracking-[0.09em] text-muted-foreground">
         {{ heading ?? `Story · ${language.displayName}` }}
       </h2>
@@ -94,7 +108,8 @@ const words = computed(() =>
     </p>
 
     <ol class="flex flex-col">
-      <li v-for="(block, index) in blocks" :key="block.key" class="group border-b border-gray-100 px-5 py-3">
+      <template v-for="(block, index) in blocks" :key="block.key">
+      <li class="group border-b border-gray-100 py-3" :class="embedded ? 'px-0' : 'px-5'">
         <div class="mb-1.5 flex items-center gap-2">
           <span class="text-[10px] font-extrabold uppercase tracking-[0.08em] text-muted-foreground">
             {{ block.type === "paragraph" ? "Paragraph" : block.type === "heading" ? "Heading" : "Image" }}
@@ -135,6 +150,15 @@ const words = computed(() =>
             >
               ↓
             </button>
+            <button
+              type="button"
+              class="px-1 text-[11px] font-bold text-primary"
+              :aria-expanded="insertAt === index + 1"
+              :aria-label="`Insert after block ${index + 1}`"
+              @click="insertAt = insertAt === index + 1 ? null : index + 1"
+            >
+              + after
+            </button>
             <button type="button" class="px-1 text-[13px] text-destructive" :aria-label="`Remove block ${index + 1}`" @click="remove(index)">✕</button>
           </template>
         </div>
@@ -145,6 +169,7 @@ const words = computed(() =>
           v-model="block.text"
           :readonly="readonly"
           :aria-label="`Paragraph ${index + 1}`"
+          :data-path="`${basePath}.blocks[${index}].text`"
           :lang="language.languageCode"
           :dir="language.direction.toLowerCase()"
           class="field-input min-h-[96px] resize-y leading-relaxed"
@@ -156,6 +181,7 @@ const words = computed(() =>
           v-model="block.text"
           :readonly="readonly"
           :aria-label="`Heading ${index + 1}`"
+          :data-path="`${basePath}.blocks[${index}].text`"
           :lang="language.languageCode"
           :dir="language.direction.toLowerCase()"
           class="field-input font-bold"
@@ -171,6 +197,11 @@ const words = computed(() =>
             >
               ⚠ No alternative text in {{ language.displayName }}
             </div>
+            <div v-else-if="assetById.get(block.assetId)?.decorative" class="mt-1 text-[11px] text-muted-foreground">Decorative: screen readers skip it.</div>
+            <div v-else-if="assetById.get(block.assetId) && altText(assetById.get(block.assetId)!)" class="mt-1 text-[11px] text-gray-700">
+              <span class="font-semibold text-muted-foreground">Alternative text ({{ language.languageCode }}):</span>
+              {{ altText(assetById.get(block.assetId)!) }}
+            </div>
             <div class="mt-1.5 flex gap-2.5">
               <RouterLink :to="{ name: 'asset-editor', params: { projectId, assetId: block.assetId } }" class="text-[11px] font-bold text-primary no-underline">
                 Edit asset
@@ -181,16 +212,23 @@ const words = computed(() =>
         </div>
         <p v-if="blockError(index)" class="mt-1.5 text-xs font-semibold text-destructive">⚠ {{ blockError(index) }}</p>
       </li>
+      <li v-if="!readonly && insertAt === index + 1" class="flex flex-wrap gap-2 border-b border-gray-100 py-2.5" :class="embedded ? 'px-0' : 'px-5'">
+        <span class="self-center text-[11px] text-muted-foreground">Insert here:</span>
+        <button type="button" class="add-block" @click="add('paragraph')">+ Paragraph</button>
+        <button type="button" class="add-block" @click="add('heading')">+ Heading</button>
+        <button type="button" class="add-block" @click="add('image')">+ Image</button>
+      </li>
+      </template>
     </ol>
 
-    <p v-if="!blocks.length" class="px-5 py-4 text-[13px] text-muted-foreground">
+    <p v-if="!blocks.length" class="py-4 text-[13px] text-muted-foreground" :class="embedded ? 'px-0' : 'px-5'">
       {{ emptyText ?? `No story in ${language.displayName} yet. Start with a paragraph; the default language needs one before the guide can be activated.` }}
     </p>
 
-    <div v-if="!readonly" class="flex flex-wrap gap-2 px-5 py-3.5">
-      <button type="button" class="add-block" @click="add('paragraph')">+ Paragraph</button>
-      <button type="button" class="add-block" @click="add('heading')">+ Heading</button>
-      <button type="button" class="add-block" @click="add('image')">+ Image</button>
+    <div v-if="!readonly" class="flex flex-wrap gap-2 py-3.5" :class="embedded ? 'px-0' : 'px-5'">
+      <button type="button" class="add-block" @click="insertAt = null; add('paragraph')">+ Paragraph</button>
+      <button type="button" class="add-block" @click="insertAt = null; add('heading')">+ Heading</button>
+      <button type="button" class="add-block" @click="insertAt = null; add('image')">+ Image</button>
     </div>
 
     <AssetPickerDialog
@@ -209,6 +247,9 @@ const words = computed(() =>
 </template>
 
 <style scoped>
+.story-embedded:focus {
+  outline: none;
+}
 .add-block {
   border: 1px solid #e5e7eb;
   border-radius: 9999px;
