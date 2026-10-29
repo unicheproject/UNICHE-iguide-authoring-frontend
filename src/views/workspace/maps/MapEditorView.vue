@@ -380,13 +380,25 @@ function toggleBounds() {
   editingBounds.value = !editingBounds.value;
 }
 
-function setInitialView() {
-  const current = canvas.value?.currentView();
-  if (!current || readonly.value) return;
+/*
+ * Pan and zoom set the initial view (`12` §3 Maps): a move the author makes (drag, wheel, keys, the zoom buttons)
+ * becomes the view visitors open the map at. The map's own moves, such as fitting the bounds on load, are not the
+ * author's and change nothing. The fields under "Initial view" stay, so the view can also be typed (`14` lines
+ * 184-185).
+ */
+let lastGesture = 0;
+const gesture = () => (lastGesture = Date.now());
+
+function onViewChange(current: { lat: number; lng: number; zoom: number }) {
+  if (readonly.value || editingBounds.value || Date.now() - lastGesture > 1500) return;
   form.lat = String(current.lat);
   form.lng = String(current.lng);
   form.zoom = String(current.zoom);
-  showToast("Initial view set", `Visitors open the map at ${current.lat}, ${current.lng} at zoom ${current.zoom}.`);
+}
+
+function zoom(delta: number) {
+  gesture();
+  canvas.value?.zoomBy(delta);
 }
 
 // Linked Place ---------------------------------------------------------------------------------------------
@@ -430,12 +442,17 @@ function box(on: boolean) {
   >
     <section class="overflow-hidden rounded-lg border bg-card">
       <div class="flex flex-wrap items-center gap-2 border-b px-4 py-2.5">
-        <button type="button" class="map-tool" aria-label="Zoom out" @click="canvas?.zoomBy(-0.5)">−</button>
-        <button type="button" class="map-tool" aria-label="Zoom in" @click="canvas?.zoomBy(0.5)">+</button>
+        <button type="button" class="map-tool" aria-label="Zoom out" @click="zoom(-0.5)">−</button>
+        <button type="button" class="map-tool" aria-label="Zoom in" @click="zoom(0.5)">+</button>
         <span class="text-[11px] text-muted-foreground">zoom {{ form.zoom }}</span>
-        <button type="button" class="map-tool px-3" :disabled="readonly || editingBounds" @click="setInitialView">Set initial view</button>
         <span class="flex-1 text-[11px] text-muted-foreground">
-          {{ editingBounds ? "Editing bounds · drag the corners or the centre handle" : "Visitor view · the map is limited to the bounds" }}
+          {{
+            editingBounds
+              ? "Editing bounds · drag the corners or the centre handle"
+              : readonly
+                ? "Visitor view · the map is limited to the bounds"
+                : "Visitor view · visitors open the map where you pan and zoom it"
+          }}
         </span>
         <button type="button" class="map-tool px-3" :class="{ 'border-primary text-primary': editingBounds }" :disabled="readonly" @click="toggleBounds">
           {{ editingBounds ? "Done" : "Edit bounds" }}
@@ -466,7 +483,7 @@ function box(on: boolean) {
         </button>
         <span class="ml-auto text-[10px] text-muted-foreground">{{ shownSummary }}</span>
       </div>
-      <div class="p-3">
+      <div class="p-3" @pointerdown.capture="gesture" @pointerup.capture="gesture" @wheel.capture="gesture" @keydown.capture="gesture">
         <GeoMapCanvas
           v-if="editor.resource"
           ref="canvas"
@@ -479,6 +496,7 @@ function box(on: boolean) {
           label="Map"
           @bounds-change="onBoundsChange"
           @marker-move="onMarkerMove"
+          @view-change="onViewChange"
         />
       </div>
     </section>
