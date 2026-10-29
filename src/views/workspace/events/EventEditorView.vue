@@ -360,8 +360,9 @@ const translationRows = computed(() => translationStatus(languages.value, 3, (co
         <h2 class="flex-1 text-[11px] font-extrabold uppercase tracking-[0.09em] text-muted-foreground">
           Occurrences ({{ form.occurrences.length }})
         </h2>
-        <span class="rounded-full border bg-muted px-2.5 py-0.5 font-mono text-[10px] text-muted-foreground" title="Times are entered and shown in this timezone">
-          {{ displayTimeZone }}
+        <!-- `03` §15: the Project timezone renders the times; until the Project has one (backend M2), the browser's does. -->
+        <span class="text-[11px] text-muted-foreground">
+          Times in <span class="font-mono">{{ displayTimeZone }}</span>, this browser's timezone, until the Project has its own
         </span>
       </div>
       <p v-if="form.occurrences.length && !upcomingCount" class="border-b border-gray-100 px-5 py-3 text-xs font-semibold text-[#9a6200]">
