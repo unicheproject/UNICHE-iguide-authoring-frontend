@@ -189,7 +189,8 @@ const subtitle = computed(() => {
   const level = parentTitle.value ? `inside ${parentTitle.value}` : "top-level place";
   return `${placeTypeLabel(place.type)} · ${PLACE_SETTING_LABELS[place.setting].label} · ${level} · ${place.slug}`;
 });
-const toReference = (r: ResourceReference) => referenceLink(projectId.value, r);
+// A trigger that opens this place links to its own "How visitors reach it" card.
+const toReference = (r: ResourceReference) => referenceLink(projectId.value, r, { resourceType: "PLACE", resourceId: props.placeId });
 
 /** The parent choices: Places that are not archived, not this one, and not inside it (no cycles, `03` §5). */
 const parentChoices = computed(() => {

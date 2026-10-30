@@ -291,13 +291,18 @@ export function storyNodes(guide: Pick<Guide, "blocks">, languageCode: string): 
 }
 
 /**
- * Whether the story is written in a language: every TEXT block has text in it. A Guide without TEXT blocks has no
- * story to count.
+ * Whether the story is written in a language: every TEXT block has text or an image in it, as the backend counts it
+ * (backend D-038). A Guide without TEXT blocks has no story to count.
  */
 export function storyComplete(guide: Pick<Guide, "blocks">, languageCode: string): boolean | null {
   const texts = guide.blocks.filter((b) => b.blockType === "TEXT");
   if (!texts.length) return null;
-  return texts.every((b) => storyWords(b.translations[languageCode]?.text?.blocks ?? []) > 0);
+  return texts.every((b) => storyHasContent(b.translations[languageCode]?.text?.blocks ?? []));
+}
+
+/** Text or an image: what a visitor sees in a TEXT block. */
+export function storyHasContent(blocks: StoryBlock[]): boolean {
+  return blocks.some((n) => (n.type === "image" ? !!n.assetId : !!n.text.trim()));
 }
 
 /** Title, summary, and the story (when the Guide has TEXT blocks) count towards completeness. */

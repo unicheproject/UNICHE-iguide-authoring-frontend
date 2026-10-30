@@ -269,7 +269,8 @@ function ensureBlockLanguages(block: BlockForm) {
   }
 }
 
-const toReference = (r: ResourceReference) => referenceLink(projectId.value, r);
+// A trigger that opens this guide links to its own "How visitors reach it" card.
+const toReference = (r: ResourceReference) => referenceLink(projectId.value, r, { resourceType: "GUIDE", resourceId: props.guideId });
 const heading = computed(() => (editor.resource ? guideTitle(editor.resource, defaultLanguage.value) : "Guide"));
 const subtitle = computed(() => (editor.resource ? `Guide · ${editor.resource.slug}` : ""));
 // The Guide as visitors would read it, from the live form, blocks in the order written (`12` §3, DECISIONS.md D-014).
@@ -613,7 +614,7 @@ const translationRows = computed(() =>
                 :readonly="!editor.editable"
                 :field-error="editor.fieldError"
                 :path="`blocks[${index}].translations.${activeLanguageInfo.languageCode}.text`"
-                :empty-text="`No text in ${activeLanguageInfo.displayName} yet. Start with a paragraph; the default language needs text in every text block before the guide can be activated.`"
+                :empty-text="`No text in ${activeLanguageInfo.displayName} yet. Start with a paragraph; the default language needs text or an image in every text block before the guide can be activated.`"
                 @uploaded="assets.unshift($event)"
               />
             </div>

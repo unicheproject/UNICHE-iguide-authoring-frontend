@@ -235,7 +235,8 @@ const editor = useResourceEditor<CmsEvent>({
   },
 });
 
-const toReference = (r: ResourceReference) => referenceLink(projectId.value, r);
+// A trigger that opens this event links to its own "How visitors reach it" card.
+const toReference = (r: ResourceReference) => referenceLink(projectId.value, r, { resourceType: "EVENT", resourceId: props.eventId });
 
 const heading = computed(() => (editor.resource ? eventTitle(editor.resource, defaultLanguage.value) : "Event"));
 const subtitle = computed(() => (editor.resource ? `Event · ${editor.resource.slug}` : ""));

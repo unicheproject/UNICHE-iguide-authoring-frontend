@@ -18,6 +18,7 @@ import { formatDate } from "@/lib/format";
 import { session } from "@/platform/auth";
 import { describeIssue } from "@/platform/readiness";
 import type { ResourceReference } from "@/platform/references";
+import { referenceKindLabel } from "@/workspace/referenceLinks";
 import type { PreviewModel } from "@/workspace/preview";
 import type { LanguageStatus } from "@/workspace/translationStatus";
 import type { EditableResource, ResourceEditor } from "@/workspace/useResourceEditor";
@@ -145,7 +146,7 @@ watch(
   },
   { immediate: true },
 );
-const kindLabel = (type: string) => type.charAt(0) + type.slice(1).toLowerCase().replace(/_/g, " ");
+const kindLabel = referenceKindLabel;
 </script>
 
 <template>

@@ -236,7 +236,8 @@ const editor = useResourceEditor<Route>({
   },
 });
 
-const toReference = (r: ResourceReference) => referenceLink(projectId.value, r);
+// A trigger that opens this route links to its own "How visitors reach it" card.
+const toReference = (r: ResourceReference) => referenceLink(projectId.value, r, { resourceType: "ROUTE", resourceId: props.routeId });
 
 const heading = computed(() => (editor.resource ? routeTitle(editor.resource, defaultLanguage.value) : "Route"));
 const subtitle = computed(() => (editor.resource ? `${routeTypeLabel(editor.resource.type)} route · ${editor.resource.slug}` : ""));

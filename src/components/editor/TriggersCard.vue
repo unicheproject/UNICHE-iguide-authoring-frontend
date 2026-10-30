@@ -4,11 +4,13 @@
  * of Interest, Route, Guide, or Event, edited in its editor and saved with it (DECISIONS.md D-018). Camera recognition is deferred (`08`), so its chip is greyed
  * with the reason (backend D-026).
  */
-import { computed } from "vue";
+import { computed, nextTick, ref, watch } from "vue";
+import { useRoute } from "vue-router";
 import BackendQrCode from "@/components/editor/BackendQrCode.vue";
 import QrCodePreview from "@/components/editor/QrCodePreview.vue";
 import { blankTrigger, TRIGGER_CHIP_CLASS as CHIP, TRIGGER_LABELS, type TriggerForm, type TriggerType } from "@/platform/triggers";
 import { useCurrentProject } from "@/workspace/currentProject";
+import { TRIGGERS_HASH } from "@/workspace/referenceLinks";
 
 const project = useCurrentProject();
 
@@ -21,6 +23,20 @@ function qrUrl(code: string): string {
 function hasBackendImage(t: TriggerForm): boolean {
   return !!t.id && !!t.runtimeUrl && t.code.trim() === (t.savedCode ?? "");
 }
+
+// A "Used in" trigger link lands here (DECISIONS.md D-037): the card scrolls into view and takes focus.
+const route = useRoute();
+const card = ref<HTMLElement | null>(null);
+watch(
+  () => route.hash,
+  async (hash) => {
+    if (hash !== TRIGGERS_HASH) return;
+    await nextTick();
+    card.value?.scrollIntoView({ block: "start" });
+    card.value?.focus({ preventScroll: true });
+  },
+  { immediate: true },
+);
 
 const props = defineProps<{
   triggers: TriggerForm[];
@@ -57,7 +73,7 @@ const invalid = (i: number, field: string) => ({ invalid: !!err(i, field) });
 </script>
 
 <template>
-  <section class="overflow-hidden rounded-lg border bg-card" aria-labelledby="triggers-heading">
+  <section id="triggers" ref="card" tabindex="-1" class="overflow-hidden rounded-lg border bg-card" aria-labelledby="triggers-heading">
     <div class="flex flex-wrap items-baseline gap-2 border-b px-5 py-3.5">
       <h2 id="triggers-heading" class="text-[11px] font-extrabold uppercase tracking-[0.09em] text-muted-foreground">How visitors reach it</h2>
       <span class="ml-auto text-xs text-muted-foreground">Beacons, places on the map, and QR codes open this in place</span>

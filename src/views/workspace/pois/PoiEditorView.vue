@@ -222,7 +222,8 @@ const editor = useResourceEditor<Poi>({
     /^media\[/.test(path) ? "Media" : /^triggers\[/.test(path) ? "How visitors reach it" : (describeTranslationPath(path, languages.value, TEXT_META) ?? FIELD_NAMES[path] ?? path),
 });
 
-const toReference = (r: ResourceReference) => referenceLink(projectId.value, r);
+// A trigger that opens this poi links to its own "How visitors reach it" card.
+const toReference = (r: ResourceReference) => referenceLink(projectId.value, r, { resourceType: "POI", resourceId: props.poiId });
 
 const heading = computed(() => (editor.resource ? poiTitle(editor.resource, defaultLanguage.value) : "Point of interest"));
 const subtitle = computed(() => {
