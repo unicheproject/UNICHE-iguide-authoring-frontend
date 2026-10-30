@@ -48,9 +48,9 @@ prototype inventory).
   spec removed them (D-028).
 - Interim 2026-10-15: `src/platform/guides.ts` bridged the guide editor onto the backend's block model
   (backend D-022). Since 2026-10-27 the editor works on the blocks themselves, TEXT and REFERENCE
-  interleaved with captions (D-031). Still open on the backend: readiness warns `MISSING_TRANSLATION` only
-  for the first TEXT block and never for reference captions (`GuideReadiness`); an image-only TEXT block
-  fails activation (`RichText.hasText`); Page references are refused until Pages exist (M6).
+  interleaved with captions (D-031). Closed on the backend 2026-10-30 (backend D-038):
+  readiness warns for every TEXT block and every caption the default language has, and an image-only TEXT
+  block counts, in the CMS's completeness too. Still open: Page references are refused until Pages exist (M6).
 - Interim 2026-10-15: `src/platform/events.ts` reads the paged Event list and saves occurrences through
   the backend's `.../occurrences` child endpoints after the Event `PUT` (backend D-023); media are bindings
   since backend D-025. Times stay in the browser's timezone until the Project has one (backend M2), and the
