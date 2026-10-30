@@ -16,10 +16,14 @@ import { listPlaces, placeTitle, type Place, type ResourceStatus } from "@/platf
 import { changePoiStatus, fetchPoiReferences, listPois, poiCompleteness, poiTitle, type Poi } from "@/platform/pois";
 import type { ResourceReference } from "@/platform/references";
 import { showToast } from "@/stores/toast";
+import { handOffActivationErrors } from "@/workspace/activationHandoff";
 import { useCurrentProject } from "@/workspace/currentProject";
 import { referenceLink } from "@/workspace/referenceLinks";
 import { findSection } from "@/workspace/sections";
 import { useCategoryFilter } from "@/workspace/useCategoryFilter";
+import { useListFilters } from "@/workspace/listFilters";
+import SearchLanguageSelect from "@/components/SearchLanguageSelect.vue";
+import FeaturedFilterChip from "@/components/FeaturedFilterChip.vue";
 import { useProjectLanguages } from "@/workspace/useProjectLanguages";
 import { parentOptions } from "../places/placeTree";
 import CreatePoiDialog from "./CreatePoiDialog.vue";
@@ -67,6 +71,8 @@ const statusFilter = ref<StatusFilter>("ALL");
 const categoryFilter = useCategoryFilter(projectId, "POI", defaultLanguage);
 const categorySelected = categoryFilter.selected;
 const query = ref("");
+const filters = useListFilters();
+const { featuredOnly, searchLanguage } = filters;
 
 function normalize(text: string): string {
   return text.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
@@ -81,8 +87,9 @@ const rows = computed(() => {
     .filter((poi) => {
       if (statusFilter.value === "PENDING" ? !poi.hasWorkingCopy : statusFilter.value !== "ALL" && poi.status !== statusFilter.value) return false;
       if (!categoryFilter.matches(poi.categoryId)) return false;
+      if (featuredOnly.value && !poi.featured) return false;
       if (!q) return true;
-      const haystack = [poi.slug, poi.code ?? "", ...Object.values(poi.translations).map((t) => t.title ?? "")];
+      const haystack = [poi.slug, poi.code ?? "", ...filters.texts(poi.translations, "title")];
       return haystack.some((text) => normalize(text).includes(q));
     });
 });
@@ -154,7 +161,10 @@ async function transition(poi: Poi, target: ResourceStatus) {
     }
     confirm.value = null;
     if (e.code === "MISSING_REQUIRED_FIELDS") {
-      showToast("Cannot activate yet", `${title(poi)} needs a title in ${defaultLanguageInfo.value?.displayName ?? "the default language"}.`, "error");
+      // The editor shows every missing field and focuses the first (`12` §3, DECISIONS.md D-036).
+      handOffActivationErrors(poi.id, e);
+      showToast("Cannot activate yet", `${title(poi)} opens at the first missing field.`, "error");
+      void router.push({ name: "poi-editor", params: { projectId: projectId.value, poiId: poi.id } });
     } else if (e.code === "VERSION_CONFLICT") {
       showToast("It changed meanwhile", "The list was reloaded; check it and try again.", "warning");
       void load();
@@ -166,7 +176,9 @@ async function transition(poi: Poi, target: ResourceStatus) {
   }
 }
 
-const toReference = (r: ResourceReference) => referenceLink(projectId.value, r);
+// A trigger that opens the poi being changed links to its editor's "How visitors reach it" card.
+const toReference = (r: ResourceReference) =>
+  referenceLink(projectId.value, r, confirm.value && { resourceType: "POI", resourceId: confirm.value.poi.id });
 
 function onCreated(poi: Poi) {
   creating.value = false;
@@ -194,7 +206,7 @@ const reorder = useReorder<Poi>({
   items: pois,
   save: (ids) => saveOrder(projectId.value, "pois", ids),
   title: (poi) => title(poi),
-  canReorder: computed(() => !query.value.trim() && statusFilter.value === "ALL" && categorySelected.value === "ALL"),
+  canReorder: computed(() => !query.value.trim() && !featuredOnly.value && statusFilter.value === "ALL" && categorySelected.value === "ALL"),
   reload: load,
 });
 </script>
@@ -241,10 +253,12 @@ const reorder = useReorder<Poi>({
         <input
           v-model="query"
           type="search"
-          aria-label="Search titles in all languages and exhibit codes"
-          placeholder="Search titles in all languages"
+          aria-label="Search titles and exhibit codes"
+          placeholder="Search titles"
           class="min-w-[240px] flex-1 rounded-lg border-[1.5px] px-3 py-[9px] text-[13px] focus:border-primary focus:outline-none"
         />
+        <SearchLanguageSelect v-model="searchLanguage" :languages="languages" />
+        <FeaturedFilterChip v-model="featuredOnly" />
         <CategoryFilterSelect v-model="categorySelected" :options="categoryFilter.options.value" />
         <div class="flex flex-wrap gap-1.5" role="group" aria-label="Filter by status">
           <button

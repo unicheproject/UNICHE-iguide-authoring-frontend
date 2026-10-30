@@ -78,6 +78,10 @@ box against the live Keycloak and Catalogue through the backend. Backend counter
 - 2026-10-27: Guide story as ordered blocks: text and references interleaved, captions, drag / position
   reordering, insert after any block or text node, alt text shown under story images; the Translation workspace
   shows every block (DECISIONS.md D-031).
+- 2026-10-29: "Featured" chip and a search-language choice in the Content lists (DECISIONS.md D-035).
+- 2026-10-29: activation refused from a Content list opens the editor at the first missing field (DECISIONS.md D-036).
+- 2026-10-29: where-used entries link to where they are edited, triggers included; a failed check keeps archive and deactivate off (DECISIONS.md D-037).
+- 2026-10-30: an image-only story block counts as written, as the backend counts it (backend D-038).
 - 2026-10-27: pan and zoom in the map editor set the map's initial view (DECISIONS.md D-034).
 - 2026-10-27: POI "3D model" with its required poster, and an "All languages" row in per-language media such as
   the audio narration (DECISIONS.md D-033).

@@ -23,10 +23,14 @@ import {
   type CmsEvent,
 } from "@/platform/events";
 import { showToast } from "@/stores/toast";
+import { handOffActivationErrors } from "@/workspace/activationHandoff";
 import { useCurrentProject } from "@/workspace/currentProject";
 import type { ResourceReference } from "@/platform/references";
 import { referenceLink } from "@/workspace/referenceLinks";
 import { findSection } from "@/workspace/sections";
+import { useListFilters } from "@/workspace/listFilters";
+import SearchLanguageSelect from "@/components/SearchLanguageSelect.vue";
+import FeaturedFilterChip from "@/components/FeaturedFilterChip.vue";
 import { useProjectLanguages } from "@/workspace/useProjectLanguages";
 import CreateEventDialog from "./CreateEventDialog.vue";
 
@@ -68,6 +72,8 @@ onBeforeUnmount(() => controller?.abort());
 type StatusFilter = "ALL" | ResourceStatus | "PENDING";
 const statusFilter = ref<StatusFilter>("ALL");
 const query = ref("");
+const filters = useListFilters();
+const { featuredOnly, searchLanguage } = filters;
 
 function normalize(text: string): string {
   return text.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
@@ -79,8 +85,9 @@ const rows = computed(() => {
     .sort((a, b) => a.sortOrder - b.sortOrder)
     .filter((event) => {
       if (statusFilter.value === "PENDING" ? !event.hasWorkingCopy : statusFilter.value !== "ALL" && event.status !== statusFilter.value) return false;
+      if (featuredOnly.value && !event.featured) return false;
       if (!q) return true;
-      const haystack = [event.slug, ...Object.values(event.translations).map((t) => t.title ?? "")];
+      const haystack = [event.slug, ...filters.texts(event.translations, "title")];
       return haystack.some((text) => normalize(text).includes(q));
     });
 });
@@ -157,7 +164,10 @@ async function transition(event: CmsEvent, target: ResourceStatus) {
     }
     confirm.value = null;
     if (e.code === "MISSING_REQUIRED_FIELDS") {
-      showToast("Cannot activate yet", e.details.map((d) => d.slice(d.indexOf(": ") + 2)).join(" "), "error");
+      // The editor shows every missing field and focuses the first (`12` §3, DECISIONS.md D-036).
+      handOffActivationErrors(event.id, e);
+      showToast("Cannot activate yet", `${title(event)} opens at the first missing field.`, "error");
+      void router.push({ name: "event-editor", params: { projectId: projectId.value, eventId: event.id } });
     } else if (e.code === "VERSION_CONFLICT") {
       showToast("It changed meanwhile", "The list was reloaded; check it and try again.", "warning");
       void load();
@@ -169,7 +179,9 @@ async function transition(event: CmsEvent, target: ResourceStatus) {
   }
 }
 
-const toReference = (r: ResourceReference) => referenceLink(projectId.value, r);
+// A trigger that opens the event being changed links to its editor's "How visitors reach it" card.
+const toReference = (r: ResourceReference) =>
+  referenceLink(projectId.value, r, confirm.value && { resourceType: "EVENT", resourceId: confirm.value.event.id });
 
 function onCreated(event: CmsEvent) {
   creating.value = false;
@@ -189,7 +201,7 @@ const reorder = useReorder<CmsEvent>({
   items: events,
   save: (ids) => saveOrder(projectId.value, "events", ids),
   title: (event) => title(event),
-  canReorder: computed(() => !query.value.trim() && statusFilter.value === "ALL"),
+  canReorder: computed(() => !query.value.trim() && !featuredOnly.value && statusFilter.value === "ALL"),
   reload: load,
 });
 </script>
@@ -229,10 +241,12 @@ const reorder = useReorder<CmsEvent>({
         <input
           v-model="query"
           type="search"
-          aria-label="Search titles in all languages"
-          placeholder="Search titles in all languages"
+          aria-label="Search titles"
+          placeholder="Search titles"
           class="min-w-[240px] flex-1 rounded-lg border-[1.5px] px-3 py-[9px] text-[13px] focus:border-primary focus:outline-none"
         />
+        <SearchLanguageSelect v-model="searchLanguage" :languages="languages" />
+        <FeaturedFilterChip v-model="featuredOnly" />
         <div class="flex flex-wrap gap-1.5" role="group" aria-label="Filter by status">
           <button
             v-for="chip in (['ALL', 'DRAFT', 'ACTIVE', 'ARCHIVED', 'PENDING'] as const)"

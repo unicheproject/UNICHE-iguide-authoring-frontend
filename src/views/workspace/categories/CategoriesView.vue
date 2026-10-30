@@ -28,6 +28,8 @@ import { showToast } from "@/stores/toast";
 import { useCurrentProject } from "@/workspace/currentProject";
 import { referenceLink } from "@/workspace/referenceLinks";
 import { findSection } from "@/workspace/sections";
+import { useListFilters } from "@/workspace/listFilters";
+import SearchLanguageSelect from "@/components/SearchLanguageSelect.vue";
 import { useProjectLanguages } from "@/workspace/useProjectLanguages";
 import { useStatusActions } from "@/workspace/useStatusActions";
 import CreateCategoryDialog from "./CreateCategoryDialog.vue";
@@ -64,6 +66,8 @@ onBeforeUnmount(() => controller?.abort());
 const statusFilter = ref<"ALL" | ResourceStatus | "PENDING">("ALL");
 const scopeFilter = ref<"ALL" | CategoryScope>("ALL");
 const query = ref("");
+const filters = useListFilters();
+const { searchLanguage } = filters;
 const normalize = (text: string) => text.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
 /** The two-level tree, or a flat list of matches while searching or filtering by status. */
@@ -75,7 +79,7 @@ const rows = computed(() => {
   if (!q && statusFilter.value === "ALL") return nodes;
   return nodes
     .filter(({ category }) => statusFilter.value === "ALL" || (statusFilter.value === "PENDING" ? !!category.hasWorkingCopy : category.status === statusFilter.value))
-    .filter(({ category }) => !q || [category.code, ...Object.values(category.translations).map((t) => t.name ?? "")].some((t) => normalize(t).includes(q)))
+    .filter(({ category }) => !q || [category.code, ...filters.texts(category.translations, "name")].some((t) => normalize(t).includes(q)))
     .map(({ category }) => ({ category, depth: 0 }));
 });
 
@@ -109,6 +113,7 @@ const actions = useStatusActions<Category>({
   title: name,
   change: (c, target) => changeCategoryStatus(projectId.value, c.id, target, c.version),
   reload: load,
+  open: (c) => void router.push({ name: "category-editor", params: { projectId: projectId.value, categoryId: c.id } }),
 });
 const { pendingId, confirm, confirmCopy } = actions;
 const toReference = (r: ResourceReference) => referenceLink(projectId.value, r);
@@ -177,10 +182,11 @@ const reorder = useReorder<Category>({
         <input
           v-model="query"
           type="search"
-          aria-label="Search names in all languages"
-          placeholder="Search names in all languages"
+          aria-label="Search names and codes"
+          placeholder="Search names"
           class="min-w-[220px] flex-1 rounded-lg border-[1.5px] px-3 py-[9px] text-[13px] focus:border-primary focus:outline-none"
         />
+        <SearchLanguageSelect v-model="searchLanguage" :languages="languages" />
         <div class="flex flex-wrap gap-1.5" role="group" aria-label="Filter by what it applies to">
           <button
             v-for="chip in (['ALL', ...CATEGORY_SCOPES] as const)"

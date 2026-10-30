@@ -15,11 +15,15 @@ import { ApiError } from "@/platform/api";
 import type { ResourceStatus } from "@/platform/places";
 import { changeRouteStatus, fetchRouteReferences, listRoutes, routeCompleteness, routeModeLabel, routeTitle, routeTypeLabel, type Route } from "@/platform/routes";
 import { showToast } from "@/stores/toast";
+import { handOffActivationErrors } from "@/workspace/activationHandoff";
 import { useCurrentProject } from "@/workspace/currentProject";
 import type { ResourceReference } from "@/platform/references";
 import { referenceLink } from "@/workspace/referenceLinks";
 import { findSection } from "@/workspace/sections";
 import { useCategoryFilter } from "@/workspace/useCategoryFilter";
+import { useListFilters } from "@/workspace/listFilters";
+import SearchLanguageSelect from "@/components/SearchLanguageSelect.vue";
+import FeaturedFilterChip from "@/components/FeaturedFilterChip.vue";
 import { useProjectLanguages } from "@/workspace/useProjectLanguages";
 import CreateRouteDialog from "./CreateRouteDialog.vue";
 
@@ -63,6 +67,8 @@ const statusFilter = ref<StatusFilter>("ALL");
 const categoryFilter = useCategoryFilter(projectId, "ROUTE", defaultLanguage);
 const categorySelected = categoryFilter.selected;
 const query = ref("");
+const filters = useListFilters();
+const { featuredOnly, searchLanguage } = filters;
 
 function normalize(text: string): string {
   return text.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
@@ -75,8 +81,9 @@ const rows = computed(() => {
     .filter((route) => {
       if (statusFilter.value === "PENDING" ? !route.hasWorkingCopy : statusFilter.value !== "ALL" && route.status !== statusFilter.value) return false;
       if (!categoryFilter.matches(route.categoryId)) return false;
+      if (featuredOnly.value && !route.featured) return false;
       if (!q) return true;
-      const haystack = [route.slug, ...Object.values(route.translations).map((t) => t.title ?? "")];
+      const haystack = [route.slug, ...filters.texts(route.translations, "title")];
       return haystack.some((text) => normalize(text).includes(q));
     });
 });
@@ -154,7 +161,10 @@ async function transition(route: Route, target: ResourceStatus) {
     }
     confirm.value = null;
     if (e.code === "MISSING_REQUIRED_FIELDS") {
-      showToast("Cannot activate yet", e.details.map((d) => d.slice(d.indexOf(": ") + 2)).join(" "), "error");
+      // The editor shows every missing field and focuses the first (`12` §3, DECISIONS.md D-036).
+      handOffActivationErrors(route.id, e);
+      showToast("Cannot activate yet", `${title(route)} opens at the first missing field.`, "error");
+      void router.push({ name: "route-editor", params: { projectId: projectId.value, routeId: route.id } });
     } else if (e.code === "VERSION_CONFLICT") {
       showToast("It changed meanwhile", "The list was reloaded; check it and try again.", "warning");
       void load();
@@ -166,7 +176,9 @@ async function transition(route: Route, target: ResourceStatus) {
   }
 }
 
-const toReference = (r: ResourceReference) => referenceLink(projectId.value, r);
+// A trigger that opens the route being changed links to its editor's "How visitors reach it" card.
+const toReference = (r: ResourceReference) =>
+  referenceLink(projectId.value, r, confirm.value && { resourceType: "ROUTE", resourceId: confirm.value.route.id });
 
 function onCreated(route: Route) {
   creating.value = false;
@@ -186,7 +198,7 @@ const reorder = useReorder<Route>({
   items: routes,
   save: (ids) => saveOrder(projectId.value, "routes", ids),
   title: (route) => title(route),
-  canReorder: computed(() => !query.value.trim() && statusFilter.value === "ALL" && categorySelected.value === "ALL"),
+  canReorder: computed(() => !query.value.trim() && !featuredOnly.value && statusFilter.value === "ALL" && categorySelected.value === "ALL"),
   reload: load,
 });
 </script>
@@ -226,10 +238,12 @@ const reorder = useReorder<Route>({
         <input
           v-model="query"
           type="search"
-          aria-label="Search titles in all languages"
-          placeholder="Search titles in all languages"
+          aria-label="Search titles"
+          placeholder="Search titles"
           class="min-w-[240px] flex-1 rounded-lg border-[1.5px] px-3 py-[9px] text-[13px] focus:border-primary focus:outline-none"
         />
+        <SearchLanguageSelect v-model="searchLanguage" :languages="languages" />
+        <FeaturedFilterChip v-model="featuredOnly" />
         <CategoryFilterSelect v-model="categorySelected" :options="categoryFilter.options.value" />
         <div class="flex flex-wrap gap-1.5" role="group" aria-label="Filter by status">
           <button

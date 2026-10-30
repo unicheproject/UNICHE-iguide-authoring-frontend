@@ -21,10 +21,14 @@ import {
   type ResourceStatus,
 } from "@/platform/places";
 import { showToast } from "@/stores/toast";
+import { handOffActivationErrors } from "@/workspace/activationHandoff";
 import { useCurrentProject } from "@/workspace/currentProject";
 import type { ResourceReference } from "@/platform/references";
 import { referenceLink } from "@/workspace/referenceLinks";
 import { findSection } from "@/workspace/sections";
+import { useListFilters } from "@/workspace/listFilters";
+import SearchLanguageSelect from "@/components/SearchLanguageSelect.vue";
+import FeaturedFilterChip from "@/components/FeaturedFilterChip.vue";
 import { useProjectLanguages } from "@/workspace/useProjectLanguages";
 import CreatePlaceDialog from "./CreatePlaceDialog.vue";
 import { flattenPlaceTree, parentOptions, placeTypeLabel } from "./placeTree";
@@ -67,6 +71,8 @@ onBeforeUnmount(() => controller?.abort());
 type StatusFilter = "ALL" | ResourceStatus | "PENDING";
 const statusFilter = ref<StatusFilter>("ALL");
 const query = ref("");
+const filters = useListFilters();
+const { featuredOnly, searchLanguage } = filters;
 
 function normalize(text: string): string {
   return text.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
@@ -76,8 +82,9 @@ const rows = computed(() => {
   const q = normalize(query.value.trim());
   return flattenPlaceTree(places.value).filter(({ place }) => {
     if (statusFilter.value === "PENDING" ? !place.hasWorkingCopy : statusFilter.value !== "ALL" && place.status !== statusFilter.value) return false;
+    if (featuredOnly.value && !place.featured) return false;
     if (!q) return true;
-    const haystack = [place.slug, ...Object.values(place.translations).map((t) => t.title ?? "")];
+    const haystack = [place.slug, ...filters.texts(place.translations, "title")];
     return haystack.some((text) => normalize(text).includes(q));
   });
 });
@@ -149,7 +156,10 @@ async function transition(place: Place, target: ResourceStatus) {
     }
     confirm.value = null;
     if (e.code === "MISSING_REQUIRED_FIELDS") {
-      showToast("Cannot activate yet", `${title(place)} needs a title in ${defaultLanguageInfo.value?.displayName ?? "the default language"}.`, "error");
+      // The editor shows every missing field and focuses the first (`12` §3, DECISIONS.md D-036).
+      handOffActivationErrors(place.id, e);
+      showToast("Cannot activate yet", `${title(place)} opens at the first missing field.`, "error");
+      openEditor(place);
     } else if (e.code === "VERSION_CONFLICT") {
       showToast("The place changed meanwhile", "The list was reloaded; check it and try again.", "warning");
       void load();
@@ -161,7 +171,9 @@ async function transition(place: Place, target: ResourceStatus) {
   }
 }
 
-const toReference = (r: ResourceReference) => referenceLink(projectId.value, r);
+// A trigger that opens the place being changed links to its editor's "How visitors reach it" card.
+const toReference = (r: ResourceReference) =>
+  referenceLink(projectId.value, r, confirm.value && { resourceType: "PLACE", resourceId: confirm.value.place.id });
 
 function openEditor(place: Place) {
   void router.push({ name: "place-editor", params: { projectId: projectId.value, placeId: place.id } });
@@ -195,7 +207,7 @@ const reorder = useReorder<Place>({
   siblingKey: (place) => (place.parentPlaceId && places.value.some((p) => p.id === place.parentPlaceId) ? place.parentPlaceId : null),
   save: (ids) => saveOrder(projectId.value, "places", ids),
   title: (place) => title(place),
-  canReorder: computed(() => !query.value.trim() && statusFilter.value === "ALL"),
+  canReorder: computed(() => !query.value.trim() && !featuredOnly.value && statusFilter.value === "ALL"),
   reload: load,
 });
 </script>
@@ -241,10 +253,12 @@ const reorder = useReorder<Place>({
         <input
           v-model="query"
           type="search"
-          aria-label="Search titles in all languages"
-          placeholder="Search titles in all languages"
+          aria-label="Search titles"
+          placeholder="Search titles"
           class="min-w-[240px] flex-1 rounded-lg border-[1.5px] px-3 py-[9px] text-[13px] focus:border-primary focus:outline-none"
         />
+        <SearchLanguageSelect v-model="searchLanguage" :languages="languages" />
+        <FeaturedFilterChip v-model="featuredOnly" />
         <div class="flex flex-wrap gap-1.5" role="group" aria-label="Filter by status">
           <button
             v-for="chip in (['ALL', 'DRAFT', 'ACTIVE', 'ARCHIVED', 'PENDING'] as const)"
@@ -372,7 +386,7 @@ const reorder = useReorder<Place>({
         <p class="mx-auto mb-[18px] max-w-[420px] text-[13px] text-muted-foreground">
           {{
             places.length
-              ? "No place matches the search or the status filter."
+              ? "No place matches the search or the filters."
               : "Places are physical or conceptual locations, from a whole region down to a single room. Points of Interest and Routes are organized under them."
           }}
         </p>

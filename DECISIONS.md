@@ -622,3 +622,49 @@ the backend's DECISIONS.md.
 - Why: the spec asks for it; the button step was easy to forget before saving.
 - Affected specs: `12` §3; `14`.
 
+## D-035 (2026-10-29) — "Featured" and search-language filters in the Content lists
+
+- Type: spec-alignment (to-do A16, A17; `12` §3 Content library: search "across the title columns of all enabled
+  languages, with an optional language filter"; filters by status, Category, `featured`, and `pending`)
+- Decision:
+  - next to the search, a "in all languages / in <language>" choice narrows what the search looks at to the titles
+    (Categories: names) in that language; slug, exhibit code, and Category code are searched in any case;
+  - a "★ Featured" chip shows only featured rows in the Places, Points of Interest, Routes, Guides, and Events lists
+    (`03`: only those kinds have `featured`); Categories have no such chip;
+  - both filter in the browser like status and Category, since the lists hold every row for reordering
+    (D-017); while "Featured" is on, reordering is off, as for the other filters. Shared by
+    `workspace/listFilters.ts`, `components/SearchLanguageSelect.vue`, and `components/FeaturedFilterChip.vue`.
+- Why: the spec names both filters; the backend has them (D-030) but the CMS lists filter locally.
+- Affected specs: `12` §3.
+
+
+## D-036 (2026-10-29) — A refused activation from a list opens the editor at the first missing field
+
+- Type: spec-alignment (to-do A18; `12` §3 Activate a Resource: "a `422` lists the missing required fields and the
+  CMS jumps to the first"; `12` §5: `422` errors shown at the field and summarized at the top of the form)
+- Decision:
+  - when "Activate" in a Content list (Places, Points of Interest, Routes, Guides, Events, Categories, Maps, Floor
+    plans) answers `MISSING_REQUIRED_FIELDS`, the list hands the field errors to the editor
+    (`workspace/activationHandoff.ts`, kept in memory, read once) and opens it; a toast says so;
+  - the editor (`useResourceEditor`), once loaded, switches to the default language and shows them as it does
+    for its own Activate: at each field, in the "Cannot activate yet" summary, focus on the first;
+  - `useStatusActions` takes an `open` callback for this.
+- Why: the toast listed messages without field names or a way to reach them; the editor already knows how to
+  name and focus every path.
+- Affected specs: `12` §3, §5.
+
+## D-037 (2026-10-29) — Where-used entries link to where they are edited; a failed check keeps the action off
+
+- Type: spec-alignment (to-do A19; `12` §3 Archive or deactivate: the action "first loads" the references, is
+  disabled while they are not empty, "each entry linking to the referencing Resource")
+- Decision:
+  - `workspace/referenceLinks.ts` links every kind the where-used list can hold: Resource editors as before,
+    Media to the asset editor, a trigger to the "How visitors reach it" card (`#triggers`) of the Resource it
+    opens, Navigation, Pages, and the Theme to their sections (no per-row editor exists yet, M6); one label set
+    (`referenceKindLabel`) serves the dialog and the editors' "Used in" card;
+  - `StatusChangeDialog`: when the references cannot be loaded, for any reason, the action stays disabled with
+    "Try again"; before, it stayed enabled and relied on the backend's `409`;
+  - the backend today returns CATEGORY, EVENT, FLOOR_PLAN, GUIDE, MAP, POI, ROUTE, and TRIGGER; the other kinds
+    are linked ahead of their modules.
+- Why: a trigger row had no link and a failed check let an author archive without seeing what uses it.
+- Affected specs: `12` §3.
