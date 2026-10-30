@@ -3,6 +3,7 @@ import { ApiError } from "@/platform/api";
 import type { ResourceStatus } from "@/platform/places";
 import type { ResourceReference } from "@/platform/references";
 import { showToast } from "@/stores/toast";
+import { handOffActivationErrors } from "@/workspace/activationHandoff";
 
 /**
  * Activate, deactivate, restore, and archive buttons of a list, as the other lists have them: activation
@@ -14,6 +15,8 @@ export function useStatusActions<T extends { id: string; status: ResourceStatus;
   title: (item: T) => string;
   change: (item: T, target: ResourceStatus) => Promise<T>;
   reload: () => void;
+  /** Opens the item's editor, where a refused activation shows its missing fields (DECISIONS.md D-036). */
+  open: (item: T) => void;
 }) {
   const pendingId = shallowRef<string | null>(null);
   const confirm = shallowRef<{ item: T; target: ResourceStatus; blockedBy?: ResourceReference[] } | null>(null);
@@ -50,7 +53,9 @@ export function useStatusActions<T extends { id: string; status: ResourceStatus;
       }
       confirm.value = null;
       if (e.code === "MISSING_REQUIRED_FIELDS") {
-        showToast("Cannot activate yet", e.details.map((d) => d.slice(d.indexOf(": ") + 2)).join(" "), "error");
+        handOffActivationErrors(item.id, e);
+        showToast("Cannot activate yet", `${options.title(item)} opens at the first missing field.`, "error");
+        options.open(item);
       } else if (e.code === "VERSION_CONFLICT") {
         showToast("It changed meanwhile", "The list was reloaded; check it and try again.", "warning");
         options.reload();

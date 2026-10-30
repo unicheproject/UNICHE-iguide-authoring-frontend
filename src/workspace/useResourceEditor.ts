@@ -16,6 +16,7 @@ import { fetchReadiness, type ReadinessIssue } from "@/platform/readiness";
 import type { ResourceStatus } from "@/platform/places";
 import type { ResourceReference } from "@/platform/references";
 import { showToast } from "@/stores/toast";
+import { takeActivationErrors } from "@/workspace/activationHandoff";
 
 /**
  * Behaviour every authored-Resource editor shares (iGuide spec 12, sections 4 to 6): loading, unsaved-change
@@ -115,6 +116,7 @@ export function useResourceEditor<T extends EditableResource>(options: ResourceE
   async function load() {
     loading.value = true;
     loadError.value = null;
+    let handedOver: ReturnType<typeof takeActivationErrors> = null;
     try {
       const loaded = await options.load();
       live.value = loaded;
@@ -133,11 +135,17 @@ export function useResourceEditor<T extends EditableResource>(options: ResourceE
         }
       }
       offerDraft();
+      handedOver = takeActivationErrors(loaded.id);
     } catch (e) {
       if (!(e instanceof ApiError)) throw e;
       loadError.value = e;
     } finally {
       loading.value = false;
+    }
+    // An activation refused from a list opens here at the first missing field (DECISIONS.md D-036).
+    if (handedOver) {
+      if (options.defaultLanguage.value) activeLanguage.value = options.defaultLanguage.value;
+      showErrors("Cannot activate yet", handedOver.fields, handedOver.requestId);
     }
   }
   watch(options.source, load, { immediate: true });

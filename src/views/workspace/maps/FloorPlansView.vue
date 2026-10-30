@@ -77,6 +77,7 @@ const actions = useStatusActions<FloorPlan>({
   title: (f) => f.internalName,
   change: (f, target) => changeFloorPlanStatus(projectId.value, f.id, target, f.version),
   reload: load,
+  open: (f) => void router.push({ name: "floor-plan-editor", params: { projectId: projectId.value, planId: f.id } }),
 });
 const { pendingId, confirm, confirmCopy } = actions;
 const toReference = (r: ResourceReference) => referenceLink(projectId.value, r);

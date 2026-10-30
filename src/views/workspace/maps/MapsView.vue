@@ -73,6 +73,7 @@ const actions = useStatusActions<GeoMap>({
   title: (m) => m.internalName,
   change: (m, target) => changeMapStatus(projectId.value, m.id, target, m.version),
   reload: load,
+  open: (m) => void router.push({ name: "map-editor", params: { projectId: projectId.value, mapId: m.id } }),
 });
 const { pendingId, confirm, confirmCopy } = actions;
 const toReference = (r: ResourceReference) => referenceLink(projectId.value, r);
