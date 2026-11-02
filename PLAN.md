@@ -82,6 +82,11 @@ box against the live Keycloak and Catalogue through the backend. Backend counter
 - 2026-10-29: activation refused from a Content list opens the editor at the first missing field (DECISIONS.md D-036).
 - 2026-10-29: where-used entries link to where they are edited, triggers included; a failed check keeps archive and deactivate off (DECISIONS.md D-037).
 - 2026-10-30: an image-only story block counts as written, as the backend counts it (backend D-038).
+- 2026-10-30: trigger types offered by the enabled surfaces, and a "Runs on" choice per trigger (DECISIONS.md D-038).
+- 2026-10-30: QR images only from the public web address in App settings → Surfaces; no stand-in (DECISIONS.md D-039).
+- 2026-10-30: offline banner; changes refused before sending until a request is answered again (DECISIONS.md D-040).
+- 2026-10-30: a 404 under the open Project re-checks it and closes the workspace with a Portal pointer; 403 is manager-only (DECISIONS.md D-041).
+- 2026-10-30: accessibility pass over the Content screens against `14` §4 (DECISIONS.md D-042); not yet tried with a screen reader.
 - 2026-10-27: pan and zoom in the map editor set the map's initial view (DECISIONS.md D-034).
 - 2026-10-27: POI "3D model" with its required poster, and an "All languages" row in per-language media such as
   the audio narration (DECISIONS.md D-033).

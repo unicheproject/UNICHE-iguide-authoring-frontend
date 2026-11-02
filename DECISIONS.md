@@ -275,6 +275,8 @@ the backend's DECISIONS.md.
 
 ## D-019 (2026-10-22) — The QR image is drawn by the CMS until the app has its public web address
 
+- Superseded 2026-10-30 by D-039: no stand-in; without the address the card says the QR cannot be produced.
+
 - Type: owner decision (2026-10-22) and stand-in, like D-014 and D-015
 - Decision: every QR code row of the "How visitors reach it" card shows a QR image, the link it encodes, and
   "Copy link", "Download PNG", and "Open" (`components/editor/QrCodePreview.vue`, the `qrcode` 1.5.4 package):
@@ -668,3 +670,108 @@ the backend's DECISIONS.md.
     are linked ahead of their modules.
 - Why: a trigger row had no link and a failed check let an author archive without seeing what uses it.
 - Affected specs: `12` §3.
+
+## D-038 (2026-10-30) — Trigger types offered by surface, and a "Runs on" choice per trigger
+
+- Type: spec-alignment (to-do A20; `03` §14 `supportedSurfaces`; `13` §1 capability matrix and its rules; `08`
+  Milestone 5 "a trigger type is rejected for a surface that does not support it")
+- Decision:
+  - `platform/triggers.ts` holds the matrix's ceiling as the backend's `TriggerType` does: QR code on Web, Mobile
+    app, and Kiosk; geo-proximity on Web and Mobile app; beacon on Mobile app only;
+  - the "How visitors reach it" card reads the Project's surfaces; an "Add" chip whose type no enabled surface can
+    run is disabled, and a line under the chips names the surface it needs with a link to App settings →
+    Surfaces; while the surfaces cannot be read nothing is greyed (the backend still checks);
+  - every row shows "Runs on": ticks for the type's surfaces (all ticked is saved as `supportedSurfaces: null`,
+    every surface; the last tick cannot be removed), "(not enabled)" next to a surface that is off, and a warning
+    when none of its surfaces is enabled; a `supportedSurfaces` error shows at the row;
+  - a beacon says the app offers it as an ordinary link until a beacon plugin is chosen (`13` §1); camera
+    recognition stays greyed as deferred; MANUAL is not offered, since every Resource is reachable by browsing
+    and the backend refuses a MANUAL row (backend D-026).
+- Why: every type was offered whatever the Project's surfaces, and a trigger's surfaces could not be set.
+- Open: the capability half (Template capabilities and `LOCATION_TRIGGERS`/`QR_TRIGGERS` feature switches,
+  `03` §2, `04` §6) waits for to-do B2.
+- Affected specs: `03` §14; `13` §1.
+
+## D-039 (2026-10-30) — QR codes come only from the public web address; no stand-in
+
+- Type: spec-alignment (to-do A21; `11` §9 the QR image encodes the target's runtime URL with `?t=`; `03` §14
+  `qr.png`; backend `qr.png` answers `422 NO_PUBLIC_BASE_URL` without the address); supersedes D-019
+- Decision:
+  - the "How visitors reach it" card reads the address from App settings → Surfaces (`publicBaseUrlOf`, WEB
+    enabled with its `publicBaseUrl`) instead of guessing it from the saved triggers' `runtimeUrl`;
+  - with an address, a saved QR code shows the backend's `qr.png` and the link it encodes, as before;
+  - without one, the row says there is no QR image because the visitor app has no public web address, links to
+    App settings → Surfaces, and the code is still saved; the CMS no longer draws a stand-in QR of its own
+    preview, which only signed-in authors could open and which could have been printed by mistake;
+  - a `qr.png` refused for the missing address says so in the same words; `QrCodePreview` only shows the
+    backend's image. The `?t=` handling of the app preview stays (the Preview's "fire trigger").
+- Why: a printed stand-in QR led visitors to a sign-in page.
+- Affected specs: `11` §9; `03` §14.
+
+## D-040 (2026-10-30) — Offline: changes refused before sending, a banner, cleared by the next answered request
+
+- Type: spec-alignment (to-do A24; `12` §6 "offline CMS": mutations are disabled with a banner; reads come from what
+  is already loaded; the banner clears when a request succeeds again)
+- Decision:
+  - `stores/connection.ts` holds `offline`: set when a request gets no response at all (network gone or backend
+    down) or the browser fires `offline`; cleared by any answered request, whatever its status;
+  - while offline, `platform/api.ts` refuses every non-GET request and every upload with `ApiError` `OFFLINE`
+    ("You are offline, so nothing was saved…") before anything is sent; GETs still go out, so the first one
+    answered clears the state;
+  - `components/OfflineBanner.vue`, under the header for a signed-in author, says changes are disabled and loaded
+    content stays readable, with "Check again" (`GET /me/authorization`), which also runs when the browser fires
+    `online`;
+  - in the editors, Save, Save draft, Apply changes, Discard changes, and the status buttons are disabled while
+    offline; list actions are refused by the API layer and say so in their toast. Unsaved form state stays in the
+    form and in this browser (D-024).
+- Why: an author kept typing and saving into a dead connection; each save failed on its own with a generic message.
+- Affected specs: `12` §6.
+
+## D-041 (2026-10-30) — Lost access: a 404 under the open Project re-checks it; 403 is a manager-only refusal
+
+- Type: spec-alignment (to-do A25; `07` §15: a non-member receives `404` on every path under a Project and the CMS
+  shows "not found" and removes it from any cached list; a member gets `403` only for operations restricted to
+  organization managers, whose controls the CMS hides from `/me/authorization`; `12` §6 Project soft-deleted)
+- Decision:
+  - `platform/api.ts` reports every `404` on a path under `/projects/{id}/…`; the workspace (`ProjectLayout`) then
+    reads the Project once more, and only when that is `404` too it closes the workspace with "This Project is not
+    available", removes the Project from the picker's list, and points to the UNICHE Platform Portal for restore
+    or membership; a Resource that is merely missing keeps its editor's own "does not exist" message;
+  - the Portal is linked through an optional `PORTAL_URL` (`public/config.js`) or `VITE_PORTAL_URL`; without it
+    the Portal is named, not linked;
+  - a `403` no longer removes the Project from the list and reads as a refusal for organization managers only;
+    the CMS has no manager-only controls in the Project workspace today (Project creation is already offered
+    only to managers, from `/me/authorization`).
+- Why: the earlier handling had `403` and `404` the wrong way round, and losing a Project while inside it showed
+  only scattered "not found" errors.
+- Affected specs: `07` §15; `12` §6.
+
+## D-042 (2026-10-30) — Accessibility pass over the Content screens
+
+- Type: spec-alignment (to-do A40; `14` §1 the CMS is operable by keyboard alone, readable by a screen reader, usable
+  at 200 percent text; `14` §4 CMS requirements)
+- Decision, by requirement of `14` §4:
+  - visible labels: every list search has a visible "Search" label; the shared filters read "Search in" and
+    "Category"; status, type, and kind chip groups have visible labels wired with `aria-labelledby`; story blocks
+    are labelled "Paragraph n" / "Heading n, level 2" with `<label for>`; trigger fields (UUID, major, minor,
+    latitude, longitude, code), parent selects, stop and block positions, occurrence start/end/status, map
+    placement coordinates, Linked Place, and the dialog searches got visible labels;
+  - errors: each invalid field carries `aria-invalid` and `aria-describedby` to its message (also in
+    `TranslationsPanel`, story blocks, triggers, and every create dialog); fields that were marked only by a red
+    border now show their message (map name, initial view, all four bounds; floor plan name); the editor's error
+    summary lists each error as a button that moves focus to its field (`ErrorSummaryItem.path`); create dialogs
+    move focus to the first invalid field (`lib/focus.ts`);
+  - not by colour alone: `StatusChip` puts a symbol before every status word (✓ active, ○ draft, ▪ archived,
+    ✎ pending changes); `TranslationDots` shows ✓ / ◐ / ○ beside each language code; selected option cards show
+    a ✓; map markers hidden from visitors carry a ⊘ badge and "hidden from visitors" in the Placed list;
+  - keyboard: `AppDialog` keeps Tab inside the open dialog; the reorder ▲/▼ buttons are 24×24 px; floor plan
+    markers show a focus ring; the asset picker is a list of `aria-pressed` buttons instead of a half-built
+    listbox; a readiness item whose field is not on the page says so instead of doing nothing;
+  - rich text: heading level buttons are named "Level 2/3" and a level change or a block move is announced;
+  - preview: labelled "Preview: <surface>, <language>", a `tabpanel` tied to the surface tabs, with `lang` set
+    and no longer hidden from screen readers;
+  - live regions: save and apply progress, and the readiness list after every recomputation, are read out.
+- Checked and already met: keyboard alternatives for every reorder (move up/down and position), coordinate
+  fields for map and floor plan placements, upload progress bars and announcements, toasts in a live region.
+- Not verified with a screen reader or at 200 percent text in a browser; to-do A43.
+- Affected specs: `14` §1, §4.

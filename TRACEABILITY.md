@@ -35,6 +35,12 @@ No automated test exists, so no screen is proven.
 States: L loading, E empty, O offline CMS, C Catalogue unavailable, D Project soft-deleted, A access
 denied, S session expired, P stale preview.
 
+O is handled once for every screen since 2026-10-30 (D-040): a banner under the header, changes refused by the
+API layer before sending, editor actions disabled; the rows below do not repeat it. D and A likewise since 2026-10-30
+(D-041): a 404 under the open Project re-checks it and closes the workspace; a 403 is a manager-only refusal.
+Accessibility (`14` §4) of every Content screen was reviewed on 2026-10-30 (D-042): visible labels, linked errors
+and summary, symbols beside colours, dialog focus trap, labelled preview, live regions; unproven with assistive tech.
+
 | Screen (`12` §3) | Status | States handled in code (unproven) | Tests |
 |---|---|---|---|
 | Project picker | in progress (page, not popover) | L, C, A partly | none |
@@ -48,7 +54,7 @@ denied, S session expired, P stale preview.
 | Content library: Events | in progress (refused activation opens the editor at the first missing field since 2026-10-29, D-036; where-used links for every kind and no archive without the check, D-037; Featured and search-language filters since 2026-10-29, D-035; drag-and-drop and keyboard reordering since 2026-10-21, D-017; trigger chips since 2026-10-22, D-018; build green, no tests) | L, E | none |
 | Content library: Categories | in progress (refused activation opens the editor at the first missing field since 2026-10-29, D-036; where-used links for every kind and no archive without the check, D-037; search-language filter since 2026-10-29, D-035; drag-and-drop and keyboard reordering since 2026-10-21, D-017; "Applies to" lock shown with its reason, D-032; build green, no tests) | L, E | none |
 | Resource editors (Place, POI, Route, Category, Guide, Event) | in progress (Working Copy save, apply, discard, apply-conflict choice since 2026-10-21, D-016; "What needs attention" from readiness and focus on the first invalid field since 2026-10-23, D-022; prototype arrangement with Used in, D-023; unsaved changes kept in browser storage, D-024; field-by-field DRAFT save conflict and problem details, D-025; removed fields dropped (Route stop Optional, SEO), POI Practical details collapsed, fewer-than-two-stops warning, D-028; Route stops drag and drop, position list, per-stop POI warning, stop-link warning, D-029; Place setup editable and Open map, D-030; POI 3D model with poster and media for all languages, D-033; Event editor checked against `03` §15 (A36, timezone labelled); Guide story as ordered text and reference blocks, D-031; `vue-tsc` and build green 2026-10-27, no tests) | L | none |
-| Triggers ("How visitors reach it") on Places, POIs, Routes, Guides, Events | in progress (QR, beacon, geo-proximity; other kinds than POIs since 2026-10-22, D-018, backend D-028; stand-in QR image and link since 2026-10-22, D-019, G-021; the backend's QR image and runtime URL once the Project has a public address, D-020; `vue-tsc` and build green, no tests) | — | none |
+| Triggers ("How visitors reach it") on Places, POIs, Routes, Guides, Events | in progress (types offered by the enabled surfaces and "Runs on" per trigger since 2026-10-30, D-038; QR only from the public web address, no stand-in, D-039; QR, beacon, geo-proximity; other kinds than POIs since 2026-10-22, D-018, backend D-028; stand-in QR image and link since 2026-10-22, D-019, G-021; the backend's QR image and runtime URL once the Project has a public address, D-020; `vue-tsc` and build green, no tests) | — | none |
 | Preview screen (Visitor app → Preview) | in progress (navigable stand-in, D-015, G-020; `pnpm run build` and a rendered harness check, no tests) | — | none |
 | Preview in app (resource editors) | in progress (CMS-drawn stand-in, D-014, G-020; `pnpm run build` green, no tests) | — | none |
 | Media library and Asset picker | in progress (same upload queue everywhere: limits before upload incl. global, progress, Retry, Cancel, live announcements; multi-file picker with drop; Replace only for DRAFT; one Used in card; floor-plan alt text; decorative confirmed, D-032; `vue-tsc` clean in these files 2026-10-27, no tests) | L, E | none |

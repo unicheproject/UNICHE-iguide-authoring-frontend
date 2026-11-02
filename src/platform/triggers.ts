@@ -1,5 +1,6 @@
 import { ApiError, apiBlob, apiRequest } from "./api";
 import type { ResourceStatus } from "./places";
+import type { SurfaceName } from "./surfaces";
 
 /*
  * Interaction Triggers (`03` §14, backend D-026): how visitors reach a Resource in place. They have no
@@ -8,6 +9,23 @@ import type { ResourceStatus } from "./places";
  */
 
 export type TriggerType = "QR_CODE" | "BEACON" | "GEO_PROXIMITY";
+
+/**
+ * The surfaces able to run each type, the ceiling of the capability matrix (`13` §1, `03` §14; backend
+ * `TriggerType`): a beacon runs on the mobile app only, a geo-proximity area on the web and the mobile app.
+ */
+export const TRIGGER_SURFACES: Record<TriggerType, SurfaceName[]> = {
+  QR_CODE: ["WEB", "MOBILE", "KIOSK"],
+  GEO_PROXIMITY: ["WEB", "MOBILE"],
+  BEACON: ["MOBILE"],
+};
+
+export const SURFACE_LABELS: Record<SurfaceName, string> = { WEB: "Web", MOBILE: "Mobile app", KIOSK: "Kiosk" };
+
+/** The surfaces a trigger runs on: those it names, or every surface able to run its type when it names none. */
+export function triggerSurfaces(type: TriggerType, surfaces: SurfaceName[] | null): SurfaceName[] {
+  return surfaces ?? TRIGGER_SURFACES[type];
+}
 
 /** The kinds a trigger can open (backend D-028); a Route Stop is opened by the triggers of its POI. */
 export type TriggerTargetType = "POI" | "PLACE" | "ROUTE" | "GUIDE" | "EVENT";
@@ -23,7 +41,7 @@ export interface Trigger {
   targetResourceType: TriggerTargetType;
   targetResourceId: string;
   code: string | null;
-  supportedSurfaces: string[] | null;
+  supportedSurfaces: SurfaceName[] | null;
   status: ResourceStatus;
   configuration: Record<string, unknown>;
   sortOrder: number;
@@ -44,6 +62,8 @@ export interface TriggerForm {
   latitude: string;
   longitude: string;
   radiusMeters: string;
+  /** The surfaces it is restricted to, in matrix order; null for every surface able to run the type (`03` §14). */
+  surfaces: SurfaceName[] | null;
   /** As last saved: the code the backend's QR image encodes, and its runtime URL; null for a new row. */
   savedCode: string | null;
   runtimeUrl: string | null;
@@ -73,6 +93,7 @@ export function blankTrigger(type: TriggerType, defaults: Partial<TriggerForm> =
     latitude: "",
     longitude: "",
     radiusMeters: type === "GEO_PROXIMITY" ? "30" : "",
+    surfaces: null,
     savedCode: null,
     runtimeUrl: null,
     ...defaults,
@@ -93,6 +114,7 @@ export function triggerToForm(t: Trigger): TriggerForm {
     latitude: text(c.latitude),
     longitude: text(c.longitude),
     radiusMeters: text(c.radiusMeters),
+    surfaces: t.supportedSurfaces ? TRIGGER_SURFACES[t.triggerType].filter((s) => t.supportedSurfaces!.includes(s)) : null,
     savedCode: t.code,
     runtimeUrl: t.runtimeUrl ?? null,
   };
@@ -138,7 +160,15 @@ export function groupTriggersByTarget(triggers: Trigger[] | null, type: TriggerT
 
 const num = (value: string) => (value.trim() === "" ? null : Number.isNaN(Number(value)) ? value.trim() : Number(value));
 
-function bodyOf(form: TriggerForm): { code: string | null; configuration: Record<string, unknown> } {
+function bodyOf(form: TriggerForm): {
+  code: string | null;
+  supportedSurfaces: SurfaceName[] | null;
+  configuration: Record<string, unknown>;
+} {
+  return { ...typeBody(form), supportedSurfaces: form.surfaces };
+}
+
+function typeBody(form: TriggerForm): { code: string | null; configuration: Record<string, unknown> } {
   switch (form.type) {
     case "QR_CODE":
       return { code: form.code.trim() || null, configuration: {} };
@@ -170,7 +200,7 @@ function bodyOf(form: TriggerForm): { code: string | null; configuration: Record
 function atRow(e: unknown, index: number): unknown {
   if (!(e instanceof ApiError)) return e;
   const details = e.details.map((d) => {
-    const m = /^(?:configuration\.)?(code|uuid|major|minor|proximityMeters|cooldownSeconds|latitude|longitude|radiusMeters): (.*)$/.exec(d);
+    const m = /^(?:configuration\.)?(code|supportedSurfaces|uuid|major|minor|proximityMeters|cooldownSeconds|latitude|longitude|radiusMeters): (.*)$/.exec(d);
     return m ? `triggers[${index}].${m[1]}: ${m[2]}` : `triggers[${index}]: ${d.replace(/^[^:]*: /, "")}`;
   });
   if (!details.length) details.push(`triggers[${index}]: ${e.message}`);
@@ -225,7 +255,7 @@ export async function syncTriggers(
       if (before && JSON.stringify(bodyOf(triggerToForm(before))) !== JSON.stringify(wanted)) {
         await apiRequest(`${base(projectId)}/${encodeURIComponent(form.id)}`, {
           method: "PUT",
-          body: { version: before.version, supportedSurfaces: before.supportedSurfaces, ...wanted },
+          body: { version: before.version, ...wanted },
         });
       }
     } catch (e) {
