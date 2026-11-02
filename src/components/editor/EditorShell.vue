@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import ResourcePreview from "@/components/editor/ResourcePreview.vue";
 import { formatDate } from "@/lib/format";
 import { session } from "@/platform/auth";
+import { connection } from "@/stores/connection";
 import { describeIssue } from "@/platform/readiness";
 import type { ResourceReference } from "@/platform/references";
 import { referenceKindLabel } from "@/workspace/referenceLinks";
@@ -147,6 +148,14 @@ watch(
   { immediate: true },
 );
 const kindLabel = referenceKindLabel;
+
+const readinessAnnouncement = computed(() => {
+  if (props.editor.resource?.status !== "ACTIVE") return "";
+  const items = props.editor.readiness;
+  if (!items.length) return `Nothing needs attention: visitors see a complete ${kind.value}.`;
+  const blocking = items.filter((i) => i.blocking).length;
+  return `${items.length} ${items.length === 1 ? "thing needs" : "things need"} attention, ${blocking} blocking.`;
+});
 </script>
 
 <template>
@@ -189,12 +198,12 @@ const kindLabel = referenceKindLabel;
           <span v-if="editor.dirty" class="text-[11px] font-semibold text-[#9a6200]">Unsaved changes</span>
           <Button
             v-if="editor.usesWorkingCopy"
-            :disabled="(!editor.workingCopy && !editor.dirty) || editor.saving || editor.applying"
+            :disabled="(!editor.workingCopy && !editor.dirty) || editor.saving || editor.applying || connection.offline"
             @click="editor.applyChanges(title)"
           >
             {{ editor.applying ? "Applying…" : "Apply changes" }}
           </Button>
-          <Button v-else :disabled="!editor.editable || !editor.dirty || editor.saving" @click="editor.save()">
+          <Button v-else :disabled="!editor.editable || !editor.dirty || editor.saving || connection.offline" @click="editor.save()">
             {{ editor.saving ? "Saving…" : "Save" }}
           </Button>
         </template>
@@ -255,7 +264,7 @@ const kindLabel = referenceKindLabel;
           <button
             type="button"
             class="whitespace-nowrap text-[11px] font-bold uppercase tracking-[0.06em] text-[#9a6200] disabled:opacity-50"
-            :disabled="!editor.dirty || editor.saving || editor.applying"
+            :disabled="!editor.dirty || editor.saving || editor.applying || connection.offline"
             @click="editor.save()"
           >
             {{ editor.saving ? "Saving…" : "Save draft" }}
@@ -263,7 +272,7 @@ const kindLabel = referenceKindLabel;
           <button
             type="button"
             class="whitespace-nowrap text-[11px] font-bold uppercase tracking-[0.06em] text-destructive disabled:opacity-50"
-            :disabled="editor.saving || editor.applying"
+            :disabled="editor.saving || editor.applying || connection.offline"
             @click="editor.discardChanges(title)"
           >
             Discard changes
@@ -291,17 +300,31 @@ const kindLabel = referenceKindLabel;
         <button
           type="button"
           class="whitespace-nowrap text-[11px] font-bold uppercase tracking-[0.06em] text-[#9a6200]"
-          :disabled="editor.transitioning"
+          :disabled="editor.transitioning || connection.offline"
           @click="editor.requestTransition('DRAFT')"
         >
           {{ editor.resource.status === "ACTIVE" ? "Deactivate" : "Restore" }}
         </button>
       </div>
 
+      <!-- Save and apply progress for screen readers; completion comes as a toast (`14` §4, D-042). -->
+      <p class="sr-only" role="status">{{ editor.saving ? "Saving…" : editor.applying ? "Applying the changes…" : "" }}</p>
+
       <div v-if="editor.summary" role="alert" data-error-summary tabindex="-1" class="mb-5 max-w-[760px] rounded-lg border border-l-[3px] border-l-destructive bg-card px-[18px] py-4">
         <strong class="mb-2 block text-[13px] font-bold text-destructive">{{ editor.summary.title }}</strong>
         <ul class="flex flex-col gap-1.5">
-          <li v-for="item in editor.summary.items" :key="item" class="text-[13px] text-destructive">• {{ item }}</li>
+          <li v-for="item in editor.summary.items" :key="item.text" class="text-[13px] text-destructive">
+            <!-- Each error links to its field (`14` §4, DECISIONS.md D-042). -->
+            <button
+              v-if="item.path"
+              type="button"
+              class="text-left text-destructive underline underline-offset-2 hover:no-underline"
+              @click="editor.focusField(item.path)"
+            >
+              {{ item.text }}
+            </button>
+            <template v-else>{{ item.text }}</template>
+          </li>
         </ul>
         <p v-if="editor.summary.requestId" class="mt-1.5 font-mono text-[11px] text-muted-foreground">Request id {{ editor.summary.requestId }}</p>
       </div>
@@ -357,7 +380,7 @@ const kindLabel = referenceKindLabel;
                   v-if="editor.resource.status === 'DRAFT'"
                   type="button"
                   class="w-full rounded-full bg-primary px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.08em] text-white hover:opacity-90 disabled:opacity-50"
-                  :disabled="editor.transitioning"
+                  :disabled="editor.transitioning || connection.offline"
                   @click="editor.requestTransition('ACTIVE')"
                 >
                   Activate
@@ -366,7 +389,7 @@ const kindLabel = referenceKindLabel;
                   v-else
                   type="button"
                   class="w-full rounded-full bg-primary px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.08em] text-white hover:opacity-90 disabled:opacity-50"
-                  :disabled="editor.transitioning"
+                  :disabled="editor.transitioning || connection.offline"
                   @click="editor.requestTransition('DRAFT')"
                 >
                   {{ editor.resource.status === "ACTIVE" ? "Deactivate" : "Restore" }}
@@ -375,16 +398,18 @@ const kindLabel = referenceKindLabel;
                   v-if="editor.resource.status !== 'ARCHIVED'"
                   type="button"
                   class="w-full rounded-full border border-destructive px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.08em] text-destructive hover:bg-[rgba(192,24,94,0.05)] disabled:opacity-50"
-                  :disabled="editor.transitioning"
+                  :disabled="editor.transitioning || connection.offline"
                   @click="editor.requestTransition('ARCHIVED')"
                 >
                   Archive
                 </button>
               </div>
               <div v-if="editor.resource.status === 'ACTIVE'" class="border-t border-gray-100 pt-3">
-                <h3 class="mb-1.5 text-[11px] font-extrabold uppercase tracking-[0.08em] text-muted-foreground">What needs attention</h3>
+                <h3 id="attention-heading" class="mb-1.5 text-[11px] font-extrabold uppercase tracking-[0.08em] text-muted-foreground">What needs attention</h3>
+                <!-- Recomputed after every save; the change is read out (`14` §4, DECISIONS.md D-042). -->
+                <p class="sr-only" aria-live="polite">{{ readinessAnnouncement }}</p>
                 <p v-if="!editor.readiness.length" class="text-xs text-muted-foreground">Nothing: visitors see a complete {{ kind }}.</p>
-                <ul v-else class="flex flex-col gap-1.5">
+                <ul v-else class="flex flex-col gap-1.5" aria-labelledby="attention-heading">
                   <li v-for="(issue, i) in editor.readiness" :key="`${issue.code}-${issue.path}-${issue.languageCode}-${i}`">
                     <button
                       type="button"

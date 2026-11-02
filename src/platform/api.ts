@@ -1,4 +1,5 @@
 import { forceTokenRefresh, getAccessToken, platformConfig, sessionExpired } from "./auth";
+import { connection, markOffline, markOnline } from "@/stores/connection";
 
 /**
  * Client for the authoring API. Every request carries the user's bearer token, which the backend
@@ -148,7 +149,30 @@ export async function apiBlob(path: string, options: RequestOptions = {}): Promi
   return response.blob();
 }
 
+/*
+ * A `404` on a path under a Project may mean the Project itself is gone for the caller: a non-member gets `404` on
+ * every path under it (`07` §15). The workspace listens and re-checks the Project (DECISIONS.md D-041).
+ */
+const projectNotFoundListeners = new Set<(projectId: string) => void>();
+
+export function onProjectPathNotFound(listener: (projectId: string) => void): () => void {
+  projectNotFoundListeners.add(listener);
+  return () => projectNotFoundListeners.delete(listener);
+}
+
+function noticeNotFound(path: string, status: number) {
+  if (status !== 404) return;
+  const match = /^\/projects\/([^/?]+)\/./.exec(path);
+  if (match) projectNotFoundListeners.forEach((listener) => listener(decodeURIComponent(match[1])));
+}
+
+/** A change attempted while offline: refused before anything is sent (`12` §6, DECISIONS.md D-040). */
+function offlineError(): ApiError {
+  return new ApiError(0, "OFFLINE", "You are offline, so nothing was saved. Your changes are still in the form.", null, []);
+}
+
 async function send(path: string, options: RequestOptions): Promise<Response> {
+  if (connection.offline && (options.method ?? "GET") !== "GET") throw offlineError();
   const token = await getAccessToken();
   const headers: Record<string, string> = {
     // Problem details (`application/problem+json`, spec 07 section 15) answer errors.
@@ -162,16 +186,20 @@ async function send(path: string, options: RequestOptions): Promise<Response> {
   }
 
   try {
-    return await fetch(`${platformConfig().apiBaseUrl}${path}`, {
+    const response = await fetch(`${platformConfig().apiBaseUrl}${path}`, {
       method: options.method ?? "GET",
       headers,
       body,
       signal: options.signal,
     });
+    markOnline();
+    noticeNotFound(path, response.status);
+    return response;
   } catch (e) {
     if (e instanceof DOMException && e.name === "AbortError") {
       throw e;
     }
+    markOffline();
     throw new ApiError(
       0,
       "NETWORK_ERROR",
@@ -216,6 +244,7 @@ async function sendUpload(
   onProgress: ((fraction: number) => void) | undefined,
   signal: AbortSignal | undefined,
 ): Promise<UploadResult> {
+  if (connection.offline) throw offlineError();
   const token = await getAccessToken();
   return new Promise<UploadResult>((resolve, reject) => {
     const xhr = new XMLHttpRequest();
@@ -226,12 +255,17 @@ async function sendUpload(
       if (event.lengthComputable) onProgress?.(event.loaded / event.total);
     };
     xhr.onload = () => {
+      markOnline();
+      noticeNotFound(path, xhr.status);
       const headers = new Headers();
       const contentType = xhr.getResponseHeader("Content-Type");
       if (contentType) headers.set("Content-Type", contentType);
       resolve({ status: xhr.status, body: xhr.responseText, headers });
     };
-    xhr.onerror = () => reject(new ApiError(0, "NETWORK_ERROR", "The iGuide backend could not be reached. Check that it is running; nothing was uploaded.", null, []));
+    xhr.onerror = () => {
+      markOffline();
+      reject(new ApiError(0, "NETWORK_ERROR", "The iGuide backend could not be reached. Check that it is running; nothing was uploaded.", null, []));
+    };
     xhr.onabort = () => reject(new DOMException("Upload cancelled", "AbortError"));
     signal?.addEventListener("abort", () => xhr.abort());
     xhr.send(form);

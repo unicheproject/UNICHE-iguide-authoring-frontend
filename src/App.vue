@@ -4,6 +4,7 @@ import { useRoute } from "vue-router";
 import AppHeader from "@/components/AppHeader.vue";
 import AppToast from "@/components/AppToast.vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
+import OfflineBanner from "@/components/OfflineBanner.vue";
 import SessionErrorView from "@/views/SessionErrorView.vue";
 import SignInView from "@/views/SignInView.vue";
 import { session } from "@/platform/auth";
@@ -25,6 +26,7 @@ watch(
 <template>
   <div class="flex min-h-screen flex-col bg-background" :class="{ 'min-w-[820px]': !bare }">
     <AppHeader v-if="!bare" />
+    <OfflineBanner v-if="!bare && session.status === 'authenticated'" />
     <div class="flex min-h-0 flex-1 items-stretch">
       <SignInView v-if="session.status === 'unauthenticated'" />
       <SessionErrorView v-else-if="session.status === 'error' && session.error" :error="session.error" />
