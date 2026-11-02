@@ -38,7 +38,11 @@ watch(
       if (e instanceof DOMException && e.name === "AbortError") return;
       if (!(e instanceof ApiError)) throw e;
       release();
-      failed.value = e.platformUnavailable ? "The UNICHE platform is not reachable." : e.message;
+      failed.value = e.platformUnavailable
+        ? "The UNICHE platform is not reachable."
+        : e.code === "NO_PUBLIC_BASE_URL" || e.details.some((d) => d.startsWith("publicBaseUrl:"))
+          ? "the visitor app has no public web address. Set it in App settings → Surfaces."
+          : e.message;
     }
   },
   { immediate: true },
