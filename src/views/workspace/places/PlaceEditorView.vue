@@ -393,7 +393,9 @@ const translationRows = computed(() => translationStatus(languages.value, PLACE_
               :class="form.setting === option ? 'border-primary bg-[#f5f0fb]' : 'border-gray-200 bg-white hover:border-primary'"
               @click="form.setting = option"
             >
-              <span class="text-[13px] font-bold">{{ PLACE_SETTING_LABELS[option].label }}</span>
+              <span class="text-[13px] font-bold">
+                <span v-if="form.setting === option" aria-hidden="true" class="text-primary">✓ </span>{{ PLACE_SETTING_LABELS[option].label }}
+              </span>
               <span class="text-xs text-muted-foreground">{{ PLACE_SETTING_LABELS[option].hint }}</span>
             </button>
           </div>
@@ -417,23 +419,27 @@ const translationRows = computed(() => translationStatus(languages.value, PLACE_
               :class="subPlace === level[0] ? 'border-primary bg-[#f5f0fb]' : 'border-gray-200 bg-white hover:border-primary'"
               @click="chooseLevel(level[0])"
             >
-              <span class="text-[13px] font-bold">{{ level[1] }}</span>
+              <span class="text-[13px] font-bold">
+                <span v-if="subPlace === level[0]" aria-hidden="true" class="text-primary">✓ </span>{{ level[1] }}
+              </span>
               <span class="text-xs text-muted-foreground">{{ level[2] }}</span>
             </button>
           </div>
           <template v-if="subPlace">
-            <label for="f-parent" class="sr-only">Parent place</label>
+            <label for="f-parent" class="small-label">Parent place</label>
             <select
               id="f-parent"
               v-model="form.parentPlaceId"
               :disabled="!editor.editable"
               class="field-input max-w-[560px]"
+              :aria-invalid="editor.fieldError('parentPlaceId') ? 'true' : undefined"
+              :aria-describedby="editor.fieldError('parentPlaceId') ? 'err-PlaceEditorView-1' : undefined"
               :class="{ invalid: editor.fieldError('parentPlaceId') }"
             >
               <option value="" disabled>Choose the parent place…</option>
               <option v-for="o in parentChoices" :key="o.id" :value="o.id">{{ o.label }}</option>
             </select>
-            <span v-if="editor.fieldError('parentPlaceId')" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("parentPlaceId") }}</span>
+            <span v-if="editor.fieldError('parentPlaceId')" id="err-PlaceEditorView-1" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("parentPlaceId") }}</span>
           </template>
         </div>
 

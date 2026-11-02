@@ -4,8 +4,8 @@ const openDialogs: symbol[] = [];
 
 <script setup lang="ts">
 /**
- * Modal dialog of the CMS mockup. Focus moves into it on open and back to the opener on close; Escape and
- * the backdrop close it unless `busy`.
+ * Modal dialog of the CMS mockup. Focus moves into it on open, stays inside while it is open (Tab wraps), and goes
+ * back to the opener on close; Escape and the backdrop close it unless `busy` (`14` §4, DECISIONS.md D-042).
  */
 import { nextTick, onBeforeUnmount, onMounted, ref } from "vue";
 
@@ -25,8 +25,28 @@ function close() {
   if (!props.busy) emit("close");
 }
 
+const FOCUSABLE = "a[href], input:not([disabled]):not([type=hidden]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex='-1'])";
+
 function onKeydown(event: KeyboardEvent) {
-  if (event.key === "Escape" && openDialogs[openDialogs.length - 1] === token) close();
+  if (openDialogs[openDialogs.length - 1] !== token) return;
+  if (event.key === "Escape") close();
+  if (event.key !== "Tab" || !panel.value) return;
+  const focusable = [...panel.value.querySelectorAll<HTMLElement>(FOCUSABLE)].filter((el) => el.offsetParent !== null);
+  if (!focusable.length) {
+    event.preventDefault();
+    panel.value.focus();
+    return;
+  }
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  const inside = panel.value.contains(document.activeElement);
+  if (event.shiftKey && (document.activeElement === first || !inside)) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && (document.activeElement === last || !inside)) {
+    event.preventDefault();
+    first.focus();
+  }
 }
 
 onMounted(async () => {

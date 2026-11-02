@@ -15,10 +15,13 @@ const props = defineProps<{ model: PreviewModel; dirty: boolean }>();
 const surface = ref<Surface>("MOBILE");
 const languageName = computed(() => props.model.language?.displayName ?? "this language");
 const dir = computed(() => (props.model.language?.direction === "RTL" ? "rtl" : "ltr"));
+// Labelled with the surface and language it renders (`14` §4, DECISIONS.md D-042).
+const label = computed(() => `Preview: ${SURFACES[surface.value].label}, ${props.model.language?.displayName ?? "no language"}`);
+const panelId = `preview-panel-${Math.random().toString(36).slice(2, 9)}`;
 </script>
 
 <template>
-  <section class="overflow-hidden rounded-lg border bg-card" aria-label="Preview">
+  <section class="overflow-hidden rounded-lg border bg-card" :aria-label="label">
     <div class="flex items-center gap-1 border-b px-3 py-2" role="tablist" aria-label="Surface">
       <button
         v-for="key in (['MOBILE', 'WEB', 'KIOSK'] as const)"
@@ -26,6 +29,7 @@ const dir = computed(() => (props.model.language?.direction === "RTL" ? "rtl" : 
         type="button"
         role="tab"
         :aria-selected="surface === key"
+        :aria-controls="panelId"
         class="rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.06em]"
         :class="surface === key ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-primary'"
         @click="surface = key"
@@ -35,8 +39,16 @@ const dir = computed(() => (props.model.language?.direction === "RTL" ? "rtl" : 
       <span class="ml-auto text-[10px] font-semibold text-muted-foreground">{{ model.language?.displayName }}</span>
     </div>
 
-    <DeviceFrame :surface="surface" :dir="dir" class="bg-muted" aria-hidden="true">
-      <header class="flex items-center gap-[0.75em] bg-[#4c1d8b] px-[1.2em] py-[0.9em] text-white">
+    <DeviceFrame
+      :id="panelId"
+      :surface="surface"
+      :dir="dir"
+      :lang="model.language?.languageCode"
+      role="tabpanel"
+      :aria-label="label"
+      class="bg-muted"
+    >
+      <header class="flex items-center gap-[0.75em] bg-[#4c1d8b] px-[1.2em] py-[0.9em] text-white" aria-hidden="true">
         <span class="text-[1.2em]">←</span>
         <span class="text-[0.8em] font-bold uppercase tracking-[0.08em] opacity-80">{{ model.kindLabel }}</span>
         <span class="ml-auto rounded-full border border-white/50 px-[0.6em] py-[0.1em] text-[0.7em] font-bold uppercase">

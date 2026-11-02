@@ -2,10 +2,11 @@
 import { computed, onBeforeUnmount, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import PageHead from "@/components/PageHead.vue";
+import StatusChip from "@/components/StatusChip.vue";
 import SectionTabs from "@/components/SectionTabs.vue";
 import StatusChangeDialog from "@/components/StatusChangeDialog.vue";
 import { Button } from "@/components/ui/button";
-import { formatDate, statusChipStyle } from "@/lib/format";
+import { formatDate } from "@/lib/format";
 import { ApiError } from "@/platform/api";
 import { changeMapStatus, fetchMapReferences, listMaps, type GeoMap } from "@/platform/maps";
 import { listPlaces, placeTitle, type Place } from "@/platform/places";
@@ -113,15 +114,13 @@ function onCreated(m: GeoMap) {
             </RouterLink>
             <div class="mt-[3px] text-[11px] text-gray-400">{{ meta(m) }} · {{ formatDate(m.updatedAt) }}</div>
           </div>
-          <span class="rounded-full px-[9px] py-[3px] text-[10px] font-bold uppercase tracking-[0.07em]" :style="statusChipStyle(m.status)">{{ m.status }}</span>
-          <span
+          <StatusChip :status="m.status" />
+          <StatusChip
             v-if="m.hasWorkingCopy"
-            class="rounded-full px-[9px] py-[3px] text-[10px] font-bold uppercase tracking-[0.07em]"
-            :style="statusChipStyle('PENDING')"
+            status="PENDING"
+            label="Pending changes"
             title="Has pending changes that visitors do not see yet"
-          >
-            Pending changes
-          </span>
+          />
           <RouterLink :to="{ name: 'map-editor', params: { projectId, mapId: m.id } }" class="text-[10px] font-bold uppercase tracking-[0.06em] text-primary no-underline">Open</RouterLink>
           <button
             type="button"

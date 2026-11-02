@@ -6,6 +6,7 @@ import { ApiError } from "@/platform/api";
 import type { ProjectLanguage } from "@/platform/languages";
 import { createPoi, POI_CODE_PATTERN, type Poi } from "@/platform/pois";
 import type { PlaceOption } from "../places/placeTree";
+import { useFocusOnErrors } from "@/lib/focus";
 
 const props = defineProps<{
   projectId: string;
@@ -21,6 +22,7 @@ const slug = ref("");
 const slugEdited = ref(false);
 const submitting = ref(false);
 const errors = ref<Record<string, string>>({});
+useFocusOnErrors(errors);
 const formError = ref<string | null>(null);
 
 watch(title, (value) => {
@@ -92,20 +94,21 @@ async function submit() {
           :dir="defaultLanguage.direction.toLowerCase()"
           :lang="defaultLanguage.languageCode"
           class="field-input"
+          :aria-describedby="errors.title ? 'err-CreatePoiDialog-1' : undefined"
           :class="{ invalid: errors.title }"
           :aria-invalid="!!errors.title"
         />
-        <span v-if="errors.title" class="text-xs font-semibold text-destructive">⚠ {{ errors.title }}</span>
+        <span v-if="errors.title" id="err-CreatePoiDialog-1" class="text-xs font-semibold text-destructive">⚠ {{ errors.title }}</span>
       </div>
 
       <div class="flex gap-3">
         <div class="flex flex-[2] flex-col gap-1.5">
           <label for="poi-place" class="field-label">Place</label>
-          <select id="poi-place" v-model="placeId" class="field-input" :class="{ invalid: errors.placeId }">
+          <select id="poi-place" v-model="placeId" class="field-input" :aria-invalid="errors.placeId ? 'true' : undefined" :aria-describedby="errors.placeId ? 'err-CreatePoiDialog-2' : undefined" :class="{ invalid: errors.placeId }">
             <option value="">Not inside a Place</option>
             <option v-for="o in placeOptions" :key="o.id" :value="o.id">{{ o.label }}</option>
           </select>
-          <span v-if="errors.placeId" class="text-xs font-semibold text-destructive">⚠ {{ errors.placeId }}</span>
+          <span v-if="errors.placeId" id="err-CreatePoiDialog-2" class="text-xs font-semibold text-destructive">⚠ {{ errors.placeId }}</span>
         </div>
         <div class="flex flex-1 flex-col gap-1.5">
           <label for="poi-code" class="field-label">Exhibit code</label>
@@ -117,9 +120,11 @@ async function submit() {
             spellcheck="false"
             placeholder="KN-001"
             class="field-input font-mono text-[13px]"
+            :aria-invalid="errors.code ? 'true' : undefined"
+            :aria-describedby="errors.code ? 'err-CreatePoiDialog-3' : undefined"
             :class="{ invalid: errors.code }"
           />
-          <span v-if="errors.code" class="text-xs font-semibold text-destructive">⚠ {{ errors.code }}</span>
+          <span v-if="errors.code" id="err-CreatePoiDialog-3" class="text-xs font-semibold text-destructive">⚠ {{ errors.code }}</span>
         </div>
       </div>
 
@@ -134,6 +139,7 @@ async function submit() {
           class="field-input font-mono text-[13px]"
           :class="{ invalid: errors.slug }"
           aria-describedby="poi-slug-help"
+          :aria-invalid="errors.slug ? 'true' : undefined"
           @input="onSlugInput"
         />
         <span v-if="errors.slug" id="poi-slug-help" class="text-xs font-semibold text-destructive">⚠ {{ errors.slug }}</span>

@@ -8,7 +8,8 @@ import TranslationsPanel, { type TextFieldGroup, type TextFieldMeta } from "@/co
 import MediaSlots, { type MediaSlot } from "@/components/media/MediaSlots.vue";
 import TriggersCard from "@/components/editor/TriggersCard.vue";
 import { listTargetTriggers, syncTriggers, triggerToForm, type Trigger, type TriggerForm } from "@/platform/triggers";
-import { SLUG_PATTERN, statusChipStyle } from "@/lib/format";
+import StatusChip from "@/components/StatusChip.vue";
+import { SLUG_PATTERN } from "@/lib/format";
 import { listAssets, type Asset, type MediaBinding } from "@/platform/assets";
 import {
   changeGuideStatus,
@@ -539,13 +540,7 @@ const translationRows = computed(() =>
                 <span v-else class="min-w-[140px] flex-1 text-[13px] text-muted-foreground">
                   {{ block.resourceId ? "Unavailable item" : "Nothing chosen yet" }}
                 </span>
-                <span
-                  v-if="itemInfo(block) && itemInfo(block)!.status !== 'ACTIVE'"
-                  class="rounded-full px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-[0.07em]"
-                  :style="statusChipStyle(itemInfo(block)!.status)"
-                >
-                  {{ itemInfo(block)!.status }}
-                </span>
+                <StatusChip v-if="itemInfo(block) && itemInfo(block)!.status !== 'ACTIVE'" :status="itemInfo(block)!.status" />
                 <button
                   v-if="editor.editable"
                   type="button"
@@ -558,6 +553,7 @@ const translationRows = computed(() =>
               </template>
               <span v-else class="flex-1"></span>
               <template v-if="editor.editable">
+                <label v-if="form.blocks.length > 1" :for="`gblock-position-${block.key}`" class="text-[10px] font-bold text-muted-foreground">Position</label>
                 <select
                   v-if="form.blocks.length > 1"
                   :id="`gblock-position-${block.key}`"
@@ -680,9 +676,11 @@ const translationRows = computed(() =>
             :readonly="!editor.editable"
             spellcheck="false"
             class="field-input font-mono text-[13px]"
+            :aria-invalid="editor.fieldError('slug') ? 'true' : undefined"
+            :aria-describedby="editor.fieldError('slug') ? 'err-GuideEditorView-1' : undefined"
             :class="{ invalid: editor.fieldError('slug') }"
           />
-          <span v-if="editor.fieldError('slug')" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("slug") }}</span>
+          <span v-if="editor.fieldError('slug')" id="err-GuideEditorView-1" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("slug") }}</span>
           <span v-else class="text-xs text-muted-foreground">Used in URLs and QR targets. Changing it breaks printed QR codes.</span>
         </div>
         <div class="flex flex-wrap items-end gap-4">
@@ -694,6 +692,8 @@ const translationRows = computed(() =>
               :readonly="!editor.editable"
               inputmode="numeric"
               class="field-input"
+              :aria-invalid="editor.fieldError('estimatedReadingMinutes') ? 'true' : undefined"
+              :aria-describedby="editor.fieldError('estimatedReadingMinutes') ? 'err-GuideEditorView-2' : undefined"
               :class="{ invalid: editor.fieldError('estimatedReadingMinutes') }"
             />
           </div>
@@ -709,7 +709,7 @@ const translationRows = computed(() =>
             </button>
           </span>
         </div>
-        <span v-if="editor.fieldError('estimatedReadingMinutes')" class="text-xs font-semibold text-destructive">
+        <span v-if="editor.fieldError('estimatedReadingMinutes')" id="err-GuideEditorView-2" class="text-xs font-semibold text-destructive">
           ⚠ {{ editor.fieldError("estimatedReadingMinutes") }}
         </span>
         <div class="flex flex-col gap-1.5">
@@ -726,7 +726,8 @@ const translationRows = computed(() =>
   </EditorShell>
 
   <AppDialog v-if="picking" :title="picking.replace !== null ? 'Change the reference' : 'Add a reference'" @close="picking = null">
-    <div class="mb-3 flex flex-wrap gap-1.5" role="group" aria-label="Kind">
+    <span id="pick-kind-label" class="field-label mb-1.5 block">Kind</span>
+    <div class="mb-3 flex flex-wrap gap-1.5" role="group" aria-labelledby="pick-kind-label">
       <button
         v-for="t in ITEM_TYPES"
         :key="t.type"
@@ -739,18 +740,18 @@ const translationRows = computed(() =>
         {{ t.plural }}
       </button>
     </div>
+    <label for="pick-search" class="field-label mb-1.5 block">Search by title</label>
     <input
+      id="pick-search"
       v-model="pickQuery"
       type="search"
-      aria-label="Search by title"
-      placeholder="Search by title"
       class="mb-3 w-full rounded-lg border-[1.5px] px-3 py-[9px] text-[13px] focus:border-primary focus:outline-none"
     />
     <ul v-if="pickable.length" class="max-h-[280px] overflow-y-auto rounded-lg border">
       <li v-for="r in pickable" :key="r.id" class="border-b border-gray-100 last:border-b-0">
         <button type="button" class="flex w-full items-center gap-2.5 px-3.5 py-[11px] text-left text-[13px] text-gray-700 hover:bg-muted" @click="pickReference(r)">
           <span class="flex-1">{{ r.title }}</span>
-          <span class="rounded-full px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-[0.07em]" :style="statusChipStyle(r.status)">{{ r.status }}</span>
+          <StatusChip :status="r.status" />
         </button>
       </li>
     </ul>

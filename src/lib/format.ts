@@ -17,6 +17,32 @@ export function statusChipStyle(status: string): { background: string; color: st
   }
 }
 
+/**
+ * A symbol per status, so a status chip never relies on its colour alone (`14` §4, DECISIONS.md D-042).
+ */
+export function statusGlyph(status: string): string {
+  switch (status.toUpperCase()) {
+    case "ACTIVE":
+    case "READY":
+    case "LIVE":
+    case "SUCCESS":
+      return "✓";
+    case "DRAFT":
+      return "○";
+    case "ARCHIVED":
+      return "▪";
+    case "SUSPENDED":
+      return "Ⅱ";
+    case "PENDING":
+      return "✎";
+    case "FAILED":
+    case "DENIED":
+      return "!";
+    default:
+      return "•";
+  }
+}
+
 const dateFormat = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" });
 
 /** "4 Sep 2026", as in the mockup. */

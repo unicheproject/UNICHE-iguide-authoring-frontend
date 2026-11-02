@@ -5,6 +5,7 @@ import { SLUG_PATTERN, slugify } from "@/lib/format";
 import { ApiError } from "@/platform/api";
 import type { ProjectLanguage } from "@/platform/languages";
 import { createRoute, ROUTE_TYPE_HINTS, ROUTE_TYPES, routeTypeLabel, type Route, type RouteType } from "@/platform/routes";
+import { useFocusOnErrors } from "@/lib/focus";
 
 const props = defineProps<{ projectId: string; defaultLanguage: ProjectLanguage }>();
 const emit = defineEmits<{ close: []; created: [route: Route] }>();
@@ -15,6 +16,7 @@ const slug = ref("");
 const slugEdited = ref(false);
 const submitting = ref(false);
 const errors = ref<Record<string, string>>({});
+useFocusOnErrors(errors);
 const formError = ref<string | null>(null);
 
 watch(title, (value) => {
@@ -65,7 +67,13 @@ async function submit() {
       <p v-if="formError" role="alert" class="text-[13px] font-semibold text-destructive">{{ formError }}</p>
 
 
-      <div class="flex flex-col gap-2" role="group" aria-labelledby="route-setting-label">
+      <div
+        class="flex flex-col gap-2"
+        role="group"
+        aria-labelledby="route-setting-label"
+        :aria-invalid="errors.type ? 'true' : undefined"
+        :aria-describedby="errors.type ? 'route-type-error' : undefined"
+      >
         <span id="route-setting-label" class="field-label">Setting</span>
         <div class="grid grid-cols-2 gap-2.5">
           <button
@@ -77,11 +85,11 @@ async function submit() {
             :class="type === t ? 'border-primary bg-[#f5f0fb]' : 'border-gray-200 bg-white hover:border-primary'"
             @click="type = t"
           >
-            <span class="text-[13px] font-bold">{{ routeTypeLabel(t) }}</span>
+            <span class="text-[13px] font-bold"><span v-if="type === t" aria-hidden="true" class="text-primary">✓ </span>{{ routeTypeLabel(t) }}</span>
             <span class="text-xs text-muted-foreground">{{ ROUTE_TYPE_HINTS[t] }}</span>
           </button>
         </div>
-        <span v-if="errors.type" class="text-xs font-semibold text-destructive">⚠ {{ errors.type }}</span>
+        <span v-if="errors.type" id="route-type-error" class="text-xs font-semibold text-destructive">⚠ {{ errors.type }}</span>
       </div>
 
       <div class="flex flex-col gap-1.5">
@@ -94,10 +102,11 @@ async function submit() {
           :dir="defaultLanguage.direction.toLowerCase()"
           :lang="defaultLanguage.languageCode"
           class="field-input"
+          :aria-describedby="errors.title ? 'err-CreateRouteDialog-1' : undefined"
           :class="{ invalid: errors.title }"
           :aria-invalid="!!errors.title"
         />
-        <span v-if="errors.title" class="text-xs font-semibold text-destructive">⚠ {{ errors.title }}</span>
+        <span v-if="errors.title" id="err-CreateRouteDialog-1" class="text-xs font-semibold text-destructive">⚠ {{ errors.title }}</span>
       </div>
 
       <div class="flex flex-col gap-1.5">
@@ -111,6 +120,7 @@ async function submit() {
           class="field-input font-mono text-[13px]"
           :class="{ invalid: errors.slug }"
           aria-describedby="route-slug-help"
+          :aria-invalid="errors.slug ? 'true' : undefined"
           @input="onSlugInput"
         />
         <span v-if="errors.slug" id="route-slug-help" class="text-xs font-semibold text-destructive">⚠ {{ errors.slug }}</span>

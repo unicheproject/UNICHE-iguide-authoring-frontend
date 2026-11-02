@@ -257,7 +257,7 @@ function errorAt(prefix: string): string | undefined {
             v-for="(p, index) in form.positions"
             :key="p.key"
             type="button"
-            class="absolute flex h-[26px] w-[26px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white bg-primary text-[11px] font-extrabold text-white shadow-[0_2px_8px_rgba(0,0,0,0.25)]"
+            class="absolute flex h-[26px] w-[26px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white bg-primary text-[11px] font-extrabold text-white shadow-[0_2px_8px_rgba(0,0,0,0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             :class="readonly ? 'cursor-default' : 'cursor-grab touch-none'"
             :style="{ left: `${unit(p.x) * 100}%`, top: `${unit(p.y) * 100}%`, transform: `translate(-50%, -50%) rotate(${Number(p.rotation) || 0}deg)` }"
             :aria-label="`${index + 1}. ${title(p.resourceType, p.resourceId)}: arrow keys move it`"
@@ -322,13 +322,22 @@ function errorAt(prefix: string): string | undefined {
         </div>
         <div class="flex flex-col gap-1.5 px-3.5 py-3">
           <label for="fp-name" class="small-label">Name</label>
-          <input id="fp-name" v-model="form.internalName" :readonly="readonly" class="field-input compact" :class="{ invalid: editor.fieldError('internalName') }" />
+          <input
+            id="fp-name"
+            v-model="form.internalName"
+            :readonly="readonly"
+            class="field-input compact"
+            :aria-invalid="editor.fieldError('internalName') ? 'true' : undefined"
+            :aria-describedby="editor.fieldError('internalName') ? 'err-fp-name' : undefined"
+            :class="{ invalid: editor.fieldError('internalName') }"
+          />
+          <span v-if="editor.fieldError('internalName')" id="err-fp-name" class="text-[11px] font-semibold text-destructive">⚠ {{ editor.fieldError("internalName") }}</span>
           <label for="fp-place" class="small-label mt-2">Linked Place</label>
-          <select id="fp-place" v-model="form.placeId" :disabled="readonly" class="field-input compact" :class="{ invalid: editor.fieldError('placeId') }">
+          <select id="fp-place" v-model="form.placeId" :disabled="readonly" class="field-input compact" :aria-invalid="editor.fieldError('placeId') ? 'true' : undefined" :aria-describedby="editor.fieldError('placeId') ? 'err-FloorPlanEditorView-2' : undefined" :class="{ invalid: editor.fieldError('placeId') }">
             <option value="">No place</option>
             <option v-for="p in indoorPlaces" :key="p.id" :value="p.id">{{ p.label }}</option>
           </select>
-          <span v-if="editor.fieldError('placeId')" class="text-[11px] font-semibold text-destructive">⚠ {{ editor.fieldError("placeId") }}</span>
+          <span v-if="editor.fieldError('placeId')" id="err-FloorPlanEditorView-2" class="text-[11px] font-semibold text-destructive">⚠ {{ editor.fieldError("placeId") }}</span>
           <span v-else class="text-[11px] text-muted-foreground">The indoor place whose page shows this plan.</span>
         </div>
       </section>

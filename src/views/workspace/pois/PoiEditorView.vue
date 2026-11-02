@@ -341,13 +341,15 @@ const translationRows = computed(() => translationStatus(languages.value, POI_TE
               v-model="form.placeId"
               :disabled="!editor.editable"
               class="field-input"
+              :aria-invalid="editor.fieldError('placeId') ? 'true' : undefined"
+              :aria-describedby="editor.fieldError('placeId') ? 'err-PoiEditorView-1' : undefined"
               :class="{ invalid: editor.fieldError('placeId') }"
             >
               <option value="">Not inside a Place</option>
               <option v-if="placeMissing" :value="form.placeId">(archived or unavailable place)</option>
               <option v-for="o in placeChoices" :key="o.id" :value="o.id">{{ o.label }}</option>
             </select>
-            <span v-if="editor.fieldError('placeId')" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("placeId") }}</span>
+            <span v-if="editor.fieldError('placeId')" id="err-PoiEditorView-1" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("placeId") }}</span>
             <span v-else class="text-xs text-muted-foreground">Which building, floor or gallery holds it.</span>
           </div>
           <div class="flex flex-col gap-1.5">
@@ -357,13 +359,15 @@ const translationRows = computed(() => translationStatus(languages.value, POI_TE
               v-model="form.categoryId"
               :disabled="!editor.editable"
               class="field-input"
+              :aria-invalid="editor.fieldError('categoryId') ? 'true' : undefined"
+              :aria-describedby="editor.fieldError('categoryId') ? 'err-PoiEditorView-2' : undefined"
               :class="{ invalid: editor.fieldError('categoryId') }"
             >
               <option value="">Uncategorised</option>
               <option v-if="categoryMissing" :value="form.categoryId">(archived or unavailable category)</option>
               <option v-for="o in categoryChoices" :key="o.id" :value="o.id">{{ o.label }}</option>
             </select>
-            <span v-if="editor.fieldError('categoryId')" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("categoryId") }}</span>
+            <span v-if="editor.fieldError('categoryId')" id="err-PoiEditorView-2" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("categoryId") }}</span>
             <span v-else class="text-xs text-muted-foreground">Drives filtering and grouping in the app.</span>
           </div>
           <div class="flex gap-2.5">
@@ -376,9 +380,11 @@ const translationRows = computed(() => translationStatus(languages.value, POI_TE
                 inputmode="decimal"
                 placeholder="—"
                 class="field-input font-mono text-[13px]"
+                :aria-invalid="editor.fieldError('latitude') ? 'true' : undefined"
+                :aria-describedby="editor.fieldError('latitude') ? 'err-PoiEditorView-3' : undefined"
                 :class="{ invalid: editor.fieldError('latitude') }"
               />
-              <span v-if="editor.fieldError('latitude')" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("latitude") }}</span>
+              <span v-if="editor.fieldError('latitude')" id="err-PoiEditorView-3" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("latitude") }}</span>
             </div>
             <div class="flex min-w-0 flex-1 flex-col gap-1.5">
               <label for="f-lng" class="small-label">Longitude</label>
@@ -389,9 +395,11 @@ const translationRows = computed(() => translationStatus(languages.value, POI_TE
                 inputmode="decimal"
                 placeholder="—"
                 class="field-input font-mono text-[13px]"
+                :aria-invalid="editor.fieldError('longitude') ? 'true' : undefined"
+                :aria-describedby="editor.fieldError('longitude') ? 'err-PoiEditorView-4' : undefined"
                 :class="{ invalid: editor.fieldError('longitude') }"
               />
-              <span v-if="editor.fieldError('longitude')" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("longitude") }}</span>
+              <span v-if="editor.fieldError('longitude')" id="err-PoiEditorView-4" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("longitude") }}</span>
             </div>
           </div>
         </div>
@@ -423,9 +431,11 @@ const translationRows = computed(() => translationStatus(languages.value, POI_TE
               spellcheck="false"
               placeholder="KN-001"
               class="field-input font-mono text-[13px]"
+              :aria-invalid="editor.fieldError('code') ? 'true' : undefined"
+              :aria-describedby="editor.fieldError('code') ? 'err-PoiEditorView-5' : undefined"
               :class="{ invalid: editor.fieldError('code') }"
             />
-            <span v-if="editor.fieldError('code')" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("code") }}</span>
+            <span v-if="editor.fieldError('code')" id="err-PoiEditorView-5" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("code") }}</span>
             <span v-else class="text-xs text-muted-foreground">The number a visitor types to open this object.</span>
           </div>
           <div class="flex min-w-[160px] flex-1 flex-col gap-1.5">
@@ -437,9 +447,11 @@ const translationRows = computed(() => translationStatus(languages.value, POI_TE
               inputmode="numeric"
               placeholder="—"
               class="field-input font-mono text-[13px]"
+              :aria-invalid="editor.fieldError('estimatedVisitMinutes') ? 'true' : undefined"
+              :aria-describedby="editor.fieldError('estimatedVisitMinutes') ? 'err-PoiEditorView-6' : undefined"
               :class="{ invalid: editor.fieldError('estimatedVisitMinutes') }"
             />
-            <span v-if="editor.fieldError('estimatedVisitMinutes')" class="text-xs font-semibold text-destructive">
+            <span v-if="editor.fieldError('estimatedVisitMinutes')" id="err-PoiEditorView-6" class="text-xs font-semibold text-destructive">
               ⚠ {{ editor.fieldError("estimatedVisitMinutes") }}
             </span>
           </div>
@@ -452,9 +464,11 @@ const translationRows = computed(() => translationStatus(languages.value, POI_TE
             :readonly="!editor.editable"
             spellcheck="false"
             class="field-input font-mono text-[13px]"
+            :aria-invalid="editor.fieldError('slug') ? 'true' : undefined"
+            :aria-describedby="editor.fieldError('slug') ? 'err-PoiEditorView-7' : undefined"
             :class="{ invalid: editor.fieldError('slug') }"
           />
-          <span v-if="editor.fieldError('slug')" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("slug") }}</span>
+          <span v-if="editor.fieldError('slug')" id="err-PoiEditorView-7" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("slug") }}</span>
           <span v-else class="text-xs text-muted-foreground">Used in URLs and QR targets. Changing it breaks printed QR codes.</span>
         </div>
         <div class="flex flex-col gap-1.5">

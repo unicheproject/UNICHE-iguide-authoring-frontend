@@ -122,9 +122,9 @@ async function create() {
     </p>
     <p v-if="formError" role="alert" class="mb-3 text-[13px] font-semibold text-destructive">{{ formError }}</p>
 
+    <label for="nm-q" class="small-label mb-1.5 block">Find area</label>
     <form class="mb-3 flex gap-2.5" role="search" @submit.prevent="search">
-      <label for="nm-q" class="sr-only">Find area</label>
-      <input id="nm-q" v-model="query" type="search" placeholder="Find area, such as Apollonas, Naxos" class="field-input flex-1" />
+      <input id="nm-q" v-model="query" type="search" placeholder="such as Apollonas, Naxos" class="field-input flex-1" />
       <button type="submit" class="dialog-primary bg-primary" :disabled="searching || !query.trim()">{{ searching ? "Searching…" : "Search" }}</button>
     </form>
     <p v-if="searchError" role="alert" class="mb-2 text-xs font-semibold text-destructive">{{ searchError }}</p>
@@ -173,7 +173,10 @@ async function create() {
           @bounds-change="bounds = $event"
         />
         <template v-if="selected">
-          <span class="text-xs text-muted-foreground">Drag the corners or the centre handle. Visitors only see the area inside the bounds.</span>
+          <span class="text-xs text-muted-foreground">
+            Drag the corners or the centre handle. Visitors only see the area inside the bounds. Without a pointer, keep
+            the search result's bounds and type exact values in the map editor's Bounds fields after creating it.
+          </span>
           <span class="font-mono text-[11px] text-muted-foreground">{{ bboxText }}</span>
           <button v-if="adjusted" type="button" class="self-start text-[11px] font-bold text-primary" @click="resetBounds">Reset to search result</button>
         </template>

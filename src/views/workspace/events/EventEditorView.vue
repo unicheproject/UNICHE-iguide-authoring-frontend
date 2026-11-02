@@ -377,9 +377,9 @@ const translationRows = computed(() => translationStatus(languages.value, 3, (co
         <table class="w-full min-w-[620px] border-collapse">
           <thead>
             <tr>
-              <th class="th px-5">Starts</th>
-              <th class="th px-3">Ends</th>
-              <th class="th px-3">Status</th>
+              <th id="occ-h-starts" class="th px-5">Starts</th>
+              <th id="occ-h-ends" class="th px-3">Ends</th>
+              <th id="occ-h-status" class="th px-3">Status</th>
               <th class="th px-5"><span class="sr-only">Actions</span></th>
             </tr>
           </thead>
@@ -387,12 +387,16 @@ const translationRows = computed(() => translationStatus(languages.value, 3, (co
             <template v-for="(o, index) in form.occurrences" :key="o.key">
               <tr :class="{ 'opacity-60': ended(o) }">
                 <td class="td px-5">
+                  <!-- The visible column headers name the fields, with the row's number (`14` §4). -->
+                  <span :id="`occ-row-${o.key}`" class="sr-only">Occurrence {{ index + 1 }}</span>
                   <input
                     :id="`occ-start-${o.key}`"
                     v-model="o.startsAt"
                     type="datetime-local"
                     :readonly="!editor.editable"
-                    :aria-label="`Occurrence ${index + 1} starts`"
+                    :aria-labelledby="`occ-row-${o.key} occ-h-starts`"
+                    :aria-invalid="editor.fieldError(`occurrences[${index}].startsAt`) ? 'true' : undefined"
+                    :aria-describedby="occurrenceError(index) ? `occ-error-${o.key}` : undefined"
                     class="field-input occ-input"
                     :class="{ invalid: editor.fieldError(`occurrences[${index}].startsAt`) }"
                     @change="sortOccurrences"
@@ -403,14 +407,16 @@ const translationRows = computed(() => translationStatus(languages.value, 3, (co
                     v-model="o.endsAt"
                     type="datetime-local"
                     :readonly="!editor.editable"
-                    :aria-label="`Occurrence ${index + 1} ends`"
+                    :aria-labelledby="`occ-row-${o.key} occ-h-ends`"
+                    :aria-invalid="editor.fieldError(`occurrences[${index}].endsAt`) ? 'true' : undefined"
+                    :aria-describedby="occurrenceError(index) ? `occ-error-${o.key}` : undefined"
                     class="field-input occ-input"
                     :class="{ invalid: editor.fieldError(`occurrences[${index}].endsAt`) }"
                   />
                 </td>
                 <td class="td px-3">
                   <span v-if="ended(o)" class="tag bg-muted text-muted-foreground">Ended</span>
-                  <div v-else class="flex gap-1" role="group" :aria-label="`Status of occurrence ${index + 1}`">
+                  <div v-else class="flex gap-1" role="group" :aria-labelledby="`occ-row-${o.key} occ-h-status`">
                     <button
                       v-for="s in OCCURRENCE_STATUSES"
                       :key="s"
@@ -438,7 +444,7 @@ const translationRows = computed(() => translationStatus(languages.value, 3, (co
                 </td>
               </tr>
               <tr v-if="occurrenceError(index)">
-                <td colspan="4" class="px-5 pb-2.5 text-xs font-semibold text-destructive">⚠ {{ occurrenceError(index) }}</td>
+                <td :id="`occ-error-${o.key}`" colspan="4" class="px-5 pb-2.5 text-xs font-semibold text-destructive">⚠ {{ occurrenceError(index) }}</td>
               </tr>
             </template>
           </tbody>
@@ -495,27 +501,27 @@ const translationRows = computed(() => translationStatus(languages.value, 3, (co
         <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,220px),1fr))] gap-3.5">
           <div class="flex flex-col gap-1.5">
             <label for="f-place" class="small-label">Place</label>
-            <select id="f-place" v-model="form.placeId" :disabled="!editor.editable" class="field-input" :class="{ invalid: editor.fieldError('placeId') }">
+            <select id="f-place" v-model="form.placeId" :disabled="!editor.editable" class="field-input" :aria-invalid="editor.fieldError('placeId') ? 'true' : undefined" :aria-describedby="editor.fieldError('placeId') ? 'err-EventEditorView-1' : undefined" :class="{ invalid: editor.fieldError('placeId') }">
               <option value="">None</option>
               <option v-for="o in placeChoices" :key="o.id" :value="o.id">{{ o.label }}</option>
             </select>
-            <span v-if="editor.fieldError('placeId')" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("placeId") }}</span>
+            <span v-if="editor.fieldError('placeId')" id="err-EventEditorView-1" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("placeId") }}</span>
           </div>
           <div class="flex flex-col gap-1.5">
             <label for="f-poi" class="small-label">Point of interest</label>
-            <select id="f-poi" v-model="form.poiId" :disabled="!editor.editable" class="field-input" :class="{ invalid: editor.fieldError('poiId') }">
+            <select id="f-poi" v-model="form.poiId" :disabled="!editor.editable" class="field-input" :aria-invalid="editor.fieldError('poiId') ? 'true' : undefined" :aria-describedby="editor.fieldError('poiId') ? 'err-EventEditorView-2' : undefined" :class="{ invalid: editor.fieldError('poiId') }">
               <option value="">None</option>
               <option v-for="o in poiChoices" :key="o.id" :value="o.id">{{ o.label }}</option>
             </select>
-            <span v-if="editor.fieldError('poiId')" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("poiId") }}</span>
+            <span v-if="editor.fieldError('poiId')" id="err-EventEditorView-2" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("poiId") }}</span>
           </div>
           <div class="flex flex-col gap-1.5">
             <label for="f-route" class="small-label">Route</label>
-            <select id="f-route" v-model="form.routeId" :disabled="!editor.editable" class="field-input" :class="{ invalid: editor.fieldError('routeId') }">
+            <select id="f-route" v-model="form.routeId" :disabled="!editor.editable" class="field-input" :aria-invalid="editor.fieldError('routeId') ? 'true' : undefined" :aria-describedby="editor.fieldError('routeId') ? 'err-EventEditorView-3' : undefined" :class="{ invalid: editor.fieldError('routeId') }">
               <option value="">None</option>
               <option v-for="o in routeChoices" :key="o.id" :value="o.id">{{ o.label }}</option>
             </select>
-            <span v-if="editor.fieldError('routeId')" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("routeId") }}</span>
+            <span v-if="editor.fieldError('routeId')" id="err-EventEditorView-3" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("routeId") }}</span>
           </div>
         </div>
         <span class="text-xs text-muted-foreground">All optional. While the event uses them, they cannot be deactivated or archived.</span>
@@ -530,9 +536,11 @@ const translationRows = computed(() => translationStatus(languages.value, 3, (co
             spellcheck="false"
             placeholder="https://"
             class="field-input"
+            :aria-invalid="editor.fieldError('bookingUrl') ? 'true' : undefined"
+            :aria-describedby="editor.fieldError('bookingUrl') ? 'err-EventEditorView-4' : undefined"
             :class="{ invalid: editor.fieldError('bookingUrl') }"
           />
-          <span v-if="editor.fieldError('bookingUrl')" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("bookingUrl") }}</span>
+          <span v-if="editor.fieldError('bookingUrl')" id="err-EventEditorView-4" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("bookingUrl") }}</span>
           <span v-else class="text-xs text-muted-foreground">Where visitors book or buy tickets. Leave empty when no booking is needed.</span>
         </div>
       </div>
@@ -551,9 +559,11 @@ const translationRows = computed(() => translationStatus(languages.value, 3, (co
             :readonly="!editor.editable"
             spellcheck="false"
             class="field-input font-mono text-[13px]"
+            :aria-invalid="editor.fieldError('slug') ? 'true' : undefined"
+            :aria-describedby="editor.fieldError('slug') ? 'err-EventEditorView-5' : undefined"
             :class="{ invalid: editor.fieldError('slug') }"
           />
-          <span v-if="editor.fieldError('slug')" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("slug") }}</span>
+          <span v-if="editor.fieldError('slug')" id="err-EventEditorView-5" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("slug") }}</span>
           <span v-else class="text-xs text-muted-foreground">Used in URLs and QR targets. Changing it breaks printed QR codes.</span>
         </div>
         <div class="flex flex-col gap-1.5">

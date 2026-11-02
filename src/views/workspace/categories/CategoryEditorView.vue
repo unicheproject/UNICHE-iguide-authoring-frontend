@@ -247,18 +247,21 @@ const translationRows = computed(() => translationStatus(languages.value, 2, (co
               {{ level[1] }}
             </button>
           </div>
+          <label v-if="form.parentCategoryId" for="f-parent-category" class="small-label">Parent category</label>
           <select
             v-if="form.parentCategoryId"
+            id="f-parent-category"
             v-model="form.parentCategoryId"
             :disabled="readonly"
-            aria-label="Parent category"
             class="field-input max-w-[360px]"
+            :aria-invalid="editor.fieldError('parentCategoryId') ? 'true' : undefined"
+            :aria-describedby="editor.fieldError('parentCategoryId') ? 'err-CategoryEditorView-1' : undefined"
             :class="{ invalid: editor.fieldError('parentCategoryId') }"
           >
             <option v-for="o in parents" :key="o.id" :value="o.id">{{ o.label }}</option>
             <option v-if="!parents.some((o) => o.id === form.parentCategoryId)" :value="form.parentCategoryId">Unavailable category</option>
           </select>
-          <span v-if="editor.fieldError('parentCategoryId')" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("parentCategoryId") }}</span>
+          <span v-if="editor.fieldError('parentCategoryId')" id="err-CategoryEditorView-1" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("parentCategoryId") }}</span>
           <span v-else class="text-[11px] text-muted-foreground">{{ levelNote }}</span>
         </div>
 
@@ -292,8 +295,8 @@ const translationRows = computed(() => translationStatus(languages.value, 2, (co
       </div>
       <div class="flex flex-col gap-1.5 px-5 py-[18px]">
         <label for="f-code" class="small-label">Code</label>
-        <input id="f-code" v-model="form.code" :readonly="readonly" spellcheck="false" class="field-input font-mono text-[13px]" :class="{ invalid: editor.fieldError('code') }" />
-        <span v-if="editor.fieldError('code')" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("code") }}</span>
+        <input id="f-code" v-model="form.code" :readonly="readonly" spellcheck="false" class="field-input font-mono text-[13px]" :aria-invalid="editor.fieldError('code') ? 'true' : undefined" :aria-describedby="editor.fieldError('code') ? 'err-CategoryEditorView-2' : undefined" :class="{ invalid: editor.fieldError('code') }" />
+        <span v-if="editor.fieldError('code')" id="err-CategoryEditorView-2" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("code") }}</span>
         <span v-else class="text-xs text-muted-foreground">Identifies the category in filters and links. Unique in the Project.</span>
       </div>
     </section>

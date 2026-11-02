@@ -231,11 +231,16 @@ function boundsEditor(target: L.LayerGroup, bounds: Bounds) {
 
 function markerIcon(m: CanvasMarker) {
   const bg = m.muted ? "#9ca3af" : "#4c1d8b";
+  // A hidden marker also gets a dashed rim and a "⊘" badge, so it does not rest on colour alone (`14` §4).
+  const rim = m.muted ? "2px dashed #4b5563" : "2px solid #fff";
+  const badge = m.muted
+    ? `<span style="position:absolute;top:-6px;right:-6px;width:14px;height:14px;border-radius:50%;background:#fff;color:#4b5563;font:800 10px/14px Montserrat,sans-serif;text-align:center">⊘</span>`
+    : "";
   return L.divIcon({
     className: "",
     iconSize: [26, 26],
     iconAnchor: [13, 13],
-    html: `<span style="width:26px;height:26px;border-radius:50%;background:${bg};color:#fff;font:800 11px Montserrat,sans-serif;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.25);border:2px solid #fff">${m.label}</span>`,
+    html: `<span style="position:relative;width:26px;height:26px;border-radius:50%;background:${bg};color:#fff;font:800 11px Montserrat,sans-serif;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.25);border:${rim}">${m.label}${badge}</span>`,
   });
 }
 
@@ -251,7 +256,8 @@ function redraw() {
   }
   for (const m of props.markers) {
     if (Number.isNaN(m.lat) || Number.isNaN(m.lng)) continue;
-    const marker = L.marker([m.lat, m.lng], { icon: markerIcon(m), draggable: !!m.draggable, title: m.title, alt: m.title });
+    const name = m.muted ? `${m.title} (hidden from visitors)` : m.title;
+    const marker = L.marker([m.lat, m.lng], { icon: markerIcon(m), draggable: !!m.draggable, title: name, alt: name });
     marker.on("dragstart", () => (dragging = true));
     marker.on("dragend", (e) => {
       dragging = false;

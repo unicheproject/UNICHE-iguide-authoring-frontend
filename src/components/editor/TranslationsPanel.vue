@@ -132,6 +132,7 @@ function error(field: string): string | undefined {
               :lang="active.languageCode"
               :dir="active.direction.toLowerCase()"
               class="field-input min-h-[92px] resize-y"
+              :aria-describedby="error(field) ? `err-translation-${field}` : undefined"
               :class="{ invalid: error(field) }"
               :data-path="`translations.${active.languageCode}.${field}`"
               :aria-invalid="error(field) ? 'true' : undefined"
@@ -145,13 +146,14 @@ function error(field: string): string | undefined {
               :lang="active.languageCode"
               :dir="active.direction.toLowerCase()"
               class="field-input"
+              :aria-describedby="error(field) ? `err-translation-${field}` : undefined"
               :class="{ invalid: error(field) }"
               :data-path="`translations.${active.languageCode}.${field}`"
               :aria-invalid="error(field) ? 'true' : undefined"
             />
             <span v-if="field === (requiredField ?? 'title') && active.isDefault" class="text-xs text-muted-foreground">{{ titleRequiredHint }}</span>
             <span v-else-if="meta[field].helper" class="text-xs text-muted-foreground">{{ meta[field].helper }}</span>
-            <span v-if="error(field)" class="text-xs font-semibold text-destructive">⚠ {{ error(field) }}</span>
+            <span v-if="error(field)" :id="`err-translation-${field}`" class="text-xs font-semibold text-destructive">⚠ {{ error(field) }}</span>
           </div>
         </template>
       </template>

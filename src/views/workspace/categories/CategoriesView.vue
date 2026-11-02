@@ -5,9 +5,11 @@ import { saveOrder } from "@/platform/ordering";
 import { dropLineClass, useReorder } from "@/workspace/useReorder";
 import { useRouter } from "vue-router";
 import PageHead from "@/components/PageHead.vue";
+import StatusChip from "@/components/StatusChip.vue";
+import TranslationDots from "@/components/TranslationDots.vue";
 import StatusChangeDialog from "@/components/StatusChangeDialog.vue";
 import { Button } from "@/components/ui/button";
-import { formatDate, statusChipStyle } from "@/lib/format";
+import { formatDate } from "@/lib/format";
 import { ApiError } from "@/platform/api";
 import CategoryIcon from "@/components/CategoryIcon.vue";
 import {
@@ -95,18 +97,6 @@ const itemsText = (c: Category) => {
   return `${c.resourceCount} ${noun}`;
 };
 
-const dotStyles = {
-  complete: { background: "#0f7a6e", borderColor: "#0f7a6e" },
-  partial: { background: "rgba(154,98,0,0.35)", borderColor: "#9a6200" },
-  missing: { background: "#ffffff", borderColor: "#d1d5db" },
-} as const;
-const dotLabels = { complete: "complete", partial: "partly translated", missing: "not translated" } as const;
-const dots = (c: Category) =>
-  languages.value.map((l) => {
-    const state = categoryCompleteness(c, l.languageCode);
-    return { code: l.languageCode, style: dotStyles[state], label: `${l.displayName}: ${dotLabels[state]}` };
-  });
-
 const actions = useStatusActions<Category>({
   items: categories,
   kind: "category",
@@ -179,15 +169,17 @@ const reorder = useReorder<Category>({
 
     <div v-else class="overflow-hidden rounded-lg border bg-card shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
       <div class="flex flex-wrap items-center gap-2.5 border-b px-[18px] py-3.5">
+        <label for="categories-search" class="text-[11px] font-bold uppercase tracking-[0.06em] text-muted-foreground">Search</label>
         <input
+          id="categories-search"
           v-model="query"
           type="search"
-          aria-label="Search names and codes"
-          placeholder="Search names"
+          placeholder="Search names and codes"
           class="min-w-[220px] flex-1 rounded-lg border-[1.5px] px-3 py-[9px] text-[13px] focus:border-primary focus:outline-none"
         />
         <SearchLanguageSelect v-model="searchLanguage" :languages="languages" />
-        <div class="flex flex-wrap gap-1.5" role="group" aria-label="Filter by what it applies to">
+        <span id="categories-scope-label" class="text-[11px] font-bold uppercase tracking-[0.06em] text-muted-foreground">Applies to</span>
+        <div class="flex flex-wrap gap-1.5" role="group" aria-labelledby="categories-scope-label">
           <button
             v-for="chip in (['ALL', ...CATEGORY_SCOPES] as const)"
             :key="chip"
@@ -200,7 +192,8 @@ const reorder = useReorder<Category>({
             {{ chip === "ALL" ? "Both kinds" : scopeLabel(chip) }}
           </button>
         </div>
-        <div class="flex flex-wrap gap-1.5" role="group" aria-label="Filter by status">
+        <span id="categories-status-label" class="text-[11px] font-bold uppercase tracking-[0.06em] text-muted-foreground">Status</span>
+        <div class="flex flex-wrap gap-1.5" role="group" aria-labelledby="categories-status-label">
           <button
             v-for="chip in (['ALL', 'DRAFT', 'ACTIVE', 'ARCHIVED', 'PENDING'] as const)"
             :key="chip"
@@ -269,29 +262,17 @@ const reorder = useReorder<Category>({
                 </div>
               </td>
               <td class="td px-3">
-                <span
-                  class="inline-flex items-center gap-[5px] rounded-full px-[9px] py-[3px] text-[10px] font-bold uppercase tracking-[0.07em]"
-                  :style="statusChipStyle(category.status)"
-                >
-                  <span class="inline-block h-1.5 w-1.5 rounded-full bg-current"></span>{{ category.status }}
-                </span>
-                <span
+                <StatusChip :status="category.status" />
+                <StatusChip
                   v-if="category.hasWorkingCopy"
-                  class="ml-1 inline-flex items-center rounded-full px-[9px] py-[3px] text-[10px] font-bold uppercase tracking-[0.07em]"
-                  :style="statusChipStyle('PENDING')"
+                  status="PENDING"
+                  label="Pending changes"
+                  class="ml-1"
                   title="Has pending changes that visitors do not see yet"
-                >
-                  Pending changes
-                </span>
+                />
               </td>
               <td class="td px-3">
-                <div class="flex flex-wrap gap-2">
-                  <span v-for="d in dots(category)" :key="d.code" :title="d.label" class="inline-flex items-center gap-1 text-[10px] font-bold text-muted-foreground">
-                    <span class="inline-block h-[9px] w-[9px] rounded-full border-[1.5px]" :style="d.style"></span>
-                    {{ d.code }}
-                    <span class="sr-only">{{ d.label }}</span>
-                  </span>
-                </div>
+                <TranslationDots :languages="languages" :completeness="(code) => categoryCompleteness(category, code)" />
               </td>
               <td class="td px-[18px]">
                 <div class="flex flex-wrap items-center justify-end gap-2.5">

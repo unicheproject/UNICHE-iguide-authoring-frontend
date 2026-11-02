@@ -7,7 +7,8 @@ import TranslationsPanel, { type TextFieldGroup, type TextFieldMeta } from "@/co
 import MediaSlots, { type MediaSlot } from "@/components/media/MediaSlots.vue";
 import TriggersCard from "@/components/editor/TriggersCard.vue";
 import { listTargetTriggers, syncTriggers, triggerToForm, type Trigger, type TriggerForm } from "@/platform/triggers";
-import { SLUG_PATTERN, statusChipStyle } from "@/lib/format";
+import StatusChip from "@/components/StatusChip.vue";
+import { SLUG_PATTERN } from "@/lib/format";
 import { listAssets, type Asset, type MediaBinding } from "@/platform/assets";
 import { assignableCategories, listCategories, type Category } from "@/platform/categories";
 import { listPois, poiTitle, type Poi } from "@/platform/pois";
@@ -531,6 +532,7 @@ const translationRows = computed(() => translationStatus(languages.value, ROUTE_
               :readonly="!editor.editable"
               inputmode="numeric"
               class="field-input"
+              :aria-invalid="editor.fieldError('estimatedDurationMinutes') ? 'true' : undefined"
               :class="{ invalid: editor.fieldError('estimatedDurationMinutes') }"
             />
           </div>
@@ -543,19 +545,20 @@ const translationRows = computed(() => translationStatus(languages.value, ROUTE_
               inputmode="numeric"
               placeholder="e.g. 2400"
               class="field-input"
+              :aria-invalid="editor.fieldError('distanceMeters') ? 'true' : undefined"
               :class="{ invalid: editor.fieldError('distanceMeters') }"
             />
           </div>
           <div class="flex min-w-[200px] flex-1 flex-col gap-1.5">
             <label for="rt-category" class="small-label">Category</label>
-            <select id="rt-category" v-model="form.categoryId" :disabled="!editor.editable" class="field-input" :class="{ invalid: editor.fieldError('categoryId') }">
+            <select id="rt-category" v-model="form.categoryId" :disabled="!editor.editable" class="field-input" :aria-invalid="editor.fieldError('categoryId') ? 'true' : undefined" :aria-describedby="editor.fieldError('categoryId') ? 'err-RouteEditorView-3' : undefined" :class="{ invalid: editor.fieldError('categoryId') }">
               <option value="">Uncategorised</option>
               <option v-if="categoryMissing" :value="form.categoryId">(archived or unavailable category)</option>
               <option v-for="o in categoryChoices" :key="o.id" :value="o.id">{{ o.label }}</option>
             </select>
           </div>
         </div>
-        <span v-if="editor.fieldError('categoryId')" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("categoryId") }}</span>
+        <span v-if="editor.fieldError('categoryId')" id="err-RouteEditorView-3" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("categoryId") }}</span>
         <span v-if="editor.fieldError('estimatedDurationMinutes')" class="text-xs font-semibold text-destructive">
           ⚠ {{ editor.fieldError("estimatedDurationMinutes") }}
         </span>
@@ -619,15 +622,13 @@ const translationRows = computed(() => translationStatus(languages.value, ROUTE_
             <RouterLink :to="{ name: 'poi-editor', params: { projectId, poiId: stop.poiId } }" class="min-w-[140px] flex-1 text-[13px] font-bold">
               <span class="sr-only">Stop {{ index + 1 }}: </span>{{ stopTitle(stop) }}
             </RouterLink>
-            <span
+            <StatusChip
               v-if="poiById.get(stop.poiId) && poiById.get(stop.poiId)!.status !== 'ACTIVE'"
-              class="rounded-full px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-[0.07em]"
-              :style="statusChipStyle(poiById.get(stop.poiId)!.status)"
+              :status="poiById.get(stop.poiId)!.status"
               :title="'The point of interest is ' + poiById.get(stop.poiId)!.status"
-            >
-              {{ poiById.get(stop.poiId)!.status }}
-            </span>
+            />
             <template v-if="editor.editable">
+              <label v-if="form.stops.length > 1" :for="`stop-position-${stop.key}`" class="text-[10px] font-bold text-muted-foreground">Position</label>
               <select
                 v-if="form.stops.length > 1"
                 :id="`stop-position-${stop.key}`"
@@ -757,9 +758,11 @@ const translationRows = computed(() => translationStatus(languages.value, ROUTE_
             :readonly="!editor.editable"
             spellcheck="false"
             class="field-input font-mono text-[13px]"
+            :aria-invalid="editor.fieldError('slug') ? 'true' : undefined"
+            :aria-describedby="editor.fieldError('slug') ? 'err-RouteEditorView-4' : undefined"
             :class="{ invalid: editor.fieldError('slug') }"
           />
-          <span v-if="editor.fieldError('slug')" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("slug") }}</span>
+          <span v-if="editor.fieldError('slug')" id="err-RouteEditorView-4" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("slug") }}</span>
           <span v-else class="text-xs text-muted-foreground">Used in URLs and QR targets. Changing it breaks printed QR codes.</span>
         </div>
         <div class="flex flex-col gap-1.5">
@@ -779,11 +782,12 @@ const translationRows = computed(() => translationStatus(languages.value, ROUTE_
     <p class="mb-3 text-[13px] text-gray-700">
       Stops are ordered. At least one stop must be an active point of interest before the route can be activated.
     </p>
+    <label for="stop-search" class="field-label mb-1.5 block">Search points of interest</label>
     <input
+      id="stop-search"
       v-model="pickQuery"
       type="search"
-      aria-label="Search points of interest"
-      placeholder="Search by title or exhibit code"
+      placeholder="Title or exhibit code"
       class="mb-3 w-full rounded-lg border-[1.5px] px-3 py-[9px] text-[13px] focus:border-primary focus:outline-none"
     />
     <ul v-if="pickable.length" class="max-h-[280px] overflow-y-auto rounded-lg border">
@@ -791,7 +795,7 @@ const translationRows = computed(() => translationStatus(languages.value, ROUTE_
         <button type="button" class="flex w-full items-center gap-2.5 px-3.5 py-[11px] text-left text-[13px] text-gray-700 hover:bg-muted" @click="addStop(p)">
           <span class="flex-1">{{ poiTitle(p, defaultLanguage) }}</span>
           <span v-if="p.code" class="font-mono text-[10px] text-muted-foreground">{{ p.code }}</span>
-          <span class="rounded-full px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-[0.07em]" :style="statusChipStyle(p.status)">{{ p.status }}</span>
+          <StatusChip :status="p.status" />
         </button>
       </li>
     </ul>

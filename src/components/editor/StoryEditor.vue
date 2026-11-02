@@ -63,11 +63,22 @@ function move(index: number, delta: number) {
   if (target < 0 || target >= props.blocks.length) return;
   const [block] = props.blocks.splice(index, 1);
   props.blocks.splice(target, 0, block);
+  announcement.value = `Moved to position ${target + 1} of ${props.blocks.length}.`;
   void nextTick(() => document.getElementById(`block-move-${block.key}-${delta < 0 ? "up" : "down"}`)?.focus());
 }
 
 function remove(index: number) {
   props.blocks.splice(index, 1);
+}
+
+// Read out by a screen reader: the current format after a change (`14` §4, DECISIONS.md D-042).
+const announcement = ref("");
+
+function setLevel(index: number, level: 2 | 3) {
+  const block = props.blocks[index];
+  if (block.type !== "heading" || block.level === level) return;
+  block.level = level;
+  announcement.value = `Heading ${index + 1} is now level ${level}.`;
 }
 
 // Images ------------------------------------------------------------------------------------------------
@@ -107,13 +118,21 @@ const words = computed(() =>
       ⚠ {{ fieldError(basePath) }}
     </p>
 
+    <p class="sr-only" aria-live="polite">{{ announcement }}</p>
+
     <ol class="flex flex-col">
       <template v-for="(block, index) in blocks" :key="block.key">
       <li class="group border-b border-gray-100 py-3" :class="embedded ? 'px-0' : 'px-5'">
         <div class="mb-1.5 flex items-center gap-2">
-          <span class="text-[10px] font-extrabold uppercase tracking-[0.08em] text-muted-foreground">
-            {{ block.type === "paragraph" ? "Paragraph" : block.type === "heading" ? "Heading" : "Image" }}
-          </span>
+          <!-- The visible label of the block's field, with the heading level (`14` §4, DECISIONS.md D-042). -->
+          <label
+            v-if="block.type !== 'image'"
+            :for="`block-${block.key}`"
+            class="text-[10px] font-extrabold uppercase tracking-[0.08em] text-muted-foreground"
+          >
+            {{ block.type === "paragraph" ? `Paragraph ${index + 1}` : `Heading ${index + 1}, level ${block.level}` }}
+          </label>
+          <span v-else class="text-[10px] font-extrabold uppercase tracking-[0.08em] text-muted-foreground">Image {{ index + 1 }}</span>
           <div v-if="block.type === 'heading'" class="flex gap-1" role="group" :aria-label="`Level of heading ${index + 1}`">
             <button
               v-for="level in ([2, 3] as const)"
@@ -121,9 +140,10 @@ const words = computed(() =>
               type="button"
               :disabled="readonly"
               :aria-pressed="block.level === level"
+              :aria-label="`Level ${level}`"
               class="rounded-full border px-2 py-px text-[10px] font-bold disabled:cursor-default"
               :class="block.level === level ? 'border-primary bg-primary text-white' : 'bg-card text-gray-700'"
-              @click="block.level = level"
+              @click="setLevel(index, level)"
             >
               H{{ level }}
             </button>
@@ -168,11 +188,12 @@ const words = computed(() =>
           :id="`block-${block.key}`"
           v-model="block.text"
           :readonly="readonly"
-          :aria-label="`Paragraph ${index + 1}`"
           :data-path="`${basePath}.blocks[${index}].text`"
           :lang="language.languageCode"
           :dir="language.direction.toLowerCase()"
           class="field-input min-h-[96px] resize-y leading-relaxed"
+          :aria-invalid="blockError(index) ? 'true' : undefined"
+          :aria-describedby="blockError(index) ? `block-error-${block.key}` : undefined"
           :class="{ invalid: blockError(index) }"
         ></textarea>
         <input
@@ -180,11 +201,12 @@ const words = computed(() =>
           :id="`block-${block.key}`"
           v-model="block.text"
           :readonly="readonly"
-          :aria-label="`Heading ${index + 1}`"
           :data-path="`${basePath}.blocks[${index}].text`"
           :lang="language.languageCode"
           :dir="language.direction.toLowerCase()"
           class="field-input font-bold"
+          :aria-invalid="blockError(index) ? 'true' : undefined"
+          :aria-describedby="blockError(index) ? `block-error-${block.key}` : undefined"
           :class="[block.level === 2 ? 'text-[17px]' : 'text-[15px]', { invalid: blockError(index) }]"
         />
         <div v-else class="flex items-center gap-3">
@@ -210,7 +232,7 @@ const words = computed(() =>
             </div>
           </div>
         </div>
-        <p v-if="blockError(index)" class="mt-1.5 text-xs font-semibold text-destructive">⚠ {{ blockError(index) }}</p>
+        <p v-if="blockError(index)" :id="`block-error-${block.key}`" class="mt-1.5 text-xs font-semibold text-destructive">⚠ {{ blockError(index) }}</p>
       </li>
       <li v-if="!readonly && insertAt === index + 1" class="flex flex-wrap gap-2 border-b border-gray-100 py-2.5" :class="embedded ? 'px-0' : 'px-5'">
         <span class="self-center text-[11px] text-muted-foreground">Insert here:</span>

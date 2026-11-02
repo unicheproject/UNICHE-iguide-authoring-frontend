@@ -25,10 +25,10 @@ defineProps<{
       @dragend="reorder.dragEnd()"
       >⠿</span
     >
-    <div class="flex flex-col">
+    <div class="flex">
       <button
         type="button"
-        class="px-1 text-[9px] leading-[11px] text-gray-500 hover:text-primary disabled:opacity-25"
+        class="inline-flex h-6 w-6 items-center justify-center rounded text-[10px] text-gray-500 hover:text-primary disabled:opacity-25"
         :aria-label="`Move ${title} up`"
         :disabled="!reorder.canMove(item, -1)"
         @click="reorder.moveBy(item, -1)"
@@ -37,7 +37,7 @@ defineProps<{
       </button>
       <button
         type="button"
-        class="px-1 text-[9px] leading-[11px] text-gray-500 hover:text-primary disabled:opacity-25"
+        class="inline-flex h-6 w-6 items-center justify-center rounded text-[10px] text-gray-500 hover:text-primary disabled:opacity-25"
         :aria-label="`Move ${title} down`"
         :disabled="!reorder.canMove(item, 1)"
         @click="reorder.moveBy(item, 1)"

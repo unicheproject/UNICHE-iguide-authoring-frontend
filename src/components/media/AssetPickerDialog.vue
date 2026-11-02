@@ -8,7 +8,7 @@
  */
 import { computed, ref } from "vue";
 import AppDialog from "@/components/AppDialog.vue";
-import { statusChipStyle } from "@/lib/format";
+import StatusChip from "@/components/StatusChip.vue";
 import { assetMatches, assetMeta, assetTypeLabel, missingAlternativeText, type Asset, type AssetType } from "@/platform/assets";
 import { useAssetUpload } from "@/workspace/useAssetUpload";
 import AssetThumb from "./AssetThumb.vue";
@@ -117,11 +117,11 @@ function chip(selectedValue: boolean) {
       <!-- Filters -->
       <aside class="flex w-[200px] flex-none flex-col gap-4 text-xs">
         <div class="flex flex-col gap-1.5">
-          <span class="small-label">Type</span>
+          <span id="picker-type-label" class="small-label">Type</span>
           <template v-if="accept.length === 1">
             <span class="font-semibold text-gray-700">{{ assetTypeLabel(accept[0]) }} only</span>
           </template>
-          <div v-else class="flex flex-wrap gap-1.5" role="group" aria-label="Filter by type">
+          <div v-else class="flex flex-wrap gap-1.5" role="group" aria-labelledby="picker-type-label">
             <button
               v-for="t in (['ALL', ...accept] as const)"
               :key="t"
@@ -136,8 +136,8 @@ function chip(selectedValue: boolean) {
           </div>
         </div>
         <div class="flex flex-col gap-1.5">
-          <span class="small-label">Status</span>
-          <div class="flex flex-wrap gap-1.5" role="group" aria-label="Filter by status">
+          <span id="picker-status-label" class="small-label">Status</span>
+          <div class="flex flex-wrap gap-1.5" role="group" aria-labelledby="picker-status-label">
             <button
               v-for="s in (['ALL', 'ACTIVE', 'DRAFT'] as const)"
               :key="s"
@@ -162,10 +162,11 @@ function chip(selectedValue: boolean) {
 
       <!-- Grid -->
       <div class="min-w-[min(100%,420px)] flex-1">
+        <label for="picker-search" class="small-label mb-1.5 block">Search</label>
         <input
+          id="picker-search"
           v-model="query"
           type="search"
-          aria-label="Search by name, filename or title"
           placeholder="Search by name, filename or title"
           class="mb-3 w-full rounded-lg border-[1.5px] px-3 py-[9px] text-[13px] focus:border-primary focus:outline-none"
         />
@@ -176,7 +177,8 @@ function chip(selectedValue: boolean) {
           <UploadEntryRow v-for="entry in uploadingEntries" :key="entry.key" :entry="entry" @retry="retry(entry)" @cancel="cancel(entry)" />
         </ul>
         <p class="sr-only" aria-live="polite">{{ announcement }}</p>
-        <ul class="grid max-h-[400px] grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-2.5 overflow-y-auto p-0.5" role="listbox" :aria-label="title">
+        <!-- A plain list of toggle buttons: each tile is pressed when chosen; double-click picks at once (D-042). -->
+        <ul class="grid max-h-[400px] grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-2.5 overflow-y-auto p-0.5" :aria-label="title">
           <li>
             <button
               type="button"
@@ -189,9 +191,10 @@ function chip(selectedValue: boolean) {
             </button>
             <input ref="fileInput" type="file" multiple class="sr-only" :accept="acceptAttribute || undefined" tabindex="-1" @change="onFiles" />
           </li>
-          <li v-for="asset in choices" :key="asset.id" role="option" :aria-selected="selectedId === asset.id">
+          <li v-for="asset in choices" :key="asset.id">
             <button
               type="button"
+              :aria-pressed="selectedId === asset.id"
               class="relative flex w-full flex-col gap-1.5 rounded-lg border-2 bg-card p-2 text-left"
               :class="selectedId === asset.id ? 'border-primary' : 'border-transparent ring-1 ring-gray-200 hover:ring-primary'"
               @click="selectedId = asset.id"
@@ -208,7 +211,7 @@ function chip(selectedValue: boolean) {
               <span class="truncate text-xs font-bold">{{ asset.internalName }}</span>
               <span class="flex items-center gap-1.5 text-[10px] text-muted-foreground">
                 <span class="truncate">{{ assetMeta(asset) }}</span>
-                <span class="ml-auto rounded-full px-1.5 py-px text-[8px] font-extrabold uppercase" :style="statusChipStyle(asset.status)">{{ asset.status }}</span>
+                <StatusChip :status="asset.status" class="ml-auto" />
               </span>
               <span class="flex items-center gap-1.5 text-[10px] text-muted-foreground">
                 <span class="font-semibold">{{ assetTypeLabel(asset.type) }}</span>

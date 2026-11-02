@@ -5,6 +5,7 @@ import { SLUG_PATTERN, slugify } from "@/lib/format";
 import { ApiError } from "@/platform/api";
 import type { ProjectLanguage } from "@/platform/languages";
 import { createEvent, type CmsEvent } from "@/platform/events";
+import { useFocusOnErrors } from "@/lib/focus";
 
 const props = defineProps<{ projectId: string; defaultLanguage: ProjectLanguage }>();
 const emit = defineEmits<{ close: []; created: [event: CmsEvent] }>();
@@ -14,6 +15,7 @@ const slug = ref("");
 const slugEdited = ref(false);
 const submitting = ref(false);
 const errors = ref<Record<string, string>>({});
+useFocusOnErrors(errors);
 const formError = ref<string | null>(null);
 
 watch(title, (value) => {
@@ -72,10 +74,11 @@ async function submit() {
           :dir="defaultLanguage.direction.toLowerCase()"
           :lang="defaultLanguage.languageCode"
           class="field-input"
+          :aria-describedby="errors.title ? 'err-CreateEventDialog-1' : undefined"
           :class="{ invalid: errors.title }"
           :aria-invalid="!!errors.title"
         />
-        <span v-if="errors.title" class="text-xs font-semibold text-destructive">⚠ {{ errors.title }}</span>
+        <span v-if="errors.title" id="err-CreateEventDialog-1" class="text-xs font-semibold text-destructive">⚠ {{ errors.title }}</span>
       </div>
 
       <div class="flex flex-col gap-1.5">
@@ -89,6 +92,7 @@ async function submit() {
           class="field-input font-mono text-[13px]"
           :class="{ invalid: errors.slug }"
           aria-describedby="event-slug-help"
+          :aria-invalid="errors.slug ? 'true' : undefined"
           @input="onSlugInput"
         />
         <span v-if="errors.slug" id="event-slug-help" class="text-xs font-semibold text-destructive">⚠ {{ errors.slug }}</span>

@@ -7,9 +7,11 @@ import { saveOrder } from "@/platform/ordering";
 import { dropLineClass, useReorder } from "@/workspace/useReorder";
 import { useRouter } from "vue-router";
 import PageHead from "@/components/PageHead.vue";
+import StatusChip from "@/components/StatusChip.vue";
+import TranslationDots from "@/components/TranslationDots.vue";
 import StatusChangeDialog from "@/components/StatusChangeDialog.vue";
 import { Button } from "@/components/ui/button";
-import { formatDate, statusChipStyle } from "@/lib/format";
+import { formatDate } from "@/lib/format";
 import { ApiError } from "@/platform/api";
 import type { ResourceStatus } from "@/platform/places";
 import { changeGuideStatus, fetchGuideReferences, guideCompleteness, guideTitle, listGuides, type Guide } from "@/platform/guides";
@@ -99,20 +101,6 @@ function facts(guide: Guide): string {
   if (guide.estimatedReadingMinutes) parts.push(`${guide.estimatedReadingMinutes} min read`);
   if (guide.featured) parts.push("featured");
   return parts.join(" · ");
-}
-
-const dotStyles = {
-  complete: { background: "#0f7a6e", borderColor: "#0f7a6e" },
-  partial: { background: "rgba(154,98,0,0.35)", borderColor: "#9a6200" },
-  missing: { background: "#ffffff", borderColor: "#d1d5db" },
-} as const;
-const dotLabels = { complete: "complete", partial: "partly translated", missing: "not translated" } as const;
-
-function dots(guide: Guide) {
-  return languages.value.map((l) => {
-    const state = guideCompleteness(guide, l.languageCode);
-    return { code: l.languageCode, style: dotStyles[state], label: `${l.displayName}: ${dotLabels[state]}` };
-  });
 }
 
 // Lifecycle actions -----------------------------------------------------------------------------------
@@ -230,16 +218,18 @@ const reorder = useReorder<Guide>({
 
     <div v-else class="overflow-hidden rounded-lg border bg-card shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
       <div class="flex flex-wrap items-center gap-2.5 border-b px-[18px] py-3.5">
+        <label for="guides-search" class="text-[11px] font-bold uppercase tracking-[0.06em] text-muted-foreground">Search</label>
         <input
+          id="guides-search"
           v-model="query"
           type="search"
-          aria-label="Search titles"
           placeholder="Search titles"
           class="min-w-[240px] flex-1 rounded-lg border-[1.5px] px-3 py-[9px] text-[13px] focus:border-primary focus:outline-none"
         />
         <SearchLanguageSelect v-model="searchLanguage" :languages="languages" />
         <FeaturedFilterChip v-model="featuredOnly" />
-        <div class="flex flex-wrap gap-1.5" role="group" aria-label="Filter by status">
+        <span id="guides-status-label" class="text-[11px] font-bold uppercase tracking-[0.06em] text-muted-foreground">Status</span>
+        <div class="flex flex-wrap gap-1.5" role="group" aria-labelledby="guides-status-label">
           <button
             v-for="chip in (['ALL', 'DRAFT', 'ACTIVE', 'ARCHIVED', 'PENDING'] as const)"
             :key="chip"
@@ -307,29 +297,17 @@ const reorder = useReorder<Guide>({
                 <TriggerChips v-if="triggersByTarget" :triggers="triggersByTarget.get(guide.id) ?? []" />
               </td>
               <td class="td px-3">
-                <span
-                  class="inline-flex items-center gap-[5px] rounded-full px-[9px] py-[3px] text-[10px] font-bold uppercase tracking-[0.07em]"
-                  :style="statusChipStyle(guide.status)"
-                >
-                  <span class="inline-block h-1.5 w-1.5 rounded-full bg-current"></span>{{ guide.status }}
-                </span>
-                <span
+                <StatusChip :status="guide.status" />
+                <StatusChip
                   v-if="guide.hasWorkingCopy"
-                  class="ml-1 inline-flex items-center rounded-full px-[9px] py-[3px] text-[10px] font-bold uppercase tracking-[0.07em]"
-                  :style="statusChipStyle('PENDING')"
+                  status="PENDING"
+                  label="Pending changes"
+                  class="ml-1"
                   title="Has pending changes that visitors do not see yet"
-                >
-                  Pending changes
-                </span>
+                />
               </td>
               <td class="td px-3">
-                <div class="flex flex-wrap gap-2">
-                  <span v-for="d in dots(guide)" :key="d.code" :title="d.label" class="inline-flex items-center gap-1 text-[10px] font-bold text-muted-foreground">
-                    <span class="inline-block h-[9px] w-[9px] rounded-full border-[1.5px]" :style="d.style"></span>
-                    {{ d.code }}
-                    <span class="sr-only">{{ d.label }}</span>
-                  </span>
-                </div>
+                <TranslationDots :languages="languages" :completeness="(code) => guideCompleteness(guide, code)" />
               </td>
               <td class="td px-[18px]">
                 <div class="flex flex-wrap items-center justify-end gap-2.5">

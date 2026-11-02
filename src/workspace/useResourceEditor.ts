@@ -67,9 +67,15 @@ const ROW_FIELDS = new Set(["id", "projectId", "status", "version", "createdAt",
 /** A readiness item of the open Resource, marked blocking or warning (DECISIONS.md D-022). */
 export type ReadinessItem = ReadinessIssue & { blocking: boolean };
 
+/** One line of the error summary; with a `path`, the summary links it to its field (`14` §4, DECISIONS.md D-042). */
+export interface ErrorSummaryItem {
+  text: string;
+  path: string | null;
+}
+
 export interface ErrorSummary {
   title: string;
-  items: string[];
+  items: ErrorSummaryItem[];
   requestId: string | null;
 }
 
@@ -250,7 +256,9 @@ export function useResourceEditor<T extends EditableResource>(options: ResourceE
     errors.value = found;
     summary.value = {
       title,
-      items: Object.entries(found).map(([path, message]) => (path ? `${options.describePath(path)}: ${message}` : message)),
+      items: Object.entries(found).map(([path, message]) =>
+        path ? { text: `${options.describePath(path)}: ${message}`, path } : { text: message, path: null },
+      ),
       requestId,
     };
     const withErrors = languagesWithErrors.value;
@@ -289,7 +297,10 @@ export function useResourceEditor<T extends EditableResource>(options: ResourceE
         return;
       }
     }
-    document.querySelector<HTMLElement>("[data-error-summary]")?.focus();
+    const summaryBox = document.querySelector<HTMLElement>("[data-error-summary]");
+    if (summaryBox) summaryBox.focus();
+    // Nothing to land on: say so rather than leaving focus where it was (`14` §4, DECISIONS.md D-042).
+    else if (path) showToast("No field to move to", `${options.describePath(path)} is not on this page.`, "info");
   }
 
   // Readiness ----------------------------------------------------------------------------------------
@@ -368,7 +379,7 @@ export function useResourceEditor<T extends EditableResource>(options: ResourceE
     } else {
       summary.value = {
         title: e.platformUnavailable ? "The UNICHE platform is not reachable" : `The ${kind} was not saved`,
-        items: [e.platformUnavailable ? "Your changes are still in the form. Try again in a moment." : e.message],
+        items: [{ text: e.platformUnavailable ? "Your changes are still in the form. Try again in a moment." : e.message, path: null }],
         requestId: e.requestId,
       };
     }

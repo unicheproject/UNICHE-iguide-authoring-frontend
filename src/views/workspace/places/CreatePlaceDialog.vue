@@ -6,6 +6,7 @@ import { ApiError } from "@/platform/api";
 import type { ProjectLanguage } from "@/platform/languages";
 import { createPlace, PLACE_SETTING_LABELS, PLACE_SETTINGS, type Place, type PlaceSetting, type PlaceType } from "@/platform/places";
 import type { PlaceOption } from "./placeTree";
+import { useFocusOnErrors } from "@/lib/focus";
 
 const props = defineProps<{
   projectId: string;
@@ -33,6 +34,7 @@ const slug = ref("");
 const slugEdited = ref(false);
 const submitting = ref(false);
 const errors = ref<Record<string, string>>({});
+useFocusOnErrors(errors);
 const formError = ref<string | null>(null);
 
 watch(title, (value) => {
@@ -108,7 +110,7 @@ async function submit() {
             :class="setting === s ? 'border-primary bg-[#f5f0fb]' : 'border-gray-200 bg-white hover:border-primary'"
             @click="setting = s"
           >
-            <span class="text-[13px] font-bold">{{ PLACE_SETTING_LABELS[s].label }}</span>
+            <span class="text-[13px] font-bold"><span v-if="setting === s" aria-hidden="true" class="text-primary">✓ </span>{{ PLACE_SETTING_LABELS[s].label }}</span>
             <span class="text-xs text-muted-foreground">{{ PLACE_SETTING_LABELS[s].hint }}</span>
           </button>
         </div>
@@ -127,15 +129,24 @@ async function submit() {
             :class="sub === level[0] ? 'border-primary bg-[#f5f0fb]' : 'border-gray-200 bg-white hover:border-primary'"
             @click="chooseLevel(level[0])"
           >
-            <span class="text-[13px] font-bold">{{ level[1] }}</span>
+            <span class="text-[13px] font-bold"><span v-if="sub === level[0]" aria-hidden="true" class="text-primary">✓ </span>{{ level[1] }}</span>
             <span class="text-xs text-muted-foreground">{{ level[2] }}</span>
           </button>
         </div>
-        <select v-if="sub" id="place-parent" v-model="parentPlaceId" aria-label="Parent place" class="field-input" :class="{ 'border-destructive': errors.parentPlaceId }">
+        <label v-if="sub" for="place-parent" class="field-label">Parent place</label>
+        <select
+          v-if="sub"
+          id="place-parent"
+          v-model="parentPlaceId"
+          class="field-input"
+          :class="{ 'border-destructive': errors.parentPlaceId }"
+          :aria-invalid="errors.parentPlaceId ? 'true' : undefined"
+          :aria-describedby="errors.parentPlaceId ? 'place-parent-error' : undefined"
+        >
           <option value="" disabled>Choose the parent place…</option>
           <option v-for="o in parentOptions" :key="o.id" :value="o.id">{{ o.label }}</option>
         </select>
-        <span v-if="errors.parentPlaceId" class="text-xs font-semibold text-destructive">⚠ {{ errors.parentPlaceId }}</span>
+        <span v-if="errors.parentPlaceId" id="place-parent-error" class="text-xs font-semibold text-destructive">⚠ {{ errors.parentPlaceId }}</span>
       </div>
 
       <template v-if="step3">

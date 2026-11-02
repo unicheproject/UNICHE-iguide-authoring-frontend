@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from "vue";
 import PageHead from "@/components/PageHead.vue";
+import StatusChip from "@/components/StatusChip.vue";
 import AssetThumb from "@/components/media/AssetThumb.vue";
 import UploadDialog from "@/components/media/UploadDialog.vue";
 import { Button } from "@/components/ui/button";
-import { formatDate, statusChipStyle } from "@/lib/format";
+import { formatDate } from "@/lib/format";
 import { ApiError } from "@/platform/api";
 import {
   ASSET_TYPES,
@@ -151,10 +152,11 @@ function chipClass(selected: boolean) {
     </div>
 
     <div class="mb-4 flex flex-wrap items-center gap-2.5">
+      <label for="media-search" class="text-[11px] font-bold uppercase tracking-[0.06em] text-muted-foreground">Search</label>
       <input
+        id="media-search"
         v-model="query"
         type="search"
-        aria-label="Search by name, filename or title"
         placeholder="Search by name, filename or title"
         class="min-w-[240px] flex-1 rounded-lg border-[1.5px] px-3 py-[9px] text-[13px] focus:border-primary focus:outline-none"
       />
@@ -173,7 +175,8 @@ function chipClass(selected: boolean) {
       </div>
     </div>
     <div class="mb-4 flex flex-wrap items-center gap-x-5 gap-y-2.5">
-      <div class="flex flex-wrap gap-1.5" role="group" aria-label="Filter by type">
+      <span id="media-type-label" class="text-[11px] font-bold uppercase tracking-[0.06em] text-muted-foreground">Type</span>
+      <div class="flex flex-wrap gap-1.5" role="group" aria-labelledby="media-type-label">
         <button
           v-for="chip in (['ALL', ...typeChips] as const)"
           :key="chip"
@@ -186,7 +189,8 @@ function chipClass(selected: boolean) {
           {{ chip === "ALL" ? "All" : assetTypeLabel(chip) }}
         </button>
       </div>
-      <div class="flex flex-wrap gap-1.5" role="group" aria-label="Filter by status">
+      <span id="media-status-label" class="text-[11px] font-bold uppercase tracking-[0.06em] text-muted-foreground">Status</span>
+      <div class="flex flex-wrap gap-1.5" role="group" aria-labelledby="media-status-label">
         <button
           v-for="chip in (['ALL', 'DRAFT', 'ACTIVE', 'ARCHIVED'] as const)"
           :key="chip"
@@ -226,7 +230,7 @@ function chipClass(selected: boolean) {
               <span class="block break-words text-[13px] font-bold">{{ asset.internalName }}</span>
               <span class="mt-0.5 block text-[11px] text-muted-foreground">{{ assetMeta(asset) }}</span>
               <span class="mt-2 flex flex-wrap gap-1.5">
-                <span class="rounded-full px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-[0.07em]" :style="statusChipStyle(asset.status)">{{ asset.status }}</span>
+                <StatusChip :status="asset.status" />
                 <span class="rounded-full border bg-muted px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-[0.07em] text-muted-foreground">
                   {{ asset.usageCount ? `used in ${asset.usageCount}` : "unused" }}
                 </span>
@@ -269,7 +273,7 @@ function chipClass(selected: boolean) {
               <td class="td px-3 text-xs">{{ assetTypeLabel(asset.type) }}</td>
               <td class="td px-3 text-xs text-muted-foreground">{{ assetMeta(asset) }}</td>
               <td class="td px-3">
-                <span class="rounded-full px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-[0.07em]" :style="statusChipStyle(asset.status)">{{ asset.status }}</span>
+                <StatusChip :status="asset.status" />
               </td>
               <td class="td px-3 text-xs">{{ asset.usageCount || "—" }}</td>
               <td class="td px-[18px] text-xs text-muted-foreground">{{ formatDate(asset.createdAt) }}</td>

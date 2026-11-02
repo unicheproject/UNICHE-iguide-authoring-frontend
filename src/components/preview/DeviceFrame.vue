@@ -6,7 +6,7 @@
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { SURFACES, type Surface } from "./surfaces";
 
-const props = defineProps<{ surface: Surface; dir?: "ltr" | "rtl"; browserChrome?: boolean }>();
+const props = defineProps<{ surface: Surface; dir?: "ltr" | "rtl"; lang?: string; browserChrome?: boolean }>();
 
 const screen = computed(() => SURFACES[props.surface]);
 const host = ref<HTMLElement | null>(null);
@@ -31,6 +31,7 @@ const scale = computed(() => hostWidth.value / screen.value.width);
         class="absolute left-0 top-0 flex origin-top-left flex-col bg-white text-[#030712]"
         :style="{ width: `${screen.width}px`, height: `${screen.height}px`, transform: `scale(${scale})`, fontSize: `${screen.font}px` }"
         :dir="dir ?? 'ltr'"
+        :lang="lang"
       >
         <slot />
       </div>

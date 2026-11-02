@@ -7,6 +7,7 @@ import { ApiError } from "@/platform/api";
 import type { Asset } from "@/platform/assets";
 import { createFloorPlan, type FloorPlan } from "@/platform/floorPlans";
 import { placeTitle, type Place } from "@/platform/places";
+import { useFocusOnErrors } from "@/lib/focus";
 
 const props = defineProps<{
   projectId: string;
@@ -24,6 +25,7 @@ const placeId = ref(props.initialPlaceId ?? "");
 const picking = ref(false);
 const creating = ref(false);
 const errors = ref<Record<string, string>>({});
+useFocusOnErrors(errors);
 const formError = ref<string | null>(null);
 
 const asset = computed(() => props.assets.find((a) => a.id === assetId.value) ?? null);
@@ -68,22 +70,30 @@ async function submit() {
         <div class="flex items-center gap-3 rounded-lg border px-3 py-2.5" :class="{ 'border-destructive': errors.assetId }">
           <AssetThumb v-if="asset" :asset="asset" height="56px" class="w-20 flex-none" />
           <span class="min-w-0 flex-1 truncate text-xs" :class="asset ? 'font-bold' : 'text-muted-foreground'">{{ asset?.internalName ?? "No image" }}</span>
-          <button type="button" class="text-[11px] font-bold text-primary" @click="picking = true">{{ asset ? "Replace" : "Choose image" }}</button>
+          <button
+            type="button"
+            class="text-[11px] font-bold text-primary"
+            :aria-invalid="errors.assetId ? 'true' : undefined"
+            :aria-describedby="errors.assetId ? 'fp-asset-error' : undefined"
+            @click="picking = true"
+          >
+            {{ asset ? "Replace" : "Choose image" }}
+          </button>
         </div>
-        <span v-if="errors.assetId" class="text-xs font-semibold text-destructive">⚠ {{ errors.assetId }}</span>
+        <span v-if="errors.assetId" id="fp-asset-error" class="text-xs font-semibold text-destructive">⚠ {{ errors.assetId }}</span>
       </div>
       <div class="flex flex-col gap-1.5">
         <label for="fp-name" class="field-label">Name</label>
-        <input id="fp-name" v-model="name" class="field-input" :class="{ invalid: errors.internalName }" />
-        <span v-if="errors.internalName" class="text-xs font-semibold text-destructive">⚠ {{ errors.internalName }}</span>
+        <input id="fp-name" v-model="name" class="field-input" :aria-invalid="errors.internalName ? 'true' : undefined" :aria-describedby="errors.internalName ? 'err-NewFloorPlanDialog-1' : undefined" :class="{ invalid: errors.internalName }" />
+        <span v-if="errors.internalName" id="err-NewFloorPlanDialog-1" class="text-xs font-semibold text-destructive">⚠ {{ errors.internalName }}</span>
       </div>
       <div class="flex flex-col gap-1.5">
         <label for="fp-place" class="field-label">Link to Place (optional)</label>
-        <select id="fp-place" v-model="placeId" class="field-input" :class="{ invalid: errors.placeId }">
+        <select id="fp-place" v-model="placeId" class="field-input" :aria-invalid="errors.placeId ? 'true' : undefined" :aria-describedby="errors.placeId ? 'err-NewFloorPlanDialog-2' : undefined" :class="{ invalid: errors.placeId }">
           <option value="">No place</option>
           <option v-for="p in indoorPlaces" :key="p.id" :value="p.id">{{ p.label }}</option>
         </select>
-        <span v-if="errors.placeId" class="text-xs font-semibold text-destructive">⚠ {{ errors.placeId }}</span>
+        <span v-if="errors.placeId" id="err-NewFloorPlanDialog-2" class="text-xs font-semibold text-destructive">⚠ {{ errors.placeId }}</span>
         <span v-else class="text-xs text-muted-foreground">Only indoor places, such as a floor of the museum building.</span>
       </div>
     </form>

@@ -71,6 +71,7 @@ const FIELD_NAMES: Record<string, string> = {
   initialZoom: "Initial zoom",
   minLatitude: "Bounds",
   maxLatitude: "Max latitude",
+  minLongitude: "Min longitude",
   maxLongitude: "Max longitude",
   hiddenCategoryIds: "Visibility",
 };
@@ -512,13 +513,21 @@ function box(on: boolean) {
               <span class="flex h-5 w-5 flex-none items-center justify-center rounded-full bg-primary text-[10px] font-extrabold text-white">{{ index + 1 }}</span>
               <span class="min-w-0 flex-1">
                 <span class="block truncate text-xs font-bold">{{ title(p.resourceType, p.resourceId) }}</span>
-                <span class="block text-[10px] text-muted-foreground">{{ kindLabel(p.resourceType) }}</span>
+                <span class="block text-[10px] text-muted-foreground">
+                  {{ kindLabel(p.resourceType) }}<template v-if="!shownBySettings(p.resourceType, p.resourceId)"> · ⊘ hidden from visitors</template>
+                </span>
               </span>
               <button v-if="!readonly" type="button" class="text-[10px] font-bold text-destructive" @click="form.placements.splice(index, 1)">Remove from map</button>
             </div>
             <div class="mt-1.5 flex gap-2 pl-7">
-              <input v-model="p.lat" :readonly="readonly" :aria-label="`Latitude of ${title(p.resourceType, p.resourceId)}`" inputmode="decimal" class="field-input compact" />
-              <input v-model="p.lng" :readonly="readonly" :aria-label="`Longitude of ${title(p.resourceType, p.resourceId)}`" inputmode="decimal" class="field-input compact" />
+              <label class="flex flex-1 flex-col gap-1 text-[10px] font-bold text-muted-foreground">
+                Latitude
+                <input v-model="p.lat" :readonly="readonly" :aria-label="`Latitude of ${title(p.resourceType, p.resourceId)}`" inputmode="decimal" class="field-input compact" />
+              </label>
+              <label class="flex flex-1 flex-col gap-1 text-[10px] font-bold text-muted-foreground">
+                Longitude
+                <input v-model="p.lng" :readonly="readonly" :aria-label="`Longitude of ${title(p.resourceType, p.resourceId)}`" inputmode="decimal" class="field-input compact" />
+              </label>
             </div>
             <p v-if="errorAt(index)" class="mt-1 pl-7 text-[11px] font-semibold text-destructive">⚠ {{ errorAt(index) }}</p>
           </li>
@@ -549,7 +558,16 @@ function box(on: boolean) {
       </div>
       <div class="flex flex-col gap-1.5 px-5 py-[18px]">
         <label for="m-name" class="small-label">Name</label>
-        <input id="m-name" v-model="form.internalName" :readonly="readonly" class="field-input" :class="{ invalid: editor.fieldError('internalName') }" />
+        <input
+          id="m-name"
+          v-model="form.internalName"
+          :readonly="readonly"
+          class="field-input"
+          :aria-invalid="editor.fieldError('internalName') ? 'true' : undefined"
+          :aria-describedby="editor.fieldError('internalName') ? 'err-m-name' : undefined"
+          :class="{ invalid: editor.fieldError('internalName') }"
+        />
+        <span v-if="editor.fieldError('internalName')" id="err-m-name" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("internalName") }}</span>
         <span class="text-xs text-muted-foreground">
           Only authors see it; visitors see the places and points of interest on it.
           <template v-if="editor.resource?.area"> Area: {{ editor.resource.area }}.</template>
@@ -608,14 +626,14 @@ function box(on: boolean) {
 
       <section class="overflow-hidden rounded-lg border bg-card">
         <div class="border-b px-3.5 py-[11px]">
-          <span class="text-[10px] font-extrabold uppercase tracking-[0.1em] text-muted-foreground">Linked Place</span>
+          <label for="m-place" class="text-[10px] font-extrabold uppercase tracking-[0.1em] text-muted-foreground">Linked Place</label>
         </div>
         <div class="flex flex-col gap-1.5 px-3.5 py-3">
-          <select v-model="form.placeId" :disabled="readonly" aria-label="Linked Place" class="field-input compact" :class="{ invalid: editor.fieldError('placeId') }">
+          <select id="m-place" v-model="form.placeId" :disabled="readonly" class="field-input compact" :aria-invalid="editor.fieldError('placeId') ? 'true' : undefined" :aria-describedby="editor.fieldError('placeId') ? 'err-MapEditorView-2' : undefined" :class="{ invalid: editor.fieldError('placeId') }">
             <option value="">No place</option>
             <option v-for="p in outdoorPlaces" :key="p.id" :value="p.id">{{ p.label }}</option>
           </select>
-          <span v-if="editor.fieldError('placeId')" class="text-[11px] font-semibold text-destructive">⚠ {{ editor.fieldError("placeId") }}</span>
+          <span v-if="editor.fieldError('placeId')" id="err-MapEditorView-2" class="text-[11px] font-semibold text-destructive">⚠ {{ editor.fieldError("placeId") }}</span>
           <span v-else class="text-[11px] text-muted-foreground">{{ placeNote }}</span>
         </div>
       </section>
@@ -625,9 +643,42 @@ function box(on: boolean) {
           <span class="text-[10px] font-extrabold uppercase tracking-[0.1em] text-muted-foreground">Initial view</span>
         </div>
         <div class="grid grid-cols-3 gap-2 px-3.5 py-3">
-          <label class="flex flex-col gap-1 text-[10px] font-bold text-muted-foreground">Latitude<input v-model="form.lat" :readonly="readonly" class="field-input compact" :class="{ invalid: editor.fieldError('initialLatitude') }" /></label>
-          <label class="flex flex-col gap-1 text-[10px] font-bold text-muted-foreground">Longitude<input v-model="form.lng" :readonly="readonly" class="field-input compact" :class="{ invalid: editor.fieldError('initialLongitude') }" /></label>
-          <label class="flex flex-col gap-1 text-[10px] font-bold text-muted-foreground">Zoom<input v-model="form.zoom" :readonly="readonly" class="field-input compact" :class="{ invalid: editor.fieldError('initialZoom') }" /></label>
+          <label class="flex flex-col gap-1 text-[10px] font-bold text-muted-foreground">
+            Latitude
+            <input
+              v-model="form.lat"
+              :readonly="readonly"
+              class="field-input compact"
+              :aria-invalid="editor.fieldError('initialLatitude') ? 'true' : undefined"
+              :aria-describedby="editor.fieldError('initialLatitude') ? 'err-m-lat' : undefined"
+              :class="{ invalid: editor.fieldError('initialLatitude') }"
+            />
+            <span v-if="editor.fieldError('initialLatitude')" id="err-m-lat" class="font-semibold text-destructive">⚠ {{ editor.fieldError("initialLatitude") }}</span>
+          </label>
+          <label class="flex flex-col gap-1 text-[10px] font-bold text-muted-foreground">
+            Longitude
+            <input
+              v-model="form.lng"
+              :readonly="readonly"
+              class="field-input compact"
+              :aria-invalid="editor.fieldError('initialLongitude') ? 'true' : undefined"
+              :aria-describedby="editor.fieldError('initialLongitude') ? 'err-m-lng' : undefined"
+              :class="{ invalid: editor.fieldError('initialLongitude') }"
+            />
+            <span v-if="editor.fieldError('initialLongitude')" id="err-m-lng" class="font-semibold text-destructive">⚠ {{ editor.fieldError("initialLongitude") }}</span>
+          </label>
+          <label class="flex flex-col gap-1 text-[10px] font-bold text-muted-foreground">
+            Zoom
+            <input
+              v-model="form.zoom"
+              :readonly="readonly"
+              class="field-input compact"
+              :aria-invalid="editor.fieldError('initialZoom') ? 'true' : undefined"
+              :aria-describedby="editor.fieldError('initialZoom') ? 'err-m-zoom' : undefined"
+              :class="{ invalid: editor.fieldError('initialZoom') }"
+            />
+            <span v-if="editor.fieldError('initialZoom')" id="err-m-zoom" class="font-semibold text-destructive">⚠ {{ editor.fieldError("initialZoom") }}</span>
+          </label>
         </div>
       </section>
 
@@ -636,11 +687,54 @@ function box(on: boolean) {
           <span class="text-[10px] font-extrabold uppercase tracking-[0.1em] text-muted-foreground">Bounds</span>
         </div>
         <div class="grid grid-cols-2 gap-2 px-3.5 py-3">
-          <label class="flex flex-col gap-1 text-[10px] font-bold text-muted-foreground">Min latitude<input v-model="form.minLat" :readonly="readonly" class="field-input compact" /></label>
-          <label class="flex flex-col gap-1 text-[10px] font-bold text-muted-foreground">Max latitude<input v-model="form.maxLat" :readonly="readonly" class="field-input compact" /></label>
-          <label class="flex flex-col gap-1 text-[10px] font-bold text-muted-foreground">Min longitude<input v-model="form.minLng" :readonly="readonly" class="field-input compact" /></label>
-          <label class="flex flex-col gap-1 text-[10px] font-bold text-muted-foreground">Max longitude<input v-model="form.maxLng" :readonly="readonly" class="field-input compact" /></label>
-          <span v-if="editor.fieldError('minLatitude')" class="col-span-2 text-[11px] font-semibold text-destructive">⚠ {{ editor.fieldError("minLatitude") }}</span>
+          <label class="flex flex-col gap-1 text-[10px] font-bold text-muted-foreground">
+            Min latitude
+            <input
+              v-model="form.minLat"
+              :readonly="readonly"
+              class="field-input compact"
+              :aria-invalid="editor.fieldError('minLatitude') ? 'true' : undefined"
+              :aria-describedby="editor.fieldError('minLatitude') ? 'err-m-minLatitude' : undefined"
+              :class="{ invalid: editor.fieldError('minLatitude') }"
+            />
+            <span v-if="editor.fieldError('minLatitude')" id="err-m-minLatitude" class="font-semibold text-destructive">⚠ {{ editor.fieldError("minLatitude") }}</span>
+          </label>
+          <label class="flex flex-col gap-1 text-[10px] font-bold text-muted-foreground">
+            Max latitude
+            <input
+              v-model="form.maxLat"
+              :readonly="readonly"
+              class="field-input compact"
+              :aria-invalid="editor.fieldError('maxLatitude') ? 'true' : undefined"
+              :aria-describedby="editor.fieldError('maxLatitude') ? 'err-m-maxLatitude' : undefined"
+              :class="{ invalid: editor.fieldError('maxLatitude') }"
+            />
+            <span v-if="editor.fieldError('maxLatitude')" id="err-m-maxLatitude" class="font-semibold text-destructive">⚠ {{ editor.fieldError("maxLatitude") }}</span>
+          </label>
+          <label class="flex flex-col gap-1 text-[10px] font-bold text-muted-foreground">
+            Min longitude
+            <input
+              v-model="form.minLng"
+              :readonly="readonly"
+              class="field-input compact"
+              :aria-invalid="editor.fieldError('minLongitude') ? 'true' : undefined"
+              :aria-describedby="editor.fieldError('minLongitude') ? 'err-m-minLongitude' : undefined"
+              :class="{ invalid: editor.fieldError('minLongitude') }"
+            />
+            <span v-if="editor.fieldError('minLongitude')" id="err-m-minLongitude" class="font-semibold text-destructive">⚠ {{ editor.fieldError("minLongitude") }}</span>
+          </label>
+          <label class="flex flex-col gap-1 text-[10px] font-bold text-muted-foreground">
+            Max longitude
+            <input
+              v-model="form.maxLng"
+              :readonly="readonly"
+              class="field-input compact"
+              :aria-invalid="editor.fieldError('maxLongitude') ? 'true' : undefined"
+              :aria-describedby="editor.fieldError('maxLongitude') ? 'err-m-maxLongitude' : undefined"
+              :class="{ invalid: editor.fieldError('maxLongitude') }"
+            />
+            <span v-if="editor.fieldError('maxLongitude')" id="err-m-maxLongitude" class="font-semibold text-destructive">⚠ {{ editor.fieldError("maxLongitude") }}</span>
+          </label>
           <span class="col-span-2 text-[11px] text-muted-foreground">Use “Edit bounds” on the map, or type values. Visitors see only this area.</span>
         </div>
       </section>

@@ -5,6 +5,7 @@ import { SLUG_PATTERN, slugify } from "@/lib/format";
 import { ApiError } from "@/platform/api";
 import { CATEGORY_SCOPES, createCategory, parentChoices, scopeLabel, type Category, type CategoryScope } from "@/platform/categories";
 import type { ProjectLanguage } from "@/platform/languages";
+import { useFocusOnErrors } from "@/lib/focus";
 
 const props = defineProps<{ projectId: string; defaultLanguage: ProjectLanguage; categories: Category[]; initialParentId: string | null }>();
 const emit = defineEmits<{ close: []; created: [category: Category] }>();
@@ -18,6 +19,7 @@ const sub = ref(!!initialParent);
 const parentId = ref(initialParent?.id ?? "");
 const submitting = ref(false);
 const errors = ref<Record<string, string>>({});
+useFocusOnErrors(errors);
 const formError = ref<string | null>(null);
 
 watch(name, (value) => {
@@ -84,9 +86,11 @@ async function submit() {
           :lang="defaultLanguage.languageCode"
           :dir="defaultLanguage.direction.toLowerCase()"
           class="field-input"
+          :aria-invalid="errors.name ? 'true' : undefined"
+          :aria-describedby="errors.name ? 'err-CreateCategoryDialog-1' : undefined"
           :class="{ invalid: errors.name }"
         />
-        <span v-if="errors.name" class="text-xs font-semibold text-destructive">⚠ {{ errors.name }}</span>
+        <span v-if="errors.name" id="err-CreateCategoryDialog-1" class="text-xs font-semibold text-destructive">⚠ {{ errors.name }}</span>
       </div>
       <div class="flex flex-col gap-2" role="group" aria-labelledby="category-scope-label">
         <span id="category-scope-label" class="field-label">Applies to</span>
@@ -119,11 +123,12 @@ async function submit() {
             {{ level[1] }}
           </button>
         </div>
-        <select v-if="sub" v-model="parentId" aria-label="Parent category" class="field-input max-w-[360px]" :class="{ invalid: errors.parentCategoryId }">
+        <label v-if="sub" for="category-parent" class="field-label">Parent category</label>
+        <select v-if="sub" id="category-parent" v-model="parentId" class="field-input max-w-[360px]" :aria-invalid="errors.parentCategoryId ? 'true' : undefined" :aria-describedby="errors.parentCategoryId ? 'err-CreateCategoryDialog-2' : undefined" :class="{ invalid: errors.parentCategoryId }">
           <option v-if="!parents.length" value="">No top-level category for {{ scopeLabel(scope) }} yet</option>
           <option v-for="o in parents" :key="o.id" :value="o.id">{{ o.label }}</option>
         </select>
-        <span v-if="errors.parentCategoryId" class="text-xs font-semibold text-destructive">⚠ {{ errors.parentCategoryId }}</span>
+        <span v-if="errors.parentCategoryId" id="err-CreateCategoryDialog-2" class="text-xs font-semibold text-destructive">⚠ {{ errors.parentCategoryId }}</span>
         <span v-else class="text-xs text-muted-foreground">Categories have two levels at most: a category and its subcategories.</span>
       </div>
       <div class="flex flex-col gap-1.5">
@@ -135,10 +140,12 @@ async function submit() {
           autocomplete="off"
           spellcheck="false"
           class="field-input font-mono text-[13px]"
+          :aria-invalid="errors.code ? 'true' : undefined"
+          :aria-describedby="errors.code ? 'err-CreateCategoryDialog-3' : undefined"
           :class="{ invalid: errors.code }"
           @input="codeEdited = true; code = ($event.target as HTMLInputElement).value"
         />
-        <span v-if="errors.code" class="text-xs font-semibold text-destructive">⚠ {{ errors.code }}</span>
+        <span v-if="errors.code" id="err-CreateCategoryDialog-3" class="text-xs font-semibold text-destructive">⚠ {{ errors.code }}</span>
         <span v-else class="text-xs text-muted-foreground">Identifies the category in filters and links. Unique in the Project.</span>
       </div>
     </form>
