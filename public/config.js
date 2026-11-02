@@ -7,4 +7,5 @@
 //   CLIENT_ID: "iguide-web",
 //   AUDIENCE: "uniche-platform",
 //   API_BASE_URL: "https://iguide.example.org/iguide/api/v1",
+//   PORTAL_URL: "https://portal.example.org", // optional
 // };

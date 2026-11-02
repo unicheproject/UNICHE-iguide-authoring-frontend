@@ -2,7 +2,8 @@
 import { onBeforeUnmount, ref, watch, type Ref } from "vue";
 import { Button } from "@/components/ui/button";
 import WorkspaceNav from "@/components/WorkspaceNav.vue";
-import { ApiError } from "@/platform/api";
+import { ApiError, onProjectPathNotFound } from "@/platform/api";
+import { platformConfig } from "@/platform/auth";
 import { fetchProject, type Project } from "@/platform/catalogue";
 import { forgetProject, upsertProject } from "@/stores/projects";
 import { provideCurrentProject } from "@/workspace/currentProject";
@@ -31,14 +32,45 @@ async function load() {
     if (e instanceof DOMException && e.name === "AbortError") return;
     if (!(e instanceof ApiError)) throw e;
     error.value = e;
-    if (e.status === 404 || e.status === 403) forgetProject(props.projectId);
+    // Only a 404 means the Project is gone for the caller; a 403 is a manager-only refusal (`07` §15).
+    if (e.status === 404) forgetProject(props.projectId);
   } finally {
     loading.value = false;
   }
 }
 
 watch(() => props.projectId, load, { immediate: true });
-onBeforeUnmount(() => controller?.abort());
+
+/*
+ * A `404` anywhere under the open Project may mean the caller lost it: no longer a member, or the Project deleted in
+ * the Catalogue (`07` §15, `12` §6). The Project is read again; only a `404` there closes the workspace, so a
+ * Resource that is merely missing keeps its own message (DECISIONS.md D-041).
+ */
+let rechecking = false;
+async function recheck(projectId: string) {
+  if (projectId !== props.projectId || !project.value || rechecking) return;
+  rechecking = true;
+  try {
+    await fetchProject(projectId);
+  } catch (e) {
+    if (e instanceof ApiError && e.status === 404 && projectId === props.projectId) {
+      controller?.abort();
+      project.value = null;
+      error.value = e;
+      forgetProject(projectId);
+    }
+  } finally {
+    rechecking = false;
+  }
+}
+const stopListening = onProjectPathNotFound((projectId) => void recheck(projectId));
+
+const portalUrl = platformConfig().portalUrl;
+
+onBeforeUnmount(() => {
+  controller?.abort();
+  stopListening();
+});
 </script>
 
 <template>
@@ -66,12 +98,19 @@ onBeforeUnmount(() => controller?.abort());
         <template v-if="error.status === 404">
           <strong class="block text-[13px] font-bold text-destructive">This Project is not available</strong>
           <p class="mt-1 text-[13px] text-gray-700">
-            It no longer exists in the UNICHE Catalogue, or you are not a member of it.
+            It was not found: it no longer exists in the UNICHE Catalogue, or you are no longer a member of it. It
+            has been removed from your list of projects. A deleted Project can be restored, and membership asked for,
+            in the
+            <a v-if="portalUrl" :href="portalUrl" target="_blank" rel="noopener" class="font-semibold text-primary">UNICHE Platform Portal</a>
+            <template v-else>UNICHE Platform Portal</template>.
           </p>
         </template>
         <template v-else-if="error.status === 403">
           <strong class="block text-[13px] font-bold text-destructive">Access denied</strong>
-          <p class="mt-1 text-[13px] text-gray-700">The UNICHE Catalogue no longer admits you to this Project.</p>
+          <p class="mt-1 text-[13px] text-gray-700">
+            The UNICHE Catalogue refused this. Only organization managers may do it; ask one of them, or go back to your
+            projects.
+          </p>
         </template>
         <template v-else>
           <strong class="block text-[13px] font-bold text-destructive">

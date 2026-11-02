@@ -24,6 +24,7 @@ VITE_REALM=uniche
 VITE_CLIENT_ID=iguide-web
 VITE_AUDIENCE=uniche-platform
 VITE_API_BASE_URL=http://localhost:8080/iguide/api/v1
+VITE_PORTAL_URL=          # optional; https://platform.uniche-eccch.eu links the Platform Portal
 ```
 
 ```bash

@@ -16,6 +16,8 @@ export interface PlatformConfig {
   audience: string;
   /** Authoring API base, ending in `/api/v1`. */
   apiBaseUrl: string;
+  /** The UNICHE Platform Portal, where a deleted Project is restored; optional, null when not set (D-041). */
+  portalUrl: string | null;
 }
 
 interface InjectedConfig {
@@ -24,6 +26,7 @@ interface InjectedConfig {
   CLIENT_ID?: string;
   AUDIENCE?: string;
   API_BASE_URL?: string;
+  PORTAL_URL?: string;
 }
 
 declare global {
@@ -67,6 +70,8 @@ export function loadConfig(): PlatformConfig {
     clientId: values.CLIENT_ID!,
     audience: values.AUDIENCE!,
     apiBaseUrl: stripTrailingSlash(values.API_BASE_URL!),
+    // Optional, so not part of `values`: without it the CMS names the Portal without linking it.
+    portalUrl: injected.PORTAL_URL || env.VITE_PORTAL_URL || null,
   };
 }
 
