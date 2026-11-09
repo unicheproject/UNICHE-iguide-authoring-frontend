@@ -56,6 +56,15 @@ None. Backend dependencies are tracked in PLAN.md and the backend's PLAN.md.
   (as Guides do), or should `13` say the attract loop skips Places?
 - Consequence: none for now; a featured Place shows no image in the attract loop.
 
+### Q-006 — Lint and format: oxlint and oxfmt, or ESLint and Prettier
+
+- Kind: question
+- Source: PLAN.md C0d plans ESLint and Prettier; D-043 moved the build to Vite+, which bundles oxlint and
+  oxfmt (`vp lint`, `vp fmt`, `vp check`) and Vitest (`vp test`).
+- Question: adopt oxlint and oxfmt through Vite+ for C0d, or keep ESLint and Prettier beside it?
+- Consequence: shapes C0d. Either way, formatting is applied once to the whole repository in its own commit,
+  so feature diffs stay readable.
+
 ### Open decisions of `09` that shape CMS steps
 
 | `09` | Shapes |

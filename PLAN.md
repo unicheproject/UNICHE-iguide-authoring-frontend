@@ -137,6 +137,8 @@ box against the live Keycloak and Catalogue through the backend. Backend counter
 - ESLint and Prettier, Vitest, Playwright with axe as `make test` and `make a11y`, CI running all of them;
   `package-lock.json` removed. Closes G-010, G-011, G-012, G-013, G-014. Placed after C0c by owner
   priority; C0c already brings the first Playwright and axe tests.
+- 2026-11-10: `package-lock.json` is already removed and Vitest comes with Vite+ (D-043); ESLint and
+  Prettier versus Vite+'s oxlint and oxfmt is Q-006.
 
 ### C0e — Dashboard shell
 

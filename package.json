@@ -4,9 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vue-tsc -b && vite build",
-    "preview": "vite preview"
+    "dev": "vp dev",
+    "build": "vue-tsc -b && vp build",
+    "preview": "vp preview"
   },
   "dependencies": {
     "@vueuse/core": "^15.0.0",
@@ -14,7 +14,6 @@
     "clsx": "^2.1.1",
     "keycloak-js": "^26.2.4",
     "leaflet": "1.9.4",
-    "lucide-vue-next": "^1.0.0",
     "qrcode": "1.5.4",
     "radix-vue": "^1.9.17",
     "tailwind-merge": "^3.7.0",
@@ -32,7 +31,9 @@
     "tailwindcss": "^3.4.19",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "~6.0.2",
-    "vite": "^8.3.0",
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
     "vue-tsc": "^3.3.11"
-  }
+  },
+  "packageManager": "pnpm@11.1.1"
 }

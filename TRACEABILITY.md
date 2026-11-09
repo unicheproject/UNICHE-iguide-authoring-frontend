@@ -15,7 +15,13 @@ the checks of `14`, `08` §Companion repositories). Backend status is referenced
 | F4 | 2026-10-02 | `pnpm run build` | passed, 10 s |
 | F5 | 2026-10-02 | `pnpm dev`, `GET http://localhost:5173/` | `200` |
 | F6 | 2026-10-02 | PKCE login with `iguide-web` against the live realm (script, from the backend session) | redirect `http://localhost:5173/` accepted, token `aud` includes `uniche-platform`, CORS origin `http://localhost:5173` allowed; other redirects rejected |
+| F7 | 2026-11-10 | `make setup` (`vp install --frozen-lockfile`, Node 26.13.0, pnpm 11.1.1) | passed, 2 s |
+| F8 | 2026-11-10 | `make typecheck` (`vp exec vue-tsc -b`) | failed: 8 errors, `TranslationsView.vue` reads the removed `story` field (G-022) |
+| F9 | 2026-11-10 | `make build` (`vp run build`) | failed at `vue-tsc -b` (G-022) |
+| F10 | 2026-11-10 | `make dev`, `GET http://localhost:5173/` | served in 287 ms, page loads in the browser |
 | F11 | 2026-11-10 | `pnpm exec vue-tsc -b`, `pnpm run build` after the G-022 fix | passed (before the fix: 8 errors in `TranslationsView.vue`) |
+| F12 | 2026-11-10 | `make typecheck` (`vp exec vue-tsc -b`) with Vite+ and the G-022 fix | passed, 7 s |
+| F13 | 2026-11-10 | `make build` (`vp run build`) with Vite+ and the G-022 fix | passed, 9 s, 297 modules, output in `dist/` |
 
 No automated test exists, so no screen is proven.
 
