@@ -3,7 +3,8 @@
  * Visitor app → Translations (`12` §3 Translation workspace, DECISIONS.md D-021): a matrix of every Resource and
  * media item by language, and an editor that shows the default language beside the target language, field by field.
  * Each save sends one language through the per-language endpoints (backend D-031, D-032): a DRAFT is written in
- * place, an ACTIVE Resource into its working copy, which the author applies in its editor.
+ * place, an ACTIVE Resource into its working copy, which the author applies in its editor. A Guide's story is
+ * translated block by block (DECISIONS.md D-031): a TEXT block's rich text, a REFERENCE block's caption.
  */
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
@@ -118,13 +119,23 @@ const errors = ref<Record<string, string>>({});
 const errorSummary = ref<string | null>(null);
 const assets = ref<Asset[]>([]);
 
+/** One Guide block in the target language: a TEXT block's rich text or a REFERENCE block's caption. */
+interface BlockForm {
+  story: StoryBlockForm[];
+  caption: string;
+}
+
 const form = reactive({
   texts: {} as Record<string, string>,
   stops: {} as Record<string, Record<string, string>>,
-  story: [] as StoryBlockForm[],
+  blocks: {} as Record<string, BlockForm>,
 });
 const snapshot = ref("");
-const serialize = () => JSON.stringify({ texts: form.texts, stops: form.stops, story: blocksForApi(form.story) });
+const blocksSnapshot = () =>
+  Object.fromEntries(Object.entries(form.blocks).map(([id, b]) => [id, { story: blocksForApi(b.story), caption: b.caption }]));
+const serialize = () => JSON.stringify({ texts: form.texts, stops: form.stops, blocks: blocksSnapshot() });
+/** The block whose save failed, with the backend's field messages for it (`text…`, `caption`). */
+const blockFailure = ref<{ blockId: string; messages: Record<string, string> } | null>(null);
 const dirty = computed(() => snapshot.value !== "" && serialize() !== snapshot.value);
 const editable = computed(() => !!selected.value && selected.value.status !== "ARCHIVED" && !!target.value);
 
@@ -133,6 +144,7 @@ function resetForm() {
   const code = target.value;
   errors.value = {};
   errorSummary.value = null;
+  blockFailure.value = null;
   if (!item || !code) {
     snapshot.value = "";
     return;
@@ -141,7 +153,9 @@ function resetForm() {
   form.stops = Object.fromEntries(
     (item.stops ?? []).filter((s) => s.id).map((s) => [s.id!, Object.fromEntries(STOP_FIELDS.map((field) => [field.key, s.texts[code]?.[field.key] ?? ""]))]),
   );
-  form.story = blocksToForm(item.story?.bodies[code]?.blocks ?? []);
+  form.blocks = Object.fromEntries(
+    (item.blocks ?? []).map((b) => [b.id, { story: blocksToForm(b.bodies[code]?.blocks ?? []), caption: b.captions[code] ?? "" }]),
+  );
   snapshot.value = serialize();
 }
 watch(target, resetForm);
@@ -213,15 +227,21 @@ async function nextMissing() {
 
 const textOrNull = (value: string) => value.trim() || null;
 
-/** One request per changed part: the Resource's fields, the story, each changed stop. */
+/** One request per changed part: the Resource's fields, each changed story block, each changed stop. */
 async function save() {
   const item = selected.value;
   const code = target.value;
   if (!item || !code || !dirty.value) return;
-  const before = JSON.parse(snapshot.value) as { texts: Record<string, string>; stops: Record<string, Record<string, string>>; story: unknown };
+  const before = JSON.parse(snapshot.value) as {
+    texts: Record<string, string>;
+    stops: Record<string, Record<string, string>>;
+    blocks: Record<string, unknown>;
+  };
   saving.value = true;
   errors.value = {};
   errorSummary.value = null;
+  blockFailure.value = null;
+  let savingBlock: string | null = null;
   let last: TranslationSaved | null = null;
   let current = item;
   const apply = (saved: TranslationSaved) => {
@@ -242,12 +262,17 @@ async function save() {
         apply(await putTranslation(projectId.value, item.kind, item.id, code, fields, versions.value));
       }
     }
-    const storyBlocks = blocksForApi(form.story);
-    if (item.story && JSON.stringify(before.story) !== JSON.stringify(storyBlocks)) {
-      if (!item.story.blockId) throw new Error("NO_STORY_BLOCK");
-      const body: GuideBody = { blocks: storyBlocks };
-      apply(await putBlockTranslation(projectId.value, item.id, item.story.blockId, code,
-        { text: storyBlocks.length ? toApiBody(body) : null }, versions.value));
+    const blocksNow = blocksSnapshot();
+    for (const block of item.blocks ?? []) {
+      const now = blocksNow[block.id];
+      if (!now || JSON.stringify(before.blocks[block.id]) === JSON.stringify(now)) continue;
+      const body: GuideBody = { blocks: now.story };
+      const fields = block.type === "TEXT"
+        ? { text: now.story.length ? toApiBody(body) : null }
+        : { caption: textOrNull(now.caption) };
+      savingBlock = block.id;
+      apply(await putBlockTranslation(projectId.value, item.id, block.id, code, fields, versions.value));
+      savingBlock = null;
     }
     for (const [stopId, texts] of Object.entries(form.stops)) {
       if (JSON.stringify(before.stops[stopId]) === JSON.stringify(texts)) continue;
@@ -270,9 +295,7 @@ async function save() {
       current.status === "ACTIVE" ? "Saved as pending changes: visitors see them once you apply them in the editor." : "",
     );
   } catch (e) {
-    if (e instanceof Error && e.message === "NO_STORY_BLOCK") {
-      errorSummary.value = "This guide has no story yet. Write it in the default language in the guide editor first.";
-    } else if (!(e instanceof ApiError)) {
+    if (!(e instanceof ApiError)) {
       throw e;
     } else if (e.code === "VERSION_CONFLICT") {
       showToast("Someone else changed this resource", "It was reloaded with their version; enter your translation again.", "warning");
@@ -282,8 +305,16 @@ async function save() {
       const fresh = items.value.find((i) => i.kind === item.kind && i.id === item.id);
       if (fresh) await open(fresh);
     } else {
-      errors.value = e.fieldMessages();
-      errorSummary.value = e.platformUnavailable ? "The UNICHE platform is not reachable. Your text is still in the form." : e.message;
+      if (savingBlock) {
+        const position = (item.blocks ?? []).findIndex((b) => b.id === savingBlock) + 1;
+        blockFailure.value = { blockId: savingBlock, messages: e.fieldMessages() };
+        errorSummary.value = e.platformUnavailable
+          ? "The UNICHE platform is not reachable. Your text is still in the form."
+          : `Story block ${position}: ${e.message}`;
+      } else {
+        errors.value = e.fieldMessages();
+        errorSummary.value = e.platformUnavailable ? "The UNICHE platform is not reachable. Your text is still in the form." : e.message;
+      }
     }
   } finally {
     saving.value = false;
@@ -296,7 +327,9 @@ function fieldError(key: string, stopIndex?: number): string | undefined {
   const prefix = stopIndex === undefined ? "" : `stops[${stopIndex}].`;
   return errors.value[`${prefix}translations.${code}.${key}`] ?? (stopIndex === undefined ? errors.value[key] : undefined);
 }
-const noFieldError = () => undefined;
+/** A story block's error, from its own request, whose paths are like `text.blocks[0]` or `caption`. */
+const blockError = (blockId: string) => (path: string): string | undefined =>
+  blockFailure.value?.blockId === blockId ? blockFailure.value.messages[path] : undefined;
 
 // Leave guard ---------------------------------------------------------------------------------------------------
 
@@ -499,31 +532,66 @@ const storyText = (body: GuideBody | null | undefined) =>
               </div>
             </div>
 
-            <!-- Guide story -->
-            <div v-if="selected.story && targetInfo" class="grid gap-x-4 gap-y-1 border-t pt-4 md:grid-cols-2">
-              <div class="min-w-0">
-                <div class="text-[11px] font-bold uppercase tracking-[0.06em] text-muted-foreground">Story · {{ sourceInfo?.displayName }}</div>
-                <template v-if="storyText(selected.story.bodies[defaultLanguage ?? '']).length">
-                  <p v-for="(line, i) in storyText(selected.story.bodies[defaultLanguage ?? ''])" :key="i" class="mt-1 whitespace-pre-wrap text-[13px] text-gray-800">{{ line }}</p>
-                </template>
-                <p v-else class="mt-1 text-[13px] italic text-muted-foreground">Empty</p>
-              </div>
-              <div class="min-w-0">
-                <p v-if="!selected.story.blockId" class="text-[12px] text-muted-foreground">
-                  This guide has no story yet: write it in the default language in its editor first.
-                </p>
-                <StoryEditor
-                  v-else
-                  :key="`${selected.id}:${targetInfo.languageCode}`"
-                  :project-id="project.id"
-                  :blocks="form.story"
-                  :language="targetInfo"
-                  :assets="assets"
-                  :readonly="!editable"
-                  :field-error="noFieldError"
-                  :heading="`Story · ${targetInfo.displayName}`"
-                  @uploaded="assets.unshift($event)"
-                />
+            <!-- Guide story, block by block (DECISIONS.md D-031) -->
+            <div v-if="selected.blocks && targetInfo" class="flex flex-col gap-3 border-t pt-4">
+              <h3 class="text-[11px] font-bold uppercase tracking-[0.06em] text-muted-foreground">Story</h3>
+              <p v-if="!selected.blocks.length" class="text-[12px] text-muted-foreground">
+                This guide has no story yet: write it in the default language in its editor first.
+              </p>
+              <div
+                v-for="(block, index) in selected.blocks"
+                :key="block.id"
+                class="grid gap-x-4 gap-y-1 rounded-md border px-3.5 py-3 md:grid-cols-2"
+              >
+                <div class="min-w-0">
+                  <div class="text-[11px] font-semibold text-muted-foreground">
+                    {{ index + 1 }}. {{ block.type === "TEXT" ? "Text" : `Reference: ${block.title}` }} · {{ sourceInfo?.languageCode }}
+                  </div>
+                  <template v-if="block.type === 'TEXT'">
+                    <template v-if="storyText(block.bodies[defaultLanguage ?? '']).length">
+                      <p v-for="(line, i) in storyText(block.bodies[defaultLanguage ?? ''])" :key="i" class="mt-1 whitespace-pre-wrap text-[13px] text-gray-800">{{ line }}</p>
+                    </template>
+                    <p v-else class="mt-1 text-[13px] italic text-muted-foreground">Empty</p>
+                  </template>
+                  <p v-else class="mt-1 whitespace-pre-wrap text-[13px]" :class="block.captions[defaultLanguage ?? ''] ? 'text-gray-800' : 'italic text-muted-foreground'">
+                    {{ block.captions[defaultLanguage ?? ""] || "No caption" }}
+                  </p>
+                </div>
+                <div v-if="form.blocks[block.id]" class="min-w-0">
+                  <StoryEditor
+                    v-if="block.type === 'TEXT'"
+                    :key="`${selected.id}:${block.id}:${targetInfo.languageCode}`"
+                    embedded
+                    :project-id="project.id"
+                    :blocks="form.blocks[block.id].story"
+                    :language="targetInfo"
+                    :assets="assets"
+                    :readonly="!editable"
+                    :field-error="blockError(block.id)"
+                    path="text"
+                    :empty-text="`No text in ${targetInfo.displayName} yet.`"
+                    @uploaded="assets.unshift($event)"
+                  />
+                  <template v-else>
+                    <label :for="`caption-${block.id}`" class="text-[11px] font-semibold text-muted-foreground">
+                      Caption · {{ targetInfo.languageCode }}
+                    </label>
+                    <textarea
+                      :id="`caption-${block.id}`"
+                      v-model="form.blocks[block.id].caption"
+                      :readonly="!editable"
+                      :dir="targetInfo.direction === 'RTL' ? 'rtl' : 'ltr'"
+                      rows="2"
+                      class="field-input w-full text-[13px]"
+                      :class="{ invalid: blockError(block.id)('caption') }"
+                      :aria-invalid="blockError(block.id)('caption') ? 'true' : undefined"
+                      :aria-describedby="blockError(block.id)('caption') ? `caption-${block.id}-error` : undefined"
+                    ></textarea>
+                    <p v-if="blockError(block.id)('caption')" :id="`caption-${block.id}-error`" class="mt-0.5 text-[11px] font-semibold text-destructive">
+                      ⚠ {{ blockError(block.id)('caption') }}
+                    </p>
+                  </template>
+                </div>
               </div>
             </div>
 
