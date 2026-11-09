@@ -15,6 +15,7 @@ the checks of `14`, `08` §Companion repositories). Backend status is referenced
 | F4 | 2026-10-02 | `pnpm run build` | passed, 10 s |
 | F5 | 2026-10-02 | `pnpm dev`, `GET http://localhost:5173/` | `200` |
 | F6 | 2026-10-02 | PKCE login with `iguide-web` against the live realm (script, from the backend session) | redirect `http://localhost:5173/` accepted, token `aud` includes `uniche-platform`, CORS origin `http://localhost:5173` allowed; other redirects rejected |
+| F11 | 2026-11-10 | `pnpm exec vue-tsc -b`, `pnpm run build` after the G-022 fix | passed (before the fix: 8 errors in `TranslationsView.vue`) |
 
 No automated test exists, so no screen is proven.
 

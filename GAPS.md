@@ -203,6 +203,14 @@ prototype inventory).
 
 ## Closed
 
+### G-022 — Translation workspace reads the removed `story` field
+
+- Found 2026-11-10: `vue-tsc -b` fails with 8 errors in `src/views/workspace/TranslationsView.vue`, which still
+  reads `item.story`; commit `3edf030` replaced `story` with `blocks` in `src/workspace/translationCatalog.ts`.
+- Closed 2026-11-10 (TRACEABILITY.md F11): the workspace lists every story block as D-031 says, a TEXT block
+  through the text editor and a REFERENCE block through its caption, and saves each changed block through
+  its own endpoint; `vue-tsc -b` and `pnpm run build` green, not run against the backend.
+
 ### G-003 — Configuration points at the MuseotekBox backend
 
 - Found: `.env.example` `VITE_API_BASE_URL=http://localhost:8080/museotekbox/api/v1`;
