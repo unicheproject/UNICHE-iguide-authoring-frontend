@@ -775,3 +775,26 @@ the backend's DECISIONS.md.
   fields for map and floor plan placements, upload progress bars and announcements, toasts in a live region.
 - Not verified with a screen reader or at 200 percent text in a browser; to-do A43.
 - Affected specs: `14` §1, §4.
+
+## D-043 (2026-11-10) — Vite+ toolchain, Node 26, pnpm 11
+
+- Type: implementation
+- Decision:
+  - the CMS builds with Vite+ 1.5.1 (`vp`), set up by `vp migrate --no-agent --no-editor --no-hooks`:
+    `vite` is aliased to `@voidzero-dev/vite-plus-core` through the catalog in `pnpm-workspace.yaml`,
+    `vite.config.ts` imports from `vite-plus`, and the scripts call `vp dev`, `vp build`, `vp preview`;
+  - Node 26.13.0 is pinned in `.node-version` and pnpm 11.1.1 in `packageManager`; `vp` (and mise, when it
+    reads `.node-version`) installs exactly these, so a dev box, CI, and the container build use the same
+    versions;
+  - `package-lock.json` is removed, as planned by D-007; `pnpm-lock.yaml` stays the only lockfile;
+  - pnpm 11 fails an install on a dependency build script that is neither allowed nor refused, so
+    `pnpm-workspace.yaml` refuses `vue-demi`'s (`allowBuilds`): its default build already targets Vue 3;
+  - `lucide-vue-next` is removed: nothing imports it, and the package is deprecated;
+  - Vite+ bundles oxlint, oxfmt, and Vitest, but lint and format are not switched on (`fmt: {}` only); the
+    choice against the ESLint and Prettier planned in C0d is Q-006.
+- Why: one pinned Node and pnpm for every environment, which the container image (G-015) needs; Vite+ wraps
+  the same Vite 8 the CMS already used.
+- Not done: `baseUrl` stays in `tsconfig.json` (deprecated in TypeScript 6, removed in 7); it only blocks
+  oxlint's type-aware rules, which are off.
+- Supersedes: the pnpm 9 version in D-007; the lockfile rule of D-007 stands.
+

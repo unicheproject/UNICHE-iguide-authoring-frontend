@@ -132,13 +132,9 @@ prototype inventory).
 - Closed by: C1 (App settings), C4 (Pages, Navigation), C5 (Overview, Translations, Preview, Launch), C6
   (Audit log).
 
-### G-010 — Two lockfiles, npm one out of sync
-
-- Found 2026-10-02: `npm ci` fails ("Missing: leaflet@1.9.4 … from lock file").
-- Closed by: C0d removing `package-lock.json` (DECISIONS.md D-007).
-
 ### G-011 — No lint or format tooling
 
+- Note 2026-11-10: Vite+ (D-043) brings oxlint and oxfmt, not switched on; the tool choice is Q-006.
 - Closed by: C0d (`make lint` green in CI).
 
 ### G-012 — No accessibility check
@@ -201,7 +197,21 @@ prototype inventory).
   endpoints instead of `manifest?preview=true`, no `contentRevision` line.
 - Closed by: C5, embedding the runtime build once it and the backend preview API (backend M8) exist.
 
+### G-022 — Translation workspace reads the removed `story` field
+
+- Found 2026-11-10 (TRACEABILITY.md F8): `make typecheck` fails with 8 errors in
+  `src/views/workspace/TranslationsView.vue`, which still reads `item.story`; commit `3edf030` replaced
+  `story` with `blocks` in `src/workspace/translationCatalog.ts` without updating the view.
+- Consequence: `make build` (and so the container image) fails at the type check.
+- Closed by: the view moved to `blocks` (owner).
+
 ## Closed
+
+### G-010 — Two lockfiles, npm one out of sync
+
+- Found 2026-10-02: `npm ci` fails ("Missing: leaflet@1.9.4 … from lock file").
+- Closed 2026-11-10 (D-043): `package-lock.json` removed; installs run `vp install --frozen-lockfile`
+  from `pnpm-lock.yaml`.
 
 ### G-003 — Configuration points at the MuseotekBox backend
 

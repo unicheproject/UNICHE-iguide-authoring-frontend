@@ -104,7 +104,8 @@ and move the baseline here with a DECISIONS.md entry.
 Found in the code (DECISIONS.md D-006, D-007):
 
 - Vue 3.5 with `<script setup>`, TypeScript 6, Vite 8 (dev server fixed on port `5173`), vue-router 4;
-- pnpm 9 with `pnpm-lock.yaml` as the only authoritative lockfile;
+- Vite+ (`vp`, D-043) over Vite 8; Node 26 pinned in `.node-version`, pnpm 11 in `packageManager`,
+  `pnpm-lock.yaml` as the only authoritative lockfile;
 - Tailwind 3 with shadcn-vue conventions (`components.json`, radix-vue, class-variance-authority,
   tailwind-merge, lucide icons); palette as CSS variables in `src/style.css`;
 - state: Vue `reactive` stores in `src/stores` and composables in `src/workspace`; no Pinia;
@@ -189,16 +190,17 @@ needs as a GAPS.md entry that names the backend item.
 
 ## 10. Commands
 
-Only commands that ran on 2026-10-02. Prerequisites: Node 22 (22.12 verified), pnpm 9 (9.15.9 verified).
+Only commands that ran on 2026-11-10. Prerequisite: the Vite+ CLI (`vp`); it installs the Node in
+`.node-version` and the pnpm in `packageManager`.
 
 | Command | Result |
 |---|---|
-| `make setup` (`pnpm install --frozen-lockfile`) | about 2 s |
-| `make typecheck` (`pnpm exec vue-tsc -b`) | passes, about 6 s |
-| `make build` (`pnpm run build`) | passes, about 10 s, output in `dist/` |
-| `make dev` (`pnpm dev`) | serves `http://localhost:5173` |
+| `make setup` (`vp install --frozen-lockfile`) | passes, about 2 s |
+| `make typecheck` (`vp exec vue-tsc -b`) | fails: 8 errors in `TranslationsView.vue` (GAPS.md G-022) |
+| `make build` (`vp run build`) | fails at the type check (G-022); `vp build` alone bundles, output in `dist/` |
+| `make dev` (`vp dev`) | serves `http://localhost:5173` |
 
-`npm ci` fails: `package-lock.json` is out of sync (GAPS.md G-010). Not available yet: lint (G-011),
+Not available yet: lint (G-011, Q-006),
 accessibility checks (G-012), tests (G-013), CI (G-014), `api-sync` (G-002), and a container image (G-015).
 
 ## 11. Working method and definition of done
