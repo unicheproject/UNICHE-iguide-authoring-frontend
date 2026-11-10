@@ -199,9 +199,10 @@ Only commands that ran on 2026-11-10. Prerequisite: the Vite+ CLI (`vp`); it ins
 | `make typecheck` (`vp exec vue-tsc -b`) | passes, about 7 s |
 | `make build` (`vp run build`) | passes, about 9 s, output in `dist/` |
 | `make dev` (`vp dev`) | serves `http://localhost:5173` |
+| `make image` (`docker build`) | passes; run it with `IDP_URL` and `API_BASE_URL` set (D-044) |
 
 Not available yet: lint (G-011, Q-006),
-accessibility checks (G-012), tests (G-013), CI (G-014), `api-sync` (G-002), and a container image (G-015).
+accessibility checks (G-012), tests (G-013), CI (G-014), and `api-sync` (G-002).
 
 ## 11. Working method and definition of done
 

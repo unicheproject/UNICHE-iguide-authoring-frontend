@@ -798,3 +798,25 @@ the backend's DECISIONS.md.
   oxlint's type-aware rules, which are off.
 - Supersedes: the pnpm 9 version in D-007; the lockfile rule of D-007 stands.
 
+## D-044 (2026-11-10) — Container image: Vite+ build, unprivileged nginx, config.js from the environment
+
+- Type: implementation
+- Decision:
+  - `Dockerfile` builds on the Vite+ 1.5.1 image (`vp install --frozen-lockfile`, then `vp run build`, so
+    `vue-tsc -b` runs in the image build) and serves `dist/` with `nginx-unprivileged` 1.30 as uid 101 on port
+    8080; both base images are pinned by tag and digest;
+  - `docker/docker-entrypoint.sh` writes `config.js` (`window.__UNICHE_CONFIG__`) at container start from
+    `IDP_URL`, `API_BASE_URL`, `PORTAL_URL`, `REALM`, `CLIENT_ID`, `AUDIENCE`; `IDP_URL` and `API_BASE_URL`
+    have no default, as in `src/platform/config.ts`; `REALM`, `CLIENT_ID`, `AUDIENCE` default to `uniche`,
+    `iguide-web`, `uniche-platform`; `PORTAL_URL` stays optional (D-041);
+  - the entrypoint stops the start on a missing value, on characters outside a URL or identifier (the values
+    are written into a JavaScript string literal), on an `IDP_URL` or `PORTAL_URL` that is not a bare origin,
+    and on an `API_BASE_URL` not ending in `/api/v1`;
+  - `docker/nginx.conf`: SPA fallback to `index.html`; `index.html` `no-cache`, `config.js` `no-store`,
+    `/assets/` immutable for a year, a missing asset is a 404;
+  - `.dockerignore` keeps `.env*` out of the build context, so `.env.local` `VITE_*` values are never baked
+    into the bundle.
+- Why: one image for every environment (G-015), closing the gap without changing how `src/platform/config.ts`
+  reads its configuration.
+- Not done: the backend compose `cms` profile (backend repository, backend D-010).
+
