@@ -151,12 +151,6 @@ prototype inventory).
 
 - Closed by: C0b (contract drift job) and C0d (full pipeline).
 
-### G-015 — No container image
-
-- Found: no Dockerfile or nginx configuration; `10` §6 lists a `cms` nginx service, which the backend
-  compose adds as a profile once this repository ships an image (backend D-010).
-- Closed by: a Dockerfile serving `dist/` with `config.js` injected per environment.
-
 ### G-016 — Public OpenStreetMap tiles and Nominatim
 
 - Found: `GeoMapCanvas.vue` and `src/platform/maps.ts` use the public services, which forbid production
@@ -198,6 +192,14 @@ prototype inventory).
 - Closed by: C5, embedding the runtime build once it and the backend preview API (backend M8) exist.
 
 ## Closed
+
+### G-015 — No container image
+
+- Found: no Dockerfile or nginx configuration; `10` §6 lists a `cms` nginx service, which the backend
+  compose adds as a profile once this repository ships an image (backend D-010).
+- Closed 2026-11-10 (D-044, TRACEABILITY.md F14, F15): `Dockerfile` builds with Vite+ and serves `dist/` with
+  unprivileged nginx; `docker/docker-entrypoint.sh` writes `config.js` from the environment at start. The
+  backend compose `cms` profile is not added yet (backend repository).
 
 ### G-022 — Translation workspace reads the removed `story` field
 

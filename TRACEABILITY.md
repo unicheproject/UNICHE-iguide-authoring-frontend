@@ -22,6 +22,8 @@ the checks of `14`, `08` §Companion repositories). Backend status is referenced
 | F11 | 2026-11-10 | `pnpm exec vue-tsc -b`, `pnpm run build` after the G-022 fix | passed (before the fix: 8 errors in `TranslationsView.vue`) |
 | F12 | 2026-11-10 | `make typecheck` (`vp exec vue-tsc -b`) with Vite+ and the G-022 fix | passed, 7 s |
 | F13 | 2026-11-10 | `make build` (`vp run build`) with Vite+ and the G-022 fix | passed, 9 s, 297 modules, output in `dist/` |
+| F14 | 2026-11-10 | `make image` (`docker build`) | passed; `vue-tsc -b` and the build run in the image; no `VITE_*` value baked into the bundle |
+| F15 | 2026-11-10 | `docker run` of the image | starts as uid 101; refuses a missing `API_BASE_URL`, an `API_BASE_URL` without `/api/v1`, a quoted `IDP_URL`, a `PORTAL_URL` with a path; writes a `config.js` that parses, with and without `PORTAL_URL`; `/` and deep links `200` `no-cache`, `/config.js` `no-store`, missing asset `404` |
 
 No automated test exists, so no screen is proven.
 

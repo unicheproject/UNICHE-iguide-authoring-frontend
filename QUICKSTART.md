@@ -49,6 +49,6 @@ Stop `make dev` with Ctrl-C; stop the backend with `make infra-down` in its repo
 
 ## Not available yet
 
-Lint, tests, accessibility checks, `api-sync`, and a container image (GAPS.md G-002, G-011 to G-015). The
+Lint, tests, accessibility checks, and `api-sync` (GAPS.md G-002, G-011 to G-014). The
 `dev/` stand-ins (local Keycloak, Catalogue mock, S3 mock) are optional and were not run in the bootstrap
 (DECISIONS.md D-010).
