@@ -8,10 +8,21 @@
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
 import PageHead from "@/components/PageHead.vue";
+import AiMarker from "@/components/editor/AiMarker.vue";
 import StoryEditor from "@/components/editor/StoryEditor.vue";
 import { blocksForApi, blocksToForm, type StoryBlockForm } from "@/components/editor/StoryEditor";
 import { Button } from "@/components/ui/button";
 import { statusChipStyle } from "@/lib/format";
+import {
+  entryLocation,
+  fetchAiProvenance,
+  fetchAiStatus,
+  markReviewed,
+  translateWithMuseMind,
+  type AiPart,
+  type AiProvenanceEntry,
+  type AiTranslationStatus,
+} from "@/platform/ai";
 import { ApiError } from "@/platform/api";
 import { listAssets, type Asset } from "@/platform/assets";
 import { toApiBody, type GuideBody } from "@/platform/guides";
@@ -58,8 +69,10 @@ async function load() {
   controller = new AbortController();
   loading.value = true;
   loadError.value = null;
+  const signal = controller.signal;
+  void loadAi(signal);
   try {
-    items.value = await loadItems(projectId.value, defaultLanguage.value, controller.signal);
+    items.value = await loadItems(projectId.value, defaultLanguage.value, signal);
   } catch (e) {
     if (e instanceof DOMException && e.name === "AbortError") return;
     if (!(e instanceof ApiError)) throw e;
@@ -73,6 +86,61 @@ watch([projectId, defaultLanguage], () => {
 }, { immediate: true });
 onBeforeUnmount(() => controller?.abort());
 
+// MuseMind (D-026, D-027) ----------------------------------------------------------------------------------------------
+
+/** Null while unknown or unreadable; the action then stays off with its reason. */
+const aiStatus = ref<AiTranslationStatus | null>(null);
+const aiStatusError = ref(false);
+const provenance = ref<AiProvenanceEntry[]>([]);
+
+/** The status and the markers; neither failing keeps the workspace from working. */
+async function loadAi(signal?: AbortSignal) {
+  const [status, entries] = await Promise.allSettled([fetchAiStatus(signal), fetchAiProvenance(projectId.value, signal)]);
+  if (signal?.aborted) return;
+  aiStatus.value = status.status === "fulfilled" ? status.value.translation : null;
+  aiStatusError.value = status.status === "rejected";
+  if (entries.status === "fulfilled") provenance.value = entries.value;
+}
+
+async function refreshProvenance() {
+  try {
+    provenance.value = await fetchAiProvenance(projectId.value);
+  } catch (e) {
+    if (!(e instanceof ApiError)) throw e;
+  }
+}
+
+/** Markers by item, part, and language: a Resource's own texts, a Route stop, the Guide story, a media item. */
+const aiKey = (kind: string, id: string, part: AiPart, code: string) => `${kind}:${id}:${part}:${code}`;
+const aiByKey = computed(() => {
+  const map = new Map<string, AiProvenanceEntry>();
+  for (const entry of provenance.value) {
+    if (entry.provenance.origin !== "AI_GENERATED") continue;
+    const at = entryLocation(entry);
+    if (at) map.set(aiKey(at.kind, at.itemId, at.part, entry.languageCode), entry);
+  }
+  return map;
+});
+/** The parts of an item MuseMind translates: its own texts, each stop that exists live, each story block. */
+function partsOf(item: TranslationItem): AiPart[] {
+  const parts: AiPart[] = ["self"];
+  for (const stop of item.stops ?? []) if (stop.id) parts.push(`stop:${stop.id}`);
+  for (const block of item.blocks ?? []) parts.push(`block:${block.id}`);
+  return parts;
+}
+const aiOf = (item: TranslationItem, code: string | null, part: AiPart = "self") =>
+  code ? aiByKey.value.get(aiKey(item.kind, item.id, part, code)) : undefined;
+/** Every marker of an item in one language, whatever the part. */
+const aiEntries = (item: TranslationItem, code: string) =>
+  partsOf(item).map((part) => aiOf(item, code, part)).filter((e): e is AiProvenanceEntry => !!e);
+const unreviewed = (entry: AiProvenanceEntry | undefined) => !!entry && !entry.provenance.reviewedAt;
+const hasUnreviewedAi = (item: TranslationItem) => languages.value.some((l) => aiEntries(item, l.languageCode).some(unreviewed));
+/** One label for a language's markers: unreviewed while any part is, pending while any part is. */
+function aiSummary(entries: AiProvenanceEntry[]): string {
+  const label = entries.some(unreviewed) ? "AI · unreviewed" : "AI · reviewed";
+  return label + (entries.some((e) => e.pending) ? " · pending" : "");
+}
+
 // Filters -------------------------------------------------------------------------------------------------------
 
 const targets = computed(() => languages.value.filter((l) => !l.isDefault));
@@ -84,6 +152,7 @@ const targetInfo = computed(() => languages.value.find((l) => l.languageCode ===
 const sourceInfo = computed(() => languages.value.find((l) => l.isDefault) ?? null);
 
 const kindFilter = ref<"ALL" | CatalogKind>("ALL");
+const aiFilter = ref(false);
 const stateFilter = ref<"ALL" | ItemState>("ALL");
 const query = ref("");
 const normalize = (text: string) => text.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
@@ -94,9 +163,11 @@ const rows = computed(() => {
     if (item.status === "ARCHIVED") return false;
     if (kindFilter.value !== "ALL" && item.kind !== kindFilter.value) return false;
     if (stateFilter.value !== "ALL" && target.value && itemProgress(item, target.value).state !== stateFilter.value) return false;
+    if (aiFilter.value && !hasUnreviewedAi(item)) return false;
     return !q || normalize(item.title).includes(q);
   });
 });
+const unreviewedCount = computed(() => items.value.filter((i) => i.status !== "ARCHIVED" && hasUnreviewedAi(i)).length);
 const kindLabel = (kind: CatalogKind) => KINDS.find((k) => k.kind === kind)!;
 
 const STATE_LABEL: Record<ItemState, string> = { complete: "Complete", partial: "Partial", missing: "Missing" };
@@ -114,6 +185,8 @@ const selected = ref<TranslationItem | null>(null);
 const versions = ref<TranslationVersions>({ version: 0, workingCopyVersion: null });
 const opening = ref(false);
 const saving = ref(false);
+const translating = ref(false);
+const reviewing = ref(false);
 const errors = ref<Record<string, string>>({});
 const errorSummary = ref<string | null>(null);
 const assets = ref<Asset[]>([]);
@@ -121,10 +194,13 @@ const assets = ref<Asset[]>([]);
 const form = reactive({
   texts: {} as Record<string, string>,
   stops: {} as Record<string, Record<string, string>>,
-  story: [] as StoryBlockForm[],
+  /** A Guide's blocks by id: a text block's rich text, a reference's caption. */
+  blocks: {} as Record<string, { nodes: StoryBlockForm[]; caption: string }>,
 });
 const snapshot = ref("");
-const serialize = () => JSON.stringify({ texts: form.texts, stops: form.stops, story: blocksForApi(form.story) });
+const blocksState = () =>
+  Object.fromEntries(Object.entries(form.blocks).map(([id, b]) => [id, { nodes: blocksForApi(b.nodes), caption: b.caption }]));
+const serialize = () => JSON.stringify({ texts: form.texts, stops: form.stops, blocks: blocksState() });
 const dirty = computed(() => snapshot.value !== "" && serialize() !== snapshot.value);
 const editable = computed(() => !!selected.value && selected.value.status !== "ARCHIVED" && !!target.value);
 
@@ -141,7 +217,9 @@ function resetForm() {
   form.stops = Object.fromEntries(
     (item.stops ?? []).filter((s) => s.id).map((s) => [s.id!, Object.fromEntries(STOP_FIELDS.map((field) => [field.key, s.texts[code]?.[field.key] ?? ""]))]),
   );
-  form.story = blocksToForm(item.story?.bodies[code]?.blocks ?? []);
+  form.blocks = Object.fromEntries(
+    (item.blocks ?? []).map((b) => [b.id, { nodes: blocksToForm(b.bodies[code]?.blocks ?? []), caption: b.captions[code] ?? "" }]),
+  );
   snapshot.value = serialize();
 }
 watch(target, resetForm);
@@ -213,12 +291,16 @@ async function nextMissing() {
 
 const textOrNull = (value: string) => value.trim() || null;
 
-/** One request per changed part: the Resource's fields, the story, each changed stop. */
+/** One request per changed part: the Resource's fields, each changed story block, each changed stop. */
 async function save() {
   const item = selected.value;
   const code = target.value;
   if (!item || !code || !dirty.value) return;
-  const before = JSON.parse(snapshot.value) as { texts: Record<string, string>; stops: Record<string, Record<string, string>>; story: unknown };
+  const before = JSON.parse(snapshot.value) as {
+    texts: Record<string, string>;
+    stops: Record<string, Record<string, string>>;
+    blocks: Record<string, unknown>;
+  };
   saving.value = true;
   errors.value = {};
   errorSummary.value = null;
@@ -242,12 +324,13 @@ async function save() {
         apply(await putTranslation(projectId.value, item.kind, item.id, code, fields, versions.value));
       }
     }
-    const storyBlocks = blocksForApi(form.story);
-    if (item.story && JSON.stringify(before.story) !== JSON.stringify(storyBlocks)) {
-      if (!item.story.blockId) throw new Error("NO_STORY_BLOCK");
-      const body: GuideBody = { blocks: storyBlocks };
-      apply(await putBlockTranslation(projectId.value, item.id, item.story.blockId, code,
-        { text: storyBlocks.length ? toApiBody(body) : null }, versions.value));
+    const now = blocksState();
+    for (const block of item.blocks ?? []) {
+      const state = now[block.id];
+      if (!state || JSON.stringify(before.blocks[block.id]) === JSON.stringify(state)) continue;
+      const body: GuideBody = { blocks: state.nodes };
+      const fields = block.type === "TEXT" ? { text: state.nodes.length ? toApiBody(body) : null } : { caption: textOrNull(state.caption) };
+      apply(await putBlockTranslation(projectId.value, item.id, block.id, code, fields, versions.value));
     }
     for (const [stopId, texts] of Object.entries(form.stops)) {
       if (JSON.stringify(before.stops[stopId]) === JSON.stringify(texts)) continue;
@@ -255,38 +338,188 @@ async function save() {
       apply(await putStopTranslation(projectId.value, item.id, stopId, code, fields, versions.value));
     }
     if (last) {
-      const saved = last as TranslationSaved;
-      current = {
-        ...itemFromResponse(item.kind, saved.resource, defaultLanguage.value, item),
-        status: item.status,
-        hasWorkingCopy: item.hasWorkingCopy || saved.workingCopyVersion !== null,
-      };
-      replace(current);
-      selected.value = current;
-      resetForm();
+      current = adopt(item, last as TranslationSaved);
+      // Changed text of a machine-translated language counts as its review (backend D-035).
+      if (aiEntries(item, code).length) void refreshProvenance();
     }
     showToast(
       "Translation saved",
       current.status === "ACTIVE" ? "Saved as pending changes: visitors see them once you apply them in the editor." : "",
     );
   } catch (e) {
-    if (e instanceof Error && e.message === "NO_STORY_BLOCK") {
-      errorSummary.value = "This guide has no story yet. Write it in the default language in the guide editor first.";
-    } else if (!(e instanceof ApiError)) {
+    if (!(e instanceof ApiError)) {
       throw e;
     } else if (e.code === "VERSION_CONFLICT") {
-      showToast("Someone else changed this resource", "It was reloaded with their version; enter your translation again.", "warning");
-      snapshot.value = "";
-      selected.value = null;
-      await load();
-      const fresh = items.value.find((i) => i.kind === item.kind && i.id === item.id);
-      if (fresh) await open(fresh);
+      await reloadAfterConflict(item, "enter your translation again.");
     } else {
       errors.value = e.fieldMessages();
       errorSummary.value = e.platformUnavailable ? "The UNICHE platform is not reachable. Your text is still in the form." : e.message;
     }
   } finally {
     saving.value = false;
+  }
+}
+
+/** Shows a saved response in the matrix and the editor. */
+function adopt(item: TranslationItem, saved: TranslationSaved): TranslationItem {
+  const current: TranslationItem = {
+    ...itemFromResponse(item.kind, saved.resource, defaultLanguage.value, item),
+    status: item.status,
+    hasWorkingCopy: item.hasWorkingCopy || saved.workingCopyVersion !== null,
+  };
+  replace(current);
+  selected.value = current;
+  resetForm();
+  return current;
+}
+
+async function reloadAfterConflict(item: TranslationItem, then: string) {
+  showToast("Someone else changed this resource", `It was reloaded with their version; ${then}`, "warning");
+  snapshot.value = "";
+  selected.value = null;
+  await load();
+  const fresh = items.value.find((i) => i.kind === item.kind && i.id === item.id);
+  if (fresh) await open(fresh);
+}
+
+// MuseMind actions ----------------------------------------------------------------------------------------------
+
+const aiReady = computed(() => aiStatus.value === "MOCK" || aiStatus.value === "AVAILABLE");
+/** Why "Translate with MuseMind" is off, or null when it is on. */
+const translateReason = computed(() => {
+  if (aiStatusError.value) return "The AI translation status could not be read.";
+  if (aiStatus.value === null) return "Checking whether AI translation is available…";
+  if (aiStatus.value === "DISABLED") return "AI translation needs the UNICHE AI gateway, which is not connected yet.";
+  return null;
+});
+const selectedAi = computed(() => (selected.value ? aiOf(selected.value, target.value) : undefined));
+
+/** How the toast and the error summary name a part. */
+function partLabel(item: TranslationItem, part: AiPart): string {
+  if (part === "self") return item.kind === "assets" ? "the media texts" : `the ${kindLabel(item.kind).noun}'s texts`;
+  if (part.startsWith("block:")) {
+    const index = (item.blocks ?? []).findIndex((b) => b.id === part.slice(6));
+    const block = item.blocks?.[index];
+    return block?.type === "REFERENCE" ? `the caption of ${block.title}` : `story block ${index + 1}`;
+  }
+  const index = (item.stops ?? []).findIndex((s) => s.id === part.slice(5));
+  return `stop ${index + 1}`;
+}
+
+/** Whether the target language already holds text in any part, which MuseMind overwrites. */
+function targetHasText(item: TranslationItem, code: string): boolean {
+  if (item.fields.some((field) => (item.texts[code]?.[field.key] ?? "").trim())) return true;
+  if ((item.stops ?? []).some((s) => s.id && Object.values(s.texts[code] ?? {}).some((t) => (t ?? "").trim()))) return true;
+  return (item.blocks ?? []).some((b) => storyText(b.bodies[code]).length > 0 || !!b.captions[code]?.trim());
+}
+
+/**
+ * Fills the target language of the whole open item from the default language through the backend, part by part:
+ * its own texts, each live stop, the story (D-027). Each part is saved as it comes back, so the versions chain; a
+ * part without default-language text is skipped; the first failure stops the rest and keeps what was done.
+ */
+async function translate() {
+  const item = selected.value;
+  const code = target.value;
+  if (!item || !code || !aiReady.value || !editable.value) return;
+  const parts = partsOf(item);
+  if (targetHasText(item, code) || dirty.value) {
+    const ok = await askConfirm({
+      title: `Replace the ${targetInfo.value?.displayName ?? code} text?`,
+      body:
+        `MuseMind overwrites this language's texts${parts.length > 1 ? ", stops, and story blocks" : ""} with a machine translation wherever the ` +
+        `${sourceInfo.value?.displayName ?? "default language"} has text` +
+        (dirty.value ? ", and your unsaved changes are lost." : "."),
+      confirmLabel: "Translate with MuseMind",
+      cancelLabel: "Keep the current text",
+      danger: true,
+    });
+    if (!ok) return;
+  }
+  translating.value = true;
+  errors.value = {};
+  errorSummary.value = null;
+  let last: TranslationSaved | null = null;
+  const done: AiPart[] = [];
+  const skipped: AiPart[] = [];
+  let failed: { part: AiPart; error: ApiError } | null = null;
+  for (const part of parts) {
+    try {
+      const result = await translateWithMuseMind(projectId.value, item.kind, item.id, part, code, versions.value);
+      if (result.workingCopyVersion !== null) {
+        versions.value = { ...versions.value, workingCopyVersion: result.workingCopyVersion };
+      } else {
+        versions.value = { version: (result.resource as { version: number }).version, workingCopyVersion: null };
+      }
+      last = result;
+      done.push(part);
+    } catch (e) {
+      if (!(e instanceof ApiError)) {
+        translating.value = false;
+        throw e;
+      }
+      if (e.hasCode("NOTHING_TO_TRANSLATE")) {
+        skipped.push(part);
+        continue;
+      }
+      failed = { part, error: e };
+      break;
+    }
+  }
+  try {
+    const current = last ? adopt(item, last) : item;
+    if (done.length) await refreshProvenance();
+    if (failed?.error.code === "VERSION_CONFLICT") {
+      await reloadAfterConflict(item, done.length ? "what was translated is kept; translate again for the rest." : "translate it again if you still want to.");
+      return;
+    }
+    if (failed?.error.code === "AI_GATEWAY_UNAVAILABLE") void loadAi();
+    if (failed) {
+      const reason = failed.error.code === "AI_GATEWAY_UNAVAILABLE"
+        ? "the UNICHE AI gateway did not answer. Try again later, or translate by hand."
+        : failed.error.platformUnavailable ? "the UNICHE platform is not reachable." : failed.error.message;
+      errorSummary.value = `MuseMind stopped at ${partLabel(item, failed.part)}: ${reason}` +
+        (done.length ? ` Translated before it: ${done.map((p) => partLabel(item, p)).join(", ")}.` : "");
+    } else if (!done.length) {
+      errorSummary.value = `There is no ${sourceInfo.value?.displayName ?? "default-language"} text to translate yet.`;
+    }
+    if (done.length) {
+      showToast(
+        "Machine translation added",
+        (aiStatus.value === "MOCK" ? "This is the mock gateway's output, not a real translation. " : "") +
+          (parts.length > 1 ? `Translated: ${done.map((p) => partLabel(item, p)).join(", ")}. ` : "") +
+          (skipped.length ? `Skipped, no ${sourceInfo.value?.displayName ?? "default-language"} text: ${skipped.map((p) => partLabel(item, p)).join(", ")}. ` : "") +
+          "Check it, then mark it reviewed." +
+          (current.status === "ACTIVE" ? " It is in the pending changes until you apply them in the editor." : ""),
+        failed ? "warning" : undefined,
+      );
+    }
+  } finally {
+    translating.value = false;
+  }
+}
+
+/** Records that one part's machine translation in the open language was checked; the text stays as it is. */
+async function review(part: AiPart) {
+  const item = selected.value;
+  const code = target.value;
+  if (!item || !code || !unreviewed(aiOf(item, code, part))) return;
+  reviewing.value = true;
+  try {
+    const entry = await markReviewed(projectId.value, item.kind, item.id, part, code);
+    const at = entryLocation(entry);
+    const key = at ? aiKey(at.kind, at.itemId, at.part, entry.languageCode) : null;
+    provenance.value = provenance.value.map((p) => {
+      const pAt = entryLocation(p);
+      return pAt && key === aiKey(pAt.kind, pAt.itemId, pAt.part, p.languageCode) ? entry : p;
+    });
+    showToast("Marked reviewed", `${item.title}${part === "self" ? "" : `, ${partLabel(item, part)}`}, in ${targetInfo.value?.displayName ?? code}.`);
+  } catch (e) {
+    if (!(e instanceof ApiError)) throw e;
+    showToast("It could not be marked reviewed", e.platformUnavailable ? "The UNICHE platform is not reachable." : e.message, "error");
+    void refreshProvenance();
+  } finally {
+    reviewing.value = false;
   }
 }
 
@@ -313,7 +546,7 @@ const storyText = (body: GuideBody | null | undefined) =>
 </script>
 
 <template>
-  <main class="min-w-0 flex-1 overflow-y-auto px-7 pb-16 pt-6">
+  <main class="min-w-0 flex-1 overflow-y-auto px-4 pb-16 pt-6 md:px-7">
     <PageHead title="Translations" :subtitle="section.subtitle" />
 
     <div v-if="!languagesLoading && !targets.length" class="max-w-[640px] rounded-lg border bg-card px-[18px] py-4 text-[13px] text-gray-700">
@@ -363,10 +596,15 @@ const storyText = (body: GuideBody | null | undefined) =>
         >
           {{ chip === "ALL" ? "Any state" : STATE_LABEL[chip] }}
         </button>
-        <button type="button" disabled class="rounded-full border px-[13px] py-1.5 text-[11px] font-semibold text-gray-400" aria-describedby="ai-reason">
-          Unreviewed AI output
+        <button
+          type="button"
+          class="rounded-full border px-[13px] py-1.5 text-[11px]"
+          :class="aiFilter ? 'border-[#855400] bg-[#855400] font-bold text-white' : 'bg-card font-semibold text-gray-700'"
+          :aria-pressed="aiFilter"
+          @click="aiFilter = !aiFilter"
+        >
+          Unreviewed AI output<span v-if="unreviewedCount"> ({{ unreviewedCount }})</span>
         </button>
-        <span id="ai-reason" class="text-[11px] text-muted-foreground">AI translation needs the UNICHE AI gateway, which is not connected yet.</span>
       </div>
 
       <div v-if="loadError" role="alert" class="max-w-[640px] rounded-lg border border-l-[3px] border-l-destructive bg-card px-[18px] py-4">
@@ -379,7 +617,7 @@ const storyText = (body: GuideBody | null | undefined) =>
         <!-- Matrix -->
         <section class="overflow-hidden rounded-lg border bg-card" aria-labelledby="matrix-heading">
           <h2 id="matrix-heading" class="sr-only">Translation state by language</h2>
-          <div v-if="loading" class="animate-skeleton" aria-busy="true" aria-label="Loading resources">
+          <div v-if="loading" class="animate-skeleton" role="status" aria-busy="true" aria-label="Loading resources">
             <div v-for="n in 5" :key="n" class="border-b border-gray-100 px-[18px] py-4"><div class="h-[13px] w-1/2 rounded bg-[#e2e3e7]"></div></div>
           </div>
           <p v-else-if="!rows.length" class="px-[18px] py-6 text-[13px] text-muted-foreground">
@@ -410,11 +648,19 @@ const storyText = (body: GuideBody | null | undefined) =>
                       type="button"
                       class="flex items-center gap-1.5 whitespace-nowrap text-[11px] text-gray-700 disabled:cursor-default"
                       :disabled="l.isDefault"
-                      :aria-label="`${item.title}, ${l.displayName}: ${cellText(item, l.languageCode)}${l.isDefault ? ' (default language)' : ', open'}`"
+                      :aria-label="`${item.title}, ${l.displayName}: ${cellText(item, l.languageCode)}${aiEntries(item, l.languageCode).length ? `, ${aiSummary(aiEntries(item, l.languageCode))}` : ''}${l.isDefault ? ' (default language)' : ', open'}`"
                       @click="open(item, l.languageCode)"
                     >
                       <span class="h-2.5 w-2.5 flex-none rounded-full" :class="dotClass(itemProgress(item, l.languageCode).state)" aria-hidden="true"></span>
                       {{ cellText(item, l.languageCode) }}
+                      <span
+                        v-if="aiEntries(item, l.languageCode).length"
+                        class="rounded-full px-[6px] py-[1px] text-[10px] font-bold"
+                        :class="aiEntries(item, l.languageCode).some(unreviewed) ? 'bg-[rgba(154,98,0,0.1)] text-[#855400]' : 'bg-gray-100 text-gray-500'"
+                        aria-hidden="true"
+                      >
+                        {{ aiSummary(aiEntries(item, l.languageCode)) }}
+                      </span>
                     </button>
                   </td>
                 </tr>
@@ -431,7 +677,7 @@ const storyText = (body: GuideBody | null | undefined) =>
               <span v-if="selected && targetInfo" class="font-normal text-muted-foreground"> · {{ targetInfo.displayName }}</span>
             </h2>
             <Button variant="outline" size="sm" :disabled="!target || !rows.length || opening" @click="nextMissing">Next missing</Button>
-            <Button size="sm" :disabled="!dirty || saving || !editable" @click="save">{{ saving ? "Saving…" : "Save" }}</Button>
+            <Button size="sm" :disabled="!dirty || saving || translating || !editable" @click="save">{{ saving ? "Saving…" : "Save" }}</Button>
           </div>
 
           <p v-if="!selected" class="px-[18px] py-6 text-[13px] text-muted-foreground">
@@ -441,15 +687,50 @@ const storyText = (body: GuideBody | null | undefined) =>
           <div v-else class="flex flex-col gap-4 px-[18px] py-4">
             <div class="flex flex-wrap items-center gap-3 text-[12px]">
               <RouterLink :to="editorLocation(project.id, selected)" class="font-bold text-primary no-underline hover:underline">Open in its editor</RouterLink>
-              <button type="button" disabled class="rounded-full border px-3 py-1 text-[11px] font-semibold text-gray-400" aria-describedby="ai-reason">
-                Translate with MuseMind
+              <button
+                type="button"
+                class="rounded-full border px-3 py-1 text-[11px] font-semibold"
+                :class="aiReady && !translateReason && editable ? 'border-primary text-primary hover:bg-accent' : 'text-gray-400'"
+                :disabled="!aiReady || !!translateReason || !editable || translating || saving"
+                :aria-describedby="translateReason ? 'ai-reason' : aiStatus === 'MOCK' ? 'ai-mock' : undefined"
+                @click="translate"
+              >
+                {{ translating ? "Translating…" : "Translate with MuseMind" }}
               </button>
+              <span
+                v-if="aiStatus === 'MOCK' && !translateReason"
+                id="ai-mock"
+                class="rounded-full px-[7px] py-[1px] text-[10px] font-bold uppercase tracking-[0.07em]"
+                :style="statusChipStyle('PENDING')"
+                title="The dev box's stand-in for the UNICHE AI gateway: its output only marks the source text, it is not a translation."
+              >
+                Mock<span class="sr-only">: the dev box's stand-in for the AI gateway, not a real translation</span>
+              </span>
+              <span v-if="translateReason" id="ai-reason" class="text-[11px] text-muted-foreground">{{ translateReason }}</span>
+              <span v-else-if="partsOf(selected).length > 1" class="text-[11px] text-muted-foreground">
+                Translates the texts{{ selected.stops?.length ? ", every stop" : "" }}{{ selected.blocks?.length ? ", and every story block" : "" }}.
+              </span>
+            </div>
+
+            <!-- AI markers: the open language in full (own texts here, stops and story at their place), the others by name -->
+            <AiMarker v-if="selectedAi" :entry="selectedAi" :reviewing="reviewing" :disabled="!editable" @review="review('self')" />
+            <div v-if="languages.some((l) => l.languageCode !== target && aiEntries(selected!, l.languageCode).length)" class="flex flex-wrap items-center gap-1.5 text-[11px] text-muted-foreground">
+              Other languages:
+              <template v-for="l in languages" :key="l.languageCode">
+                <span
+                  v-if="l.languageCode !== target && aiEntries(selected, l.languageCode).length"
+                  class="rounded-full px-[7px] py-[1px] font-bold"
+                  :class="aiEntries(selected, l.languageCode).some(unreviewed) ? 'bg-[rgba(154,98,0,0.1)] text-[#855400]' : 'bg-gray-100 text-gray-500'"
+                >
+                  {{ l.languageCode }}: {{ aiSummary(aiEntries(selected, l.languageCode)) }}
+                </span>
+              </template>
             </div>
 
             <div
               v-if="selected.status === 'ACTIVE'"
               role="status"
-              class="rounded-lg border-l-[3px] border-l-[#9a6200] bg-[rgba(154,98,0,0.07)] px-3.5 py-2.5 text-[12px] text-gray-700"
+              class="rounded-lg border-l-[3px] border-l-[#855400] bg-[rgba(154,98,0,0.07)] px-3.5 py-2.5 text-[12px] text-gray-700"
             >
               This {{ kindLabel(selected.kind).noun }} is active. Saved translations become pending changes; visitors see
               them once you apply the changes in its editor.
@@ -499,31 +780,64 @@ const storyText = (body: GuideBody | null | undefined) =>
               </div>
             </div>
 
-            <!-- Guide story -->
-            <div v-if="selected.story && targetInfo" class="grid gap-x-4 gap-y-1 border-t pt-4 md:grid-cols-2">
-              <div class="min-w-0">
-                <div class="text-[11px] font-bold uppercase tracking-[0.06em] text-muted-foreground">Story · {{ sourceInfo?.displayName }}</div>
-                <template v-if="storyText(selected.story.bodies[defaultLanguage ?? '']).length">
-                  <p v-for="(line, i) in storyText(selected.story.bodies[defaultLanguage ?? ''])" :key="i" class="mt-1 whitespace-pre-wrap text-[13px] text-gray-800">{{ line }}</p>
-                </template>
-                <p v-else class="mt-1 text-[13px] italic text-muted-foreground">Empty</p>
-              </div>
-              <div class="min-w-0">
-                <p v-if="!selected.story.blockId" class="text-[12px] text-muted-foreground">
-                  This guide has no story yet: write it in the default language in its editor first.
-                </p>
-                <StoryEditor
-                  v-else
-                  :key="`${selected.id}:${targetInfo.languageCode}`"
-                  :project-id="project.id"
-                  :blocks="form.story"
-                  :language="targetInfo"
-                  :assets="assets"
-                  :readonly="!editable"
-                  :field-error="noFieldError"
-                  :heading="`Story · ${targetInfo.displayName}`"
-                  @uploaded="assets.unshift($event)"
+            <!-- Guide story: every block in order, a text block's rich text or a reference's caption (D-031) -->
+            <div v-if="selected.blocks?.length && targetInfo" class="flex flex-col gap-3 border-t pt-4">
+              <h3 class="text-[11px] font-bold uppercase tracking-[0.06em] text-muted-foreground">Story</h3>
+              <div v-for="(block, index) in selected.blocks" :key="block.id" class="rounded-md border px-3.5 py-3">
+                <div class="mb-2 text-[13px] font-semibold">
+                  {{ index + 1 }}. {{ block.type === "TEXT" ? "Text" : `Reference: ${block.title}` }}
+                </div>
+                <AiMarker
+                  v-if="aiOf(selected, target, `block:${block.id}`)"
+                  class="mb-2"
+                  :label="block.type === 'TEXT' ? `Story block ${index + 1}` : `Caption of ${block.title}`"
+                  :entry="aiOf(selected, target, `block:${block.id}`)!"
+                  :reviewing="reviewing"
+                  :disabled="!editable"
+                  @review="review(`block:${block.id}`)"
                 />
+                <div v-if="form.blocks[block.id]" class="grid gap-x-4 gap-y-1 md:grid-cols-2">
+                  <div class="min-w-0">
+                    <div class="text-[11px] font-semibold text-muted-foreground">
+                      {{ block.type === "TEXT" ? "Text" : "Caption" }} · {{ sourceInfo?.displayName }}
+                    </div>
+                    <template v-if="block.type === 'TEXT'">
+                      <template v-if="storyText(block.bodies[defaultLanguage ?? '']).length">
+                        <p v-for="(line, i) in storyText(block.bodies[defaultLanguage ?? ''])" :key="i" class="mt-1 whitespace-pre-wrap text-[13px] text-gray-800">{{ line }}</p>
+                      </template>
+                      <p v-else class="mt-1 text-[13px] italic text-muted-foreground">Empty</p>
+                    </template>
+                    <p v-else class="whitespace-pre-wrap text-[13px]" :class="block.captions[defaultLanguage ?? ''] ? 'text-gray-800' : 'italic text-muted-foreground'">
+                      {{ block.captions[defaultLanguage ?? ""] || "Empty" }}
+                    </p>
+                  </div>
+                  <div class="min-w-0">
+                    <StoryEditor
+                      v-if="block.type === 'TEXT'"
+                      :key="`${selected.id}:${block.id}:${targetInfo.languageCode}`"
+                      embedded
+                      :project-id="project.id"
+                      :blocks="form.blocks[block.id].nodes"
+                      :language="targetInfo"
+                      :assets="assets"
+                      :readonly="!editable"
+                      :field-error="noFieldError"
+                      :empty-text="`No text in ${targetInfo.displayName} yet.`"
+                      @uploaded="assets.unshift($event)"
+                    />
+                    <template v-else>
+                      <label :for="`tx-caption-${block.id}`" class="text-[11px] font-semibold text-muted-foreground">Caption · {{ targetInfo.displayName }}</label>
+                      <input
+                        :id="`tx-caption-${block.id}`"
+                        v-model="form.blocks[block.id].caption"
+                        :readonly="!editable"
+                        :lang="targetInfo.languageCode"
+                        :dir="targetInfo.direction === 'RTL' ? 'rtl' : 'ltr'"
+                        class="field-input mt-1 w-full text-[13px]"
+                      />
+                    </template>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -532,6 +846,15 @@ const storyText = (body: GuideBody | null | undefined) =>
               <h3 class="text-[11px] font-bold uppercase tracking-[0.06em] text-muted-foreground">Stops</h3>
               <div v-for="(stop, index) in selected.stops" :key="stop.id ?? index" class="rounded-md border px-3.5 py-3">
                 <div class="mb-2 text-[13px] font-semibold">{{ index + 1 }}. {{ stop.title }}</div>
+                <AiMarker
+                  v-if="stop.id && aiOf(selected, target, `stop:${stop.id}`)"
+                  class="mb-2"
+                  :label="`Stop ${index + 1}`"
+                  :entry="aiOf(selected, target, `stop:${stop.id}`)!"
+                  :reviewing="reviewing"
+                  :disabled="!editable"
+                  @review="review(`stop:${stop.id}`)"
+                />
                 <p v-if="!stop.id" class="text-[12px] text-muted-foreground">Added in the pending changes only: translate it after applying them.</p>
                 <div v-for="field in STOP_FIELDS" v-else :key="field.key" class="mb-2 grid gap-x-4 gap-y-1 md:grid-cols-2">
                   <div class="min-w-0">
