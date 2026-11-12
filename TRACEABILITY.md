@@ -29,6 +29,15 @@ the checks of `14`, `08` §Companion repositories). Backend status is referenced
 | F18 | 2026-11-10 | `pnpm run build` (Windows); `playwright test` against the built CMS and the stack of F16 | build passed; 35 passed. New: gradient contrast on the eight Content lists (failed at 1.32:1 before D-053), Content lists and editors at 200% zoom and 320 px without sideways scrolling (failed on all 16 screens before D-054), landmarks and heading outline on the same 16 screens. Screenshots at 320 px: header wrapped, Menu disclosure, editor in one column, the list table scrolling in its box |
 | F19 | 2026-11-11 | `pnpm run build` (Windows); `playwright test` against the built CMS, backend D-046 (`./mvnw verify` 343 tests green, backend R31) and the `dev/` stand-ins, twice | build passed; 39 passed both runs. New: `navigation-editor.spec.ts`, `guide-reference.spec.ts`, Navigation loaded and loading in `screens.spec.ts`, Navigation at 200% zoom, 320 px, and in the heading outline |
 | F20 | 2026-11-11 | `pnpm run build` (Windows); `playwright test` against the built CMS and the stack of F19, twice | build passed; 40 passed both runs. New: `editor-preview.spec.ts` ("Preview in app" as a pop-up, D-056); the start-up text's contrast and the media test's wait fixed |
+| F21 | 2026-11-10 | `make setup` (`vp install --frozen-lockfile`, Node 26.13.0, pnpm 11.1.1) | passed, 2 s |
+| F22 | 2026-11-10 | `make typecheck` (`vp exec vue-tsc -b`) | failed: 8 errors, `TranslationsView.vue` reads the removed `story` field (G-022) |
+| F23 | 2026-11-10 | `make build` (`vp run build`) | failed at `vue-tsc -b` (G-022) |
+| F24 | 2026-11-10 | `make dev`, `GET http://localhost:5173/` | served in 287 ms, page loads in the browser |
+| F25 | 2026-11-10 | `pnpm exec vue-tsc -b`, `pnpm run build` after the G-022 fix | passed (before the fix: 8 errors in `TranslationsView.vue`) |
+| F26 | 2026-11-10 | `make typecheck` (`vp exec vue-tsc -b`) with Vite+ and the G-022 fix | passed, 7 s |
+| F27 | 2026-11-10 | `make build` (`vp run build`) with Vite+ and the G-022 fix | passed, 9 s, 297 modules, output in `dist/` |
+| F28 | 2026-11-10 | `make image` (`docker build`) | passed; `vue-tsc -b` and the build run in the image; no `VITE_*` value baked into the bundle |
+| F29 | 2026-11-10 | `docker run` of the image | starts as uid 101; refuses a missing `API_BASE_URL`, an `API_BASE_URL` without `/api/v1`, a quoted `IDP_URL`, a `PORTAL_URL` with a path; writes a `config.js` that parses, with and without `PORTAL_URL`; `/` and deep links `200` `no-cache`, `/config.js` `no-store`, missing asset `404` |
 
 Since F16 the repository has Playwright and axe tests (`e2e/`, D-051, D-052) for the Content lists loaded and
 loading, the Place editor's lifecycle, media upload, the Place map link, the picker, and five Visitor app screens; they run against a stack started by hand, not in CI (G-014), and

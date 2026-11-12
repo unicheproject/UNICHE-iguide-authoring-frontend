@@ -1,0 +1,17 @@
+# Secrets and local config: never part of an image
+.env
+.env.*
+!.env.example
+
+# Rebuilt inside the image
+node_modules
+dist
+
+# Not needed to build
+.git
+.vscode
+.idea
+.zed
+.vite-hooks
+dev
+*.log

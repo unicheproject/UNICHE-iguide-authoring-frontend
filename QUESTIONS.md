@@ -68,6 +68,15 @@ None. Backend dependencies are tracked in PLAN.md and the backend's PLAN.md.
   "`environment` is set from the Place's type".
 - Consequence until resolved: the CMS departs from `12` §3 as D-057 records.
 
+### Q-007 — Lint and format: oxlint and oxfmt, or ESLint and Prettier
+
+- Kind: question
+- Source: PLAN.md C0d plans ESLint and Prettier; D-067 moved the build to Vite+, which bundles oxlint and
+  oxfmt (`vp lint`, `vp fmt`, `vp check`) and Vitest (`vp test`).
+- Question: adopt oxlint and oxfmt through Vite+ for C0d, or keep ESLint and Prettier beside it?
+- Consequence: shapes C0d. Either way, formatting is applied once to the whole repository in its own commit,
+  so feature diffs stay readable.
+
 ### Open decisions of `09` that shape CMS steps
 
 | `09` | Shapes |

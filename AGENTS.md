@@ -104,15 +104,14 @@ and move the baseline here with a DECISIONS.md entry.
 Found in the code (DECISIONS.md D-006, D-007):
 
 - Vue 3.5 with `<script setup>`, TypeScript 6, Vite 8 (dev server fixed on port `5173`), vue-router 4;
-- pnpm 9 with `pnpm-lock.yaml` as the only authoritative lockfile;
+- Vite+ (`vp`, D-067) over Vite 8; Node 26 pinned in `.node-version`, pnpm 11 in `packageManager`,
+  `pnpm-lock.yaml` as the only authoritative lockfile;
 - Tailwind 3 with shadcn-vue conventions (`components.json`, radix-vue, class-variance-authority,
   tailwind-merge, lucide icons); palette as CSS variables in `src/style.css`;
 - state: Vue `reactive` stores in `src/stores` and composables in `src/workspace`; no Pinia;
 - `src/platform/`: `auth.ts` (keycloak-js), `config.ts` (runtime config), `api.ts` (fetch and XHR upload
   with bearer and `401` retry), and hand-written resource modules (GAPS.md G-001);
-- Leaflet 1.9 with the OpenMapTiles "OSM Bright" style from OpenFreeMap, drawn by MapLibre GL 6 through
-  `@maplibre/maplibre-gl-leaflet` (OpenStreetMap raster tiles without WebGL), and Nominatim search, prototyping only
-  (`09` §22, DECISIONS.md D-064);
+- Leaflet 1.9 with public OpenStreetMap tiles and Nominatim search, prototyping only (`09` §22);
 - `qrcode` 1.5.4 for the stand-in QR images of the trigger card (DECISIONS.md D-019);
 - `dev/`: optional local Keycloak, Catalogue mock, and S3 mock (DECISIONS.md D-010).
 
@@ -181,8 +180,7 @@ Status: the backend has no committed contract yet (backend G-004), so nothing he
 
 WCAG 2.1 AA per `14` §1 and the CMS requirements of `14` §4. Every slice that adds or changes a screen
 adds an automated check (Playwright with axe-core) for that screen in its states, plus keyboard-only
-checks for its interactions. Status: `e2e/` holds the first Playwright and axe tests (DECISIONS.md D-051); most
-screens are not covered yet and nothing runs in CI (GAPS.md G-012, G-014).
+checks for its interactions. Status: no automated check exists (GAPS.md G-012).
 
 ## 9. Cross-repository changes
 
@@ -192,18 +190,19 @@ needs as a GAPS.md entry that names the backend item.
 
 ## 10. Commands
 
-Only commands that ran on 2026-10-02. Prerequisites: Node 22 (22.12 verified), pnpm 9 (9.15.9 verified).
+Only commands that ran on 2026-11-10. Prerequisite: the Vite+ CLI (`vp`); it installs the Node in
+`.node-version` and the pnpm in `packageManager`.
 
 | Command | Result |
 |---|---|
-| `make setup` (`pnpm install --frozen-lockfile`) | about 2 s |
-| `make typecheck` (`pnpm exec vue-tsc -b`) | passes, about 6 s |
-| `make build` (`pnpm run build`) | passes, about 10 s, output in `dist/` |
-| `make dev` (`pnpm dev`) | serves `http://localhost:5173` |
-| `make e2e` (`pnpm exec playwright test`) | 40 tests against a running stack (`e2e/README.md`), about 6 min; verified 2026-11-11 |
+| `make setup` (`vp install --frozen-lockfile`) | passes, about 2 s |
+| `make typecheck` (`vp exec vue-tsc -b`) | passes, about 7 s |
+| `make build` (`vp run build`) | passes, about 9 s, output in `dist/` |
+| `make dev` (`vp dev`) | serves `http://localhost:5173` |
+| `make image` (`docker build`) | passes; run it with `IDP_URL` and `API_BASE_URL` set (D-068) |
 
-`npm ci` fails: `package-lock.json` is out of sync (GAPS.md G-010). Not available yet: lint (G-011), unit tests
-and full screen coverage (G-012, G-013), CI (G-014), `api-sync` (G-002), and a container image (G-015).
+Not available yet: lint (G-011, Q-007),
+accessibility checks (G-012), tests (G-013), CI (G-014), and `api-sync` (G-002).
 
 ## 11. Working method and definition of done
 

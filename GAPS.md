@@ -138,13 +138,9 @@ prototype inventory).
 - Closed by: C1 (App settings), C4 (Pages, Navigation), C5 (Overview, Translations, Preview, Launch), C6
   (Audit log).
 
-### G-010 — Two lockfiles, npm one out of sync
-
-- Found 2026-10-02: `npm ci` fails ("Missing: leaflet@1.9.4 … from lock file").
-- Closed by: C0d removing `package-lock.json` (DECISIONS.md D-007).
-
 ### G-011 — No lint or format tooling
 
+- Note 2026-11-10: Vite+ (D-067) brings oxlint and oxfmt, not switched on; the tool choice is Q-007.
 - Closed by: C0d (`make lint` green in CI).
 
 ### G-012 — No accessibility check
@@ -170,12 +166,6 @@ prototype inventory).
 ### G-014 — No CI
 
 - Closed by: C0b (contract drift job) and C0d (full pipeline).
-
-### G-015 — No container image
-
-- Found: no Dockerfile or nginx configuration; `10` §6 lists a `cms` nginx service, which the backend
-  compose adds as a profile once this repository ships an image (backend D-010).
-- Closed by: a Dockerfile serving `dist/` with `config.js` injected per environment.
 
 ### G-016 — Public OpenStreetMap tiles and Nominatim
 
@@ -220,6 +210,28 @@ prototype inventory).
 - Closed by: C5, embedding the runtime build once it and the backend preview API (backend M8) exist.
 
 ## Closed
+
+### G-015 — No container image
+
+- Found: no Dockerfile or nginx configuration; `10` §6 lists a `cms` nginx service, which the backend
+  compose adds as a profile once this repository ships an image (backend D-010).
+- Closed 2026-11-10 (D-068, TRACEABILITY.md F28, F29): `Dockerfile` builds with Vite+ and serves `dist/` with
+  unprivileged nginx; `docker/docker-entrypoint.sh` writes `config.js` from the environment at start. The
+  backend compose `cms` profile is not added yet (backend repository).
+
+### G-022 — Translation workspace reads the removed `story` field
+
+- Found 2026-11-10 (TRACEABILITY.md F22): `vue-tsc -b` fails with 8 errors in `src/views/workspace/TranslationsView.vue`, which still
+  reads `item.story`; commit `3edf030` replaced `story` with `blocks` in `src/workspace/translationCatalog.ts`.
+- Closed 2026-11-10 (TRACEABILITY.md F25): the workspace lists every story block as D-031 says, a TEXT block
+  through the text editor and a REFERENCE block through its caption, and saves each changed block through
+  its own endpoint; `vue-tsc -b` and `pnpm run build` green, not run against the backend.
+
+### G-010 — Two lockfiles, npm one out of sync
+
+- Found 2026-10-02: `npm ci` fails ("Missing: leaflet@1.9.4 … from lock file").
+- Closed 2026-11-10 (D-067): `package-lock.json` removed; installs run `vp install --frozen-lockfile`
+  from `pnpm-lock.yaml`.
 
 ### G-003 — Configuration points at the MuseotekBox backend
 

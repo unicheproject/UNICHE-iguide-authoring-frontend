@@ -1223,3 +1223,51 @@ the backend's DECISIONS.md.
 - Why: owner request 2026-11-12 ("When I click 'Preview in App', I want to be able to scroll to the previous page if
   I move the mouse outside the dialog box.").
 - Affected specs: `12` §3 (Preview in app); `14` §4 (the card keeps its focus trap and Escape).
+
+## D-067 (2026-11-10) — Vite+ toolchain, Node 26, pnpm 11
+
+- Type: implementation
+- Decision:
+  - the CMS builds with Vite+ 1.5.1 (`vp`), set up by `vp migrate --no-agent --no-editor --no-hooks`:
+    `vite` is aliased to `voidzero-dev/vite-plus-core` through the catalog in `pnpm-workspace.yaml`,
+    `vite.config.ts` imports from `vite-plus`, and the scripts call `vp dev`, `vp build`, `vp preview`;
+  - Node 26.13.0 is pinned in `.node-version` and pnpm 11.1.1 in `packageManager`; `vp` (and mise, when it
+    reads `.node-version`) installs exactly these, so a dev box, CI, and the container build use the same
+    versions;
+  - `package-lock.json` is removed, as planned by D-007; `pnpm-lock.yaml` stays the only lockfile;
+  - pnpm 11 fails an install on a dependency build script that is neither allowed nor refused, so
+    `pnpm-workspace.yaml` refuses `vue-demi`'s (`allowBuilds`): its default build already targets Vue 3;
+  - `lucide-vue-next` is removed: nothing imports it, and the package is deprecated;
+  - amended by the merge of 2026-11-12: `lucide-vue-next` is kept, since the breadcrumbs, the filter menu, the
+    Route map and the Guide story (D-058, D-061, D-063, D-065) import it; this entry and D-068 were D-043 and D-044
+    on their branch, renumbered because the main line had used those numbers (Q-007 was Q-006, F21-F29 were F7-F15);
+  - Vite+ bundles oxlint, oxfmt, and Vitest, but lint and format are not switched on (`fmt: {}` only); the
+    choice against the ESLint and Prettier planned in C0d is Q-007.
+- Why: one pinned Node and pnpm for every environment, which the container image (G-015) needs; Vite+ wraps
+  the same Vite 8 the CMS already used.
+- Not done: `baseUrl` stays in `tsconfig.json` (deprecated in TypeScript 6, removed in 7); it only blocks
+  oxlint's type-aware rules, which are off.
+- Supersedes: the pnpm 9 version in D-007; the lockfile rule of D-007 stands.
+
+## D-068 (2026-11-10) — Container image: Vite+ build, unprivileged nginx, config.js from the environment
+
+- Type: implementation
+- Decision:
+  - `Dockerfile` builds on the Vite+ 1.5.1 image (`vp install --frozen-lockfile`, then `vp run build`, so
+    `vue-tsc -b` runs in the image build) and serves `dist/` with `nginx-unprivileged` 1.30 as uid 101 on port
+    8080; both base images are pinned by tag and digest;
+  - `docker/docker-entrypoint.sh` writes `config.js` (`window.__UNICHE_CONFIG__`) at container start from
+    `IDP_URL`, `API_BASE_URL`, `PORTAL_URL`, `REALM`, `CLIENT_ID`, `AUDIENCE`; `IDP_URL` and `API_BASE_URL`
+    have no default, as in `src/platform/config.ts`; `REALM`, `CLIENT_ID`, `AUDIENCE` default to `uniche`,
+    `iguide-web`, `uniche-platform`; `PORTAL_URL` stays optional (D-041);
+  - the entrypoint stops the start on a missing value, on characters outside a URL or identifier (the values
+    are written into a JavaScript string literal), on an `IDP_URL` or `PORTAL_URL` that is not a bare origin,
+    and on an `API_BASE_URL` not ending in `/api/v1`;
+  - `docker/nginx.conf`: SPA fallback to `index.html`; `index.html` `no-cache`, `config.js` `no-store`,
+    `/assets/` immutable for a year, a missing asset is a 404;
+  - `.dockerignore` keeps `.env*` out of the build context, so `.env.local` `VITE_*` values are never baked
+    into the bundle.
+- Why: one image for every environment (G-015), closing the gap without changing how `src/platform/config.ts`
+  reads its configuration.
+- Not done: the backend compose `cms` profile (backend repository, backend D-010).
+
