@@ -21,13 +21,25 @@ export interface Project {
   name: string;
   slug: string;
   status: string;
-  /** Not served by the backend yet; always `null` until it is. */
+  /** As the Catalogue dates the Project; null when it sends none. */
   createdAt: string | null;
   updatedAt: string | null;
+  /**
+   * Local initialization state (`12` §3 Project picker; backend D-040). Only a read of the Project itself fills
+   * it: the organisation listings relay the Catalogue and leave `initialized` false and the rest empty, so
+   * `detailed` tells whether these fields can be trusted.
+   */
+  detailed: boolean;
+  initialized: boolean;
+  initializedAt: string | null;
+  template: { id: string; key: string; version: number; name: string } | null;
+  stylePresetKey: string | null;
+  applicationStatus: string | null;
+  enabledSurfaces: string[];
 }
 
 /** A Project as the backend returns it (`ProjectResponse`). */
-interface ProjectResponse {
+export interface ProjectResponse {
   id: string;
   organizationId: string;
   name: string;
@@ -35,18 +47,38 @@ interface ProjectResponse {
   status: string;
   localDescription: string | null;
   initialized: boolean;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+  initializedAt?: string | null;
+  template?: Project["template"];
+  stylePresetKey?: string | null;
+  applicationStatus?: string | null;
+  enabledSurfaces?: string[] | null;
 }
 
-function toProject(response: ProjectResponse): Project {
+export function toProject(response: ProjectResponse, detailed = true): Project {
   return {
     id: response.id,
     orgId: response.organizationId,
     name: response.name,
     slug: response.slug,
     status: response.status,
-    createdAt: null,
-    updatedAt: null,
+    createdAt: response.createdAt ?? null,
+    updatedAt: response.updatedAt ?? null,
+    detailed,
+    initialized: response.initialized,
+    initializedAt: response.initializedAt ?? null,
+    template: response.template ?? null,
+    stylePresetKey: response.stylePresetKey ?? null,
+    applicationStatus: response.applicationStatus ?? null,
+    enabledSurfaces: response.enabledSurfaces ?? [],
   };
+}
+
+/** The organisations the caller manages or belongs to, as the Catalogue names them (`02` §11). */
+export async function listOrganisations(signal?: AbortSignal): Promise<Organisation[]> {
+  const organisations = await apiRequest<Organisation[]>("/organizations", { signal });
+  return organisations.map((o) => ({ id: o.id, name: o.name, slug: o.slug ?? null, status: o.status ?? null }));
 }
 
 export interface CreateProjectInput {
@@ -58,7 +90,7 @@ export async function listOrganisationProjects(orgId: string, signal?: AbortSign
   const projects = await apiRequest<ProjectResponse[]>(`/organizations/${encodeURIComponent(orgId)}/projects`, {
     signal,
   });
-  return projects.map(toProject);
+  return projects.map((p) => toProject(p, false));
 }
 
 /** Creates the Project in the Catalogue (step 1 of Project creation); the backend adds the tool slug. */
@@ -67,6 +99,7 @@ export async function createProject(orgId: string, input: CreateProjectInput): P
     method: "POST",
     body: input,
   });
+  // A Project just created is not initialized, so its local state is known.
   return toProject(project);
 }
 

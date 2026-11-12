@@ -19,6 +19,7 @@ let authorizationRevision = 1;
 
 const routes = [
   ["GET", /^\/api\/v1\/me\/authorization$/, meAuthorization],
+  ["GET", /^\/api\/v1\/organisations$/, listOrganisations],
   ["GET", /^\/api\/v1\/organisations\/([^/]+)$/, getOrganisation],
   ["GET", /^\/api\/v1\/organisations\/([^/]+)\/projects$/, listProjects],
   ["POST", /^\/api\/v1\/organisations\/([^/]+)\/projects$/, createProject],
@@ -36,6 +37,10 @@ function meAuthorization() {
     etag: `"rev-${authorizationRevision}"`,
     ttlSeconds: 30,
   });
+}
+
+function listOrganisations() {
+  return json(200, [...organisations.values()].filter(canSeeOrganisation).map(toOrganisation));
 }
 
 function getOrganisation(orgId) {

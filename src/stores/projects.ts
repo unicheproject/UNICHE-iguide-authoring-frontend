@@ -4,6 +4,7 @@ import { fetchMyAuthorization, type MyAuthorization } from "@/platform/authoriza
 import {
   fetchProject,
   listOrganisationProjects,
+  listOrganisations,
   type Organisation,
   type Project,
 } from "@/platform/catalogue";
@@ -70,8 +71,10 @@ async function doLoad(): Promise<void> {
   state.status = "loading";
   state.error = null;
   try {
-    const authorization = await fetchMyAuthorization();
-    const groups = await Promise.all(organisationIdsOf(authorization).map((id) => loadGroup(id, authorization)));
+    const [authorization, named] = await Promise.all([fetchMyAuthorization(), loadOrganisationNames()]);
+    const groups = await Promise.all(
+      organisationIdsOf(authorization).map((id) => loadGroup(id, authorization, named.get(id))),
+    );
     state.groups = groups.sort((a, b) => a.organisation.name.localeCompare(b.organisation.name));
     state.status = "ready";
   } catch (e) {
@@ -90,19 +93,34 @@ function organisationIdsOf(authorization: MyAuthorization): string[] {
   ];
 }
 
-async function loadGroup(orgId: string, authorization: MyAuthorization): Promise<OrganisationGroup> {
+async function loadGroup(orgId: string, authorization: MyAuthorization, organisation?: Organisation): Promise<OrganisationGroup> {
   const managed = authorization.managedOrganisations.includes(orgId);
   const projects = await listOrganisationProjects(orgId).catch((e) => {
     if (isDenied(e)) return membershipProjects(orgId, authorization);
     throw e;
   });
-  return { organisation: placeholderOrganisation(orgId), managed, projects: sortByName(projects) };
+  return { organisation: organisation ?? placeholderOrganisation(orgId), managed, projects: sortByName(await detailed(projects)) };
 }
 
 /**
- * The backend has no organization read yet (backend G-021, M1c), so the name is a placeholder that
- * still tells several organisations apart.
+ * Each listed Project read on its own, for its initialization state: the listing relays the Catalogue and carries
+ * none (backend D-040, Q-020). A Project that cannot be read keeps its listed values.
  */
+function detailed(projects: Project[]): Promise<Project[]> {
+  return Promise.all(projects.map((p) => (p.detailed ? p : fetchProject(p.id).catch(() => p))));
+}
+
+/** The Catalogue's names of the organisations; none when it cannot be read, so the picker still opens. */
+async function loadOrganisationNames(): Promise<Map<string, Organisation>> {
+  try {
+    return new Map((await listOrganisations()).map((o) => [o.id, o]));
+  } catch (e) {
+    if (!(e instanceof ApiError)) throw e;
+    return new Map();
+  }
+}
+
+/** For an organisation the Catalogue did not name: a placeholder that still tells several apart. */
 function placeholderOrganisation(orgId: string): Organisation {
   return { id: orgId, name: `Organisation ${orgId.slice(0, 8)}`, slug: null, status: null };
 }
@@ -124,6 +142,15 @@ async function membershipProjects(orgId: string, authorization: MyAuthorization)
 function isDenied(e: unknown): boolean {
   return e instanceof ApiError && (e.status === 403 || e.status === 404);
 }
+
+type Listed = Pick<Project, "id" | "detailed" | "initialized">;
+
+/** A Project created but not initialized offers "resume initialization" instead of opening (`12` §3). */
+export const needsSetup = (p: Listed) => p.detailed && !p.initialized;
+
+/** Where the picker leads for a Project: its Dashboard, or Create a Project at step 2 to resume initialization. */
+export const projectTarget = (p: Listed) =>
+  needsSetup(p) ? { name: "project-create", query: { resume: p.id } } : { name: "project", params: { projectId: p.id } };
 
 /** Adds or refreshes one Project, e.g. after creating or opening it. */
 export function upsertProject(project: Project): void {

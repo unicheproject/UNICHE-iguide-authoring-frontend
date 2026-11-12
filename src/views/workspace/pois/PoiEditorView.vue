@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from "vue";
-import GeoPicker, { type GeoPoint } from "@/components/GeoPicker.vue";
+import GeoPicker, { type GeoArea, type GeoPoint } from "@/components/GeoPicker.vue";
+import { listMaps, type GeoMap } from "@/platform/maps";
 import EditorShell from "@/components/editor/EditorShell.vue";
 import TranslationsPanel, { type TextFieldGroup, type TextFieldMeta } from "@/components/editor/TranslationsPanel.vue";
 import TriggersCard from "@/components/editor/TriggersCard.vue";
@@ -9,7 +10,7 @@ import { SLUG_PATTERN } from "@/lib/format";
 import { listAssets, type Asset, type MediaBinding } from "@/platform/assets";
 import { assignableCategories, listCategories, type Category } from "@/platform/categories";
 import { listPlaces, placeTitle, type Place } from "@/platform/places";
-import { listTargetTriggers, syncTriggers, triggerToForm, type Trigger, type TriggerForm } from "@/platform/triggers";
+import { listTargetTriggers, saveWithTriggers, triggerToForm, type Trigger, type TriggerForm } from "@/platform/triggers";
 import {
   changePoiStatus,
   fetchPoi,
@@ -151,14 +152,16 @@ const editor = useResourceEditor<Poi>({
   languages,
   defaultLanguage,
   async load() {
-    const [poi, allPlaces, pois, library, allCategories, triggers] = await Promise.all([
+    const [poi, allPlaces, pois, library, allCategories, triggers, allMaps] = await Promise.all([
       fetchPoi(projectId.value, props.poiId),
       listPlaces(projectId.value),
       listPois(projectId.value),
       listAssets(projectId.value),
       listCategories(projectId.value),
       listTargetTriggers(projectId.value, "POI", props.poiId),
+      listMaps(projectId.value),
     ]);
+    maps.value = allMaps;
     savedTriggers.value = triggers;
     places.value = allPlaces;
     categories.value = allCategories;
@@ -167,20 +170,22 @@ const editor = useResourceEditor<Poi>({
     return poi;
   },
   async save(poi, version) {
-    // Triggers are rows of their own and do not move the POI's version, so they go first: when one is
-    // refused, the POI is not saved either and the form can be corrected and saved again.
-    savedTriggers.value = await syncTriggers(projectId.value, "POI", poi.id, form.triggers);
-    return updatePoi(projectId.value, poi.id, { version, ...input() });
+    // Triggers are rows of their own and do not move the POI's version: saved first, put back when it is refused.
+    const { saved, triggers } = await saveWithTriggers(projectId.value, "POI", poi.id, form.triggers, () =>
+      updatePoi(projectId.value, poi.id, { version, ...input() }),
+    );
+    savedTriggers.value = triggers;
+    return saved;
   },
   workingCopy: {
     kind: "pois",
     projectId: () => projectId.value,
-    async payload(poi) {
-      // Triggers have a lifecycle of their own (backend D-026) and are not in the working copy: "Save draft"
-      // saves them live, first, as a DRAFT save does; a refused one stops the save at `triggers[i]`.
-      const body = poiWorkingCopyPayload(input());
-      savedTriggers.value = await syncTriggers(projectId.value, "POI", poi.id, form.triggers);
-      return body;
+    payload: () => poiWorkingCopyPayload(input()),
+    // Triggers are not in the working copy (backend D-026): "Save draft" saves them live around it.
+    async around(poi, save) {
+      const { saved, triggers } = await saveWithTriggers(projectId.value, "POI", poi.id, form.triggers, save);
+      savedTriggers.value = triggers;
+      return saved;
     },
     fromResponse: poiFromResponse,
   },
@@ -272,6 +277,29 @@ const mapAnchors = computed(() => [
   ...(editor.resource ? toPoint(editor.resource.latitude, editor.resource.longitude) : []),
   ...places.value.filter((p) => p.status !== "ARCHIVED").flatMap((p) => toPoint(p.latitude, p.longitude)),
 ]);
+/*
+ * The site map is framed on the area the point of interest belongs to: the Geographic Map of its Place, or of the
+ * nearest parent Place that has one (owner request 2026-11-04). Without one, every saved coordinate frames it.
+ */
+const maps = ref<GeoMap[]>([]);
+const areaMap = computed(() => {
+  const seen = new Set<string>();
+  let placeId: string | null = form.placeId || null;
+  while (placeId && !seen.has(placeId)) {
+    seen.add(placeId);
+    const id = placeId;
+    const found = maps.value.find((m) => m.placeId === id && m.status !== "ARCHIVED" && m.minLatitude !== null);
+    if (found) return found;
+    placeId = places.value.find((p) => p.id === id)?.parentPlaceId ?? null;
+  }
+  return null;
+});
+const mapArea = computed<GeoArea | null>(() => {
+  const m = areaMap.value;
+  return m && m.minLatitude !== null && m.minLongitude !== null && m.maxLatitude !== null && m.maxLongitude !== null
+    ? [[m.minLatitude, m.minLongitude], [m.maxLatitude, m.maxLongitude]]
+    : null;
+});
 function onMapPick(lat: string, lng: string) {
   form.latitude = lat;
   form.longitude = lng;
@@ -405,7 +433,8 @@ const translationRows = computed(() => translationStatus(languages.value, POI_TE
         </div>
         <GeoPicker
           class="flex-[1_1_260px]"
-          label="Site map"
+          :label="areaMap ? areaMap.internalName : 'Site map'"
+          :area="mapArea"
           :latitude="form.latitude"
           :longitude="form.longitude"
           :others="mapOthers"
