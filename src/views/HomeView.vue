@@ -3,14 +3,15 @@ import { computed } from "vue";
 import { Button } from "@/components/ui/button";
 import { session } from "@/platform/auth";
 import { formatDate, statusChipStyle } from "@/lib/format";
-import { canCreateProjects, loadProjects, projectsState } from "@/stores/projects";
+import { canCreateProjects, loadProjects, needsSetup, projectsState, projectTarget as target } from "@/stores/projects";
 
 const firstName = computed(() => session.user?.displayName.split(" ")[0] ?? "");
 const hasProjects = computed(() => projectsState.groups.some((g) => g.projects.length > 0));
+
 </script>
 
 <template>
-  <main class="relative min-w-0 flex-1 overflow-y-auto px-7 pb-16 pt-6">
+  <main class="relative min-w-0 flex-1 overflow-y-auto px-4 pb-16 pt-6 md:px-7">
     <div class="mb-[22px] flex flex-wrap items-start gap-5">
       <div class="min-w-[min(100%,300px)] flex-1">
         <h1 class="text-2xl font-extrabold leading-tight tracking-[-0.01em]">Welcome, {{ firstName }}</h1>
@@ -28,6 +29,7 @@ const hasProjects = computed(() => projectsState.groups.some((g) => g.projects.l
     <div
       v-if="projectsState.status === 'loading' || projectsState.status === 'idle'"
       class="animate-skeleton"
+      role="status"
       aria-busy="true"
       aria-label="Loading projects"
     >
@@ -77,7 +79,7 @@ const hasProjects = computed(() => projectsState.groups.some((g) => g.projects.l
         <div class="mb-2.5 flex items-center gap-2">
           <h2
             :id="`org-${group.organisation.id}`"
-            class="whitespace-nowrap text-[9px] font-extrabold uppercase tracking-[0.16em] text-gray-400"
+            class="whitespace-nowrap text-[9px] font-extrabold uppercase tracking-[0.16em] text-muted-foreground"
           >
             {{ group.organisation.name }}
           </h2>
@@ -86,20 +88,25 @@ const hasProjects = computed(() => projectsState.groups.some((g) => g.projects.l
         <ul class="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-3.5">
           <li v-for="project in group.projects" :key="project.id">
             <RouterLink
-              :to="{ name: 'project', params: { projectId: project.id } }"
+              :to="target(project)"
               class="flex h-full flex-col gap-1 rounded-[10px] border bg-card p-[18px] text-foreground no-underline hover:border-primary hover:text-foreground hover:no-underline"
             >
               <span class="flex items-start gap-2">
                 <span class="min-w-0 flex-1 break-words text-[15px] font-bold">{{ project.name }}</span>
                 <span
                   class="mt-0.5 rounded-full px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-[0.07em]"
-                  :style="statusChipStyle(project.status)"
+                  :style="statusChipStyle(needsSetup(project) ? 'DRAFT' : project.status)"
                 >
-                  {{ project.status }}
+                  {{ needsSetup(project) ? "Setup" : project.status }}
                 </span>
               </span>
               <span class="break-words font-mono text-[11px] text-muted-foreground">{{ project.slug }}</span>
-              <span class="mt-auto pt-2 text-[11px] text-muted-foreground">Updated {{ formatDate(project.updatedAt) }}</span>
+              <span v-if="needsSetup(project)" class="mt-auto pt-2 text-[11px] font-bold text-primary">
+                Not initialized · Resume initialization
+              </span>
+              <span v-else class="mt-auto pt-2 text-[11px] text-muted-foreground">
+                <template v-if="project.template">{{ project.template.name }} · </template>Updated {{ formatDate(project.updatedAt) }}
+              </span>
             </RouterLink>
           </li>
         </ul>

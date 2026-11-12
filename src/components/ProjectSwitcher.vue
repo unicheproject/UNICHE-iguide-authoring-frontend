@@ -8,7 +8,9 @@ import {
   findOrganisation,
   findProject,
   loadProjects,
+  needsSetup,
   projectsState,
+  projectTarget as target,
 } from "@/stores/projects";
 
 const route = useRoute();
@@ -69,74 +71,81 @@ watch(() => route.fullPath, () => {
     <div
       v-if="open"
       id="project-switcher-menu"
-      class="absolute left-0 top-[calc(100%+8px)] z-[80] max-h-[70vh] w-[340px] overflow-y-auto rounded-[10px] border bg-card shadow-[0_18px_44px_rgba(3,7,18,0.18)]"
+      class="absolute left-0 top-[calc(100%+8px)] z-[80] flex max-h-[70vh] w-[340px] flex-col overflow-hidden rounded-[10px] border bg-card shadow-[0_18px_44px_rgba(3,7,18,0.18)]"
     >
-      <div v-if="projectsState.status === 'loading'" class="animate-skeleton px-3.5 py-3" aria-busy="true">
-        <div class="mb-2 h-2.5 w-2/5 rounded bg-[#e6e7eb]"></div>
-        <div class="mb-2 h-3 w-3/4 rounded bg-[#dcdde2]"></div>
-        <div class="h-3 w-3/5 rounded bg-[#dcdde2]"></div>
-        <span class="sr-only">Loading projects</span>
-      </div>
-
-      <div v-else-if="projectsState.status === 'error'" role="alert" class="px-3.5 py-3">
-        <p class="text-xs font-bold text-destructive">
-          {{
-            projectsState.error?.platformUnavailable
-              ? "The UNICHE platform is not reachable"
-              : "Projects could not be loaded"
-          }}
-        </p>
-        <p v-if="projectsState.error?.requestId" class="mt-0.5 font-mono text-[10px] text-muted-foreground">
-          Request id {{ projectsState.error.requestId }}
-        </p>
-        <button type="button" class="mt-2 text-xs font-bold text-primary hover:underline" @click="loadProjects()">
-          Try again
-        </button>
-      </div>
-
-      <template v-else>
-        <p v-if="!projectsState.groups.length" class="px-3.5 py-3 text-xs text-muted-foreground">
-          The UNICHE Catalogue lists no organisations or projects for you yet.
-        </p>
-        <div v-for="group in projectsState.groups" :key="group.organisation.id">
-          <div
-            class="border-b bg-muted px-3.5 py-2 text-[9px] font-extrabold uppercase tracking-[0.12em] text-muted-foreground"
-          >
-            {{ group.organisation.name }}
-          </div>
-          <p v-if="!group.projects.length" class="border-b border-gray-100 px-3.5 py-2.5 text-[11px] text-muted-foreground">
-            No projects yet.
-          </p>
-          <ul>
-            <li v-for="project in group.projects" :key="project.id">
-              <RouterLink
-                :to="{ name: 'project', params: { projectId: project.id } }"
-                class="block border-b border-l-[3px] border-b-gray-100 px-3.5 py-2.5 text-left no-underline hover:bg-muted hover:no-underline"
-                :class="project.id === currentId ? 'border-l-primary bg-primary/[0.06]' : 'border-l-transparent'"
-                :aria-current="project.id === currentId ? 'page' : undefined"
-              >
-                <span class="flex items-center gap-1.5">
-                  <span class="min-w-0 flex-1 break-words text-xs font-bold text-foreground">{{ project.name }}</span>
-                  <span
-                    class="rounded-full px-1.5 py-0.5 text-[8px] font-extrabold uppercase tracking-[0.07em]"
-                    :style="statusChipStyle(project.status)"
-                  >
-                    {{ project.status }}
-                  </span>
-                </span>
-                <span class="mt-0.5 block break-words text-[10px] text-muted-foreground">
-                  {{ project.slug }} · updated {{ formatDate(project.updatedAt) }}
-                </span>
-              </RouterLink>
-            </li>
-          </ul>
+      <!-- Only the list scrolls, so "Create Project" stays in reach however many Projects there are. -->
+      <div class="min-h-0 flex-1 overflow-y-auto">
+        <div v-if="projectsState.status === 'loading'" class="animate-skeleton px-3.5 py-3" aria-busy="true">
+          <div class="mb-2 h-2.5 w-2/5 rounded bg-[#e6e7eb]"></div>
+          <div class="mb-2 h-3 w-3/4 rounded bg-[#dcdde2]"></div>
+          <div class="h-3 w-3/5 rounded bg-[#dcdde2]"></div>
+          <span class="sr-only">Loading projects</span>
         </div>
-      </template>
+
+        <div v-else-if="projectsState.status === 'error'" role="alert" class="px-3.5 py-3">
+          <p class="text-xs font-bold text-destructive">
+            {{
+              projectsState.error?.platformUnavailable
+                ? "The UNICHE platform is not reachable"
+                : "Projects could not be loaded"
+            }}
+          </p>
+          <p v-if="projectsState.error?.requestId" class="mt-0.5 font-mono text-[10px] text-muted-foreground">
+            Request id {{ projectsState.error.requestId }}
+          </p>
+          <button type="button" class="mt-2 text-xs font-bold text-primary hover:underline" @click="loadProjects()">
+            Try again
+          </button>
+        </div>
+
+        <template v-else>
+          <p v-if="!projectsState.groups.length" class="px-3.5 py-3 text-xs text-muted-foreground">
+            The UNICHE Catalogue lists no organisations or projects for you yet.
+          </p>
+          <div v-for="group in projectsState.groups" :key="group.organisation.id">
+            <div
+              class="border-b bg-muted px-3.5 py-2 text-[9px] font-extrabold uppercase tracking-[0.12em] text-muted-foreground"
+            >
+              {{ group.organisation.name }}
+            </div>
+            <p v-if="!group.projects.length" class="border-b border-gray-100 px-3.5 py-2.5 text-[11px] text-muted-foreground">
+              No projects yet.
+            </p>
+            <ul>
+              <li v-for="project in group.projects" :key="project.id">
+                <RouterLink
+                  :to="target(project)"
+                  class="block border-b border-l-[3px] border-b-gray-100 px-3.5 py-2.5 text-left no-underline hover:bg-muted hover:no-underline"
+                  :class="project.id === currentId ? 'border-l-primary bg-primary/[0.06]' : 'border-l-transparent'"
+                  :aria-current="project.id === currentId ? 'page' : undefined"
+                >
+                  <span class="flex items-center gap-1.5">
+                    <span class="min-w-0 flex-1 break-words text-xs font-bold text-foreground">{{ project.name }}</span>
+                    <span
+                      class="rounded-full px-1.5 py-0.5 text-[8px] font-extrabold uppercase tracking-[0.07em]"
+                      :style="statusChipStyle(needsSetup(project) ? 'DRAFT' : project.status)"
+                    >
+                      {{ needsSetup(project) ? "Setup" : project.status }}
+                    </span>
+                  </span>
+                  <span v-if="needsSetup(project)" class="mt-0.5 block text-[10px] font-bold text-primary">
+                    Not initialized · resume initialization
+                  </span>
+                  <span v-else class="mt-0.5 block break-words text-[10px] text-muted-foreground">
+                    <template v-if="project.template">{{ project.template.name }} · </template>{{ project.slug }} · updated
+                    {{ formatDate(project.updatedAt) }}
+                  </span>
+                </RouterLink>
+              </li>
+            </ul>
+          </div>
+        </template>
+      </div>
 
       <RouterLink
         v-if="canCreateProjects"
         :to="{ name: 'project-create' }"
-        class="block bg-card px-3.5 py-3 text-left text-xs font-bold text-primary no-underline hover:bg-muted hover:no-underline"
+        class="block flex-shrink-0 border-t bg-card px-3.5 py-3 text-left text-xs font-bold text-primary no-underline shadow-[0_-4px_10px_rgba(3,7,18,0.05)] hover:bg-muted hover:no-underline"
       >
         + Create Project
       </RouterLink>

@@ -9,13 +9,13 @@ export interface ProjectLanguage {
   direction: TextDirection;
   isDefault: boolean;
   sortOrder: number;
-  /** Non-archived Places and Points of Interest with a title in this language. */
+  /** Non-archived content items of every kind with a title in this language. */
   titledResourceCount: number;
 }
 
 export interface ProjectLanguages {
   languages: ProjectLanguage[];
-  /** Non-archived Places and Points of Interest in the Project. */
+  /** Non-archived content items of every kind in the Project. */
   resourceCount: number;
 }
 
