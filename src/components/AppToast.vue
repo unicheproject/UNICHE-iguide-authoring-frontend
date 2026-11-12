@@ -2,7 +2,7 @@
 import { computed } from "vue";
 import { dismissToast, toastState } from "@/stores/toast";
 
-const marks = { success: "#0f7a6e", warning: "#9a6200", error: "#c0185e", info: "#2d5aa0" } as const;
+const marks = { success: "#0c6d62", warning: "#855400", error: "#c0185e", info: "#2d5aa0" } as const;
 const mark = computed(() => (toastState.current ? marks[toastState.current.tone] : marks.success));
 </script>
 

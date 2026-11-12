@@ -21,6 +21,9 @@ import type { ResourceStatus } from "@/platform/places";
 import { useCurrentProject } from "@/workspace/currentProject";
 import { findSection } from "@/workspace/sections";
 import { useProjectLanguages } from "@/workspace/useProjectLanguages";
+import { choiceFilter } from "@/workspace/listFilters";
+import ListFilterMenu from "@/components/ListFilterMenu.vue";
+import FilterChoiceGroup from "@/components/FilterChoiceGroup.vue";
 
 const section = findSection("media")!;
 const project = useCurrentProject();
@@ -98,6 +101,21 @@ const typeChips = computed(() => [
   ...MAIN_TYPES,
   ...ASSET_TYPES.filter((t) => !MAIN_TYPES.includes(t) && assets.value.some((a) => a.type === t)),
 ]);
+const typeOptions = computed(() => [
+  { value: "ALL" as const, label: "All" },
+  ...typeChips.value.map((value) => ({ value, label: assetTypeLabel(value) })),
+]);
+const statusOptions: { value: "ALL" | ResourceStatus; label: string }[] = [
+  { value: "ALL", label: "Any status" },
+  { value: "DRAFT", label: "DRAFT" },
+  { value: "ACTIVE", label: "ACTIVE" },
+  { value: "ARCHIVED", label: "ARCHIVED" },
+];
+/** The filters in force, shown as chips beside the Filters button. */
+const activeFilters = computed(() => [
+  ...choiceFilter("type", "Type", typeFilter, typeOptions.value, "ALL"),
+  ...choiceFilter("status", "Status", statusFilter, statusOptions, "ALL"),
+]);
 
 const visible = computed(() =>
   assets.value.filter(
@@ -126,14 +144,11 @@ watch(pageCount, (count) => {
   if (page.value >= count) page.value = count - 1;
 });
 
-function chipClass(selected: boolean) {
-  return selected ? "border-primary bg-primary font-bold text-white" : "bg-card font-semibold text-gray-700";
-}
 </script>
 
 <template>
   <main
-    class="relative min-w-0 flex-1 overflow-y-auto px-7 pb-16 pt-6"
+    class="relative min-w-0 flex-1 overflow-y-auto px-4 pb-16 pt-6 md:px-7"
     @dragover.prevent="dragging = !uploading"
     @dragleave.self="dragging = false"
     @drop.prevent="onDrop"
@@ -158,9 +173,13 @@ function chipClass(selected: boolean) {
         v-model="query"
         type="search"
         placeholder="Search by name, filename or title"
-        class="min-w-[240px] flex-1 rounded-lg border-[1.5px] px-3 py-[9px] text-[13px] focus:border-primary focus:outline-none"
+        class="min-w-[min(100%,200px)] flex-1 rounded-lg border-[1.5px] px-3 py-[9px] text-[13px] focus:border-primary focus:outline-none"
       />
-      <div class="flex overflow-hidden rounded-lg border" role="group" aria-label="View">
+      <ListFilterMenu :active="activeFilters">
+        <FilterChoiceGroup v-model="typeFilter" legend="Type" :options="typeOptions" />
+        <FilterChoiceGroup v-model="statusFilter" legend="Status" :options="statusOptions" />
+      </ListFilterMenu>
+      <div class="ml-auto flex overflow-hidden rounded-lg border" role="group" aria-label="View">
         <button
           v-for="v in (['grid', 'list'] as const)"
           :key="v"
@@ -174,36 +193,6 @@ function chipClass(selected: boolean) {
         </button>
       </div>
     </div>
-    <div class="mb-4 flex flex-wrap items-center gap-x-5 gap-y-2.5">
-      <span id="media-type-label" class="text-[11px] font-bold uppercase tracking-[0.06em] text-muted-foreground">Type</span>
-      <div class="flex flex-wrap gap-1.5" role="group" aria-labelledby="media-type-label">
-        <button
-          v-for="chip in (['ALL', ...typeChips] as const)"
-          :key="chip"
-          type="button"
-          class="rounded-full border px-[13px] py-1.5 text-[11px]"
-          :class="chipClass(typeFilter === chip)"
-          :aria-pressed="typeFilter === chip"
-          @click="typeFilter = chip"
-        >
-          {{ chip === "ALL" ? "All" : assetTypeLabel(chip) }}
-        </button>
-      </div>
-      <span id="media-status-label" class="text-[11px] font-bold uppercase tracking-[0.06em] text-muted-foreground">Status</span>
-      <div class="flex flex-wrap gap-1.5" role="group" aria-labelledby="media-status-label">
-        <button
-          v-for="chip in (['ALL', 'DRAFT', 'ACTIVE', 'ARCHIVED'] as const)"
-          :key="chip"
-          type="button"
-          class="rounded-full border px-[13px] py-1.5 text-[11px]"
-          :class="chipClass(statusFilter === chip)"
-          :aria-pressed="statusFilter === chip"
-          @click="statusFilter = chip"
-        >
-          {{ chip === "ALL" ? "Any status" : chip }}
-        </button>
-      </div>
-    </div>
 
     <div v-if="loadError" role="alert" class="max-w-[640px] rounded-lg border border-l-[3px] border-l-destructive bg-card px-[18px] py-4">
       <strong class="block text-[13px] font-bold text-destructive">
@@ -213,7 +202,7 @@ function chipClass(selected: boolean) {
       <Button variant="outline" size="sm" class="mt-3" @click="load">Try again</Button>
     </div>
 
-    <div v-else-if="loading" class="grid animate-skeleton grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4" aria-busy="true" aria-label="Loading media">
+    <div v-else-if="loading" class="grid animate-skeleton grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4" role="status" aria-busy="true" aria-label="Loading media">
       <div v-for="n in 8" :key="n" class="h-[200px] rounded-lg border bg-card"></div>
     </div>
 
@@ -267,7 +256,7 @@ function chipClass(selected: boolean) {
                 <RouterLink :to="{ name: 'asset-editor', params: { projectId, assetId: asset.id } }" class="text-[13px] font-semibold text-foreground no-underline hover:underline">
                   {{ asset.internalName }}
                 </RouterLink>
-                <div class="truncate text-[11px] text-gray-400">{{ asset.originalFilename }}</div>
+                <div class="truncate text-[11px] text-gray-500">{{ asset.originalFilename }}</div>
                 <div v-if="missingAlternativeText(asset, defaultLanguage)" class="text-[11px] font-semibold text-destructive">⚠ No alt text ({{ defaultLanguage }})</div>
               </td>
               <td class="td px-3 text-xs">{{ assetTypeLabel(asset.type) }}</td>

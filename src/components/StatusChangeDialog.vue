@@ -54,7 +54,7 @@ const blocked = computed(() => references.value.length > 0);
     </p>
 
     <p v-if="loading" class="mb-4 animate-skeleton text-[12px] text-muted-foreground" aria-busy="true">Checking where it is used…</p>
-    <div v-else-if="loadFailed && !blockedBy" role="alert" class="mb-4 flex items-center gap-3 text-[12px] font-semibold text-[#9a6200]">
+    <div v-else-if="loadFailed && !blockedBy" role="alert" class="mb-4 flex items-center gap-3 text-[12px] font-semibold text-[#855400]">
       <p>Where it is used could not be checked, so “{{ actionLabel }}” stays off until it can be.</p>
       <button type="button" class="shrink-0 rounded-full border px-3 py-1 text-[11px] font-bold text-gray-700" @click="check">
         Try again

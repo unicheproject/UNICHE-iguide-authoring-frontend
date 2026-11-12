@@ -1,7 +1,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch, type Ref } from "vue";
 import { askConfirm } from "@/stores/confirm";
 import { onBeforeRouteLeave, useRoute } from "vue-router";
-import { ApiError } from "@/platform/api";
+import { ApiError, PartlySavedError } from "@/platform/api";
 import { session } from "@/platform/auth";
 import {
   applyWorkingCopy,
@@ -16,7 +16,7 @@ import { fetchReadiness, type ReadinessIssue } from "@/platform/readiness";
 import type { ResourceStatus } from "@/platform/places";
 import type { ResourceReference } from "@/platform/references";
 import { showToast } from "@/stores/toast";
-import { takeActivationErrors } from "@/workspace/activationHandoff";
+import { takeActivationErrors, isMissingFieldsError } from "@/workspace/activationHandoff";
 
 /**
  * Behaviour every authored-Resource editor shares (iGuide spec 12, sections 4 to 6): loading, unsaved-change
@@ -50,6 +50,8 @@ export interface WorkingCopySupport<T> {
   fromResponse: (raw: unknown) => T | Promise<T>;
   /** Moves error paths of the payload to where the form shows them, as the kind's DRAFT save does. */
   mapError?: (error: ApiError) => ApiError;
+  /** Wraps the copy save for rows saved live beside it, such as triggers, which are put back when it is refused. */
+  around?: <R>(resource: T, save: () => Promise<R>) => Promise<R>;
 }
 
 /** One field that differs between the author's pending changes and the live version after an apply conflict. */
@@ -289,13 +291,18 @@ export function useResourceEditor<T extends EditableResource>(options: ResourceE
     const selectors = path
       ? [`[data-path="${CSS.escape(path)}"]`, `#f-${CSS.escape(plain[0])}`, `#f-${CSS.escape(plain[plain.length - 1])}`]
       : [];
-    for (const selector of selectors) {
-      const element = document.querySelector<HTMLElement>(selector);
-      if (element && element.getClientRects().length) {
-        element.scrollIntoView({ block: "center" });
-        element.focus();
-        return;
+    // Right after load the form may still wait for something else, such as the Project's languages: give it a moment.
+    for (let attempt = 0; attempt < 20; attempt++) {
+      for (const selector of selectors) {
+        const element = document.querySelector<HTMLElement>(selector);
+        if (element && element.getClientRects().length) {
+          element.scrollIntoView({ block: "center" });
+          element.focus();
+          return;
+        }
       }
+      if (!selectors.length && document.querySelector("[data-error-summary]")) break;
+      await new Promise((resolve) => setTimeout(resolve, 50));
     }
     const summaryBox = document.querySelector<HTMLElement>("[data-error-summary]");
     if (summaryBox) summaryBox.focus();
@@ -357,6 +364,12 @@ export function useResourceEditor<T extends EditableResource>(options: ResourceE
         saved.status === "ACTIVE" ? "Visitors see the change on their next refresh." : "Draft saved. Visitors do not see it until you activate it.",
       );
     } catch (e) {
+      if (e instanceof PartlySavedError) {
+        // Its own fields are saved: take the new version, keep the form so saving again sends the rest.
+        resource.value = e.saved as T;
+        handleSaveError(e.reason, `The ${kind} was saved only in part`);
+        return;
+      }
       if (!(e instanceof ApiError)) throw e;
       handleSaveError(e);
     } finally {
@@ -374,11 +387,11 @@ export function useResourceEditor<T extends EditableResource>(options: ResourceE
       const name = options.describePath(field).toLowerCase();
       showErrors("Check the highlighted fields", { [field]: `Another ${kind} in this Project already uses this ${name}.` }, e.requestId);
     } else if (e.status === 422 || e.status === 400) {
-      const title = e.code === "RESOURCE_NOT_EDITABLE" ? `This ${kind} can no longer be edited` : failed;
+      const title = e.hasCode("RESOURCE_NOT_EDITABLE") ? `This ${kind} can no longer be edited` : failed;
       showErrors(title, e.fieldMessages(), e.requestId);
     } else {
       summary.value = {
-        title: e.platformUnavailable ? "The UNICHE platform is not reachable" : `The ${kind} was not saved`,
+        title: e.platformUnavailable ? "The UNICHE platform is not reachable" : failed,
         items: [{ text: e.platformUnavailable ? "Your changes are still in the form. Try again in a moment." : e.message, path: null }],
         requestId: e.requestId,
       };
@@ -402,11 +415,13 @@ export function useResourceEditor<T extends EditableResource>(options: ResourceE
     saving.value = true;
     try {
       const copy = workingCopy.value;
-      const saved = await saveWorkingCopy(support.projectId(), support.kind, current.id, {
-        baseVersion: rebaseTo ?? copy?.baseVersion ?? live.value?.version ?? current.version,
-        workingCopyVersion: copy?.version ?? null,
-        payload: await support.payload(current),
-      });
+      const send = async () =>
+        saveWorkingCopy(support.projectId(), support.kind, current.id, {
+          baseVersion: rebaseTo ?? copy?.baseVersion ?? live.value?.version ?? current.version,
+          workingCopyVersion: copy?.version ?? null,
+          payload: await support.payload(current),
+        });
+      const saved = support.around ? await support.around(current, send) : await send();
       workingCopy.value = saved;
       apply(await copied(saved, live.value ?? current));
       conflict.value = null;
@@ -653,7 +668,7 @@ export function useResourceEditor<T extends EditableResource>(options: ResourceE
         return;
       }
       confirmTarget.value = null;
-      if (e.code === "MISSING_REQUIRED_FIELDS") {
+      if (isMissingFieldsError(e)) {
         if (options.defaultLanguage.value) activeLanguage.value = options.defaultLanguage.value;
         showErrors("Cannot activate yet", e.fieldMessages(), e.requestId);
       } else if (e.code === "VERSION_CONFLICT") {

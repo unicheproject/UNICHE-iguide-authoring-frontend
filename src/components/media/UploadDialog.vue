@@ -85,6 +85,7 @@ async function close() {
         multiple
         class="sr-only"
         tabindex="-1"
+        aria-label="Files to upload"
         :accept="asFloorPlan ? 'image/*' : undefined"
         @change="onFiles"
       />

@@ -1,17 +1,23 @@
 <script setup lang="ts">
 /**
- * Schematic site map of the CMS mockup: a grid over a geographic area, with the other Resources as hollow
- * dots and this one as the pin. Clicking moves the pin and reports the new coordinates; the arrow keys
- * nudge it, so the picker also works without a pointer. The area is derived from `anchors` until
- * Geographic Maps with their own bounds exist.
+ * Where a Resource sits, on OpenStreetMap tiles: framed on the map of the area it belongs to (`area`, such as its
+ * Place's Geographic Map) or else on every saved coordinate of the Project, with the other Resources as hollow dots
+ * and this one as the pin. Clicking or dragging moves the pin and reports the new coordinates; the arrow keys nudge
+ * it, so the picker also works without a pointer.
  */
-import { computed } from "vue";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import { addBasemap } from "@/components/map/basemap";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
 export interface GeoPoint {
   lat: number;
   lng: number;
   title?: string;
 }
+
+/** South-west and north-east corners. */
+export type GeoArea = [[number, number], [number, number]];
 
 const props = defineProps<{
   label: string;
@@ -20,17 +26,23 @@ const props = defineProps<{
   longitude: string;
   /** Other Resources shown as dots. */
   others: GeoPoint[];
-  /** Points that define the visible area; they do not move while the author picks. */
+  /** Points that frame the view when there is no `area`; they do not move while the author picks. */
   anchors: GeoPoint[];
+  /** The area the Resource belongs to, outlined and framed. */
+  area?: GeoArea | null;
   disabled?: boolean;
 }>();
 const emit = defineEmits<{ pick: [lat: string, lng: string] }>();
 
-/** Smallest visible span in degrees, about 200 m, so a single point still gives a usable area. */
-const MIN_SPAN = 0.002;
-const PADDING = 0.25;
 const DECIMALS = 5;
+/** A nudge moves the pin by this share of the visible span. */
 const NUDGE = 0.02;
+
+const host = ref<HTMLDivElement | null>(null);
+let map: L.Map | null = null;
+let dotsLayer: L.LayerGroup | null = null;
+let areaLayer: L.LayerGroup | null = null;
+let pin: L.Marker | null = null;
 
 function typed(): GeoPoint | null {
   const lat = Number(props.latitude.trim());
@@ -40,88 +52,128 @@ function typed(): GeoPoint | null {
   return { lat, lng };
 }
 
-const bounds = computed(() => {
-  // With nothing saved anywhere yet, the typed coordinates are the only reference.
-  const fallback = typed();
+const hasFrame = computed(() => !!props.area || props.anchors.length > 0 || props.others.length > 0 || !!typed());
+const interactive = computed(() => !props.disabled && hasFrame.value);
+
+const pick = (lat: number, lng: number) => emit("pick", lat.toFixed(DECIMALS), lng.toFixed(DECIMALS));
+
+/** Frames the area, else every known point, else the typed coordinates. */
+function frame() {
+  if (!map) return;
+  if (props.area) {
+    map.fitBounds(L.latLngBounds(props.area), { padding: [8, 8], animate: false });
+    return;
+  }
   const points = [...props.anchors, ...props.others];
-  if (!points.length && fallback) points.push(fallback);
-  if (!points.length) return null;
-  const lats = points.map((p) => p.lat);
-  const lngs = points.map((p) => p.lng);
-  const span = (min: number, max: number) => Math.max(max - min, MIN_SPAN) * (1 + 2 * PADDING);
-  const latSpan = span(Math.min(...lats), Math.max(...lats));
-  const lngSpan = span(Math.min(...lngs), Math.max(...lngs));
-  const latMid = (Math.min(...lats) + Math.max(...lats)) / 2;
-  const lngMid = (Math.min(...lngs) + Math.max(...lngs)) / 2;
-  return {
-    minLat: latMid - latSpan / 2,
-    maxLat: latMid + latSpan / 2,
-    minLng: lngMid - lngSpan / 2,
-    maxLng: lngMid + lngSpan / 2,
-  };
-});
-
-function toPosition(lat: number, lng: number) {
-  const b = bounds.value;
-  if (!b) return null;
-  const clamp = (v: number) => Math.min(1, Math.max(0, v));
-  return {
-    x: clamp((lng - b.minLng) / (b.maxLng - b.minLng)),
-    y: clamp((b.maxLat - lat) / (b.maxLat - b.minLat)),
-  };
+  const own = typed();
+  if (!points.length && own) points.push(own);
+  if (!points.length) {
+    map.setView([38.3, 23.8], 5, { animate: false });
+    return;
+  }
+  map.fitBounds(L.latLngBounds(points.map((p) => [p.lat, p.lng] as [number, number])), { padding: [24, 24], maxZoom: 17, animate: false });
 }
 
-function toCoordinates(x: number, y: number): [string, string] {
-  const b = bounds.value!;
-  const lat = b.maxLat - y * (b.maxLat - b.minLat);
-  const lng = b.minLng + x * (b.maxLng - b.minLng);
-  return [lat.toFixed(DECIMALS), lng.toFixed(DECIMALS)];
+function drawArea() {
+  if (!areaLayer) return;
+  areaLayer.clearLayers();
+  if (props.area) L.rectangle(props.area, { color: "#b05fd6", weight: 2, dashArray: "6 5", fill: false, interactive: false }).addTo(areaLayer);
 }
 
-const current = computed(() => {
-  const point = typed();
-  return point ? toPosition(point.lat, point.lng) : null;
+function drawDots() {
+  if (!dotsLayer) return;
+  dotsLayer.clearLayers();
+  for (const p of props.others) {
+    const dot = L.circleMarker([p.lat, p.lng], { radius: 4, weight: 1.5, color: "#9ca3af", fillColor: "#fff", fillOpacity: 1, interactive: !!p.title });
+    if (p.title) dot.bindTooltip(p.title);
+    dot.addTo(dotsLayer);
+  }
+}
+
+const pinIcon = L.divIcon({
+  className: "",
+  iconSize: [18, 18],
+  iconAnchor: [9, 9],
+  html: '<span style="display:block;width:18px;height:18px;border-radius:50%;background:#4c1d8b;border:3px solid #fff;box-shadow:0 2px 7px rgba(0,0,0,0.3)"></span>',
 });
 
-const dots = computed(() =>
-  props.others.flatMap((p) => {
-    const pos = toPosition(p.lat, p.lng);
-    return pos ? [{ ...pos, title: p.title ?? "" }] : [];
-  }),
+function drawPin() {
+  if (!map) return;
+  const at = typed();
+  if (!at) {
+    pin?.remove();
+    pin = null;
+    return;
+  }
+  if (!pin) {
+    pin = L.marker([at.lat, at.lng], { icon: pinIcon, draggable: interactive.value, keyboard: false, zIndexOffset: 1000, title: "This point of interest" });
+    pin.on("dragend", () => {
+      const ll = pin!.getLatLng();
+      pick(ll.lat, ll.lng);
+    });
+    pin.addTo(map);
+  } else {
+    pin.setLatLng([at.lat, at.lng]);
+  }
+  if (pin.dragging) {
+    if (interactive.value) pin.dragging.enable();
+    else pin.dragging.disable();
+  }
+}
+
+onMounted(() => {
+  if (!host.value) return;
+  map = L.map(host.value, { keyboard: false, zoomSnap: 0.25, zoomDelta: 0.5, wheelPxPerZoomLevel: 120 });
+  addBasemap(map);
+  areaLayer = L.layerGroup().addTo(map);
+  dotsLayer = L.layerGroup().addTo(map);
+  map.on("click", (e: L.LeafletMouseEvent) => {
+    if (interactive.value) pick(e.latlng.lat, e.latlng.lng);
+  });
+  frame();
+  drawArea();
+  drawDots();
+  drawPin();
+});
+
+onBeforeUnmount(() => {
+  map?.remove();
+  map = null;
+  pin = null;
+});
+
+// The frame follows the area and the saved points, never the pin the author is moving.
+const frameKey = computed(() =>
+  JSON.stringify([props.area ?? null, props.anchors.map((p) => [p.lat, p.lng]), props.others.map((p) => [p.lat, p.lng])]),
 );
-
-const interactive = computed(() => !props.disabled && !!bounds.value);
-
-function onClick(event: MouseEvent) {
-  if (!interactive.value) return;
-  const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
-  const x = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
-  const y = Math.min(1, Math.max(0, (event.clientY - rect.top) / rect.height));
-  emit("pick", ...toCoordinates(x, y));
-}
+watch(frameKey, () => {
+  frame();
+  drawArea();
+  drawDots();
+});
+watch(() => [props.latitude, props.longitude, props.disabled], drawPin);
 
 function onKeydown(event: KeyboardEvent) {
-  if (!interactive.value) return;
+  if (!interactive.value || !map) return;
   const moves: Record<string, [number, number]> = {
     ArrowLeft: [-NUDGE, 0],
     ArrowRight: [NUDGE, 0],
-    ArrowUp: [0, -NUDGE],
-    ArrowDown: [0, NUDGE],
+    ArrowUp: [0, NUDGE],
+    ArrowDown: [0, -NUDGE],
   };
   const move = moves[event.key];
   if (!move) return;
   event.preventDefault();
-  const start = current.value ?? { x: 0.5, y: 0.5 };
-  const x = Math.min(1, Math.max(0, start.x + move[0]));
-  const y = Math.min(1, Math.max(0, start.y + move[1]));
-  emit("pick", ...toCoordinates(x, y));
+  const view = map.getBounds();
+  const start = typed() ?? { lat: view.getCenter().lat, lng: view.getCenter().lng };
+  pick(start.lat + move[1] * (view.getNorth() - view.getSouth()), start.lng + move[0] * (view.getEast() - view.getWest()));
 }
 
 const note = computed(() => {
-  if (!bounds.value) return { text: "No coordinates in this Project yet. Type the first ones on the left, then click to refine.", warn: true };
+  if (!hasFrame.value) return { text: "No coordinates in this Project yet. Type the first ones, or click the map to place it.", warn: true };
   if (props.disabled) return { text: "Read-only while the point of interest is not a draft.", warn: false };
-  if (!current.value) return { text: "No coordinates yet. Click the map to place it, or type them on the left.", warn: true };
-  return { text: "Click anywhere, or use the arrow keys, to move the pin.", warn: false };
+  if (!typed()) return { text: "No coordinates yet. Click the map to place it, or type them.", warn: true };
+  return { text: "Click the map or drag the pin to move it; the arrow keys nudge it.", warn: false };
 });
 </script>
 
@@ -129,42 +181,24 @@ const note = computed(() => {
   <div class="flex min-w-0 flex-col gap-2">
     <span class="text-[10px] font-extrabold uppercase tracking-[0.09em] text-muted-foreground">{{ label }}</span>
     <div
-      class="map relative h-[190px] overflow-hidden rounded-lg border-[1.5px]"
+      ref="host"
+      class="picker relative z-0 h-[260px] overflow-hidden rounded-lg border-[1.5px] bg-muted"
       :class="interactive ? 'cursor-crosshair' : 'cursor-default'"
       :tabindex="interactive ? 0 : -1"
       role="group"
       :aria-label="`${label}: pin position. Arrow keys move the pin; the latitude and longitude fields set it exactly.`"
-      :title="interactive ? 'Click to place this point of interest' : undefined"
-      @click="onClick"
       @keydown="onKeydown"
-    >
-      <span
-        v-for="(dot, index) in dots"
-        :key="index"
-        :title="dot.title"
-        class="absolute -ml-1 -mt-1 block h-2 w-2 rounded-full border-[1.5px] border-gray-400 bg-white"
-        :style="{ left: `${dot.x * 100}%`, top: `${dot.y * 100}%` }"
-      ></span>
-      <span
-        v-if="current"
-        class="absolute -ml-2 -mt-2 block h-4 w-4 rounded-full border-[2.5px] border-white bg-primary shadow-[0_2px_7px_rgba(0,0,0,0.3)]"
-        :style="{ left: `${current.x * 100}%`, top: `${current.y * 100}%` }"
-        aria-hidden="true"
-      ></span>
-    </div>
-    <span class="text-[11px]" :class="note.warn ? 'text-[#9a6200]' : 'text-muted-foreground'">{{ note.text }}</span>
+    ></div>
+    <span class="text-[11px]" :class="note.warn ? 'text-[#855400]' : 'text-muted-foreground'">{{ note.text }}</span>
   </div>
 </template>
 
 <style scoped>
-/* The mockup's grid paper. */
-.map {
-  background:
-    repeating-linear-gradient(0deg, #f3f4f6 0 19px, #eceef1 19px 20px),
-    repeating-linear-gradient(90deg, transparent 0 19px, #eceef1 19px 20px);
-}
-.map:focus-visible {
+.picker:focus-visible {
   outline: 2px solid #4c1d8b;
   outline-offset: 2px;
+}
+.picker.cursor-crosshair :deep(.leaflet-grab) {
+  cursor: crosshair;
 }
 </style>

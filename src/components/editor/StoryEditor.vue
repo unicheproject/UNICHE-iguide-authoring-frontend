@@ -64,7 +64,12 @@ function move(index: number, delta: number) {
   const [block] = props.blocks.splice(index, 1);
   props.blocks.splice(target, 0, block);
   announcement.value = `Moved to position ${target + 1} of ${props.blocks.length}.`;
-  void nextTick(() => document.getElementById(`block-move-${block.key}-${delta < 0 ? "up" : "down"}`)?.focus());
+  // At the end of the list the same button is disabled, so its counterpart takes focus.
+  void nextTick(() => {
+    const same = document.getElementById(`block-move-${block.key}-${delta < 0 ? "up" : "down"}`) as HTMLButtonElement | null;
+    const other = document.getElementById(`block-move-${block.key}-${delta < 0 ? "down" : "up"}`);
+    (same && !same.disabled ? same : other ?? same)?.focus();
+  });
 }
 
 function remove(index: number) {

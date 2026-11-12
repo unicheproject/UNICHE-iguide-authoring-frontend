@@ -13,8 +13,8 @@ const props = defineProps<{
 }>();
 
 const LOOK: Record<Completeness, { glyph: string; color: string; label: string }> = {
-  complete: { glyph: "✓", color: "#0f7a6e", label: "complete" },
-  partial: { glyph: "◐", color: "#9a6200", label: "partly translated" },
+  complete: { glyph: "✓", color: "#0c6d62", label: "complete" },
+  partial: { glyph: "◐", color: "#855400", label: "partly translated" },
   missing: { glyph: "○", color: "#6b7280", label: "not translated" },
 };
 

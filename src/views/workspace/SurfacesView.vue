@@ -92,7 +92,9 @@ async function save() {
     const found: Record<string, string> = {};
     for (const [path, message] of Object.entries(e.fieldMessages())) {
       const match = /^surfaces\[(\d+)\]\.configuration\.publicBaseUrl/.exec(path);
-      found[match ? `${ORDER[Number(match[1])]}.publicBaseUrl` : path] = message;
+      const other = /^surfaces\[(\d+)\]/.exec(path);
+      const key = match ? `${ORDER[Number(match[1])]}.publicBaseUrl` : other ? ORDER[Number(other[1])] : "";
+      found[key] = found[key] ? `${found[key]} ${message}` : message;
     }
     fieldErrors.value = found;
     saveError.value = e;
@@ -105,8 +107,16 @@ const saveErrorText = computed(() => {
   const e = saveError.value;
   if (!e) return null;
   if (e.platformUnavailable) return { title: "The UNICHE platform is not reachable", detail: "Nothing was changed. Try again in a moment." };
-  return { title: "The surfaces were not saved", detail: e.details.join(" ") || e.message };
+  const named = Object.entries(fieldErrors.value).map(([key, message]) => `${fieldLabel(key)}: ${message}`);
+  return { title: "The surfaces were not saved", detail: named.join(" ") || e.message };
 });
+
+/** The label a field error is shown under in the summary; the API's paths never reach the screen. */
+function fieldLabel(key: string): string {
+  const [name, field] = key.split(".") as [SurfaceName, string | undefined];
+  if (field === "publicBaseUrl") return name === "WEB" ? "Public web address" : `${COPY[name]?.label ?? name} address`;
+  return COPY[name]?.label ?? "Surfaces";
+}
 
 const addressMissing = computed(() => form.WEB.enabled && !form.WEB.publicBaseUrl.trim());
 
@@ -124,16 +134,16 @@ onBeforeRouteLeave(
 </script>
 
 <template>
-  <main class="relative min-w-0 flex-1 overflow-y-auto px-7 pb-16 pt-6">
+  <main class="relative min-w-0 flex-1 overflow-y-auto px-4 pb-16 pt-6 md:px-7">
     <PageHead title="App settings" :subtitle="section.subtitle">
       <template #actions>
-        <span v-if="dirty" class="text-[11px] font-semibold text-[#9a6200]">Unsaved changes</span>
+        <span v-if="dirty" class="text-[11px] font-semibold text-[#855400]">Unsaved changes</span>
         <Button :disabled="!dirty || saving || loading" @click="save">{{ saving ? "Saving…" : "Save" }}</Button>
       </template>
     </PageHead>
     <SectionTabs :project-id="project.id" section="surfaces" />
 
-    <div v-if="loading && !surfaces.length" class="max-w-[760px] animate-skeleton rounded-lg border bg-card" aria-busy="true" aria-label="Loading surfaces">
+    <div v-if="loading && !surfaces.length" class="animate-skeleton rounded-lg border bg-card" role="status" aria-busy="true" aria-label="Loading surfaces">
       <div v-for="n in 3" :key="n" class="border-b border-gray-100 px-[18px] py-4"><div class="h-3 w-40 rounded bg-[#dcdde2]"></div></div>
     </div>
 
@@ -146,13 +156,13 @@ onBeforeRouteLeave(
     </div>
 
     <template v-else>
-      <div v-if="saveErrorText" role="alert" class="mb-5 max-w-[760px] rounded-lg border border-l-[3px] border-l-destructive bg-card px-[18px] py-3.5">
+      <div v-if="saveErrorText" role="alert" class="mb-5 rounded-lg border border-l-[3px] border-l-destructive bg-card px-[18px] py-3.5">
         <strong class="block text-[13px] font-bold text-destructive">{{ saveErrorText.title }}</strong>
         <p class="mt-0.5 text-[13px] text-gray-700">{{ saveErrorText.detail }}</p>
         <p v-if="saveError?.requestId" class="mt-1 font-mono text-[11px] text-muted-foreground">Request id {{ saveError.requestId }}</p>
       </div>
 
-      <div class="flex max-w-[760px] flex-col gap-4" :aria-busy="saving">
+      <div class="flex flex-col gap-4" :aria-busy="saving">
         <section v-for="name in ORDER" :key="name" class="overflow-hidden rounded-lg border bg-card">
           <div class="flex flex-wrap items-center gap-3 px-[18px] py-3.5">
             <div class="min-w-[200px] flex-1">
@@ -186,16 +196,16 @@ onBeforeRouteLeave(
               :disabled="saving"
               :aria-invalid="!!fieldErrors['WEB.publicBaseUrl']"
               aria-describedby="public-base-url-help"
-              class="field-input w-full font-mono text-[13px]"
+              class="field-input w-full max-w-[560px] font-mono text-[13px]"
               :class="{ invalid: fieldErrors['WEB.publicBaseUrl'] }"
             />
             <p v-if="fieldErrors['WEB.publicBaseUrl']" class="mt-1 text-xs font-semibold text-destructive">⚠ {{ fieldErrors["WEB.publicBaseUrl"] }}</p>
-            <p id="public-base-url-help" class="mt-1 text-xs text-muted-foreground">
+            <p id="public-base-url-help" class="mt-1 max-w-[760px] text-xs text-muted-foreground">
               Where the organization hosts the web app: https and the address only, without a path. For local tests,
               http://localhost works too. QR codes and shared links are built on it, so changing it later breaks
               printed codes.
             </p>
-            <p v-if="addressMissing" class="mt-1 text-xs font-semibold text-[#9a6200]">
+            <p v-if="addressMissing" class="mt-1 text-xs font-semibold text-[#855400]">
               Without an address the QR codes cannot be produced.
             </p>
           </div>

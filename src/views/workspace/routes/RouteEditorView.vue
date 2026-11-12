@@ -1,17 +1,19 @@
 <script setup lang="ts">
 import { computed, nextTick, reactive, ref } from "vue";
 import AppDialog from "@/components/AppDialog.vue";
-import RouteMap, { type RouteMapStop } from "@/components/RouteMap.vue";
+import RouteMap, { type RouteMapStop, type RoutePlaceMap } from "@/components/RouteMap.vue";
 import EditorShell from "@/components/editor/EditorShell.vue";
 import TranslationsPanel, { type TextFieldGroup, type TextFieldMeta } from "@/components/editor/TranslationsPanel.vue";
 import MediaSlots, { type MediaSlot } from "@/components/media/MediaSlots.vue";
 import TriggersCard from "@/components/editor/TriggersCard.vue";
-import { listTargetTriggers, syncTriggers, triggerToForm, type Trigger, type TriggerForm } from "@/platform/triggers";
+import { listTargetTriggers, saveWithTriggers, triggerToForm, type Trigger, type TriggerForm } from "@/platform/triggers";
 import StatusChip from "@/components/StatusChip.vue";
 import { SLUG_PATTERN } from "@/lib/format";
 import { listAssets, type Asset, type MediaBinding } from "@/platform/assets";
 import { assignableCategories, listCategories, type Category } from "@/platform/categories";
 import { listPois, poiTitle, type Poi } from "@/platform/pois";
+import { listPlaces, placeTitle, type Place } from "@/platform/places";
+import { listMaps, type GeoMap } from "@/platform/maps";
 import {
   changeRouteStatus,
   fetchRoute,
@@ -98,6 +100,9 @@ const poiById = computed(() => new Map(pois.value.map((p) => [p.id, p])));
 // The media library, for the slot's name and preview.
 const assets = ref<Asset[]>([]);
 const categories = ref<Category[]>([]);
+// Places and geographic Maps, to draw the Route on the Map of its stops' Place.
+const places = ref<Place[]>([]);
+const geoMaps = ref<GeoMap[]>([]);
 
 interface StopForm {
   /** Stable list key, also for stops that are not saved yet. */
@@ -166,13 +171,18 @@ const editor = useResourceEditor<Route>({
   languages,
   defaultLanguage,
   async load() {
-    const [route, allPois, library, allCategories, triggers] = await Promise.all([
+    const [route, allPois, library, allCategories, triggers, allPlaces, allMaps] = await Promise.all([
       fetchRoute(projectId.value, props.routeId),
       listPois(projectId.value),
       listAssets(projectId.value),
       listCategories(projectId.value),
       listTargetTriggers(projectId.value, "ROUTE", props.routeId),
+      // The map is a picture of the stops: without Places or Maps the editor still works.
+      listPlaces(projectId.value).catch(() => [] as Place[]),
+      listMaps(projectId.value).catch(() => [] as GeoMap[]),
     ]);
+    places.value = allPlaces;
+    geoMaps.value = allMaps;
     savedTriggers.value = triggers;
     liveStopIds.value = route.stops.flatMap((s) => (s.id ? [s.id] : []));
     pois.value = allPois;
@@ -181,18 +191,22 @@ const editor = useResourceEditor<Route>({
     return route;
   },
   async save(route, version) {
-    // Triggers are rows of their own and do not move the Route's version, so they go first (as for POIs).
-    savedTriggers.value = await syncTriggers(projectId.value, "ROUTE", route.id, form.triggers);
-    return updateRoute(projectId.value, route.id, { version, ...input() });
+    // Triggers are rows of their own and do not move the Route's version: saved first, put back when it is refused.
+    const { saved, triggers } = await saveWithTriggers(projectId.value, "ROUTE", route.id, form.triggers, () =>
+      updateRoute(projectId.value, route.id, { version, ...input() }),
+    );
+    savedTriggers.value = triggers;
+    return saved;
   },
   workingCopy: {
     kind: "routes",
     projectId: () => projectId.value,
-    async payload(route) {
-      // Triggers are not in the working copy (backend D-026): "Save draft" saves them live, after the body.
-      const body = routeWorkingCopyPayload(input());
-      savedTriggers.value = await syncTriggers(projectId.value, "ROUTE", route.id, form.triggers);
-      return body;
+    payload: () => routeWorkingCopyPayload(input()),
+    // Triggers are not in the working copy (backend D-026): "Save draft" saves them live around it.
+    async around(route, save) {
+      const { saved, triggers } = await saveWithTriggers(projectId.value, "ROUTE", route.id, form.triggers, save);
+      savedTriggers.value = triggers;
+      return saved;
     },
     fromResponse: routeFromResponse,
   },
@@ -298,12 +312,19 @@ function stopError(index: number): string | undefined {
  */
 const stopAnnouncement = ref("");
 
+/** Focuses the moved row's button; at the end of the list that one is disabled, so its counterpart takes focus. */
+function focusMoved(id: string) {
+  const button = document.getElementById(id) as HTMLButtonElement | null;
+  const other = id.endsWith("-up") ? document.getElementById(id.replace(/-up$/, "-down")) : id.endsWith("-down") ? document.getElementById(id.replace(/-down$/, "-up")) : null;
+  (button && !button.disabled ? button : other ?? button)?.focus();
+}
+
 function moveStopTo(index: number, target: number, focusId?: (key: string) => string) {
   if (target < 0 || target >= form.stops.length || target === index) return;
   const [stop] = form.stops.splice(index, 1);
   form.stops.splice(target, 0, stop);
   stopAnnouncement.value = `Moved ${stopTitle(stop)} to position ${target + 1} of ${form.stops.length}.`;
-  if (focusId) void nextTick(() => document.getElementById(focusId(stop.key))?.focus());
+  if (focusId) void nextTick(() => focusMoved(focusId(stop.key)));
 }
 
 /** Moves a stop and keeps keyboard focus on the same button, so repeated presses keep moving it. */
@@ -386,6 +407,50 @@ const mapStops = computed<RouteMapStop[]>(() =>
     return { number: i + 1, title: stopTitle(s), lat: poi?.latitude ?? null, lng: poi?.longitude ?? null };
   }),
 );
+
+/**
+ * The Map the Route is drawn on: of the Places that hold its stops, or hold those Places, the one with a geographic
+ * Map that covers the most stops; on a tie, the closest Place to the stops. ACTIVE Maps go before DRAFT ones.
+ */
+const placeMap = computed<RoutePlaceMap | null>(() => {
+  const placeById = new Map(places.value.map((p) => [p.id, p]));
+  const mapOfPlace = new Map<string, GeoMap>();
+  for (const m of geoMaps.value) {
+    if (!m.placeId || m.status === "ARCHIVED") continue;
+    const current = mapOfPlace.get(m.placeId);
+    if (!current || (current.status !== "ACTIVE" && m.status === "ACTIVE")) mapOfPlace.set(m.placeId, m);
+  }
+  const score = new Map<string, { stops: number; depth: number }>();
+  for (const stop of form.stops) {
+    let placeId = poiById.value.get(stop.poiId)?.placeId ?? null;
+    const seen = new Set<string>();
+    for (let depth = 0; placeId && !seen.has(placeId); depth++) {
+      seen.add(placeId);
+      if (mapOfPlace.has(placeId)) {
+        const s = score.get(placeId) ?? { stops: 0, depth: 0 };
+        score.set(placeId, { stops: s.stops + 1, depth: s.depth + depth });
+      }
+      placeId = placeById.get(placeId)?.parentPlaceId ?? null;
+    }
+  }
+  const best = [...score.entries()].sort(([, a], [, b]) => b.stops - a.stops || a.depth / a.stops - b.depth / b.stops)[0];
+  if (!best) return null;
+  const m = mapOfPlace.get(best[0])!;
+  const place = placeById.get(best[0]);
+  const hasBounds = m.minLatitude !== null && m.minLongitude !== null && m.maxLatitude !== null && m.maxLongitude !== null;
+  return {
+    id: m.id,
+    name: m.internalName,
+    placeTitle: place ? placeTitle(place, defaultLanguage.value, defaultLanguage.value) : null,
+    bounds: hasBounds
+      ? [
+          [m.minLatitude!, m.minLongitude!],
+          [m.maxLatitude!, m.maxLongitude!],
+        ]
+      : null,
+    view: { lat: m.initialLatitude, lng: m.initialLongitude, zoom: m.initialZoom },
+  };
+});
 
 const picking = ref(false);
 const pickQuery = ref("");
@@ -570,20 +635,20 @@ const translationRows = computed(() => translationStatus(languages.value, ROUTE_
       </div>
     </section>
 
-    <section class="overflow-hidden rounded-lg border bg-card">
+    <section class="overflow-hidden rounded-lg border bg-card" aria-labelledby="stops-heading" data-path="stops" tabindex="-1">
       <div class="flex items-center gap-2.5 border-b px-5 py-3.5">
-        <h2 class="flex-1 text-[11px] font-extrabold uppercase tracking-[0.09em] text-muted-foreground">Stops ({{ form.stops.length }})</h2>
+        <h2 id="stops-heading" class="flex-1 text-[11px] font-extrabold uppercase tracking-[0.09em] text-muted-foreground">Stops ({{ form.stops.length }})</h2>
       </div>
       <div class="border-b border-gray-100 px-5 py-4">
-        <RouteMap :stops="mapStops" :loop="form.loop" />
+        <RouteMap :stops="mapStops" :loop="form.loop" :place-map="placeMap" :indoor="form.type === 'INDOOR'" :project-id="projectId" />
       </div>
       <p v-if="!hasActiveStop" class="border-b border-gray-100 px-5 py-3 text-xs font-semibold text-destructive">
         ⚠ At least one stop must be an ACTIVE point of interest before the route can be activated.
       </p>
-      <p v-if="form.stops.length < 2" class="border-b border-gray-100 px-5 py-3 text-xs font-semibold text-[#9a6200]">
+      <p v-if="form.stops.length < 2" class="border-b border-gray-100 px-5 py-3 text-xs font-semibold text-[#855400]">
         ⚠ A route usually has at least two stops. It can still be activated with one.
       </p>
-      <p v-if="stopLinksChange" class="border-b border-gray-100 px-5 py-3 text-xs font-semibold text-[#9a6200]">
+      <p v-if="stopLinksChange" class="border-b border-gray-100 px-5 py-3 text-xs font-semibold text-[#855400]">
         ⚠ The stops are in a different order than visitors see now. A stop's link follows its position, so after you
         apply, links and QR codes that point to a stop number lead to another stop.
       </p>
@@ -662,7 +727,7 @@ const translationRows = computed(() => translationStatus(languages.value, ROUTE_
               <button type="button" class="px-1 text-[13px] text-destructive" :aria-label="`Remove stop ${index + 1}`" @click="removeStop(index)">✕</button>
             </template>
           </div>
-          <p v-if="stopPoiWarning(stop)" class="mt-1.5 pl-[34px] text-xs font-semibold text-[#9a6200]">⚠ {{ stopPoiWarning(stop) }}</p>
+          <p v-if="stopPoiWarning(stop)" class="mt-1.5 pl-[34px] text-xs font-semibold text-[#855400]">⚠ {{ stopPoiWarning(stop) }}</p>
           <label
             v-if="activeLanguageInfo && stop.translations[activeLanguageInfo.languageCode]"
             :for="`stop-walk-${stop.key}`"

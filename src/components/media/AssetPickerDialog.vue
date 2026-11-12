@@ -53,10 +53,12 @@ const choices = computed(() => {
       props.accept.includes(a.type) &&
       a.status !== "ARCHIVED" &&
       !excluded.has(a.id) &&
-      (typeFilter.value === "ALL" || a.type === typeFilter.value) &&
-      (statusFilter.value === "ALL" || a.status === statusFilter.value) &&
-      (!onlyUsed.value || used.has(a.id)) &&
-      assetMatches(a, query.value),
+      // The selected Asset, such as a file just uploaded, stays in view whatever the filters say.
+      (a.id === selectedId.value ||
+        ((typeFilter.value === "ALL" || a.type === typeFilter.value) &&
+          (statusFilter.value === "ALL" || a.status === statusFilter.value) &&
+          (!onlyUsed.value || used.has(a.id)) &&
+          assetMatches(a, query.value))),
   );
 });
 
@@ -189,7 +191,7 @@ function chip(selectedValue: boolean) {
               Upload new
               <span class="text-[10px] font-normal text-muted-foreground">or drop files here</span>
             </button>
-            <input ref="fileInput" type="file" multiple class="sr-only" :accept="acceptAttribute || undefined" tabindex="-1" @change="onFiles" />
+            <input ref="fileInput" type="file" multiple class="sr-only" aria-label="Files to upload" :accept="acceptAttribute || undefined" tabindex="-1" @change="onFiles" />
           </li>
           <li v-for="asset in choices" :key="asset.id">
             <button
@@ -231,7 +233,7 @@ function chip(selectedValue: boolean) {
       <div class="mr-auto flex min-w-0 items-center gap-2 self-center text-xs">
         <template v-if="selected">
           <span class="truncate font-bold">{{ selected.internalName }}</span>
-          <span v-if="(selected.type === 'IMAGE' || selected.type === 'FLOOR_PLAN') && defaultLanguage" :class="altMissing ? 'font-semibold text-destructive' : 'text-[#0f7a6e]'">
+          <span v-if="(selected.type === 'IMAGE' || selected.type === 'FLOOR_PLAN') && defaultLanguage" :class="altMissing ? 'font-semibold text-destructive' : 'text-[#0c6d62]'">
             {{ altMissing ? `⚠ Alt text (${defaultLanguage}): missing` : `✓ Alt text (${defaultLanguage}): present` }}
           </span>
         </template>

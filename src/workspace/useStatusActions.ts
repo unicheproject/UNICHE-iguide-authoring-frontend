@@ -3,7 +3,7 @@ import { ApiError } from "@/platform/api";
 import type { ResourceStatus } from "@/platform/places";
 import type { ResourceReference } from "@/platform/references";
 import { showToast } from "@/stores/toast";
-import { handOffActivationErrors } from "@/workspace/activationHandoff";
+import { handOffActivationErrors, isMissingFieldsError } from "@/workspace/activationHandoff";
 
 /**
  * Activate, deactivate, restore, and archive buttons of a list, as the other lists have them: activation
@@ -52,7 +52,7 @@ export function useStatusActions<T extends { id: string; status: ResourceStatus;
         return;
       }
       confirm.value = null;
-      if (e.code === "MISSING_REQUIRED_FIELDS") {
+      if (isMissingFieldsError(e)) {
         handOffActivationErrors(item.id, e);
         showToast("Cannot activate yet", `${options.title(item)} opens at the first missing field.`, "error");
         options.open(item);

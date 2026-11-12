@@ -4,8 +4,8 @@ import type { SurfaceName } from "./surfaces";
 
 /*
  * Interaction Triggers (`03` §14, backend D-026): how visitors reach a Resource in place. They have no
- * screen of their own (`12` §3); the editor of their target edits them and `syncTriggers` saves them after
- * the Resource itself.
+ * screen of their own (`12` §3); the editor of their target edits them and `saveWithTriggers` saves them before
+ * the Resource itself, so a refused trigger stops the save, and puts them back when the Resource is then refused.
  */
 
 export type TriggerType = "QR_CODE" | "BEACON" | "GEO_PROXIMITY";
@@ -127,12 +127,16 @@ export function fetchQrImage(projectId: string, triggerId: string, signal?: Abor
 
 /** The non-archived triggers of one Resource, in their order. */
 export async function listTargetTriggers(projectId: string, type: TriggerTargetType, id: string): Promise<Trigger[]> {
+  return (await listEveryTargetTrigger(projectId, type, id)).filter((t) => t.status !== "ARCHIVED");
+}
+
+async function listEveryTargetTrigger(projectId: string, type: TriggerTargetType, id: string): Promise<Trigger[]> {
   const triggers: Trigger[] = [];
   for (let page = 0; ; page++) {
     const result = await apiRequest<Page<Trigger>>(
       `${base(projectId)}?targetResourceType=${type}&targetResourceId=${encodeURIComponent(id)}&size=200&page=${page}`,
     );
-    triggers.push(...result.content.filter((t) => t.status !== "ARCHIVED"));
+    triggers.push(...result.content);
     if (page + 1 >= result.totalPages) return triggers;
   }
 }
@@ -217,8 +221,9 @@ export async function syncTriggers(
   type: TriggerTargetType,
   id: string,
   desired: TriggerForm[],
+  current?: Trigger[],
 ): Promise<Trigger[]> {
-  const current = await listTargetTriggers(projectId, type, id);
+  current ??= await listTargetTriggers(projectId, type, id);
   // A new row identical to a trigger nobody kept is that trigger: a save that failed half-way created it.
   const unclaimed = current.filter((t) => !desired.some((d) => d.id === t.id));
   desired = desired.map((d) => {
@@ -263,6 +268,59 @@ export async function syncTriggers(
     }
   }
   return listTargetTriggers(projectId, type, id);
+}
+
+/**
+ * Saves the triggers, then the Resource through `saveResource`. The triggers go first, so a refused trigger stops
+ * the save; when the rest is refused, the triggers are put back as they were, so a save that failed changed
+ * nothing (DECISIONS.md D-044). Putting them back is best effort: when it fails too, the next save repairs them.
+ */
+export async function saveWithTriggers<R>(
+  projectId: string,
+  type: TriggerTargetType,
+  id: string,
+  desired: TriggerForm[],
+  saveResource: () => Promise<R>,
+): Promise<{ saved: R; triggers: Trigger[] }> {
+  const before = await listTargetTriggers(projectId, type, id);
+  try {
+    const triggers = await syncTriggers(projectId, type, id, desired, before);
+    return { saved: await saveResource(), triggers };
+  } catch (e) {
+    await restoreTriggers(projectId, type, id, before).catch(() => undefined);
+    throw e;
+  }
+}
+
+const settingsOf = (t: Trigger) =>
+  JSON.stringify({ code: t.code, supportedSurfaces: t.supportedSurfaces, configuration: t.configuration });
+
+/** Makes the Resource's triggers those of `before` again: new ones archived, removed ones restored, edits undone. */
+async function restoreTriggers(projectId: string, type: TriggerTargetType, id: string, before: Trigger[]): Promise<void> {
+  const now = await listEveryTargetTrigger(projectId, type, id);
+  const status = (t: Trigger, targetStatus: ResourceStatus) =>
+    apiRequest<Trigger>(`${base(projectId)}/${encodeURIComponent(t.id)}/status`, {
+      method: "POST",
+      body: { targetStatus, version: t.version },
+    });
+  // Archived first, so a restored QR code does not meet a new one with the same code.
+  for (const added of now.filter((t) => t.status !== "ARCHIVED" && !before.some((b) => b.id === t.id))) {
+    await status(added, "ARCHIVED");
+  }
+  for (const old of before) {
+    let current = now.find((t) => t.id === old.id);
+    if (!current) continue;
+    if (current.status === "ARCHIVED") {
+      current = await status(current, "DRAFT");
+      if (old.status === "ACTIVE") current = await status(current, "ACTIVE");
+    }
+    if (settingsOf(current) !== settingsOf(old)) {
+      await apiRequest(`${base(projectId)}/${encodeURIComponent(old.id)}`, {
+        method: "PUT",
+        body: { version: current.version, code: old.code, supportedSurfaces: old.supportedSurfaces, configuration: old.configuration },
+      });
+    }
+  }
 }
 
 export const TRIGGER_LABELS: Record<TriggerType, string> = {

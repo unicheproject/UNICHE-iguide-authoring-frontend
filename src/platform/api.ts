@@ -71,6 +71,14 @@ export class ApiError extends Error {
     return byPath;
   }
 
+  /**
+   * Whether the problem carries the code, on itself or on one of its field errors: a `422 VALIDATION_ERROR` names
+   * the specific code, such as MISSING_REQUIRED_FIELDS, only on its field errors (`07` §15).
+   */
+  hasCode(code: string): boolean {
+    return this.code === code || this.fieldErrors.some((e) => e.code === code);
+  }
+
   /** `502`, `503`, `504`: the backend answered, but the UNICHE platform behind it did not. */
   get platformUnavailable(): boolean {
     return this.status === 502 || this.status === 503 || this.status === 504;
@@ -326,4 +334,34 @@ function defaultMessage(status: number): string {
     default:
       return `The request failed with status ${status}.`;
   }
+}
+
+/**
+ * A save whose first request, the Resource's own fields, went through and whose later steps (Category, stops,
+ * blocks, occurrences, media) did not: the Resource as it now is, with its new version, and why a step failed. The
+ * editor takes the new version and keeps the form, so saving again finishes the job instead of meeting its own
+ * earlier write as a version conflict.
+ */
+export class PartlySavedError<T = unknown> extends Error {
+  readonly saved: T;
+  readonly reason: ApiError;
+
+  constructor(saved: T, reason: ApiError) {
+    super(reason.message);
+    this.name = "PartlySavedError";
+    this.saved = saved;
+    this.reason = reason;
+  }
+}
+
+/** Runs the steps after a Resource's own fields were saved, then reads it back; see `PartlySavedError`. */
+export async function completeSave<T>(steps: () => Promise<void>, reload: () => Promise<T>): Promise<T> {
+  try {
+    await steps();
+  } catch (e) {
+    if (!(e instanceof ApiError)) throw e;
+    const saved = await reload().catch(() => null);
+    throw saved ? new PartlySavedError(saved, e) : e;
+  }
+  return reload();
 }

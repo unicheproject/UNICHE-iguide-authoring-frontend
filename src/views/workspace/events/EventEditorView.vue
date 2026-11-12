@@ -4,12 +4,12 @@ import EditorShell from "@/components/editor/EditorShell.vue";
 import TranslationsPanel, { type TextFieldGroup, type TextFieldMeta } from "@/components/editor/TranslationsPanel.vue";
 import MediaSlots, { type MediaSlot } from "@/components/media/MediaSlots.vue";
 import TriggersCard from "@/components/editor/TriggersCard.vue";
-import { listTargetTriggers, syncTriggers, triggerToForm, type Trigger, type TriggerForm } from "@/platform/triggers";
+import { listTargetTriggers, saveWithTriggers, triggerToForm, type Trigger, type TriggerForm } from "@/platform/triggers";
 import { SLUG_PATTERN } from "@/lib/format";
 import { listAssets, type Asset, type MediaBinding } from "@/platform/assets";
 import {
   changeEventStatus,
-  displayTimeZone,
+  browserTimeZone,
   eventFromResponse,
   eventTitle,
   eventWorkingCopyPayload,
@@ -17,6 +17,7 @@ import {
   fetchEventReferences,
   fromLocalInput,
   OCCURRENCE_STATUSES,
+  shiftLocal,
   toLocalInput,
   updateEvent,
   type CmsEvent,
@@ -29,6 +30,7 @@ import { listPois, poiTitle, type Poi } from "@/platform/pois";
 import type { ResourceReference } from "@/platform/references";
 import { listRoutes, routeTitle, type Route } from "@/platform/routes";
 import { useCurrentProject } from "@/workspace/currentProject";
+import { loadProjectSettings } from "@/workspace/projectSettings";
 import { describeTranslationPath, ensureTextRows, optionalText, textsForApi, textsFrom, type Texts } from "@/workspace/formFields";
 import { referenceLink } from "@/workspace/referenceLinks";
 import { heroBlock, mediaBlocks, previewLanguages, textBlocks, textIn, type PreviewBlock, type PreviewModel } from "@/workspace/preview";
@@ -42,6 +44,11 @@ const project = useCurrentProject();
 const projectId = computed(() => project.value.id);
 const { languages, defaultLanguage, loading: languagesLoading } = useProjectLanguages(projectId);
 const languageCodes = () => languages.value.map((l) => l.languageCode);
+
+// Occurrence times are typed and shown in the Project timezone (`03` §15, CMS D-049); a Project without one uses
+// this browser's. Read with the Event, before the form is filled.
+const projectTimeZone = ref<string | null>(null);
+const timeZone = computed(() => projectTimeZone.value ?? browserTimeZone);
 
 type TextKey = keyof EventTranslation;
 const TEXT_KEYS: TextKey[] = ["title", "summary", "description", "locationText"];
@@ -89,10 +96,11 @@ const preview = computed<PreviewModel | null>(() => {
   if (!editor.resource) return null;
   const { language, fallbackName, codes } = previewLanguages(languages.value, editor.activeLanguage, defaultLanguage.value);
   const when = (o: OccurrenceForm) => {
-    const start = o.startsAt ? new Date(o.startsAt) : null;
-    const end = o.endsAt ? new Date(o.endsAt) : null;
-    const fmt = (d: Date) => d.toLocaleString(language?.languageCode ?? undefined, { dateStyle: "medium", timeStyle: "short" });
-    return start && !Number.isNaN(start.getTime()) ? fmt(start) + (end && !Number.isNaN(end.getTime()) ? ` – ${fmt(end)}` : "") : "Date not set";
+    const start = fromLocalInput(o.startsAt, timeZone.value);
+    const end = fromLocalInput(o.endsAt, timeZone.value);
+    const fmt = (iso: string) =>
+      new Date(iso).toLocaleString(language?.languageCode ?? undefined, { dateStyle: "medium", timeStyle: "short", timeZone: timeZone.value });
+    return start ? fmt(start) + (end ? ` – ${fmt(end)}` : "") : "Date not set";
   };
   const blocks: PreviewBlock[] = [
     ...heroBlock(form.media, assets.value, codes),
@@ -144,8 +152,8 @@ function input(): Omit<UpdateEventInput, "version"> {
     translations: textsForApi(TEXT_KEYS, languageCodes(), form.translations),
     occurrences: form.occurrences.map((o) => ({
       id: o.id,
-      startsAt: fromLocalInput(o.startsAt)!,
-      endsAt: fromLocalInput(o.endsAt)!,
+      startsAt: fromLocalInput(o.startsAt, timeZone.value)!,
+      endsAt: fromLocalInput(o.endsAt, timeZone.value)!,
       status: o.status,
     })),
     media: form.media.map((m) => ({ ...m })),
@@ -158,14 +166,16 @@ const editor = useResourceEditor<CmsEvent>({
   languages,
   defaultLanguage,
   async load() {
-    const [event, allPlaces, allPois, allRoutes, library, triggers] = await Promise.all([
+    const [event, allPlaces, allPois, allRoutes, library, triggers, settings] = await Promise.all([
       fetchEvent(projectId.value, props.eventId),
       listPlaces(projectId.value),
       listPois(projectId.value),
       listRoutes(projectId.value),
       listAssets(projectId.value),
       listTargetTriggers(projectId.value, "EVENT", props.eventId),
+      loadProjectSettings(projectId.value),
     ]);
+    projectTimeZone.value = settings?.timezone ?? null;
     savedTriggers.value = triggers;
     places.value = allPlaces;
     pois.value = allPois;
@@ -174,18 +184,22 @@ const editor = useResourceEditor<CmsEvent>({
     return event;
   },
   async save(event, version) {
-    // Triggers are rows of their own and do not move the Event's version, so they go first (as for POIs).
-    savedTriggers.value = await syncTriggers(projectId.value, "EVENT", event.id, form.triggers);
-    return updateEvent(projectId.value, event.id, { version, ...input() });
+    // Triggers are rows of their own and do not move the Event's version: saved first, put back when it is refused.
+    const { saved, triggers } = await saveWithTriggers(projectId.value, "EVENT", event.id, form.triggers, () =>
+      updateEvent(projectId.value, event.id, { version, ...input() }),
+    );
+    savedTriggers.value = triggers;
+    return saved;
   },
   workingCopy: {
     kind: "events",
     projectId: () => projectId.value,
-    async payload(event) {
-      // Triggers are not in the working copy (backend D-026): "Save draft" saves them live, after the body.
-      const body = eventWorkingCopyPayload(input());
-      savedTriggers.value = await syncTriggers(projectId.value, "EVENT", event.id, form.triggers);
-      return body;
+    payload: () => eventWorkingCopyPayload(input()),
+    // Triggers are not in the working copy (backend D-026): "Save draft" saves them live around it.
+    async around(event, save) {
+      const { saved, triggers } = await saveWithTriggers(projectId.value, "EVENT", event.id, form.triggers, save);
+      savedTriggers.value = triggers;
+      return saved;
     },
     fromResponse: eventFromResponse,
   },
@@ -203,8 +217,8 @@ const editor = useResourceEditor<CmsEvent>({
     form.occurrences = event.occurrences.map((o) => ({
       key: `o-${++keyCounter}`,
       id: o.id,
-      startsAt: toLocalInput(o.startsAt),
-      endsAt: toLocalInput(o.endsAt),
+      startsAt: toLocalInput(o.startsAt, timeZone.value),
+      endsAt: toLocalInput(o.endsAt, timeZone.value),
       status: o.status,
     }));
     form.media = event.media.map((m) => ({ ...m }));
@@ -218,8 +232,8 @@ const editor = useResourceEditor<CmsEvent>({
     const url = form.bookingUrl.trim();
     if (url && !/^https?:\/\/[^\s/]+/i.test(url)) found.bookingUrl = "An address starting with https:// or http://.";
     form.occurrences.forEach((o, i) => {
-      const start = fromLocalInput(o.startsAt);
-      const end = fromLocalInput(o.endsAt);
+      const start = fromLocalInput(o.startsAt, timeZone.value);
+      const end = fromLocalInput(o.endsAt, timeZone.value);
       if (!start) found[`occurrences[${i}].startsAt`] = "Set when it starts.";
       if (!end) found[`occurrences[${i}].endsAt`] = "Set when it ends.";
       if (start && end && Date.parse(end) <= Date.parse(start)) found[`occurrences[${i}].endsAt`] = "It must end after it starts.";
@@ -276,7 +290,7 @@ const routeChoices = computed(() => choices(routes.value, form.routeId, (r) => r
 const now = Date.now();
 
 function ended(o: OccurrenceForm): boolean {
-  const end = fromLocalInput(o.endsAt);
+  const end = fromLocalInput(o.endsAt, timeZone.value);
   return !!end && Date.parse(end) < now;
 }
 
@@ -286,27 +300,19 @@ function occurrenceError(index: number): string | undefined {
   return messages.length ? [...new Set(messages)].join(" ") : undefined;
 }
 
-function shift(local: string, days: number): string {
-  const d = new Date(local);
-  d.setDate(d.getDate() + days);
-  return toLocalInput(d.toISOString());
-}
-
 async function addOccurrence(repeatWeekly = false) {
   const last = form.occurrences[form.occurrences.length - 1];
   let startsAt: string;
   let endsAt: string;
   if (last && last.startsAt && last.endsAt) {
     const days = repeatWeekly ? 7 : 1;
-    startsAt = shift(last.startsAt, days);
-    endsAt = shift(last.endsAt, days);
+    startsAt = shiftLocal(last.startsAt, days);
+    endsAt = shiftLocal(last.endsAt, days);
   } else {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(10, 0, 0, 0);
-    startsAt = toLocalInput(tomorrow.toISOString());
-    tomorrow.setHours(11);
-    endsAt = toLocalInput(tomorrow.toISOString());
+    // Tomorrow 10:00 to 11:00 in the Project timezone.
+    const tomorrow = shiftLocal(toLocalInput(new Date().toISOString(), timeZone.value), 1).slice(0, 10);
+    startsAt = `${tomorrow}T10:00`;
+    endsAt = `${tomorrow}T11:00`;
   }
   const key = `o-${++keyCounter}`;
   form.occurrences.push({ key, id: null, startsAt, endsAt, status: "SCHEDULED" });
@@ -361,12 +367,13 @@ const translationRows = computed(() => translationStatus(languages.value, 3, (co
         <h2 class="flex-1 text-[11px] font-extrabold uppercase tracking-[0.09em] text-muted-foreground">
           Occurrences ({{ form.occurrences.length }})
         </h2>
-        <!-- `03` §15: the Project timezone renders the times; until the Project has one (backend M2), the browser's does. -->
+        <!-- `03` §15: the Project timezone renders the times; a Project without one uses the browser's. -->
         <span class="text-[11px] text-muted-foreground">
-          Times in <span class="font-mono">{{ displayTimeZone }}</span>, this browser's timezone, until the Project has its own
+          <template v-if="projectTimeZone">Times in <span class="font-mono">{{ projectTimeZone }}</span>, the Project's timezone</template>
+          <template v-else>Times in <span class="font-mono">{{ browserTimeZone }}</span>, this browser's timezone: the Project has none set</template>
         </span>
       </div>
-      <p v-if="form.occurrences.length && !upcomingCount" class="border-b border-gray-100 px-5 py-3 text-xs font-semibold text-[#9a6200]">
+      <p v-if="form.occurrences.length && !upcomingCount" class="border-b border-gray-100 px-5 py-3 text-xs font-semibold text-[#855400]">
         ⚠ No upcoming scheduled date: visitors will not see this event in the calendar.
       </p>
       <p v-if="editor.fieldError('occurrences')" class="border-b border-gray-100 px-5 py-3 text-xs font-semibold text-destructive">

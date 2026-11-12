@@ -21,7 +21,8 @@
     --secondary-foreground: 266 65% 33%;
 
     --muted: 220 14% 96%;
-    --muted-foreground: 220 9% 46%; /* #6b7280 */
+    /* #5d636f: 4.5:1 on the #f3f4f6 canvas and muted surfaces, which #6b7280 missed (`14` §4). */
+    --muted-foreground: 220 9% 40%;
 
     --accent: 263 52% 94%;
     --accent-foreground: 266 65% 33%;
@@ -130,4 +131,22 @@
   .dialog-primary:disabled {
     opacity: 0.6;
   }
+}
+
+/*
+ * Application shell (D-062): the header and the workspace menu stay put and only the page's <main> scrolls. A
+ * viewport lower than 420 CSS pixels (a phone held sideways, the 320 by 256 reflow check of `14` §1) scrolls as one
+ * document instead, so the header does not take most of the screen.
+ */
+@media (min-height: 420px) {
+  .app-shell {
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+  }
+}
+/* Every page's <main> holds its own absolutely placed parts (visually hidden inputs, toggle knobs), which otherwise
+   escape it and make the whole document scroll as well. */
+.app-shell main {
+  position: relative;
 }

@@ -23,12 +23,14 @@ import {
   type ResourceStatus,
 } from "@/platform/places";
 import { showToast } from "@/stores/toast";
-import { handOffActivationErrors } from "@/workspace/activationHandoff";
+import { handOffActivationErrors, isMissingFieldsError } from "@/workspace/activationHandoff";
 import { useCurrentProject } from "@/workspace/currentProject";
 import type { ResourceReference } from "@/platform/references";
 import { referenceLink } from "@/workspace/referenceLinks";
 import { findSection } from "@/workspace/sections";
-import { useListFilters } from "@/workspace/listFilters";
+import { STATUS_FILTER_OPTIONS, choiceFilter, useListFilters } from "@/workspace/listFilters";
+import ListFilterMenu from "@/components/ListFilterMenu.vue";
+import FilterChoiceGroup from "@/components/FilterChoiceGroup.vue";
 import SearchLanguageSelect from "@/components/SearchLanguageSelect.vue";
 import FeaturedFilterChip from "@/components/FeaturedFilterChip.vue";
 import { useProjectLanguages } from "@/workspace/useProjectLanguages";
@@ -75,6 +77,11 @@ const statusFilter = ref<StatusFilter>("ALL");
 const query = ref("");
 const filters = useListFilters();
 const { featuredOnly, searchLanguage } = filters;
+/** The filters in force, shown as chips beside the Filters button. */
+const activeFilters = computed(() => [
+  ...choiceFilter("status", "Status", statusFilter, STATUS_FILTER_OPTIONS, "ALL"),
+  ...filters.active(languages.value),
+]);
 
 function normalize(text: string): string {
   return text.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
@@ -143,7 +150,7 @@ async function transition(place: Place, target: ResourceStatus) {
       return;
     }
     confirm.value = null;
-    if (e.code === "MISSING_REQUIRED_FIELDS") {
+    if (isMissingFieldsError(e)) {
       // The editor shows every missing field and focuses the first (`12` §3, DECISIONS.md D-036).
       handOffActivationErrors(place.id, e);
       showToast("Cannot activate yet", `${title(place)} opens at the first missing field.`, "error");
@@ -201,7 +208,7 @@ const reorder = useReorder<Place>({
 </script>
 
 <template>
-  <main class="relative min-w-0 flex-1 overflow-y-auto px-7 pb-16 pt-6">
+  <main class="relative min-w-0 flex-1 overflow-y-auto px-4 pb-16 pt-6 md:px-7">
     <PageHead :title="section.title" :subtitle="section.subtitle">
       <template #actions>
         <Button variant="brand" :disabled="!defaultLanguageInfo" @click="creating = true">New place</Button>
@@ -210,7 +217,7 @@ const reorder = useReorder<Place>({
 
     <div
       v-if="noLanguages"
-      class="mb-5 flex flex-wrap items-center gap-3.5 rounded-lg border-l-[3px] border-l-[#9a6200] bg-[rgba(154,98,0,0.07)] px-[18px] py-3.5 text-[13px]"
+      class="mb-5 flex flex-wrap items-center gap-3.5 rounded-lg border-l-[3px] border-l-[#855400] bg-[rgba(154,98,0,0.07)] px-[18px] py-3.5 text-[13px]"
     >
       <div class="min-w-[min(100%,260px)] flex-1">
         <strong class="mb-0.5 block text-[13px] font-bold">Add a language first</strong>
@@ -244,31 +251,20 @@ const reorder = useReorder<Place>({
           v-model="query"
           type="search"
           placeholder="Search titles"
-          class="min-w-[240px] flex-1 rounded-lg border-[1.5px] px-3 py-[9px] text-[13px] focus:border-primary focus:outline-none"
+          class="min-w-[min(100%,200px)] flex-1 rounded-lg border-[1.5px] px-3 py-[9px] text-[13px] focus:border-primary focus:outline-none"
         />
-        <SearchLanguageSelect v-model="searchLanguage" :languages="languages" />
-        <FeaturedFilterChip v-model="featuredOnly" />
-        <span id="places-status-label" class="text-[11px] font-bold uppercase tracking-[0.06em] text-muted-foreground">Status</span>
-        <div class="flex flex-wrap gap-1.5" role="group" aria-labelledby="places-status-label">
-          <button
-            v-for="chip in (['ALL', 'DRAFT', 'ACTIVE', 'ARCHIVED', 'PENDING'] as const)"
-            :key="chip"
-            type="button"
-            class="rounded-full border px-[13px] py-1.5 text-[11px]"
-            :class="statusFilter === chip ? 'border-primary bg-primary font-bold text-white' : 'bg-card font-semibold text-gray-700'"
-            :aria-pressed="statusFilter === chip"
-            @click="statusFilter = chip"
-          >
-            {{ chip === "ALL" ? "All" : chip === "PENDING" ? "Pending changes" : chip }}
-          </button>
-        </div>
+        <ListFilterMenu :active="activeFilters">
+          <FilterChoiceGroup v-model="statusFilter" legend="Status" :options="STATUS_FILTER_OPTIONS" />
+          <FeaturedFilterChip v-model="featuredOnly" />
+          <SearchLanguageSelect v-model="searchLanguage" :languages="languages" />
+        </ListFilterMenu>
         <span class="ml-auto text-[11px] text-muted-foreground">
           {{ reorder.enabled || reorder.saving ? "Sorted by order · drag or use the arrows to reorder" : "Clear the search and filters to reorder" }}
         </span>
         <p class="sr-only" aria-live="polite">{{ reorder.announcement }}</p>
       </div>
 
-      <div v-if="loading" class="animate-skeleton" aria-busy="true" aria-label="Loading places">
+      <div v-if="loading" class="animate-skeleton" role="status" aria-busy="true" aria-label="Loading places">
         <div v-for="n in 4" :key="n" class="flex items-center gap-3.5 border-b border-gray-100 px-[18px] py-4">
           <div class="h-[13px] w-1/3 rounded bg-[#e2e3e7]"></div>
           <div class="flex-1"></div>
@@ -306,10 +302,10 @@ const reorder = useReorder<Place>({
                     {{ title(place) }}
                   </RouterLink>
                   <span class="rounded-full border bg-muted px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-[0.08em] text-muted-foreground">
-                    {{ placeTypeLabel(place.type) }} · {{ place.setting === "INDOOR" ? "indoor" : "outdoor" }}
+                    {{ placeTypeLabel(place.type) }}
                   </span>
                 </div>
-                <div class="mt-[3px] break-words text-[11px] text-gray-400" :style="{ paddingLeft: `${depth * 18}px` }">
+                <div class="mt-[3px] break-words text-[11px] text-gray-500" :style="{ paddingLeft: `${depth * 18}px` }">
                   <span class="font-mono">{{ place.slug }}</span> · {{ formatDate(place.updatedAt) }}
                 </div>
                 <div v-if="triggersByTarget" :style="{ paddingLeft: `${depth * 18}px` }">

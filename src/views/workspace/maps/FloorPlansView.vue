@@ -103,7 +103,7 @@ const ordered = computed(() => [...plans.value].sort((a, b) => a.sortOrder - b.s
 </script>
 
 <template>
-  <main class="relative min-w-0 flex-1 overflow-y-auto px-7 pb-16 pt-6">
+  <main class="relative min-w-0 flex-1 overflow-y-auto px-4 pb-16 pt-6 md:px-7">
     <PageHead :title="section.title" :subtitle="section.subtitle">
       <template #actions>
         <Button variant="brand" @click="creating = true">New floor plan</Button>
@@ -119,7 +119,7 @@ const ordered = computed(() => [...plans.value].sort((a, b) => a.sortOrder - b.s
 
     <div v-else class="overflow-hidden rounded-lg border bg-card shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
       <p class="sr-only" aria-live="polite">{{ reorder.announcement }}</p>
-      <div v-if="loading" class="animate-skeleton" aria-busy="true" aria-label="Loading floor plans">
+      <div v-if="loading" class="animate-skeleton" role="status" aria-busy="true" aria-label="Loading floor plans">
         <div v-for="n in 2" :key="n" class="border-b border-gray-100 px-[18px] py-4"><div class="h-[13px] w-1/3 rounded bg-[#e2e3e7]"></div></div>
       </div>
       <ul v-else-if="plans.length">
@@ -136,7 +136,7 @@ const ordered = computed(() => [...plans.value].sort((a, b) => a.sortOrder - b.s
             <RouterLink :to="{ name: 'floor-plan-editor', params: { projectId, planId: m.id } }" class="text-[13px] font-semibold text-foreground no-underline hover:underline">
               {{ m.internalName }}
             </RouterLink>
-            <div class="mt-[3px] text-[11px] text-gray-400">{{ meta(m) }} · {{ formatDate(m.updatedAt) }}</div>
+            <div class="mt-[3px] text-[11px] text-gray-500">{{ meta(m) }} · {{ formatDate(m.updatedAt) }}</div>
           </div>
           <StatusChip :status="m.status" />
           <StatusChip

@@ -29,7 +29,7 @@ const addable = computed(() =>
 function completion(language: ProjectLanguage): string {
   const total = data.value?.resourceCount ?? 0;
   if (total === 0) return "no content yet";
-  return `${language.titledResourceCount} of ${total} places and points of interest titled`;
+  return `${language.titledResourceCount} of ${total} content items titled`;
 }
 
 function asInput(language: ProjectLanguage): LanguageInput {
@@ -80,7 +80,7 @@ async function remove() {
 const saveErrorText = computed(() => {
   const e = saveError.value;
   if (!e) return null;
-  if (e.code === "DEFAULT_LANGUAGE_INCOMPLETE") {
+  if (e.hasCode("DEFAULT_LANGUAGE_INCOMPLETE")) {
     return {
       title: "The default language needs complete titles",
       detail: `${Object.values(e.fieldMessages())[0] ?? e.message}. Translate them first; the default language is what visitors see when a translation is missing.`,
@@ -92,11 +92,11 @@ const saveErrorText = computed(() => {
 </script>
 
 <template>
-  <main class="relative min-w-0 flex-1 overflow-y-auto px-7 pb-16 pt-6">
+  <main class="relative min-w-0 flex-1 overflow-y-auto px-4 pb-16 pt-6 md:px-7">
     <PageHead title="App settings" :subtitle="section.subtitle" />
     <SectionTabs :project-id="project.id" section="languages" />
 
-    <div v-if="loading && !data" class="max-w-[760px] animate-skeleton rounded-lg border bg-card" aria-busy="true">
+    <div v-if="loading && !data" class="animate-skeleton rounded-lg border bg-card" aria-busy="true">
       <div v-for="n in 2" :key="n" class="flex items-center gap-3 border-b border-gray-100 px-[18px] py-3.5">
         <div class="flex-1">
           <div class="mb-1.5 h-3 w-24 rounded bg-[#dcdde2]"></div>
@@ -121,13 +121,13 @@ const saveErrorText = computed(() => {
       <div
         v-if="saveErrorText"
         role="alert"
-        class="mb-5 max-w-[760px] rounded-lg border border-l-[3px] border-l-destructive bg-card px-[18px] py-3.5"
+        class="mb-5 rounded-lg border border-l-[3px] border-l-destructive bg-card px-[18px] py-3.5"
       >
         <strong class="block text-[13px] font-bold text-destructive">{{ saveErrorText.title }}</strong>
         <p class="mt-0.5 text-[13px] text-gray-700">{{ saveErrorText.detail }}</p>
       </div>
 
-      <div class="max-w-[760px] overflow-hidden rounded-lg border bg-card" :aria-busy="saving">
+      <div class="overflow-hidden rounded-lg border bg-card" :aria-busy="saving">
         <p v-if="!languages.length" class="border-b border-gray-100 px-[18px] py-4 text-[13px] text-muted-foreground">
           This Project has no languages yet. The first language you add becomes the default: every Place, Point of
           Interest and Page needs its text in it, and visitors see it when a translation is missing.

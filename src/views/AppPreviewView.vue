@@ -10,7 +10,11 @@ import PreviewApp from "@/components/preview/PreviewApp.vue";
 import { SURFACES, type Surface } from "@/components/preview/surfaces";
 import { ApiError } from "@/platform/api";
 import { fetchProject } from "@/platform/catalogue";
+import { listNavigations, type Navigation } from "@/platform/navigation";
+import { previewMenu } from "@/workspace/navigationMenu";
 import { loadPreviewData, visibleData, type PreviewData, type PreviewMode } from "@/workspace/previewData";
+import { useProjectSettings } from "@/workspace/projectSettings";
+import { themeStyle, useProjectTheme } from "@/workspace/projectTheme";
 
 const props = defineProps<{ projectId: string; surface?: string; lang?: string; mode?: string; t?: string }>();
 
@@ -18,7 +22,11 @@ const surface = computed<Surface>(() => (props.surface === "MOBILE" || props.sur
 const mode = computed<PreviewMode>(() => (props.mode === "LIVE" ? "LIVE" : "WORKING"));
 
 const name = ref("");
+const theme = useProjectTheme(computed(() => props.projectId));
+const settings = useProjectSettings(computed(() => props.projectId));
 const all = ref<PreviewData | null>(null);
+/** The Project's menus; the app falls back to its default menu without them (D-055). */
+const menus = ref<Navigation[]>([]);
 const error = ref<ApiError | null>(null);
 let controller: AbortController | null = null;
 
@@ -27,9 +35,17 @@ async function load() {
   controller = new AbortController();
   error.value = null;
   try {
-    const [project, data] = await Promise.all([fetchProject(props.projectId, controller.signal), loadPreviewData(props.projectId, controller.signal)]);
+    const [project, data, navigations] = await Promise.all([
+      fetchProject(props.projectId, controller.signal),
+      loadPreviewData(props.projectId, controller.signal),
+      listNavigations(props.projectId, controller.signal).catch((e) => {
+        if (e instanceof ApiError) return [];
+        throw e;
+      }),
+    ]);
     name.value = project.name;
     all.value = data;
+    menus.value = navigations;
     document.title = `Preview · ${project.name}`;
     await nextTick();
     fireCode();
@@ -60,6 +76,11 @@ const defaultLanguage = computed(() => all.value?.languages.find((l) => l.isDefa
 const language = computed(() =>
   props.lang && all.value?.languages.some((l) => l.languageCode === props.lang) ? props.lang : defaultLanguage.value,
 );
+const shown = computed(() => (all.value ? visibleData(all.value, mode.value) : null));
+const menuOf = (context: "PRIMARY" | "FOOTER") =>
+  shown.value
+    ? previewMenu(menus.value.find((m) => m.context === context), { data: shown.value, language: language.value, defaultLanguage: defaultLanguage.value })
+    : [];
 const direction = computed(() => (all.value?.languages.find((l) => l.languageCode === language.value)?.direction === "RTL" ? "rtl" : "ltr"));
 </script>
 
@@ -71,15 +92,27 @@ const direction = computed(() => (all.value?.languages.find((l) => l.languageCod
     <p v-else-if="!all" class="m-8 text-[13px] text-muted-foreground" aria-busy="true">Loading the preview…</p>
     <div
       v-else
-      class="flex h-screen flex-col bg-white text-[#030712]"
+      class="flex h-screen flex-col bg-[var(--t-bg)] text-[var(--t-text)] [font-family:var(--t-body)]"
       :class="surface === 'MOBILE' ? 'w-[390px] shadow-lg' : 'w-full'"
-      :style="{ fontSize: `${SURFACES[surface].font}px` }"
+      :style="{ fontSize: `${SURFACES[surface].font}px`, ...themeStyle(theme) }"
       :dir="direction"
+      :lang="language ?? undefined"
     >
-      <p v-if="unknownCode" role="status" class="border-b bg-[rgba(154,98,0,0.07)] px-4 py-2 text-[13px] text-[#9a6200]">
+      <p v-if="unknownCode" role="status" class="border-b bg-[rgba(154,98,0,0.07)] px-4 py-2 text-[13px] text-[#855400]">
         No QR code “{{ unknownCode }}” in this Project. It may have been removed, or the code was mistyped.
       </p>
-      <PreviewApp ref="app" :data="visibleData(all, mode)" :language="language" :default-language="defaultLanguage" :surface="surface" :app-name="name" />
+      <PreviewApp
+        ref="app"
+        :data="visibleData(all, mode)"
+        :language="language"
+        :default-language="defaultLanguage"
+        :surface="surface"
+        :app-name="name"
+        :theme="theme"
+        :time-zone="settings?.timezone"
+        :menu="menuOf('PRIMARY')"
+        :footer="menuOf('FOOTER')"
+      />
     </div>
   </main>
 </template>

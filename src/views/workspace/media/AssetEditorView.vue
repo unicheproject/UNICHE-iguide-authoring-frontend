@@ -244,7 +244,7 @@ async function setDecorative(event: Event) {
         >
           {{ replacing ? "Replacing…" : "Replace file" }}
         </button>
-        <input ref="replaceInput" type="file" class="sr-only" tabindex="-1" :accept="replaceAccept" @change="onReplacement" />
+        <input ref="replaceInput" type="file" class="sr-only" aria-label="Replacement file" tabindex="-1" :accept="replaceAccept" @change="onReplacement" />
         <button
           type="button"
           class="rounded-full border bg-muted px-4 py-2 text-[10px] font-bold uppercase tracking-[0.06em] text-gray-700 disabled:opacity-50"

@@ -42,13 +42,14 @@ const where = (issue: ReadinessIssue) =>
 const details = computed(() => [
   { label: "Organisation", value: organisationName.value },
   { label: "Slug", value: project.value.slug, mono: true },
+  ...(project.value.template ? [{ label: "Template", value: `${project.value.template.name} v${project.value.template.version}` }] : []),
   { label: "Created", value: formatDate(project.value.createdAt) },
   { label: "Last updated", value: formatDate(project.value.updatedAt) },
 ]);
 </script>
 
 <template>
-  <main class="relative min-w-0 flex-1 overflow-y-auto px-7 pb-16 pt-6">
+  <main class="relative min-w-0 flex-1 overflow-y-auto px-4 pb-16 pt-6 md:px-7">
     <PageHead
       title="Dashboard"
       :subtitle="`${project.name} · ${organisationName}. The UNICHE Catalogue confirmed your access to this Project.`"
@@ -56,8 +57,25 @@ const details = computed(() => [
     />
 
     <section
-      class="mb-5 max-w-[860px] rounded-lg border border-l-[3px] bg-card px-[18px] py-4"
-      :class="readiness && !readiness.activatable ? 'border-l-destructive' : 'border-l-[#0f7a6e]'"
+      v-if="!project.initialized"
+      class="mb-5 rounded-lg border border-l-[3px] border-l-[#855400] bg-card px-[18px] py-4"
+      aria-labelledby="setup-title"
+    >
+      <h2 id="setup-title" class="text-[15px] font-bold">This Project is not initialized</h2>
+      <p class="mt-1 text-[13px] text-gray-700">
+        It has no Template yet: pick a Template and a style, then its languages and surfaces, to finish setting it up.
+      </p>
+      <RouterLink
+        :to="{ name: 'project-create', query: { resume: project.id } }"
+        class="mt-3 inline-block rounded-full bg-primary px-[22px] py-2.5 text-[11px] font-bold uppercase tracking-[0.06em] text-primary-foreground no-underline hover:bg-[#3a1469] hover:text-primary-foreground hover:no-underline"
+      >
+        Resume initialization
+      </RouterLink>
+    </section>
+
+    <section
+      class="mb-5 rounded-lg border border-l-[3px] bg-card px-[18px] py-4"
+      :class="readiness && !readiness.activatable ? 'border-l-destructive' : 'border-l-[#0c6d62]'"
       aria-labelledby="readiness-heading"
       aria-live="polite"
     >
@@ -102,7 +120,7 @@ const details = computed(() => [
           {{ showAll ? "Show fewer" : `Show all ${blocking.length}` }}
         </button>
         <details v-if="warnings.length" class="mt-3 text-[13px]">
-          <summary class="cursor-pointer text-[12px] font-bold text-[#9a6200]">Warnings ({{ warnings.length }})</summary>
+          <summary class="cursor-pointer text-[12px] font-bold text-[#855400]">Warnings ({{ warnings.length }})</summary>
           <ul class="mt-2 flex flex-col gap-1.5">
             <li v-for="(issue, i) in warnings" :key="`w-${issue.resourceId}-${issue.path}-${issue.code}-${i}`">
               <RouterLink v-if="link(issue)" :to="link(issue)!" class="font-semibold text-primary no-underline hover:underline">{{ where(issue) }}</RouterLink>

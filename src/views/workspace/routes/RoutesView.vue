@@ -17,13 +17,15 @@ import { ApiError } from "@/platform/api";
 import type { ResourceStatus } from "@/platform/places";
 import { changeRouteStatus, fetchRouteReferences, listRoutes, routeCompleteness, routeModeLabel, routeTitle, routeTypeLabel, type Route } from "@/platform/routes";
 import { showToast } from "@/stores/toast";
-import { handOffActivationErrors } from "@/workspace/activationHandoff";
+import { handOffActivationErrors, isMissingFieldsError } from "@/workspace/activationHandoff";
 import { useCurrentProject } from "@/workspace/currentProject";
 import type { ResourceReference } from "@/platform/references";
 import { referenceLink } from "@/workspace/referenceLinks";
 import { findSection } from "@/workspace/sections";
 import { useCategoryFilter } from "@/workspace/useCategoryFilter";
-import { useListFilters } from "@/workspace/listFilters";
+import { STATUS_FILTER_OPTIONS, categoryFilterChip, choiceFilter, useListFilters } from "@/workspace/listFilters";
+import ListFilterMenu from "@/components/ListFilterMenu.vue";
+import FilterChoiceGroup from "@/components/FilterChoiceGroup.vue";
 import SearchLanguageSelect from "@/components/SearchLanguageSelect.vue";
 import FeaturedFilterChip from "@/components/FeaturedFilterChip.vue";
 import { useProjectLanguages } from "@/workspace/useProjectLanguages";
@@ -71,6 +73,12 @@ const categorySelected = categoryFilter.selected;
 const query = ref("");
 const filters = useListFilters();
 const { featuredOnly, searchLanguage } = filters;
+/** The filters in force, shown as chips beside the Filters button. */
+const activeFilters = computed(() => [
+  ...choiceFilter("status", "Status", statusFilter, STATUS_FILTER_OPTIONS, "ALL"),
+  ...categoryFilterChip(categorySelected, categoryFilter.options.value),
+  ...filters.active(languages.value),
+]);
 
 function normalize(text: string): string {
   return text.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
@@ -148,7 +156,7 @@ async function transition(route: Route, target: ResourceStatus) {
       return;
     }
     confirm.value = null;
-    if (e.code === "MISSING_REQUIRED_FIELDS") {
+    if (isMissingFieldsError(e)) {
       // The editor shows every missing field and focuses the first (`12` §3, DECISIONS.md D-036).
       handOffActivationErrors(route.id, e);
       showToast("Cannot activate yet", `${title(route)} opens at the first missing field.`, "error");
@@ -192,7 +200,7 @@ const reorder = useReorder<Route>({
 </script>
 
 <template>
-  <main class="relative min-w-0 flex-1 overflow-y-auto px-7 pb-16 pt-6">
+  <main class="relative min-w-0 flex-1 overflow-y-auto px-4 pb-16 pt-6 md:px-7">
     <PageHead :title="section.title" :subtitle="section.subtitle">
       <template #actions>
         <Button variant="brand" :disabled="!defaultLanguageInfo" @click="creating = true">New route</Button>
@@ -201,7 +209,7 @@ const reorder = useReorder<Route>({
 
     <div
       v-if="noLanguages"
-      class="mb-5 flex flex-wrap items-center gap-3.5 rounded-lg border-l-[3px] border-l-[#9a6200] bg-[rgba(154,98,0,0.07)] px-[18px] py-3.5 text-[13px]"
+      class="mb-5 flex flex-wrap items-center gap-3.5 rounded-lg border-l-[3px] border-l-[#855400] bg-[rgba(154,98,0,0.07)] px-[18px] py-3.5 text-[13px]"
     >
       <div class="min-w-[min(100%,260px)] flex-1">
         <strong class="mb-0.5 block text-[13px] font-bold">Add a language first</strong>
@@ -229,32 +237,21 @@ const reorder = useReorder<Route>({
           v-model="query"
           type="search"
           placeholder="Search titles"
-          class="min-w-[240px] flex-1 rounded-lg border-[1.5px] px-3 py-[9px] text-[13px] focus:border-primary focus:outline-none"
+          class="min-w-[min(100%,200px)] flex-1 rounded-lg border-[1.5px] px-3 py-[9px] text-[13px] focus:border-primary focus:outline-none"
         />
-        <SearchLanguageSelect v-model="searchLanguage" :languages="languages" />
-        <FeaturedFilterChip v-model="featuredOnly" />
-        <CategoryFilterSelect v-model="categorySelected" :options="categoryFilter.options.value" />
-        <span id="routes-status-label" class="text-[11px] font-bold uppercase tracking-[0.06em] text-muted-foreground">Status</span>
-        <div class="flex flex-wrap gap-1.5" role="group" aria-labelledby="routes-status-label">
-          <button
-            v-for="chip in (['ALL', 'DRAFT', 'ACTIVE', 'ARCHIVED', 'PENDING'] as const)"
-            :key="chip"
-            type="button"
-            class="rounded-full border px-[13px] py-1.5 text-[11px]"
-            :class="statusFilter === chip ? 'border-primary bg-primary font-bold text-white' : 'bg-card font-semibold text-gray-700'"
-            :aria-pressed="statusFilter === chip"
-            @click="statusFilter = chip"
-          >
-            {{ chip === "ALL" ? "All" : chip === "PENDING" ? "Pending changes" : chip }}
-          </button>
-        </div>
+        <ListFilterMenu :active="activeFilters">
+          <FilterChoiceGroup v-model="statusFilter" legend="Status" :options="STATUS_FILTER_OPTIONS" />
+          <CategoryFilterSelect v-model="categorySelected" :options="categoryFilter.options.value" />
+          <FeaturedFilterChip v-model="featuredOnly" />
+          <SearchLanguageSelect v-model="searchLanguage" :languages="languages" />
+        </ListFilterMenu>
         <span class="ml-auto text-[11px] text-muted-foreground">
           {{ reorder.enabled || reorder.saving ? "Sorted by order · drag or use the arrows to reorder" : "Clear the search and filters to reorder" }}
         </span>
         <p class="sr-only" aria-live="polite">{{ reorder.announcement }}</p>
       </div>
 
-      <div v-if="loading" class="animate-skeleton" aria-busy="true" aria-label="Loading routes">
+      <div v-if="loading" class="animate-skeleton" role="status" aria-busy="true" aria-label="Loading routes">
         <div v-for="n in 3" :key="n" class="flex items-center gap-3.5 border-b border-gray-100 px-[18px] py-4">
           <div class="h-[13px] w-1/3 rounded bg-[#e2e3e7]"></div>
           <div class="flex-1"></div>
@@ -294,7 +291,7 @@ const reorder = useReorder<Route>({
                     {{ routeTypeLabel(route.type) }}
                   </span>
                 </div>
-                <div class="mt-[3px] break-words text-[11px] text-gray-400">
+                <div class="mt-[3px] break-words text-[11px] text-gray-500">
                   <span class="font-mono">{{ route.slug }}</span> · {{ facts(route) }} · {{ formatDate(route.updatedAt) }}
                 </div>
                 <TriggerChips v-if="triggersByTarget" :triggers="triggersByTarget.get(route.id) ?? []" />

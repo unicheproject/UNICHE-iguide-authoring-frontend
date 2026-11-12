@@ -87,6 +87,26 @@ box against the live Keycloak and Catalogue through the backend. Backend counter
 - 2026-10-30: offline banner; changes refused before sending until a request is answered again (DECISIONS.md D-040).
 - 2026-10-30: a 404 under the open Project re-checks it and closes the workspace with a Portal pointer; 403 is manager-only (DECISIONS.md D-041).
 - 2026-10-30: accessibility pass over the Content screens against `14` §4 (DECISIONS.md D-042); not yet tried with a screen reader.
+- 2026-11-02: end-to-end check of every Content screen against the local stand-ins; activation from lists, focus after reorder, and contrast fixed (DECISIONS.md D-043).
+- 2026-11-03: organisation names and Project dates from the backend, Surfaces errors by field label, triggers put back when the Resource save is refused (DECISIONS.md D-044).
+- 2026-11-04: Create a Project steps 2–3 with Templates and style presets, initialization, and resume from the picker and the Dashboard (DECISIONS.md D-045, backend D-040); C1a done except the theme editor.
+- 2026-11-04: the header Project switcher scrolls its list only, so "+ Create Project" stays pinned at the bottom (owner request).
+- 2026-11-04: a map opens cropped to its bounds (Map editor, linked map on the Place editor, preview): the outside is covered, and it cannot be panned past them or zoomed out further than they fill the canvas; "Edit bounds" still shows the surroundings (owner request).
+- 2026-11-04: the Place editor crops its linked map in place: "Edit map area" shows the corner and centre handles, "Save map area" saves the map's bounds at once (initial view kept inside them). DRAFT maps only; an ACTIVE map points to the map editor, whose changes wait as pending changes (owner request).
+- 2026-11-04: the editors' side column is 360px (was 310px), so "Partial (n of m fields)" fits beside the language in the Translations card; the row wraps rather than cutting text (owner request).
+- 2026-11-04: Places have media slots, a primary image and a gallery, saved with the Place (DRAFT) or in its pending changes (ACTIVE); the editor's and the Preview section's Place pages show them, and cards show the primary image (owner request; backend D-041).
+- 2026-11-04: media search ignores accents and case ("Κυμη" finds "Κύμη"), in the asset picker and the Media library; the picker keeps the selected or just-uploaded file in view whatever the filters (owner request).
+- 2026-11-04: the Point of Interest "Site map" is a real OpenStreetMap map (was a schematic grid), framed and named after the Geographic Map of its Place or nearest parent Place with one (area outlined), else on every saved coordinate; the other Points of Interest are dots; click, drag, or arrow keys move the pin (owner request).
+- 2026-11-04: previews in the Project's theme and app shell (D-046): editor "Preview in app", Visitor app → Preview, and its new tab.
+- 2026-11-05: a save that stops after the Resource's own fields keeps their new version, so saving again finishes it instead of a false version conflict (D-047).
+- 2026-11-09: the Place editor crops an ACTIVE linked map into its pending changes and applies them (D-048, to-do A56).
+- 2026-11-09: Content follows the Project settings: switched-off kinds greyed in the menu, trigger types greyed by capability, Event times in the Project timezone (D-049, to-do B2).
+- 2026-11-10: the Place editor links and unlinks ACTIVE maps and floor plans through their working copy, applied at once (D-050, to-do B8).
+- 2026-11-10: first Playwright + axe tests in `e2e/` against the dev stack, `make e2e` (D-051, to-do A49); Content loading skeletons get `role="status"`.
+- 2026-11-10: loading placeholders and the Project picker pass axe; e2e tests for the picker, five Visitor app screens, and every loading state (D-052, to-do A58).
+- 2026-11-10: brand gradient deepened to 5.9–7.0:1 (D-053, to-do A46); the shell reflows at 200% zoom and 320 px, menu as a disclosure below 768 px, zoom/reflow and heading-outline tests (D-054, to-do A43 automatable part).
+- 2026-11-11: Navigation editor (main menu tree, footer links, keyboard reorder, labels per language, picker shared with the Guide editor), menus drawn in the previews (D-055, to-do B15; backend D-046).
+- 2026-11-11: the editors' "Preview in app" opens as a pop-up (D-056).
 - 2026-10-27: pan and zoom in the map editor set the map's initial view (DECISIONS.md D-034).
 - 2026-10-27: POI "3D model" with its required poster, and an "All languages" row in per-language media such as
   the audio narration (DECISIONS.md D-033).

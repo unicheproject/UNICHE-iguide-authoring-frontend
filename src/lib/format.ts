@@ -5,10 +5,10 @@ export function statusChipStyle(status: string): { background: string; color: st
     case "READY":
     case "LIVE":
     case "SUCCESS":
-      return { background: "rgba(15,122,110,0.1)", color: "#0f7a6e" };
+      return { background: "rgba(15,122,110,0.1)", color: "#0c6d62" };
     case "SUSPENDED":
     case "PENDING":
-      return { background: "rgba(154,98,0,0.1)", color: "#9a6200" };
+      return { background: "rgba(154,98,0,0.1)", color: "#855400" };
     case "FAILED":
     case "DENIED":
       return { background: "rgba(192,24,94,0.1)", color: "#c0185e" };

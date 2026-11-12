@@ -32,7 +32,7 @@ function stateText(entry: UploadEntry): string {
       <span
         class="flex h-5 w-5 flex-none items-center justify-center rounded-full text-[11px] font-bold"
         :class="{
-          'bg-[#0f7a6e] text-white': entry.state === 'done',
+          'bg-[#0c6d62] text-white': entry.state === 'done',
           'bg-destructive text-white': entry.state === 'error',
           'bg-muted text-muted-foreground': entry.state === 'queued' || entry.state === 'cancelled' || entry.state === 'uploading',
         }"
@@ -46,7 +46,7 @@ function stateText(entry: UploadEntry): string {
       </span>
       <span
         class="w-16 text-right tabular-nums"
-        :class="entry.state === 'error' ? 'font-bold text-destructive' : entry.state === 'done' ? 'font-bold text-[#0f7a6e]' : 'text-muted-foreground'"
+        :class="entry.state === 'error' ? 'font-bold text-destructive' : entry.state === 'done' ? 'font-bold text-[#0c6d62]' : 'text-muted-foreground'"
       >
         {{ stateText(entry) }}
       </span>

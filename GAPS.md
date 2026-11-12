@@ -33,6 +33,8 @@ prototype inventory).
 - Interim 2026-10-14 (owner request): `src/platform/catalogue.ts` calls `/organizations/...` and maps
   `ProjectResponse` onto `Project`; the picker shows `Organisation <id prefix>` instead of names and no
   dates, and lists Projects of every tool until backend M1c. The mapping is hand-written and goes with C0c.
+- 2026-11-03: names and dates closed: the picker reads `GET /api/v1/organizations` and the Project dates the
+  backend now relays (D-044, backend G-021 closed). The mapping stays hand-written until C0c.
 - Interim 2026-10-14 (owner request): `src/platform/places.ts` reads the backend's paged Place list,
   maps `environment` to `setting`, and emulates `spatial-link` over the map and floor plan `placeId`
   (backend D-018), which works only while that map or plan is DRAFT. `maps.ts` and `floorPlans.ts` read paged
@@ -112,6 +114,8 @@ prototype inventory).
   Catalogue details.
 - Spec: `12` §3 Project picker and Dashboard, §4 Create a Project.
 - Closed by: C0c (picker, step 1), C0e (Dashboard shell), C1a (steps 2–3, resume).
+- 2026-11-04: steps 2–3 and resume done (D-045). Still open: the picker is a page, not a header popover; it reads
+  each Project for its initialization state because the listing carries none (backend Q-020).
 
 ### G-009 — Stub screens
 
@@ -129,6 +133,8 @@ prototype inventory).
   content counts (active and draft per kind, from `?size=1&status=` on each list, `platform/overview.ts`)
   and the Project languages; its Pages, Navigation, Theme, Preview, and Launch parts show their place with
   "Not available yet", since the backend has none of them (backend M2, M6, M8).
+- 2026-11-11: Navigation has its own screen, the menu editor (D-055, backend D-046); the Overview's Navigation step
+  shows the item counts and links there. Pages stay "Not available yet".
 - Closed by: C1 (App settings), C4 (Pages, Navigation), C5 (Overview, Translations, Preview, Launch), C6
   (Audit log).
 
@@ -144,11 +150,21 @@ prototype inventory).
 ### G-012 — No accessibility check
 
 - Spec: `14` §1, §4; AGENTS.md §8.
+- 2026-11-02: one scripted axe run over every Content screen came out clean (TRACEABILITY F10, D-043); the script is
+  not in the repository and does not measure gradients, so the gap stays open.
+- 2026-11-10: axe runs in the repository's Playwright tests on the Content lists, their create dialogs, and the
+  Place editor's states (D-051, TRACEABILITY F16); since D-052 also the picker, Overview, Languages, Surfaces,
+  Translations, Preview, and every loading state (F17); since D-053 and D-054 gradient text contrast, 200% zoom,
+  320 px reflow, and the heading outline of the Content screens (F18). Open: a screen-reader pass by ear, CI.
 - Closed by: C0c (first axe tests) and C0d (`make a11y` in CI).
 
 ### G-013 — No tests
 
 - Found: no Vitest or Playwright configuration, no test files.
+- 2026-11-02: a scripted Playwright run against the `dev/` stand-ins covered the Content flows (TRACEABILITY F9); its
+  scripts can seed the first tests here.
+- 2026-11-10: the first Playwright tests are in `e2e/` (D-051): sign-in, the Content lists, the Place editor's
+  lifecycle, media upload, the Place map link. Open: no Vitest unit tests, the other editors, CI (G-014).
 - Closed by: C0a (first Playwright sign-in test), C0d (`make test` in CI).
 
 ### G-014 — No CI
@@ -199,6 +215,8 @@ prototype inventory).
 - Also 2026-10-19: Visitor app → Preview is the same kind of stand-in, navigable (DECISIONS.md D-015):
   a default menu instead of the Navigation, no Pages, no theme or surfaces, data from the authoring
   endpoints instead of `manifest?preview=true`, no `contentRevision` line.
+- 2026-11-11 (D-055): the Preview screens draw the Project's main menu and footer links once the main menu has
+  items; the Resource editors' small preview keeps its default menu.
 - Closed by: C5, embedding the runtime build once it and the backend preview API (backend M8) exist.
 
 ## Closed

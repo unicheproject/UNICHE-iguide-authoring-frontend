@@ -1,7 +1,7 @@
 <script setup lang="ts" generic="T extends EditableResource">
 /**
- * Page frame of every Resource editor, arranged as the prototype's (AGENTS.md section 6, DECISIONS.md D-023): back
- * link, loading and error states, page head with the status and pending-changes chips and Save (DRAFT) or Apply
+ * Page frame of every Resource editor, arranged as the prototype's (AGENTS.md section 6, DECISIONS.md D-023): breadcrumb
+ * trail (D-058), loading and error states, page head with the status and pending-changes chips and Save (DRAFT) or Apply
  * changes (ACTIVE), the working-copy banner with Save draft and Discard (spec 12 section 3, Resource editors), the
  * read-only banner for ARCHIVED Resources, the error summary, then a 760px form column beside a 310px side column:
  * Preview in app, Status and visibility, Translations, and Used in. Also the status-change, version-conflict, and
@@ -9,6 +9,7 @@
  */
 import { computed, ref, watch } from "vue";
 import type { RouteLocationRaw } from "vue-router";
+import AppBreadcrumbs, { type Crumb } from "@/components/AppBreadcrumbs.vue";
 import AppDialog from "@/components/AppDialog.vue";
 import PageHead from "@/components/PageHead.vue";
 import StatusChangeDialog from "@/components/StatusChangeDialog.vue";
@@ -55,6 +56,11 @@ const previewOpen = ref(false);
 
 const editor = computed(() => props.editor);
 const kind = computed(() => props.editor.kind);
+
+// Section › current Resource (D-058); the Resource's crumb waits for it to load, so no placeholder title flashes.
+const crumbs = computed<Crumb[]>(() =>
+  props.editor.resource ? [{ label: props.backLabel, to: props.backTo }, { label: props.title }] : [{ label: props.backLabel, to: props.backTo }],
+);
 
 const statusText = computed(() => {
   switch (editor.value.resource?.status) {
@@ -159,17 +165,15 @@ const readinessAnnouncement = computed(() => {
 </script>
 
 <template>
-  <main class="relative min-w-0 flex-1 overflow-y-auto px-7 pb-16 pt-6">
-    <RouterLink :to="backTo" class="inline-block pb-1.5 text-xs font-bold tracking-[0.04em] text-primary no-underline hover:no-underline">
-      ← {{ backLabel }}
-    </RouterLink>
+  <main class="relative min-w-0 flex-1 overflow-y-auto px-4 pb-16 pt-6 md:px-7">
+    <AppBreadcrumbs :items="crumbs" />
 
-    <div v-if="editor.loading || pending" class="animate-skeleton" aria-busy="true" :aria-label="`Loading ${kind}`">
+    <div v-if="editor.loading || pending" class="animate-skeleton" role="status" aria-busy="true" :aria-label="`Loading ${kind}`">
       <div class="mb-[26px] flex flex-col gap-[11px]">
         <div class="h-[25px] w-[min(55%,340px)] rounded-md bg-[#dcdde2]"></div>
         <div class="h-3 w-[min(78%,520px)] rounded bg-[#e6e7eb]"></div>
       </div>
-      <div class="h-64 max-w-[760px] rounded-lg border bg-card"></div>
+      <div class="h-64 rounded-lg border bg-card"></div>
     </div>
 
     <div
@@ -192,10 +196,10 @@ const readinessAnnouncement = computed(() => {
     </div>
 
     <template v-else>
-      <div class="max-w-[1090px]">
+      <div>
       <PageHead :title="title" :subtitle="meta" :status="editor.resource.status" :pending="pendingChip">
         <template #actions>
-          <span v-if="editor.dirty" class="text-[11px] font-semibold text-[#9a6200]">Unsaved changes</span>
+          <span v-if="editor.dirty" class="text-[11px] font-semibold text-[#855400]">Unsaved changes</span>
           <Button
             v-if="editor.usesWorkingCopy"
             :disabled="(!editor.workingCopy && !editor.dirty) || editor.saving || editor.applying || connection.offline"
@@ -247,7 +251,7 @@ const readinessAnnouncement = computed(() => {
       <div
         v-if="editor.usesWorkingCopy && (editor.workingCopy || editor.dirty)"
         role="status"
-        class="mb-5 flex flex-wrap items-center gap-3.5 rounded-lg border-l-[3px] border-l-[#9a6200] bg-[rgba(154,98,0,0.07)] px-[18px] py-3.5 text-[13px]"
+        class="mb-5 flex flex-wrap items-center gap-3.5 rounded-lg border-l-[3px] border-l-[#855400] bg-[rgba(154,98,0,0.07)] px-[18px] py-3.5 text-[13px]"
       >
         <span class="text-[15px]" aria-hidden="true">✎</span>
         <div class="min-w-[min(100%,260px)] flex-1">
@@ -263,7 +267,7 @@ const readinessAnnouncement = computed(() => {
         <div class="flex items-center gap-3">
           <button
             type="button"
-            class="whitespace-nowrap text-[11px] font-bold uppercase tracking-[0.06em] text-[#9a6200] disabled:opacity-50"
+            class="whitespace-nowrap text-[11px] font-bold uppercase tracking-[0.06em] text-[#855400] disabled:opacity-50"
             :disabled="!editor.dirty || editor.saving || editor.applying || connection.offline"
             @click="editor.save()"
           >
@@ -282,7 +286,7 @@ const readinessAnnouncement = computed(() => {
 
       <div
         v-if="!editor.editable"
-        class="mb-5 flex flex-wrap items-center gap-3.5 rounded-lg border-l-[3px] border-l-[#9a6200] bg-[rgba(154,98,0,0.07)] px-[18px] py-3.5 text-[13px]"
+        class="mb-5 flex flex-wrap items-center gap-3.5 rounded-lg border-l-[3px] border-l-[#855400] bg-[rgba(154,98,0,0.07)] px-[18px] py-3.5 text-[13px]"
       >
         <span class="text-[15px]" aria-hidden="true">✎</span>
         <div class="min-w-[min(100%,260px)] flex-1">
@@ -299,7 +303,7 @@ const readinessAnnouncement = computed(() => {
         </div>
         <button
           type="button"
-          class="whitespace-nowrap text-[11px] font-bold uppercase tracking-[0.06em] text-[#9a6200]"
+          class="whitespace-nowrap text-[11px] font-bold uppercase tracking-[0.06em] text-[#855400]"
           :disabled="editor.transitioning || connection.offline"
           @click="editor.requestTransition('DRAFT')"
         >
@@ -329,8 +333,8 @@ const readinessAnnouncement = computed(() => {
         <p v-if="editor.summary.requestId" class="mt-1.5 font-mono text-[11px] text-muted-foreground">Request id {{ editor.summary.requestId }}</p>
       </div>
 
-      <!-- A 760px form beside the 310px side column, as in the prototype; below 1024px the side column follows. -->
-      <div class="grid items-start gap-5 lg:grid-cols-[minmax(0,760px)_310px]">
+      <!-- The form fills the main area beside the 360px side column, like the list pages (D-060); below 1024px the side column follows. -->
+      <div class="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
         <div class="flex min-w-0 flex-col gap-[18px]">
           <slot />
         </div>
@@ -342,18 +346,12 @@ const readinessAnnouncement = computed(() => {
             <button
               type="button"
               class="self-start rounded-full border bg-card px-4 py-2 text-[11px] font-bold uppercase tracking-[0.06em] text-primary shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:bg-accent/40"
+              aria-haspopup="dialog"
               :aria-expanded="previewOpen"
-              aria-controls="resource-preview"
-              @click="previewOpen = !previewOpen"
+              @click="previewOpen = true"
             >
-              <span aria-hidden="true">⧉</span> {{ previewOpen ? "Close preview" : "Preview in app" }}
+              <span aria-hidden="true">⧉</span> Preview in app
             </button>
-            <ResourcePreview
-              v-if="previewOpen"
-              id="resource-preview"
-              :model="preview"
-              :dirty="editor.dirty"
-            />
           </div>
           <section class="overflow-hidden rounded-lg border bg-card" aria-labelledby="status-heading">
             <div class="px-4 pb-1 pt-4">
@@ -418,7 +416,7 @@ const readinessAnnouncement = computed(() => {
                     >
                       <span
                         class="mt-px whitespace-nowrap rounded-full px-1.5 py-px text-[9px] font-extrabold uppercase tracking-[0.06em]"
-                        :class="issue.blocking ? 'bg-[rgba(192,24,94,0.1)] text-destructive' : 'bg-[rgba(154,98,0,0.1)] text-[#9a6200]'"
+                        :class="issue.blocking ? 'bg-[rgba(192,24,94,0.1)] text-destructive' : 'bg-[rgba(154,98,0,0.1)] text-[#855400]'"
                       >
                         {{ issue.blocking ? "Blocks" : "Warning" }}
                       </span>
@@ -440,7 +438,7 @@ const readinessAnnouncement = computed(() => {
               <li v-for="s in translations" :key="s.language.languageCode">
                 <button
                   type="button"
-                  class="flex w-full items-center gap-2.5 px-3.5 py-1.5 text-left text-[13px] hover:bg-accent/40"
+                  class="flex w-full flex-wrap items-center gap-x-2.5 gap-y-0.5 px-3.5 py-1.5 text-left text-[13px] hover:bg-accent/40"
                   :aria-current="editor.activeLanguage === s.language.languageCode ? 'true' : undefined"
                   :title="`Edit the ${s.language.displayName} texts`"
                   @click="editor.activeLanguage = s.language.languageCode"
@@ -448,7 +446,7 @@ const readinessAnnouncement = computed(() => {
                   <span class="h-2.5 w-2.5 flex-none rounded-full" :class="dotClass(s)" aria-hidden="true"></span>
                   <span :class="s.language.isDefault ? 'font-bold' : 'font-semibold'">{{ s.language.displayName }}</span>
                   <span v-if="s.language.isDefault" class="text-[10px] text-muted-foreground">default</span>
-                  <span v-if="editor.activeLanguage === s.language.languageCode" class="text-[10px] font-bold text-primary">· editing</span>
+                  <span v-if="editor.activeLanguage === s.language.languageCode" class="whitespace-nowrap text-[10px] font-bold text-primary">· editing</span>
                   <span class="ml-auto whitespace-nowrap text-[12px]" :class="s.filled === 0 ? 'text-destructive' : 'text-muted-foreground'">
                     {{ languageProgress(s) }}
                   </span>
@@ -496,6 +494,12 @@ const readinessAnnouncement = computed(() => {
       @close="editor.confirmTarget = null"
       @confirm="editor.transition(editor.confirmTarget!)"
     />
+
+    <!-- "Preview in app" as the prototype's pop-up card below its button, Close in the card's header (D-056, D-059);
+         Escape or a click outside closes it, and focus returns to the button. -->
+    <AppDialog v-if="previewOpen && preview" :title="`Preview in app: ${title}`" popover @close="previewOpen = false">
+      <ResourcePreview :model="preview" :dirty="editor.dirty" @close="previewOpen = false" />
+    </AppDialog>
 
     <AppDialog
       v-if="editor.applyConflict"

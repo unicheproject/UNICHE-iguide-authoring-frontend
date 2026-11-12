@@ -20,6 +20,9 @@ import {
   type TriggerType,
 } from "@/platform/triggers";
 import { useCurrentProject } from "@/workspace/currentProject";
+import { capabilityOff, useProjectSettings } from "@/workspace/projectSettings";
+import { sectionLocation } from "@/workspace/sections";
+import type { Capability } from "@/platform/settings";
 import { TRIGGERS_HASH } from "@/workspace/referenceLinks";
 
 const project = useCurrentProject();
@@ -74,18 +77,43 @@ onMounted(async () => {
 
 const ADDABLE = ["BEACON", "GEO_PROXIMITY", "QR_CODE"] as const;
 
+// A type whose capability is off in App settings → Features is greyed with the reason too (`12` §3, CMS D-049).
+const settings = useProjectSettings(computed(() => project.value.id));
+const CAPABILITY: Record<(typeof ADDABLE)[number], Capability> = {
+  BEACON: "LOCATION_TRIGGERS",
+  GEO_PROXIMITY: "LOCATION_TRIGGERS",
+  QR_CODE: "QR_TRIGGERS",
+};
+/** Why visitors cannot use a type in this Project: its Template lacks the capability, or Features turned it off. */
+function switchedOff(type: TriggerType): "template" | "features" | null {
+  const capability = CAPABILITY[type as (typeof ADDABLE)[number]];
+  const s = settings.value;
+  if (!capability || !capabilityOff(s, capability)) return null;
+  return s!.capabilities.includes(capability) ? "features" : "template";
+}
+const OFF_TEXT = { template: "not offered by this Project's Template.", features: "turned off in" } as const;
+const featuresLink = computed(() => sectionLocation(project.value.id, "features"));
+
 const listOf = (surfaces: SurfaceName[]) => {
   const names = surfaces.map((s) => SURFACE_LABELS[s]);
   return names.length > 1 ? `${names.slice(0, -1).join(", ")} or ${names[names.length - 1]}` : names[0];
 };
 
-/** Why a type cannot be added: no enabled surface can run it. */
+/** Why a type cannot be added: its capability is off, or no enabled surface can run it. */
 function unavailable(type: TriggerType): string | null {
+  const off = switchedOff(type);
+  if (off) return `${TRIGGER_LABELS[type]}: ${OFF_TEXT[off]}`;
   const enabled = enabledSurfaces.value;
   if (!enabled || TRIGGER_SURFACES[type].some((s) => enabled.has(s))) return null;
   return `${TRIGGER_LABELS[type]}: needs the ${listOf(TRIGGER_SURFACES[type])} surface, which is not enabled.`;
 }
-const unavailableReasons = computed(() => ADDABLE.map(unavailable).filter((r): r is string => !!r));
+const unavailableReasons = computed(() =>
+  ADDABLE.flatMap((type) => {
+    const text = unavailable(type);
+    const off = switchedOff(type);
+    return text ? [{ text, link: off === "features" ? "features" : off ? null : "surfaces" }] : [];
+  }),
+);
 
 const runsOn = (t: TriggerForm) => triggerSurfaces(t.type, t.surfaces);
 
@@ -234,9 +262,13 @@ const invalid = (i: number, field: string) => ({ invalid: !!err(i, field) });
             {{ SURFACE_LABELS[TRIGGER_SURFACES[t.type][0]] }} only<span v-if="enabledSurfaces && !enabledSurfaces.has(TRIGGER_SURFACES[t.type][0])"> (not enabled)</span>
           </span>
         </fieldset>
-        <p v-if="unreachable(t)" class="text-xs font-semibold text-[#9a6200]">
+        <p v-if="switchedOff(t.type)" class="text-xs font-semibold text-[#855400]">
+          ⚠ Visitors cannot use it: {{ TRIGGER_LABELS[t.type] }} is {{ OFF_TEXT[switchedOff(t.type)!] }}
+          <RouterLink v-if="switchedOff(t.type) === 'features'" :to="featuresLink" class="text-primary underline">App settings → Features</RouterLink>
+        </p>
+        <p v-else-if="unreachable(t)" class="text-xs font-semibold text-[#855400]">
           ⚠ None of the surfaces it runs on is enabled, so visitors cannot use it. Enable one in
-          <RouterLink :to="{ name: 'project-surfaces', params: { projectId: project.id } }" class="text-primary">App settings → Surfaces</RouterLink>.
+          <RouterLink :to="{ name: 'project-surfaces', params: { projectId: project.id } }" class="text-primary underline">App settings → Surfaces</RouterLink>.
         </p>
 
         <div v-if="t.type === 'BEACON'" class="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
@@ -267,7 +299,7 @@ const invalid = (i: number, field: string) => ({ invalid: !!err(i, field) });
           :code="t.code.trim()"
           :runtime-url="t.runtimeUrl!"
         />
-        <p v-else-if="publicBaseUrl === ''" class="text-xs font-semibold text-[#9a6200]">
+        <p v-else-if="publicBaseUrl === ''" class="text-xs font-semibold text-[#855400]">
           ⚠ No QR image: the visitor app has no public web address for the code to open. Set it in
           <RouterLink :to="{ name: 'project-surfaces', params: { projectId: project.id } }" class="text-primary">
             App settings → Surfaces
@@ -300,14 +332,16 @@ const invalid = (i: number, field: string) => ({ invalid: !!err(i, field) });
       >
         + {{ TRIGGER_LABELS[type] }}
       </button>
-      <button type="button" class="add-chip" disabled title="Camera recognition is deferred: not part of the first release.">
+      <button type="button" class="add-chip" disabled aria-describedby="triggers-ar-deferred">
         + AR scan target
       </button>
-      <ul v-if="unavailableReasons.length" id="triggers-unavailable" class="w-full text-xs text-muted-foreground">
-        <li v-for="reason in unavailableReasons" :key="reason">
-          {{ reason }}
-          <RouterLink :to="{ name: 'project-surfaces', params: { projectId: project.id } }" class="text-primary">App settings → Surfaces</RouterLink>
+      <ul id="triggers-unavailable" class="w-full text-xs text-muted-foreground">
+        <li v-for="reason in unavailableReasons" :key="reason.text">
+          {{ reason.text }}
+          <RouterLink v-if="reason.link === 'features'" :to="featuresLink" class="text-primary underline">App settings → Features</RouterLink>
+          <RouterLink v-else-if="reason.link === 'surfaces'" :to="{ name: 'project-surfaces', params: { projectId: project.id } }" class="text-primary underline">App settings → Surfaces</RouterLink>
         </li>
+        <li id="triggers-ar-deferred">AR scan target: camera recognition is deferred, not part of the first release.</li>
       </ul>
     </div>
   </section>

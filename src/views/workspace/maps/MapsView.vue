@@ -88,7 +88,7 @@ function onCreated(m: GeoMap) {
 </script>
 
 <template>
-  <main class="relative min-w-0 flex-1 overflow-y-auto px-7 pb-16 pt-6">
+  <main class="relative min-w-0 flex-1 overflow-y-auto px-4 pb-16 pt-6 md:px-7">
     <PageHead :title="section.title" :subtitle="section.subtitle">
       <template #actions>
         <Button variant="brand" @click="creating = true">New map</Button>
@@ -103,7 +103,7 @@ function onCreated(m: GeoMap) {
     </div>
 
     <div v-else class="overflow-hidden rounded-lg border bg-card shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-      <div v-if="loading" class="animate-skeleton" aria-busy="true" aria-label="Loading maps">
+      <div v-if="loading" class="animate-skeleton" role="status" aria-busy="true" aria-label="Loading maps">
         <div v-for="n in 2" :key="n" class="border-b border-gray-100 px-[18px] py-4"><div class="h-[13px] w-1/3 rounded bg-[#e2e3e7]"></div></div>
       </div>
       <ul v-else-if="maps.length">
@@ -112,7 +112,7 @@ function onCreated(m: GeoMap) {
             <RouterLink :to="{ name: 'map-editor', params: { projectId, mapId: m.id } }" class="text-[13px] font-semibold text-foreground no-underline hover:underline">
               {{ m.internalName }}
             </RouterLink>
-            <div class="mt-[3px] text-[11px] text-gray-400">{{ meta(m) }} · {{ formatDate(m.updatedAt) }}</div>
+            <div class="mt-[3px] text-[11px] text-gray-500">{{ meta(m) }} · {{ formatDate(m.updatedAt) }}</div>
           </div>
           <StatusChip :status="m.status" />
           <StatusChip

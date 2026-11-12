@@ -775,3 +775,451 @@ the backend's DECISIONS.md.
   fields for map and floor plan placements, upload progress bars and announcements, toasts in a live region.
 - Not verified with a screen reader or at 200 percent text in a browser; to-do A43.
 - Affected specs: `14` §1, §4.
+
+## D-043 (2026-11-02) — End-to-end check of the Content screens, and what it fixed
+
+- Type: verification (owner request "make checks everywhere in the app until now")
+- Run: the current backend (285 tests green) on port 8090 against the local stand-ins of `dev/` (Keycloak, Catalogue
+  mock, S3 mock) and a fresh PostgreSQL; this build served on port 5180; a scripted Chromium (Playwright) signed in
+  as the test curator and drove every Content screen, editor, and create dialog, with axe-core (WCAG 2.2 A/AA) on
+  each. Scripts are outside the repository (G-013 stays open).
+- Worked as designed: create dialogs with field errors and a duplicate slug; activation with readiness; archive and
+  restore; Working Copy save draft, apply confirmation, and apply; triggers offered by surface, QR from the public web
+  address with image, link and download; uploads with limits and progress; alternative text required before an image
+  activates; map from an area search, placement, keyboard-reachable marker; floor plan from the picker; Guide story
+  with text and reference blocks and captions; Route stops; Event dates; Category scope lock; list search, status and
+  category filters, keyboard reorder kept after reload; Translations matrix and MuseMind (mock) with the AI marker;
+  Preview and Preview in app; offline banner, refused changes and kept form; lost access closes the workspace.
+- Fixed:
+  - activation refused from a list never opened the editor (D-036): the CMS matched `MISSING_REQUIRED_FIELDS` on the
+    problem, but the backend sends `422 VALIDATION_ERROR` and puts that code on the field errors (`07` §15). New
+    `ApiError.hasCode()` looks at both; used for `MISSING_REQUIRED_FIELDS`, `DEFAULT_LANGUAGE_INCOMPLETE`,
+    `NOTHING_TO_TRANSLATE`, and `RESOURCE_NOT_EDITABLE`, which had the same mismatch;
+  - focus on the first missing field waits up to a second for the form, which may still wait for the languages;
+    the Route "Stops" card is a focus target (`data-path="stops"`);
+  - keyboard reorder: list ▲/▼ buttons are disabled while the order saves, which dropped focus; focus returns to the
+    moved row's button, or its counterpart at the end of the list; the same for Route stops, Guide blocks, and
+    paragraphs in a story;
+  - contrast (`14` §4, 4.5:1): muted text `#6b7280` → `#5d636f` (4.39 → 5.49 on the canvas); amber `#9a6200` →
+    `#855400`; teal `#0f7a6e` → `#0c6d62`; list row details and menu group headings one grey darker; links inside the
+    trigger notes underlined;
+  - the hidden file inputs of upload, picker, and Replace are named; the deferred "AR scan target" chip states its
+    reason in text instead of a tooltip; "· editing" in the Translations card no longer wraps.
+- Left open (to-do list): the UNICHE gradient on "New …" buttons gives white text 1.3–3.9:1, a design decision;
+  outside Content, the project picker and Dashboard show "Organisation 5d1e7a52" and "—" for the dates, and the
+  Surfaces error lists the raw path `surfaces[0].configuration.publicBaseUrl`.
+- Noted, unchanged: triggers save before their Resource so a refused trigger stops the save; when the Resource is
+  then refused (an archived Place, for example), the triggers are already saved, and saving again does not
+  duplicate them.
+- Affected specs: `07` §15, `12` §3–§5, `14` §4.
+
+## D-044 (2026-11-03) — Organisation names and Project dates; Surfaces errors by label; triggers put back on a refused save
+
+- Type: fix (owner request "fix A47, A48, A50", to-do list)
+- Organisation names (A47): the picker and Dashboard read `GET /api/v1/organizations`, the backend's relay of the
+  Catalogue (`02` §11, `07` §14; backend D-039), instead of showing `Organisation <id prefix>`; an
+  organisation the relay does not name, or a relay that fails, still shows the placeholder so the picker opens.
+  The Project's `createdAt` and `updatedAt` come from the Catalogue through `ProjectResponse` and fill "Created",
+  "Last updated", and "updated …" in the picker. The `dev/` Catalogue mock serves `GET /api/v1/organisations`.
+- Surfaces (A48): the error summary names the field ("Public web address: …") instead of the API path
+  `surfaces[0].configuration.publicBaseUrl`; the message at the field is unchanged.
+- Triggers (A50, owner decision "fix"): the editors of Places, POIs, Routes, Guides, and Events save through
+  `saveWithTriggers`. The triggers still go first, so a refused trigger stops the save; when the Resource, or its
+  working copy, is then refused, the triggers are put back as they were: new ones archived, removed ones restored
+  to their status, edited ones given their settings again. A save that failed changes nothing, matching the "not
+  saved" message. Putting back is best effort; when it fails too (connection lost), the next save repairs the rows,
+  as before. The working-copy path uses a new `around` hook of `useResourceEditor`.
+- Affected specs: `02` §11, `03` §14, `07` §14–§15, `12` §3–§4.
+
+## D-045 (2026-11-04) — Create a Project steps 2–3, initialization, and resume
+
+- Type: feature (owner request "do whatever is needed", to-do A51; outside the Content menu)
+- Context: Create a Project stopped after step 1 because the backend had no Templates and no `POST /initialize`;
+  backend D-040 added them (Templates with style presets, initialization, theme, settings).
+- Decision, following `12` §4 and the mockup:
+  - step 1 creates the Project in the Catalogue as before, then the page stays open at step 2 with `?resume=<id>`;
+  - step 2 offers the ACTIVE Template versions (name, version, description, surfaces) and the style presets as
+    tiles drawn in their heading font on their primary colour, with background and ink dots and their corner
+    shape; the Template's `defaultStylePreset` is "Suggested" and the selection follows the Template until the
+    author picks a style; a small preview shows the Home Page with the Project name; "Continue" confirms;
+  - step 3 is a disabled fieldset until then: languages (the Template's defaults, add from the known list, make
+    default, remove) and the surfaces among the Template's `supportedSurfaces`; a summary precedes "Initialize";
+    empty languages or surfaces are refused before sending; field errors of `initialize` are listed by label;
+  - "resume initialization": the picker and the header switcher read each listed Project with
+    `GET /projects/{id}` (the listing relays the Catalogue and carries no local state, backend D-040, Q-020) and
+    lead a Project with `initialized` false to step 2 with its current languages and surfaces; the Dashboard of
+    such a Project says so with the same link; a resumed Project already initialized opens its Dashboard;
+  - the ink on a preset's primary colour is chosen by the CMS by contrast (backend Q-022); preset fonts load from
+    the same font service as the CMS.
+- Also: the Languages screen called its count "places and points of interest"; the backend counts every content
+  kind, now including the Template's Categories, so it reads "content items".
+- Not done: the theme editor (App settings → Appearance), Pages and Navigation (backend M6), activation (backend
+  M2b).
+- Affected specs: `04` §3–9, `12` §3 Project picker, §4 Create a Project.
+
+## D-046 (2026-11-04) — Previews in the Project's theme
+
+- Type: implementation (owner request 2026-11-04, the mockup's themed preview)
+- Decision: "Preview in app" of the Resource editors and Visitor app → Preview (also "Open in new tab") draw in the
+  Project's theme: `GET /projects/{id}/theme` (backend D-040) gives the effective values (the Template's defaults
+  overridden by the Project's), the shell choices, and the logos; font keys resolve to families through
+  `GET /templates` and load from the same font service as the style tiles (D-045). `workspace/projectTheme.ts`
+  turns them into CSS variables on the device frame (primary and its ink, accent for small headings only where the
+  primary reads as text on the background at 4.5:1, a tint, muted text kept at 4.5:1, border, background, text,
+  heading and body fonts, corner radius, density as a spacing factor) and caches a Project's theme for 30 seconds.
+  The shell follows `04` §11: search in the header or off, the language switcher in the header, the footer, or off,
+  a bottom bar or a burger menu on mobile, tiles or a header menu on a kiosk's Home. The default menu's labels
+  follow the previewed language (Greek and English, English otherwise) until Navigation exists (M6). A Project
+  that is not initialized has no theme (`409`) and keeps the CMS default; the footnote names the style.
+- Why: the mockup shows the preview in the Project's style; the theme exists since D-045, its editor does not
+  (to-do A52, outside Content).
+- Alternatives: wait for the visitor runtime (`11`), which will draw the theme itself.
+- Affected specs: `04` §9–11; `12` §3 Preview; `14` §2.
+
+
+## D-047 (2026-11-05) — A save that stops after the Resource's own fields keeps their new version
+
+- Decision: a DRAFT save of a Place, Point of Interest, Route, Guide, or Event writes its own fields first and then,
+  in further requests, its Category, stops, blocks, occurrences, and media. When one of those later requests fails,
+  `completeSave` (`platform/api.ts`) reads the Resource back and throws `PartlySavedError`; the editor takes the new
+  version, keeps the form as it is ("Unsaved changes"), and shows "The <kind> was saved only in part" with the
+  reason. Saving again sends the rest on the new version.
+- Why: the editor kept the old version, so the next save met the author's own earlier write as "Someone else changed
+  this place" (owner report 2026-11-05: a backend without Place media, D-041, refused the images after the fields
+  were saved).
+- Alternatives: one request per save, which needs the backend to take every child list in the update body (as the
+  working copy does); rolling the fields back, which can itself fail.
+- Affected specs: `03` §1 (version and optimistic locking); `12` §3 editors.
+
+## D-048 (2026-11-09) — The Place editor crops an ACTIVE linked map through its pending changes
+
+- Decision: "Edit map area" in the Place editor works on an ACTIVE map too. The crop is saved into the map's working
+  copy, on top of what is already pending there (the copy's `version` and `baseVersion`), never onto the live map.
+  While the map has pending changes the Place editor shows the map as it would read after apply, says that visitors
+  still see it as it was, and offers "Apply map changes"; discarding stays in the map editor. An ARCHIVED map is
+  not cropped here.
+- Why: owner request (A56, 2026-11-04) after D-041's in-place crop of DRAFT maps; an ACTIVE Resource changes only
+  through its one working copy (`03` §1).
+- Alternatives: apply at once on save, which would also make live whatever else was pending on the map; send the
+  author to the map editor (the previous behaviour).
+- Affected specs: `03` §1 and §7; `12` §3 Place ("Open map"), Maps editor.
+
+## D-049 (2026-11-09) — Content follows the Project settings: switched-off kinds, trigger types, Event timezone
+
+- Decision: the CMS reads `GET /projects/{id}/settings` (backend D-040; `workspace/projectSettings.ts`, cached for
+  30 seconds). A content kind whose capability is off stays in the menu, greyed with an "off" pill and the reason
+  ("Events: disabled in App settings → Features", or "not offered by this Project's Template"), as the mockup's nav
+  does: Points of Interest `POI_EXPLORATION`, Routes `ROUTES`, Guides `GUIDES`, Events `EVENTS`, Maps & Floor Plans
+  when both `MAPS` and `FLOOR_PLANS` are off; Places and Categories have no capability. In "How visitors reach it",
+  QR code is greyed while `QR_TRIGGERS` is off and Bluetooth beacon and geo-proximity while `LOCATION_TRIGGERS` is
+  off, with the reason and a link to App settings → Features; an existing trigger of such a type says visitors
+  cannot use it. Event times are typed, listed, and previewed in the Project timezone; without one, the browser's,
+  and the editor says which. Without readable settings (a Project not initialized) nothing is greyed.
+- Why: `12` §3 (lines 103-104, 157), `03` §2 and §15; to-do B2, unblocked by backend D-040.
+- Alternatives: hiding switched-off kinds (the spec says greyed, not hidden); blocking their screens (authors may
+  prepare content before switching a capability on).
+- Affected specs: `03` §2, §14, §15; `12` §3.
+
+## D-050 (2026-11-10) — The Place editor links an ACTIVE map or floor plan through its working copy
+
+- Decision: choosing an ACTIVE map or floor plan in the Place editor's "Map" / "Floor plan" field, or unlinking an
+  ACTIVE one, saves the change of `placeId` into that map's or plan's working copy (its live fields and children,
+  with the new Place) and applies it at once, as the field promises ("linking applies at once") and as a DRAFT one
+  is re-saved. One that already has pending changes is refused before anything is touched, naming it: applying
+  would make those changes live too. If the apply is refused (for example by the readiness check, backend D-037),
+  the copy that held only the link is discarded again and the reason is shown.
+- Why: owner request 2026-11-10 (to-do B8); an ACTIVE Resource changes only through its working copy (`03` §1),
+  and the Place editor refused ACTIVE maps and plans with "open the map, change its place, and apply the changes".
+- Alternatives: leave the link pending with an "Apply" button like the crop (D-048), which would leave the field
+  showing the old link until applied; apply on top of other pending changes (makes someone's unfinished edit live).
+- Also: durations (filled in by the backend since its D-043) are shown as whole seconds played, as the browser's
+  player counts them, instead of rounded (a 3.5 s file read 00:04 beside a player at 0:03).
+- Affected specs: `03` §1, §7, §8; `12` §3 Place.
+
+## D-051 (2026-11-10) — The first Playwright and axe tests
+
+- Decision: `@playwright/test` 1.65.0 and `@axe-core/playwright` 4.14.0 (dev dependencies, added through Windows
+  pnpm), `playwright.config.ts`, and `e2e/` with the first tests, from the scripts behind F9 and F10:
+  - they run against a stack started by hand (the `dev/` stand-ins, the backend, the CMS; `e2e/README.md`),
+    configured by `CMS_URL`, `API_URL`, and `IDP_URL`; one worker, no retries (AGENTS.md §11: never silently
+    retry);
+  - one sign-in through the local Keycloak's login page, whose session the tests reuse; test data through the
+    backend API with a password grant of the local `iguide-web` client, never the live realm. Each file creates
+    and initializes its own Project (Greek default, English, web), so a test never depends on earlier data;
+  - axe with the WCAG 2.0 and 2.1 A and AA rules on every state a test reaches, once nothing on the page is
+    `aria-busy`; a violation fails the test with its rule and elements;
+  - coverage: the eight Content lists with their create dialogs from the keyboard; the Place editor from creation
+    through pending changes and apply; a recording's duration; linking an ACTIVE map (D-050);
+  - `make e2e` and `pnpm test:e2e` run them; the TypeScript of the tests is checked by `vue-tsc -b`
+    (`tsconfig.node.json`). `e2e/.auth/`, `test-results/`, and `playwright-report/` are not committed.
+- Found by the first run: every Content list's loading skeleton, the workspace's, and the editor's carried an
+  `aria-label` on a plain `div`, which ARIA does not allow (`aria-prohibited-attr`). They are now `role="status"`
+  regions, so a screen reader also hears "Loading places". The same skeletons outside Content (Home, Translations,
+  Languages, Surfaces, Overview, Preview) are left for their own item (to-do A58).
+- Why: owner request 2026-11-10 (to-do A49); AGENTS.md §8, §11; GAPS G-012, G-013.
+- Alternatives: Vitest component tests first (they do not see the real backend or axe on a real page); starting the
+  stack from Playwright's `webServer` (the stack is three services and Docker; a later CI item, G-014).
+- Affected specs: `14` §1, §4; `12` §3; `08` §Companion repositories.
+
+## D-052 (2026-11-10) — Loading placeholders and the Project picker pass axe
+
+- Decision: the labelled loading placeholders of Home, Translations, Surfaces, Overview, and Preview get
+  `role="status"`, like the Content ones of D-051; those of Languages, the Project switcher, and Create a Project
+  carry no label and needed nothing. The Project picker's organisation headings move from `text-gray-400` (about
+  2.5:1 on white, found by the new test) to the muted text colour (about 6:1). `e2e/screens.spec.ts` adds axe on
+  the picker and the five screens once loaded, and on the loading state of every Content list and those five
+  screens, with the backend's reads held back until axe has run.
+- Why: owner request 2026-11-10 (to-do A58, from D-051); `14` §2 (4.5:1), §4.
+- Alternatives: dropping the labels (a screen reader would then hear nothing while a screen loads).
+- Affected specs: `14` §2, §4; `12` §3.
+
+## D-053 (2026-11-10) — The brand gradient deepened for white text
+
+- Decision: the `brand` button (every "New …" and "Upload" call to action) keeps the UNICHE pink, purple, teal
+  gradient with deeper stops, `#b3156f` → `#7b3aa8` → `#0b6f7c`, so white text has 5.9:1 to 7.0:1 on every part
+  of it (before: `#f832a4` → `#b05fd6` → `#29f8fd`, 1.3:1 to 3.9:1). The text shadow that tried to compensate is
+  gone. `expectGradientTextContrast` in `e2e/support/a11y.ts` samples every text-bearing gradient on a page, at its
+  stops and halfway between them, because axe does not measure gradients; it runs on every Content list.
+- Why: owner decision 2026-11-10 (to-do A46: darker gradient over dark text or a solid button); `14` §1 (WCAG 2.1 AA,
+  1.4.3), §4.
+- Alternatives: near-black text on the bright gradient (5.2:1 and up, less like the mockup); the solid primary
+  colour (11.3:1, loses the brand look).
+- Affected specs: `14` §1, §4; `12` §3.
+
+## D-054 (2026-11-10) — The CMS reflows at 200% zoom and at 320 CSS pixels
+
+- Decision: the application shell no longer has a minimum width of 820 CSS pixels, which made every screen scroll
+  sideways at 200% zoom on a laptop and at 320 pixels:
+  - the header wraps; below 768 pixels the user's name is read by screen readers only, next to the initials;
+  - below 768 pixels the workspace menu is a "Menu" disclosure button (`aria-expanded`, `aria-controls`) above the
+    page, closed again when a section opens, instead of the fixed 236-pixel column;
+  - the page padding narrows from 28 to 16 pixels on small screens;
+  - data tables keep their columns and scroll inside their own box, the two-dimensional exception of 1.4.10.
+- Tests (`e2e/zoom-and-structure.spec.ts`, the automatable half of to-do A43): every Content list and editor at
+  700 × 450 (200% of 1400 × 900) and at 320 × 256 keeps its title and main action reachable without the page
+  scrolling sideways, naming the element that sticks out when it does; every Content list and editor has one main
+  landmark, the navigation, one level-1 heading, and no skipped heading level. The test that found the overflow
+  failed on all sixteen screens before the change and passes after it.
+- Not automated: listening with NVDA and checking reading order and announcements by ear stays with the owner
+  (A43).
+- Why: `14` §1 (CMS conforms to WCAG 2.1 AA, "usable at 200 percent text scaling"; 1.4.4, 1.4.10); to-do A43.
+- Alternatives: a minimum width with a "use a wider window" notice (fails 1.4.10); a hamburger menu at every width
+  (hides the menu on desktop for no gain).
+- Affected specs: `14` §1, §4; `12` §3 (workspace navigation).
+
+## D-055 (2026-11-11) — The Navigation editor and the menus in the previews
+
+- Decision: Visitor app → Navigation is a screen of its own (`views/workspace/navigation/NavigationView.vue`) over
+  the backend's `/navigations` (backend D-046), as `12` §3 "Navigation editor" describes:
+  - two tabs, "Main menu" (PRIMARY) and "Footer links" (FOOTER), each with its item count; a menu that does not
+    exist yet is created with the first item added to it;
+  - the main menu is a tree, rows indented by depth, the level read out to screen readers; footer links are flat;
+  - "+ Link" opens the Resource picker (Places, Points of Interest, Routes, Guides, Events; kinds whose capability
+    is off are listed, disabled, with the reason, D-049); "+ Heading" (main menu only) asks for the
+    default-language label a heading needs (backend D-046);
+  - each row shows the label in the chosen language ("Labels in"), or notes that it uses the target's title; the
+    target, its status, and a warning when visitors will not see the item (target not active, capability off,
+    heading without a default label);
+  - per row, keyboard first (`14` §4): move up and down, set the position among the siblings, move under the item
+    above and out one level (main menu); drag and drop among siblings as an addition; "Labels" opens one field
+    per language inside the row; "Change target"; "Remove", which asks first when items sit under it;
+  - every action saves at once (menus have no lifecycle or pending changes) and is announced; a stale view reloads
+    with a warning;
+  - a preview on the right draws the menus in the Project's theme, mobile first (bottom bar or burger, as the
+    shell says) with the web frame next to it.
+- The Guide editor's inline reference picker became `components/ResourcePickerDialog.vue`, used by both editors.
+- `PreviewApp` takes optional `menu` and `footer` entries (`workspace/navigationMenu.ts` builds them, labels in the
+  previewed language, else the target's title, `03` §13): once the main menu has items it replaces the default
+  menu in the header, the burger, and the bottom bar, an item with items under it opens them, and footer links show
+  above the footer. Visitor app → Preview, its new-tab view, and the Navigation editor pass them; an entry whose
+  target the mode does not show is left out, as the runtime leaves out dead entries. Without a main menu the
+  default menu still stands in.
+- The Overview's Navigation step shows the item counts and links to the screen.
+- Tests: `e2e/navigation-editor.spec.ts` (a heading, two links moved under it and reordered by keyboard, a label per
+  language with the title fallback, the preview drawing the menu, a footer link, a heading removed with what is
+  under it, axe on each state), `e2e/guide-reference.spec.ts` (the shared picker in the Guide editor), and the
+  Navigation screen in `screens.spec.ts` and `zoom-and-structure.spec.ts`. The structure test leaves out the
+  stand-in app inside a preview frame (`data-preview-frame`), which has its own page outline as the iframe of `12`
+  §3 will; its `settle` now waits for the title before it checks that nothing is loading.
+- Why: owner request 2026-11-11 (to-do B15); `12` §3, `03` §13, `13` "Moving through content", `14` §4.
+- Alternatives: editing the whole tree in a form with one Save (every other live-saved screen saves per action, and
+  a save of the whole tree would conflict with any concurrent edit); a tree widget with `role="tree"` (arrow-key
+  semantics that buttons per row make unnecessary).
+- Affected specs: `03` §13; `12` §3; `13`; `14` §4.
+
+## D-056 (2026-11-11) — "Preview in app" opens as a pop-up
+
+- Decision: in every Resource editor, "Preview in app" opens the preview (D-014) in a pop-up over the editor
+  ("Preview in app: <title>", closed by Close, Escape, or the backdrop, focus back on the button) instead of expanding
+  in the side column. It still draws the live form, unsaved changes included, on Mobile, Web, or Kiosk.
+- Amended the same day (owner request): the pop-up fills the window (`AppDialog` `fullscreen`), Close sits at the top
+  right next to the title, and nothing in the dialog scrolls. It was then polished in an /impeccable critique loop
+  (screenshots of the owner's data at 1400, 1920, 1024, and 390 wide; independent reviews scored it 24, 30, 29, 29,
+  31 of 40 over the rounds):
+  - the screen is never drawn above 100% (a larger drawing misleads about legibility), and the toolbar says what is
+    judged ("Phone 390 px · 82%");
+  - "Fit" shows the whole device, "Fit width" draws it at the stage's width (at most 100%) with its own screen the only
+    thing that scrolls; a phone starts in Fit, a browser or kiosk in Fit width, and each keeps its choice while the
+    pop-up is open;
+  - the devices read as devices: a phone and a kiosk (now 1080 x 1920) bezel, the browser bar, a shadow kept clear of
+    the stage edge;
+  - a fade and a "Scroll the screen for more" button (outside the scaled screen, so legible at any zoom) say the screen
+    continues; the screen itself is focusable and scrolls by keyboard;
+  - the surface tabs are 12-pixel, 30-pixel-tall controls with arrow-key, Home, and End movement and a focus ring; the
+    pop-up opens on the chosen tab, not on Close; "Shows unsaved changes" is a badge in the toolbar; the toolbar keeps
+    its rows when switching screens on a narrow window;
+  - the footnote says the language follows the editor's language tab, and names the red dashed outlines only when a
+    text is missing; "Play" and "Play video" follow the previewed language; the back arrow flips for right-to-left.
+- Found by the e2e suite while checking it: the start-up screen's "Checking your UNICHE session…" was grey text below
+  4.5:1 on its background (now `#4b5563`), and `media.spec.ts` waited for any "uploaded" text, which the counter
+  shows as "0 of 1 uploaded" while the file is still on its way (it now waits for "1 of 1 uploaded").
+- Why: owner request 2026-11-11; the side column was too narrow to read the Web and Kiosk screens.
+- Alternatives: a wider side column (squeezes the form); a separate tab (the new-tab view of Visitor app → Preview
+  already exists and shows saved content only).
+- Affected specs: `12` §3 Resource editors, Preview; `14` §4.
+
+
+## D-057 (2026-11-11) — The Place setting follows the type and is no longer shown
+
+- Type: spec-deviation (owner request 2026-11-11: "I shouldn't be given the option to switch between indoor and
+  outdoor"; QUESTIONS.md Q-006; amends D-030)
+- Decision:
+  - the "New place" dialog and the Place editor's "Place setup" no longer show the Indoor / Outdoor cards; the steps
+    are renumbered (dialog: 1 · Level, 2 · Title; setup: 1 · Level, 2 · Map or Floor plan); the editor subtitle and
+    the Places list badge show the type only;
+  - the API still takes `environment` (`03` §5), so the CMS derives it: Building, Floor, and Room are `INDOOR`
+    (floor plan), Region, Destination, Site, and Area are `OUTDOOR` (map), Other keeps the setting it has
+    (`settingForType` in `views/workspace/places/placeTree.ts`); an unchanged type keeps the saved setting, so older
+    Places save unchanged;
+  - a new top-level Place is `OUTDOOR` with type Area; a new sub-place takes its parent's setting (an indoor parent
+    gives a Room); changing the type in Details changes the setting on save, after which the link step follows it;
+  - while a map or floor plan is linked the type list offers only the types of the saved setting, with "unlink the
+    map / floor plan first" under it; a refused `environment` is shown at the type.
+- Why: the owner wants the choice off the screen; the type already says whether a place is indoors.
+- Alternatives: derive it from the link (needs the setting saved before a link can apply, so it cannot be the
+  source); a fixed `OUTDOOR` (indoor places could never use a floor plan).
+- Affected specs: `12` §3 Place; `03` §5.
+
+## D-058 (2026-11-11) — Breadcrumbs replace the editors' back link
+
+- Decision: every Resource editor (`EditorShell.vue`) opens with a breadcrumb trail, "Places › Acropolis", instead of
+  the prototype's "← Places" link. `AppBreadcrumbs.vue` is a `nav` "Breadcrumb" with an ordered list; the section
+  keeps the link's purple bold 12px look, a drawn chevron separates the crumbs (flipped for right-to-left, hidden
+  from screen readers), and the current Resource is muted, `aria-current="page"`, and truncated with an ellipsis
+  (full title in a tooltip) so the trail stays on one line at 320 CSS pixels. The Resource's crumb appears once it
+  loads; while loading or on error only the section link shows.
+- No parent Place in the trail: the sidebar sections, not the Place tree, are the CMS's hierarchy, and a POI's Place
+  is a field it can change in the same form.
+- Why: owner request 2026-11-11 ("make the back button look prettier, maybe with breadcrumbs").
+- Affected specs: `12` §3 Resource editors; prototype `iGuide CMS.html` (D-004, D-023).
+
+## D-059 (2026-11-11) — "Preview in app" is the prototype's pop-up card
+
+- Decision: replaces the full-window pop-up of D-056 (its unsaved-form, surface-switch, focus, and labelling rules
+  stay). As in the prototype, "Preview in app" opens a card below its button, right edges aligned, at most 560px wide
+  and as tall as the window allows (`AppDialog` `popover`): a sticky header ("In the app", Mobile / Web / Kiosk as one
+  segmented pill, Close ✕), the screen on a grey stage, and a note on what it shows (unsaved changes, language,
+  approximation). The backdrop is clear; a click outside, Escape, or Close shuts it, and focus returns to the button.
+- Departs from D-056: the screen is drawn unscaled at the card's width (a phone at most 390px) and as tall as its
+  content, the card scrolling, as the prototype does; so Web and Kiosk show their wide layout at the card's width, not
+  a 1280 or 1080 screen scaled down, and the Fit / Fit width zoom, the size line, the browser bar, and the bezels are
+  gone. The new-tab Visitor app → Preview still draws the real screen sizes.
+- Why: owner request 2026-11-11 ("'preview in app' as pop up. Make it look like the one in the cms.html").
+- Affected specs: `12` §3 Resource editors, Preview; `14` §4; prototype `iGuide CMS.html` (D-004).
+
+## D-060 (2026-11-11) — Workspace pages fill the main area
+
+- Decision: every workspace page's frame fills the main content area, as the list pages do. The Resource editors drop
+  the 1090px cap and their form column grows (`minmax(0,1fr)` beside the 360px side column); the Dashboard readiness
+  and setup cards, App settings → Languages and Surfaces, and the "Not available yet" section card drop their
+  760/860/640px caps. Reading measures stay inside pages: page subtitles (760px), help text, and single short inputs
+  (the Surfaces web address, 560px); error alerts keep 640px; device frames in Preview and Navigation keep their sizes.
+- Departs from the prototype's 760px form column and 760–900px content caps (D-004).
+- Why: owner request 2026-11-11 ("Some pages aren't displaying in full width. Please fix this.").
+- Affected specs: prototype `iGuide CMS.html` (D-004); `12` §3 Resource editors.
+
+## D-061 (2026-11-11) — Content list filters sit in a "Filters" menu
+
+- Decision: every Content list with filters (Places, Points of Interest, Routes, Guides, Events, Categories, Media)
+  keeps only its search field (and Media's Grid/List switch) in the toolbar. Status, Category, Featured, "Search in",
+  Applies to, and Media type move into a shared "Filters" popover (`ListFilterMenu`, radix-vue Popover, modal: focus
+  moves in, Tab stays inside, Escape or outside click closes it and focus returns to the button). The button counts
+  the filters in force; each shows beside it as a removable chip ("Status: DRAFT ×"), with "Clear all" beside two or
+  more and "Clear filters" in the popover, so no filter is ever hidden. Single-choice filters are radio groups drawn
+  as pills with a check mark (`FilterChoiceGroup`); Featured is a checkbox. Maps & Floor Plans has no filters and is
+  unchanged. The reorder note stays in the toolbar.
+- Departs from the prototype's filter chips beside the search field (AGENTS.md §6, D-004).
+- Why: owner request 2026-11-11 ("The filters need to be 'tucked away a bit.' Let's put them inside a dropdown menu.").
+- Affected specs: `12` §3 Content library; `14` §4; prototype `iGuide CMS.html` (D-004).
+
+## D-062 (2026-11-11) — Fixed header and menu, only the page scrolls
+
+- Decision: the shell fills the viewport (`100dvh`); the header and the workspace menu stay put and only the page's
+  `<main>` scrolls (the menu scrolls on its own when its items overflow). A route to another path starts the new page
+  at its top; a query-only change (list filters) keeps the position. A "Skip to content" link, first in the tab
+  order, focuses `<main>`. Below 768 pixels the Project switcher takes its own row and "Manage members" and "Help"
+  move into the avatar menu, so the fixed header stays two rows; the opened "Menu" disclosure is at most 55% of the
+  viewport height and scrolls itself. A viewport lower than 420 CSS pixels (phone held sideways, the 320 by 256
+  reflow check) scrolls as one document, header included, so the header never takes most of the screen.
+- Departs from: nothing in `12`; the prototype's fixed header (AGENTS.md §6) now also holds when the page scrolls.
+- Why: owner request 2026-11-11 ("The top bar and navigation should be static, and only the content should be
+  scrollable.").
+- Affected specs: `12` §3; `14` §1, §4 (1.4.10 reflow, 2.4.1 bypass blocks).
+
+## D-063 (2026-11-11) — The Route editor draws its stops on the map of their Place
+
+- Decision: the Stops card of an outdoor Route shows the geographic Map of the Place its stops belong to, on
+  OpenStreetMap tiles, with the stops as numbered pins joined in stop order (back to the first for a loop). The Map
+  is found through the stops' Points of Interest: of their Places and those Places' ancestors, the one with a
+  non-archived Map covering the most stops, the closest Place on a tie, an ACTIVE Map before a DRAFT one. The Map's
+  area stays clear and the rest is lightly dimmed; the view fits the area and every stop, and stops outside the area
+  are listed. Without such a Map the tiles are framed on the stops; without stops an empty state says the map opens
+  with the first stop. An indoor Route keeps the schematic drawing. `GeoMapCanvas` gained an optional `frame`.
+- Departs from: the prototype's schematic grid drawing of the Route (`RouteMap`, D-004).
+- Why: owner request 2026-11-11 ("In the Routes section, display a map of the place and, on top of it, the points
+  selected by the user, along with their connections.").
+- Affected specs: `12` §3 Route; `09` §22 (public OpenStreetMap tiles, prototyping only).
+
+## D-064 (2026-11-11) — CMS maps use the OpenMapTiles "OSM Bright" style
+
+- Decision: every CMS map (Map editor, new-map dialog, location picker, Route map, preview maps) draws the
+  OpenMapTiles "OSM Bright" style, served without a key by OpenFreeMap (`https://tiles.openfreemap.org/styles/bright`)
+  and rendered as vector tiles by MapLibre GL inside Leaflet (`maplibre-gl` 6.17.0, `@maplibre/maplibre-gl-leaflet`
+  0.1.4, both pinned). One module, `src/components/map/basemap.ts`, adds it; the MapLibre worker is bundled by Vite
+  (`?worker&url`). Without WebGL the map falls back to the OpenStreetMap raster tiles. Markers, lines and areas stay
+  Leaflet layers above it.
+- Departs from: the public OpenStreetMap raster tiles of AGENTS.md §5.
+- Why: owner request 2026-11-11 ("use bright theme from openmaptiles for the maps"). OpenFreeMap needs no API key, so
+  no new runtime configuration; MapTiler's hosted Bright would need one.
+- Affected specs: `09` §22 (tiles remain a prototyping choice; production tiles are still open there).
+
+## D-065 (2026-11-12) — Guide story as one list of elements; no summary, media or triggers on the Guide editor
+
+- Decision: the Guide editor's story is one ordered list of elements: paragraph, heading (H2/H3), image, and
+  reference. Each is added at the end or after any element ("+" on its row), and moved by drag, the arrows, or its
+  position select. The list is shared by every language (texts and captions per language, an image the same asset in
+  all). The API shape stays as D-031: loading spreads every TEXT block into its nodes, aligning the languages node by
+  node; saving joins each run of consecutive non-reference elements into one TEXT block, a language with nothing in
+  the run sending no text, otherwise every element keeping its place (untranslated as blank text, which the backend
+  accepts, D-038) so the languages line up when read back. `src/views/workspace/guides/guideElements.ts` holds both
+  directions. The Guide editor no longer shows the Summary field, the "How visitors reach it" card, or the media slots
+  (primary image, gallery); a Guide's existing summary, triggers and media bindings are kept as loaded and saved
+  unchanged, and the preview still draws the media visitors see. Triggers stay reachable from the Points of Interest
+  side. The Translations panel counts the title and the story only.
+- Departs from: `12` §3 Guide (summary, media slots and triggers in the Guide editor); D-031's two-level editor
+  (TEXT blocks holding their own paragraph list).
+- Why: owner request 2026-11-12 ("the selection of text and references should be handled along with the other
+  elements … insert them anywhere in the guide and move them around … remove 'How visitors reach it' … remove the
+  summary below the title and the option to add media. This applies only to the Guides page.").
+- Affected specs: `12` §3 Guide; `03` §11 (unchanged API).
+
+## D-066 (2026-11-12) — The mouse wheel outside the "Preview in app" card scrolls the editor
+
+- Decision: the pop-up card's clear backdrop (D-059) still closes the card on a click, but the mouse wheel over it
+  scrolls what lies underneath: the nearest scrollable area that can still move that way, skipping text fields, so
+  the editor's page moves while the card stays open, kept on screen, and the wheel inside the card scrolls only the
+  card. Controls under the backdrop stay unreachable while the card is open, as before.
+- Departs from: D-059 (the backdrop held every pointer event).
+- Why: owner request 2026-11-12 ("When I click 'Preview in App', I want to be able to scroll to the previous page if
+  I move the mouse outside the dialog box.").
+- Affected specs: `12` §3 (Preview in app); `14` §4 (the card keeps its focus trap and Escape).

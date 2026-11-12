@@ -30,7 +30,9 @@ import { showToast } from "@/stores/toast";
 import { useCurrentProject } from "@/workspace/currentProject";
 import { referenceLink } from "@/workspace/referenceLinks";
 import { findSection } from "@/workspace/sections";
-import { useListFilters } from "@/workspace/listFilters";
+import { STATUS_FILTER_OPTIONS, choiceFilter, useListFilters } from "@/workspace/listFilters";
+import ListFilterMenu from "@/components/ListFilterMenu.vue";
+import FilterChoiceGroup from "@/components/FilterChoiceGroup.vue";
 import SearchLanguageSelect from "@/components/SearchLanguageSelect.vue";
 import { useProjectLanguages } from "@/workspace/useProjectLanguages";
 import { useStatusActions } from "@/workspace/useStatusActions";
@@ -69,6 +71,16 @@ const statusFilter = ref<"ALL" | ResourceStatus | "PENDING">("ALL");
 const scopeFilter = ref<"ALL" | CategoryScope>("ALL");
 const query = ref("");
 const filters = useListFilters();
+const scopeOptions: { value: "ALL" | CategoryScope; label: string }[] = [
+  { value: "ALL", label: "Both kinds" },
+  ...CATEGORY_SCOPES.map((value) => ({ value, label: scopeLabel(value) })),
+];
+/** The filters in force, shown as chips beside the Filters button. */
+const activeFilters = computed(() => [
+  ...choiceFilter("status", "Status", statusFilter, STATUS_FILTER_OPTIONS, "ALL"),
+  ...choiceFilter("scope", "Applies to", scopeFilter, scopeOptions, "ALL"),
+  ...filters.active(languages.value, false),
+]);
 const { searchLanguage } = filters;
 const normalize = (text: string) => text.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
@@ -139,7 +151,7 @@ const reorder = useReorder<Category>({
 </script>
 
 <template>
-  <main class="relative min-w-0 flex-1 overflow-y-auto px-7 pb-16 pt-6">
+  <main class="relative min-w-0 flex-1 overflow-y-auto px-4 pb-16 pt-6 md:px-7">
     <PageHead :title="section.title" :subtitle="section.subtitle">
       <template #actions>
         <Button variant="brand" :disabled="!defaultLanguageInfo" @click="newCategory()">New category</Button>
@@ -148,7 +160,7 @@ const reorder = useReorder<Category>({
 
     <div
       v-if="noLanguages"
-      class="mb-5 flex flex-wrap items-center gap-3.5 rounded-lg border-l-[3px] border-l-[#9a6200] bg-[rgba(154,98,0,0.07)] px-[18px] py-3.5 text-[13px]"
+      class="mb-5 flex flex-wrap items-center gap-3.5 rounded-lg border-l-[3px] border-l-[#855400] bg-[rgba(154,98,0,0.07)] px-[18px] py-3.5 text-[13px]"
     >
       <div class="min-w-[min(100%,260px)] flex-1">
         <strong class="mb-0.5 block text-[13px] font-bold">Add a language first</strong>
@@ -175,44 +187,20 @@ const reorder = useReorder<Category>({
           v-model="query"
           type="search"
           placeholder="Search names and codes"
-          class="min-w-[220px] flex-1 rounded-lg border-[1.5px] px-3 py-[9px] text-[13px] focus:border-primary focus:outline-none"
+          class="min-w-[min(100%,200px)] flex-1 rounded-lg border-[1.5px] px-3 py-[9px] text-[13px] focus:border-primary focus:outline-none"
         />
-        <SearchLanguageSelect v-model="searchLanguage" :languages="languages" />
-        <span id="categories-scope-label" class="text-[11px] font-bold uppercase tracking-[0.06em] text-muted-foreground">Applies to</span>
-        <div class="flex flex-wrap gap-1.5" role="group" aria-labelledby="categories-scope-label">
-          <button
-            v-for="chip in (['ALL', ...CATEGORY_SCOPES] as const)"
-            :key="chip"
-            type="button"
-            class="rounded-full border px-[13px] py-1.5 text-[11px]"
-            :class="scopeFilter === chip ? 'border-primary bg-primary font-bold text-white' : 'bg-card font-semibold text-gray-700'"
-            :aria-pressed="scopeFilter === chip"
-            @click="scopeFilter = chip"
-          >
-            {{ chip === "ALL" ? "Both kinds" : scopeLabel(chip) }}
-          </button>
-        </div>
-        <span id="categories-status-label" class="text-[11px] font-bold uppercase tracking-[0.06em] text-muted-foreground">Status</span>
-        <div class="flex flex-wrap gap-1.5" role="group" aria-labelledby="categories-status-label">
-          <button
-            v-for="chip in (['ALL', 'DRAFT', 'ACTIVE', 'ARCHIVED', 'PENDING'] as const)"
-            :key="chip"
-            type="button"
-            class="rounded-full border px-[13px] py-1.5 text-[11px]"
-            :class="statusFilter === chip ? 'border-primary bg-primary font-bold text-white' : 'bg-card font-semibold text-gray-700'"
-            :aria-pressed="statusFilter === chip"
-            @click="statusFilter = chip"
-          >
-            {{ chip === "ALL" ? "All" : chip === "PENDING" ? "Pending changes" : chip }}
-          </button>
-        </div>
+        <ListFilterMenu :active="activeFilters">
+          <FilterChoiceGroup v-model="statusFilter" legend="Status" :options="STATUS_FILTER_OPTIONS" />
+          <FilterChoiceGroup v-model="scopeFilter" legend="Applies to" :options="scopeOptions" />
+          <SearchLanguageSelect v-model="searchLanguage" :languages="languages" />
+        </ListFilterMenu>
         <span class="ml-auto text-[11px] text-muted-foreground">
           {{ query || statusFilter !== "ALL" ? "Matches · clear the search and filters to reorder" : "Tree · drag or use the arrows to reorder" }}
         </span>
         <p class="sr-only" aria-live="polite">{{ reorder.announcement }}</p>
       </div>
 
-      <div v-if="loading" class="animate-skeleton" aria-busy="true" aria-label="Loading categories">
+      <div v-if="loading" class="animate-skeleton" role="status" aria-busy="true" aria-label="Loading categories">
         <div v-for="n in 3" :key="n" class="flex items-center gap-3.5 border-b border-gray-100 px-[18px] py-4">
           <div class="h-[13px] w-1/3 rounded bg-[#e2e3e7]"></div>
         </div>
@@ -254,7 +242,7 @@ const reorder = useReorder<Category>({
                     {{ category.scope === "ROUTE" ? "Route" : "POI" }}
                   </span>
                 </div>
-                <div class="mt-[3px] break-words text-[11px] text-gray-400" :style="{ paddingLeft: `${depth * 18 + (depth ? 46 : 32)}px` }">
+                <div class="mt-[3px] break-words text-[11px] text-gray-500" :style="{ paddingLeft: `${depth * 18 + (depth ? 46 : 32)}px` }">
                   <span class="font-mono">{{ category.code }}</span>
                   <template v-if="!depth && parentName(category) && (query || statusFilter !== 'ALL')"> · in {{ parentName(category) }}</template>
                   · {{ scopeLabel(category.scope) }} · {{ itemsText(category) }} ·

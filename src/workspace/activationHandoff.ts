@@ -11,6 +11,14 @@ interface Handoff {
 
 const pending = new Map<string, Handoff>();
 
+/**
+ * An activation refused for missing fields: a `422 VALIDATION_ERROR` whose field errors carry
+ * `MISSING_REQUIRED_FIELDS` (`07` §15). The code sits on the field errors, not on the problem itself.
+ */
+export function isMissingFieldsError(error: ApiError): boolean {
+  return error.hasCode("MISSING_REQUIRED_FIELDS");
+}
+
 export function handOffActivationErrors(resourceId: string, error: ApiError) {
   pending.set(resourceId, { fields: error.fieldMessages(), requestId: error.requestId });
 }

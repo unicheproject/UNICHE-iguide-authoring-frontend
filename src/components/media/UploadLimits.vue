@@ -10,7 +10,7 @@ const emit = defineEmits<{ reload: [] }>();
 </script>
 
 <template>
-  <p v-if="failed && !limits" class="text-[11px] font-semibold text-[#9a6200]">
+  <p v-if="failed && !limits" class="text-[11px] font-semibold text-[#855400]">
     The size limits could not be loaded, so uploads wait.
     <button type="button" class="font-bold text-primary" @click="emit('reload')">Try again</button>
   </p>

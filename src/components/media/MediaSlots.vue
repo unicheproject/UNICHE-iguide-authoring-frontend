@@ -131,7 +131,7 @@ function requirement(slot: MediaSlot): string {
           {{ slot.label }}
         </div>
         <p v-if="slot.hint" class="border-b border-gray-100 px-3 py-2 text-[11px] text-muted-foreground">{{ slot.hint }}</p>
-        <p v-if="missingRequired(slot)" class="border-b border-gray-100 px-3 py-2 text-[11px] font-semibold text-[#9a6200]">⚠ {{ missingRequired(slot) }}</p>
+        <p v-if="missingRequired(slot)" class="border-b border-gray-100 px-3 py-2 text-[11px] font-semibold text-[#855400]">⚠ {{ missingRequired(slot) }}</p>
 
         <!-- One asset per language -->
         <ul v-if="slot.perLanguage" class="flex flex-col">
@@ -201,7 +201,7 @@ function requirement(slot: MediaSlot): string {
             </div>
           </div>
           <div v-if="!bindingsOf(slot).length" class="p-3">
-            <span class="mb-2 block text-[11px]" :class="slot.recommended ? 'text-[#9a6200]' : 'text-muted-foreground'">{{ requirement(slot) }}</span>
+            <span class="mb-2 block text-[11px]" :class="slot.recommended ? 'text-[#855400]' : 'text-muted-foreground'">{{ requirement(slot) }}</span>
             <button
               v-if="!readonly"
               type="button"
