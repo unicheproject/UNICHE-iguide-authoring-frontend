@@ -149,6 +149,12 @@ export const router = createRouter({
           meta: { section: "media" },
         },
         {
+          path: "navigation",
+          name: "navigation",
+          component: () => import("@/views/workspace/navigation/NavigationView.vue"),
+          meta: { section: "navigation" },
+        },
+        {
           path: "preview",
           name: "preview",
           component: () => import("@/views/workspace/PreviewView.vue"),

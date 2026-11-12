@@ -1,8 +1,7 @@
 <script setup lang="ts">
 /*
- * Visitor app overview (`12` §3, mockup screen 09). Only the content and the languages exist in the backend
- * yet; Pages, Navigation, Theme, Preview, and Launch show their place with a note instead of data
- * (GAPS.md G-009).
+ * Visitor app overview (`12` §3, mockup screen 09). The content, the languages, and the menus (D-055) exist in
+ * the backend; Pages, Theme, Preview, and Launch show their place with a note instead of data (GAPS.md G-009).
  */
 import { computed, onBeforeUnmount, ref, watch } from "vue";
 import { RouterLink } from "vue-router";
@@ -10,6 +9,7 @@ import PageHead from "@/components/PageHead.vue";
 import { Button } from "@/components/ui/button";
 import { ApiError } from "@/platform/api";
 import { fetchProjectLanguages, type ProjectLanguage } from "@/platform/languages";
+import { listNavigations, type Navigation } from "@/platform/navigation";
 import { fetchContentCounts, type ContentCount } from "@/platform/overview";
 import { useCurrentProject } from "@/workspace/currentProject";
 import { findSection, sectionLocation } from "@/workspace/sections";
@@ -20,6 +20,7 @@ const projectId = computed(() => project.value.id);
 
 const counts = ref<ContentCount[]>([]);
 const languages = ref<ProjectLanguage[]>([]);
+const menus = ref<Navigation[]>([]);
 const loading = ref(true);
 const loadError = ref<ApiError | null>(null);
 let controller: AbortController | null = null;
@@ -31,7 +32,12 @@ async function load() {
   loading.value = true;
   loadError.value = null;
   try {
-    const [c, l] = await Promise.all([fetchContentCounts(projectId.value, signal), fetchProjectLanguages(projectId.value, signal)]);
+    const [c, l, n] = await Promise.all([
+      fetchContentCounts(projectId.value, signal),
+      fetchProjectLanguages(projectId.value, signal),
+      listNavigations(projectId.value, signal),
+    ]);
+    menus.value = n;
     counts.value = c;
     languages.value = l.languages;
   } catch (e) {
@@ -50,6 +56,12 @@ const total = computed(() => counts.value.reduce((n, c) => n + c.active + c.draf
 const defaultLanguage = computed(() => languages.value.find((l) => l.isDefault));
 
 const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+const navigationText = computed(() => {
+  const main = menus.value.find((m) => m.context === "PRIMARY")?.items.length ?? 0;
+  const footer = menus.value.find((m) => m.context === "FOOTER")?.items.length ?? 0;
+  if (!main && !footer) return "No menu yet";
+  return `Main menu ${plural(main, "item", "items")} · ${plural(footer, "footer link", "footer links")}`;
+});
 
 interface Step {
   title: string;
@@ -64,7 +76,11 @@ const steps = computed<Step[]>(() => [
     to: sectionLocation(projectId.value, "places"),
   },
   { title: "Pages", text: "Not available yet" },
-  { title: "Navigation", text: "Not available yet" },
+  {
+    title: "Navigation",
+    text: navigationText.value,
+    to: sectionLocation(projectId.value, "navigation"),
+  },
   {
     title: "App settings",
     text: languages.value.length
@@ -87,7 +103,7 @@ const pending = [
 </script>
 
 <template>
-  <main class="relative min-w-0 flex-1 overflow-y-auto px-7 pb-16 pt-6">
+  <main class="relative min-w-0 flex-1 overflow-y-auto px-4 pb-16 pt-6 md:px-7">
     <PageHead :title="section.title" :subtitle="section.subtitle" />
 
     <div v-if="loadError" role="alert" class="max-w-[640px] rounded-lg border border-l-[3px] border-l-destructive bg-card px-[18px] py-4">
@@ -98,7 +114,7 @@ const pending = [
       <Button variant="outline" size="sm" class="mt-3" @click="load">Try again</Button>
     </div>
 
-    <div v-else-if="loading" class="animate-skeleton space-y-4" aria-busy="true" aria-label="Loading the overview">
+    <div v-else-if="loading" class="animate-skeleton space-y-4" role="status" aria-busy="true" aria-label="Loading the overview">
       <div class="h-[120px] rounded-[10px] border bg-card"></div>
       <div class="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
         <div v-for="n in 3" :key="n" class="h-[220px] rounded-[10px] border bg-card"></div>

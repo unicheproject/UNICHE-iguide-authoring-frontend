@@ -1,5 +1,7 @@
-import { ApiError, apiRequest } from "./api";
+import { ApiError, apiRequest, completeSave } from "./api";
+import { syncMedia, toMediaBindings, type MediaBinding, type MediaBindingResponse } from "./assets";
 import type { ResourceReference } from "./references";
+import { applyWorkingCopy, discardWorkingCopy, saveWorkingCopy } from "./workingCopies";
 
 export type ResourceStatus = "DRAFT" | "ACTIVE" | "ARCHIVED";
 
@@ -56,6 +58,8 @@ export interface Place {
   workingCopyUpdatedAt: string | null;
   /** Keyed by language code. */
   translations: Record<string, PlaceTranslation>;
+  /** The primary image and gallery (backend D-041). */
+  media: MediaBinding[];
 }
 
 export interface CreatePlaceInput {
@@ -78,17 +82,19 @@ export interface UpdatePlaceInput {
   longitude: number | null;
   featured: boolean;
   translations: Record<string, PlaceTranslation>;
+  media: MediaBinding[];
 }
 
 const base = (projectId: string) => `/projects/${encodeURIComponent(projectId)}/places`;
 
 /*
  * Stopgap until the generated client (PLAN.md C0b, C3): the backend calls `setting` `environment`
- * (backend D-018) and pages its lists, so responses and request bodies are translated here.
+ * (backend D-018) and pages its lists, so responses and request bodies are translated here. Media are bindings
+ * (backend D-041): read from `media`, saved through `.../places/{id}/resource-assets` after the Place's own `PUT`.
  */
 
 /** A Place as the backend returns it. */
-type PlaceResponse = Omit<Place, "setting"> & { environment: PlaceSetting };
+type PlaceResponse = Omit<Place, "setting" | "media"> & { environment: PlaceSetting; media?: MediaBindingResponse[] };
 
 interface Page<T> {
   content: T[];
@@ -96,7 +102,11 @@ interface Page<T> {
   totalPages: number;
 }
 
-const toPlace = ({ environment, ...rest }: PlaceResponse): Place => ({ ...rest, setting: environment });
+const toPlace = ({ environment, media, ...rest }: PlaceResponse): Place => ({
+  ...rest,
+  setting: environment,
+  media: toMediaBindings(media ?? []),
+});
 
 function toBody<T extends { setting: PlaceSetting }>({ setting, ...rest }: T) {
   return { ...rest, environment: setting };
@@ -121,17 +131,23 @@ export async function createPlace(projectId: string, input: CreatePlaceInput): P
 }
 
 export async function updatePlace(projectId: string, placeId: string, input: UpdatePlaceInput): Promise<Place> {
-  return toPlace(
-    await apiRequest<PlaceResponse>(`${base(projectId)}/${encodeURIComponent(placeId)}`, {
-      method: "PUT",
-      body: toBody(input),
-    }),
-  );
+  const { media, ...fields } = input;
+  await apiRequest<PlaceResponse>(`${base(projectId)}/${encodeURIComponent(placeId)}`, {
+    method: "PUT",
+    body: toBody(fields),
+  });
+  return completeSave(async () => {
+    await syncMedia(projectId, "places", placeId, media);
+  }, () => fetchPlace(projectId, placeId));
 }
 
-/** The working-copy payload of an ACTIVE Place: the update body without `version` (backend D-027). */
+/** The working-copy payload of an ACTIVE Place: the update body without `version`, its media as one list (D-027). */
 export function placeWorkingCopyPayload(input: Omit<UpdatePlaceInput, "version">): Record<string, unknown> {
-  return toBody(input);
+  const { media, ...fields } = input;
+  return {
+    ...toBody(fields),
+    media: media.filter((b) => b.usage !== "INLINE").map(({ assetId, usage, languageCode }) => ({ assetId, usage, languageCode })),
+  };
 }
 
 /** A Place as the backend renders a working copy or an apply. */
@@ -200,25 +216,39 @@ export async function fetchSpatialLink(projectId: string, placeId: string): Prom
   return { mapId: maps[0]?.id ?? null, floorPlanId: plans[0]?.id ?? null };
 }
 
-/** Re-saves a map or floor plan with another `placeId`; only DRAFT ones can be saved. */
 /**
- * An ACTIVE map or plan changes its Place only through its own working copy (backend D-027), so the link is
- * refused here with the way to do it, before any other map or plan is touched.
+ * An ACTIVE map or plan changes its Place through its working copy (backend D-027), which the link applies at once,
+ * so the link reaches visitors as a DRAFT one's does (D-050). One with pending changes of its own is refused before
+ * any other map or plan is touched: applying would make those changes live too.
  */
-function requireDraftLink(kind: "maps" | "floor-plans", items: Linkable[]) {
-  if (items.some((item) => item.status === "ACTIVE")) {
+function requireNoPendingChanges(kind: "maps" | "floor-plans", items: Linkable[]) {
+  const pending = items.find((item) => item.status === "ACTIVE" && item.hasWorkingCopy);
+  if (pending) {
     const noun = kind === "maps" ? "map" : "floor plan";
-    throw new ApiError(422, "RESOURCE_NOT_EDITABLE",
-      `An active ${noun} is linked through its own editor: open the ${noun}, change its place, and apply the changes.`,
+    throw new ApiError(422, "RESOURCE_HAS_PENDING_CHANGES",
+      `The ${noun} “${String(pending.internalName)}” has pending changes: open it, apply or discard them, then link it here.`,
       null, [], {});
   }
 }
 
+/** Re-saves a map or floor plan with another `placeId`: a DRAFT one directly, an ACTIVE one through its copy. */
 async function relink(projectId: string, kind: "maps" | "floor-plans", item: Linkable, placeId: string | null) {
-  await apiRequest(`${projectPath(projectId)}/${kind}/${encodeURIComponent(item.id)}`, {
-    method: "PUT",
-    body: { ...item, placeId },
-  });
+  const itemPath = `${projectPath(projectId)}/${kind}/${encodeURIComponent(item.id)}`;
+  if (item.status !== "ACTIVE") {
+    await apiRequest(itemPath, { method: "PUT", body: { ...item, placeId } });
+    return;
+  }
+  // The copy is the live map or plan with the new Place: its read DTO and its children, as the payload names them.
+  const children = await apiRequest<Record<string, unknown>[]>(`${itemPath}/${kind === "maps" ? "resources" : "positions"}`);
+  const payload = { ...item, placeId, [kind === "maps" ? "placements" : "positions"]: children };
+  await saveWorkingCopy(projectId, kind, item.id, { baseVersion: item.version, workingCopyVersion: null, payload });
+  try {
+    await applyWorkingCopy(projectId, kind, item.id);
+  } catch (e) {
+    // The copy held nothing but the link; leaving it would show pending changes nobody made.
+    await discardWorkingCopy(projectId, kind, item.id).catch(() => undefined);
+    throw e;
+  }
 }
 
 /** Links the map or floor plan, unlinking whatever the Place showed before; both null unlinks. */
@@ -235,8 +265,8 @@ export async function setSpatialLink(projectId: string, placeId: string, link: S
   const newPlan = link.floorPlanId && !plans.some((p) => p.id === link.floorPlanId)
     ? await apiRequest<Linkable>(`${projectPath(projectId)}/floor-plans/${encodeURIComponent(link.floorPlanId)}`)
     : null;
-  requireDraftLink("maps", [...unlinkMaps, ...(newMap ? [newMap] : [])]);
-  requireDraftLink("floor-plans", [...unlinkPlans, ...(newPlan ? [newPlan] : [])]);
+  requireNoPendingChanges("maps", [...unlinkMaps, ...(newMap ? [newMap] : [])]);
+  requireNoPendingChanges("floor-plans", [...unlinkPlans, ...(newPlan ? [newPlan] : [])]);
   for (const map of unlinkMaps) await relink(projectId, "maps", map, null);
   for (const plan of unlinkPlans) await relink(projectId, "floor-plans", plan, null);
   if (newMap) await relink(projectId, "maps", newMap, placeId);

@@ -31,6 +31,8 @@ export interface PreviewContext {
   data: PreviewData;
   language: string | null;
   defaultLanguage: string | null;
+  /** The Project timezone Event dates are shown in (`03` §15); the browser's when absent. */
+  timeZone?: string | null;
 }
 
 function langs(ctx: PreviewContext) {
@@ -90,7 +92,8 @@ export function summaryOf(ctx: PreviewContext, target: PreviewTarget): PreviewTe
 /** The hero image of a card, if the Resource has one in the previewed language or for all. */
 export function cardImage(ctx: PreviewContext, target: PreviewTarget): string | null {
   const d = ctx.data;
-  const r = target.type === "POI" ? d.pois.find((x) => x.id === target.id)
+  const r = target.type === "PLACE" ? d.places.find((x) => x.id === target.id)
+    : target.type === "POI" ? d.pois.find((x) => x.id === target.id)
     : target.type === "ROUTE" ? d.routes.find((x) => x.id === target.id)
       : target.type === "GUIDE" ? d.guides.find((x) => x.id === target.id)
         : target.type === "EVENT" ? d.events.find((x) => x.id === target.id) : undefined;
@@ -124,6 +127,7 @@ function placeModel(ctx: PreviewContext, place: Place): PreviewModel {
   const { language, fallbackName, codes } = langs(ctx);
   const parent = place.parentPlaceId ? ctx.data.places.find((p) => p.id === place.parentPlaceId) : undefined;
   const blocks: PreviewBlock[] = [
+    ...heroBlock(place.media, ctx.data.assets, codes),
     { type: "facts", items: [{ label: "", value: placeTypeLabel(place.type) }] },
     ...textBlocks(place.translations, [
       { key: "summary", label: "Summary" },
@@ -132,6 +136,7 @@ function placeModel(ctx: PreviewContext, place: Place): PreviewModel {
       { key: "accessibilityInformation", label: "Accessibility information", heading: "Accessibility" },
     ], codes),
   ];
+  blocks.push(...mediaBlocks(place.media, ctx.data.assets, codes));
   const map = ctx.data.maps.find((m) => m.placeId === place.id);
   if (map) blocks.push(mapBlock(ctx, map));
   if (parent) blocks.push({ type: "list", heading: "Part of", items: [linkItem(ctx, { type: "PLACE", id: parent.id })] });
@@ -229,7 +234,7 @@ function guideModel(ctx: PreviewContext, guide: Guide): PreviewModel {
 function eventModel(ctx: PreviewContext, event: CmsEvent): PreviewModel {
   const { language, fallbackName, codes } = langs(ctx);
   const fmt = (iso: string) =>
-    new Date(iso).toLocaleString(ctx.language ?? undefined, { dateStyle: "medium", timeStyle: "short" });
+    new Date(iso).toLocaleString(ctx.language ?? undefined, { dateStyle: "medium", timeStyle: "short", timeZone: ctx.timeZone ?? undefined });
   const links: PreviewListItem[] = [
     ...(event.placeId ? [linkItem(ctx, { type: "PLACE", id: event.placeId })] : []),
     ...(event.poiId ? [linkItem(ctx, { type: "POI", id: event.poiId })] : []),

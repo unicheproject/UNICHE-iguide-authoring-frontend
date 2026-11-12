@@ -31,6 +31,17 @@ export interface PreviewTarget {
   id: string;
 }
 
+/**
+ * An entry of the Project's menu as the stand-in visitor app draws it (`03` §13, D-055): a label already resolved for
+ * the previewed language, what it opens (none for a heading), and the entries under it.
+ */
+export interface PreviewMenuItem {
+  key: string;
+  label: string;
+  target: PreviewTarget | null;
+  children: PreviewMenuItem[];
+}
+
 export interface PreviewListItem {
   title: string;
   subtitle?: string;

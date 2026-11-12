@@ -168,7 +168,7 @@ export interface MediaBindingResponse {
   sortOrder: number;
 }
 
-export type MediaKind = "pois" | "routes" | "guides" | "events";
+export type MediaKind = "places" | "pois" | "routes" | "guides" | "events";
 
 export const toMediaBindings = (media: MediaBindingResponse[]): MediaBinding[] =>
   media.map(({ assetId, usage, languageCode }) => ({ assetId, usage, languageCode }));
@@ -215,7 +215,8 @@ export async function syncMedia(projectId: string, kind: MediaKind, resourceId: 
 
 /** "03:12" for a duration in seconds. */
 export function formatDuration(seconds: number): string {
-  const total = Math.round(seconds);
+  // Whole seconds played, as the browser's player counts them.
+  const total = Math.floor(seconds);
   const h = Math.floor(total / 3600);
   const m = Math.floor((total % 3600) / 60);
   const s = total % 60;
@@ -225,12 +226,15 @@ export function formatDuration(seconds: number): string {
 
 /** Search over the name, the file name, and the title in every language (iGuide spec 12, media library). */
 export function assetMatches(asset: Asset, query: string): boolean {
-  const q = query.trim().toLowerCase();
+  const q = fold(query.trim());
   if (!q) return true;
   return [asset.internalName, asset.originalFilename, ...Object.values(asset.translations).map((t) => t.title ?? "")].some((text) =>
-    text.toLowerCase().includes(q),
+    fold(text ?? "").includes(q),
   );
 }
+
+/** Lowercase without accents, so "κυμη" finds "Κύμη" and "cafe" finds "Café". */
+const fold = (text: string) => text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
 /** The type the backend will give a file, from its MIME type or name, to check the size limit first. */
 export function assetTypeOf(file: File): AssetType {

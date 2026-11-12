@@ -376,7 +376,7 @@ function toggleBounds() {
     }
     const fit = canvas.value?.zoomFor(bounds.value);
     const zoom = Number(form.zoom);
-    if (fit !== undefined && (Number.isNaN(zoom) || zoom < fit - 0.5)) form.zoom = String(fit);
+    if (fit !== undefined && (Number.isNaN(zoom) || zoom < fit)) form.zoom = String(fit);
   }
   editingBounds.value = !editingBounds.value;
 }

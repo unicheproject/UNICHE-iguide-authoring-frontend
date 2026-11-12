@@ -2,7 +2,8 @@
 export const SURFACES = {
   WEB: { label: "Web", caption: "Desktop browser, 1280 wide", width: 1280, height: 860, font: 16 },
   MOBILE: { label: "Mobile", caption: "Phone, 390 wide", width: 390, height: 780, font: 15 },
-  KIOSK: { label: "Kiosk", caption: "Kiosk screen, 1080 wide", width: 1080, height: 1500, font: 24 },
+  // A portrait kiosk at the common 1080 x 1920.
+  KIOSK: { label: "Kiosk", caption: "Kiosk screen, 1080 wide", width: 1080, height: 1920, font: 24 },
 } as const;
 
 export type Surface = keyof typeof SURFACES;

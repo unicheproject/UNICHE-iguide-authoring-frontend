@@ -1,4 +1,4 @@
-import { apiRequest } from "./api";
+import { apiRequest, completeSave } from "./api";
 import { syncMedia, toMediaBindings, type MediaBinding, type MediaBindingResponse } from "./assets";
 import type { ResourceStatus } from "./places";
 import type { ResourceReference } from "./references";
@@ -123,9 +123,10 @@ export async function updatePoi(projectId: string, poiId: string, input: UpdateP
     method: "PUT",
     body: { ...body, version: input.version },
   });
-  await setResourceCategory(projectId, "pois", poiId, categoryId);
-  await syncMedia(projectId, "pois", poiId, media);
-  return fetchPoi(projectId, poiId);
+  return completeSave(async () => {
+    await setResourceCategory(projectId, "pois", poiId, categoryId);
+    await syncMedia(projectId, "pois", poiId, media);
+  }, () => fetchPoi(projectId, poiId));
 }
 
 /**

@@ -13,10 +13,14 @@ import PreviewApp from "@/components/preview/PreviewApp.vue";
 import { SURFACES, type Surface } from "@/components/preview/surfaces";
 import { Button } from "@/components/ui/button";
 import { ApiError } from "@/platform/api";
+import { listNavigations, type Navigation } from "@/platform/navigation";
 import { TRIGGER_LABELS, type Trigger } from "@/platform/triggers";
 import { useCurrentProject } from "@/workspace/currentProject";
+import { previewMenu } from "@/workspace/navigationMenu";
 import { loadPreviewData, visibleData, type PreviewData, type PreviewMode } from "@/workspace/previewData";
 import { titleOf } from "@/workspace/previewModels";
+import { useProjectSettings } from "@/workspace/projectSettings";
+import { themeStyle, useProjectTheme } from "@/workspace/projectTheme";
 import { findSection } from "@/workspace/sections";
 
 const section = findSection("preview")!;
@@ -25,6 +29,8 @@ const projectId = computed(() => project.value.id);
 const router = useRouter();
 
 const all = ref<PreviewData | null>(null);
+/** The Project's menus; the app falls back to its default menu without them (D-055). */
+const menus = ref<Navigation[]>([]);
 const loading = ref(true);
 const loadError = ref<ApiError | null>(null);
 let controller: AbortController | null = null;
@@ -33,6 +39,8 @@ const surface = ref<Surface>("WEB");
 const language = ref<string | null>(null);
 const mode = ref<PreviewMode>("WORKING");
 const app = ref<InstanceType<typeof PreviewApp> | null>(null);
+const theme = useProjectTheme(projectId);
+const settings = useProjectSettings(projectId);
 
 async function load() {
   controller?.abort();
@@ -41,7 +49,13 @@ async function load() {
   loading.value = true;
   loadError.value = null;
   try {
-    all.value = await loadPreviewData(projectId.value, signal);
+    [all.value, menus.value] = await Promise.all([
+      loadPreviewData(projectId.value, signal),
+      listNavigations(projectId.value, signal).catch((e) => {
+        if (e instanceof ApiError) return [];
+        throw e;
+      }),
+    ]);
     const codes = all.value.languages.map((l) => l.languageCode);
     if (!language.value || !codes.includes(language.value)) language.value = defaultLanguage.value;
   } catch (e) {
@@ -57,6 +71,10 @@ onBeforeUnmount(() => controller?.abort());
 
 const defaultLanguage = computed(() => all.value?.languages.find((l) => l.isDefault)?.languageCode ?? null);
 const data = computed(() => (all.value ? visibleData(all.value, mode.value) : null));
+const menuOf = (context: "PRIMARY" | "FOOTER") =>
+  data.value
+    ? previewMenu(menus.value.find((m) => m.context === context), { data: data.value, language: language.value, defaultLanguage: defaultLanguage.value })
+    : [];
 const activeLanguage = computed(() => all.value?.languages.find((l) => l.languageCode === language.value) ?? null);
 
 /** Titles visitors of the chosen language would see in the default language instead. */
@@ -102,7 +120,7 @@ const chip = (selected: boolean) =>
 </script>
 
 <template>
-  <main class="relative min-w-0 flex-1 overflow-y-auto px-7 pb-16 pt-6">
+  <main class="relative min-w-0 flex-1 overflow-y-auto px-4 pb-16 pt-6 md:px-7">
     <PageHead :title="section.title" :subtitle="section.subtitle">
       <template #actions>
         <Button variant="outline" :disabled="!data" @click="openInNewTab">Open in new tab</Button>
@@ -117,7 +135,7 @@ const chip = (selected: boolean) =>
       <Button variant="outline" size="sm" class="mt-3" @click="load">Try again</Button>
     </div>
 
-    <div v-else-if="loading || !data" class="animate-skeleton space-y-4" aria-busy="true" aria-label="Loading the preview">
+    <div v-else-if="loading || !data" class="animate-skeleton space-y-4" role="status" aria-busy="true" aria-label="Loading the preview">
       <div class="h-[64px] rounded-[10px] border bg-card"></div>
       <div class="mx-auto h-[520px] max-w-[1000px] rounded-xl border bg-card"></div>
     </div>
@@ -170,7 +188,7 @@ const chip = (selected: boolean) =>
 
       <p class="mb-2 text-center text-[10px] font-extrabold uppercase tracking-[0.1em] text-muted-foreground">{{ SURFACES[surface].caption }}</p>
       <div class="mx-auto" :class="surface === 'MOBILE' ? 'max-w-[400px]' : surface === 'KIOSK' ? 'max-w-[640px]' : 'max-w-[1000px]'">
-        <DeviceFrame :surface="surface" :dir="activeLanguage?.direction === 'RTL' ? 'rtl' : 'ltr'" browser-chrome>
+        <DeviceFrame :surface="surface" :dir="activeLanguage?.direction === 'RTL' ? 'rtl' : 'ltr'" :lang="language ?? undefined" browser-chrome :style="themeStyle(theme)">
           <PreviewApp
             ref="app"
             :data="data"
@@ -178,12 +196,18 @@ const chip = (selected: boolean) =>
             :default-language="defaultLanguage"
             :surface="surface"
             :app-name="project.name"
+            :theme="theme"
+            :time-zone="settings?.timezone"
+            :menu="menuOf('PRIMARY')"
+            :footer="menuOf('FOOTER')"
           />
         </DeviceFrame>
       </div>
       <p class="mx-auto mt-3 max-w-[760px] text-center text-[11px] text-muted-foreground">
-        An approximation in the default theme with a default menu: the visitor app, Pages, Navigation, and the theme are not
-        available yet. Red marks texts missing in the chosen language. Nothing here changes what visitors see.
+        An approximation {{ theme.styleName ? `in the Project's theme (${theme.styleName})` : "in the default theme" }}:
+        the visitor app and Pages are not available yet. {{ menuOf("PRIMARY").length ? "The menu is the Project's Navigation." : "With no main menu set up under Navigation, a default menu stands in." }}
+        Red marks texts missing in the chosen language.
+        Nothing here changes what visitors see.
       </p>
     </template>
   </main>

@@ -21,7 +21,8 @@ function openHelp() {}
 </script>
 
 <template>
-  <header class="flex h-[60px] flex-none items-center gap-[18px] border-b bg-card px-5">
+  <!-- Wraps at narrow widths and high zoom instead of widening the page (WCAG 1.4.10, D-054). -->
+  <header class="flex min-h-[60px] flex-none flex-wrap items-center gap-x-[18px] gap-y-2 border-b bg-card px-4 py-2.5 md:px-5">
     <img
       src="https://uniche-eccch.eu/static/assets/images/uniche-logo-transparent-header.png"
       alt="UNICHE"
@@ -33,19 +34,20 @@ function openHelp() {}
       iGuide CMS
     </span>
 
-    <ProjectSwitcher v-if="session.status === 'authenticated'" />
+    <!-- Below 768 pixels the switcher takes its own row under the brand and the avatar, keeping the fixed header low (D-062). -->
+    <ProjectSwitcher v-if="session.status === 'authenticated'" class="max-md:order-last max-md:ml-0 max-md:basis-full" />
 
-    <div v-if="session.user" class="ml-auto flex flex-shrink-0 items-center gap-[18px]">
+    <div v-if="session.user" class="ml-auto flex flex-wrap items-center gap-x-[18px] gap-y-1">
       <button
         type="button"
-        class="whitespace-nowrap text-xs font-semibold text-primary hover:text-highlight hover:underline"
+        class="hidden whitespace-nowrap text-xs font-semibold text-primary hover:text-highlight hover:underline md:inline"
         @click="openManageMembers"
       >
         Manage members <span aria-hidden="true">↗</span>
       </button>
       <button
         type="button"
-        class="whitespace-nowrap text-xs font-semibold text-muted-foreground hover:text-highlight hover:underline"
+        class="hidden whitespace-nowrap text-xs font-semibold text-muted-foreground hover:text-highlight hover:underline md:inline"
         @click="openHelp"
       >
         Help
@@ -65,7 +67,7 @@ function openHelp() {}
           >
             {{ session.user.initials }}
           </span>
-          <span class="whitespace-nowrap text-xs font-semibold">{{ session.user.shortName }}</span>
+          <span class="sr-only whitespace-nowrap text-xs font-semibold md:not-sr-only">{{ session.user.shortName }}</span>
         </button>
 
         <div
@@ -80,6 +82,23 @@ function openHelp() {}
             </span>
             <span class="mt-1 block text-[10px] text-muted-foreground">Signed in with your UNICHE account</span>
           </div>
+          <!-- On a small screen "Manage members" and "Help" live here instead of in the bar. -->
+          <button
+            type="button"
+            role="menuitem"
+            class="w-full border-b px-3.5 py-3 text-left text-xs font-semibold text-primary hover:bg-accent md:hidden"
+            @click="menuOpen = false; openManageMembers()"
+          >
+            Manage members <span aria-hidden="true">↗</span>
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            class="w-full border-b px-3.5 py-3 text-left text-xs font-semibold text-foreground hover:bg-accent md:hidden"
+            @click="menuOpen = false; openHelp()"
+          >
+            Help
+          </button>
           <button
             type="button"
             role="menuitem"

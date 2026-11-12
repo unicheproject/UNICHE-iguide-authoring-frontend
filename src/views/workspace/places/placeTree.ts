@@ -1,4 +1,4 @@
-import { placeTitle, type Place, type PlaceType } from "@/platform/places";
+import { placeTitle, type Place, type PlaceSetting, type PlaceType } from "@/platform/places";
 
 /** A Place in hierarchy order, with its depth for indentation. */
 export interface PlaceNode {
@@ -9,6 +9,8 @@ export interface PlaceNode {
 export interface PlaceOption {
   id: string;
   label: string;
+  /** The Place's setting, so a new sub-place can take it over (DECISIONS.md D-057). */
+  setting?: PlaceSetting;
 }
 
 /**
@@ -82,4 +84,15 @@ const TYPE_LABELS: Record<PlaceType, string> = {
 
 export function placeTypeLabel(type: PlaceType): string {
   return TYPE_LABELS[type];
+}
+
+/*
+ * The author no longer picks the setting (DECISIONS.md D-057): it follows the type. Buildings, floors, and rooms are
+ * indoor and use a floor plan; the other types are outdoor and use a geographic map; "Other" keeps the setting it has.
+ */
+const INDOOR_TYPES: readonly PlaceType[] = ["BUILDING", "FLOOR", "ROOM"];
+
+export function settingForType(type: PlaceType, current: PlaceSetting): PlaceSetting {
+  if (type === "OTHER") return current;
+  return INDOOR_TYPES.includes(type) ? "INDOOR" : "OUTDOOR";
 }

@@ -1,12 +1,14 @@
 <script setup lang="ts">
 /**
  * A Leaflet map on OpenStreetMap tiles, as the CMS mockup draws maps (its `syncMaps`, `boundsEditor`, and
- * `maskOf`). In visitor view it is limited to the bounds; while editing the bounds, a rectangle with corner
+ * `maskOf`). In visitor view it shows the bounds as cropped: the outside is covered, and the map cannot be panned
+ * past them or zoomed out further than they fill the canvas. While editing the bounds, a rectangle with corner
  * handles and a centre handle can be dragged, with the outside dimmed. Markers are numbered and can be
  * dragged; route lines are drawn under them.
  */
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { addBasemap } from "@/components/map/basemap";
 import { onBeforeUnmount, onMounted, ref, watch } from "vue";
 
 export type LatLng = [number, number];
@@ -29,13 +31,15 @@ const props = withDefaults(
     view: { lat: number; lng: number; zoom: number };
     bounds: Bounds | null;
     editBounds?: boolean;
-    /** Keep the map inside the bounds, as visitors see it. */
+    /** Show only the area inside the bounds, as visitors see it. */
     limitToBounds?: boolean;
     /**
      * Show the whole bounds whatever the canvas size, instead of the saved initial view, whose zoom was chosen in
      * the editor's wider canvas: the visitor preview, drawn at phone, web, or kiosk width.
      */
     fitToBounds?: boolean;
+    /** With `fitToBounds`, the area to fit instead of the bounds, such as the bounds plus every marker. */
+    frame?: Bounds | null;
     markers?: CanvasMarker[];
     lines?: LatLng[][];
     height?: string;
@@ -44,7 +48,7 @@ const props = withDefaults(
     /** Accessible name of the map region. */
     label: string;
   }>(),
-  { editBounds: false, limitToBounds: false, fitToBounds: false, markers: () => [], lines: () => [], height: "460px", fitKey: "" },
+  { editBounds: false, limitToBounds: false, fitToBounds: false, frame: null, markers: () => [], lines: () => [], height: "460px", fitKey: "" },
 );
 const emit = defineEmits<{
   boundsChange: [bounds: Bounds];
@@ -58,13 +62,11 @@ let layer: L.LayerGroup | null = null;
 let dragging = false;
 let resizeObserver: ResizeObserver | null = null;
 
-const TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
-const ATTRIBUTION = '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
 onMounted(() => {
   if (!host.value) return;
   map = L.map(host.value, { zoomControl: true, zoomSnap: 0.25, zoomDelta: 0.5, wheelPxPerZoomLevel: 120 });
-  L.tileLayer(TILE_URL, { maxZoom: 19, attribution: ATTRIBUTION }).addTo(map);
+  addBasemap(map);
   layer = L.layerGroup().addTo(map);
   map.setView([props.view.lat, props.view.lng], props.view.zoom);
   map.on("moveend", () => {
@@ -94,8 +96,9 @@ onBeforeUnmount(() => {
 });
 
 function fitIfAsked() {
-  if (map && props.fitToBounds && props.bounds && !props.editBounds) {
-    map.fitBounds(L.latLngBounds(props.bounds), { padding: [6, 6], animate: false });
+  const area = props.frame ?? props.bounds;
+  if (map && props.fitToBounds && area && !props.editBounds) {
+    map.fitBounds(L.latLngBounds(area), { padding: props.frame ? [28, 28] : [6, 6], animate: false });
   }
 }
 
@@ -104,15 +107,20 @@ function round(value: number, digits: number): number {
   return Math.round(value * f) / f;
 }
 
-/** Visitor view keeps the map within the bounds; editing frees it. */
+const cropped = () => !!props.bounds && props.limitToBounds && !props.editBounds;
+
+/**
+ * Visitor view keeps the map within the bounds, zoomed in at least as far as the whole area fills the canvas, so
+ * nothing past the crop is reachable; editing frees it.
+ */
 function applyLimits() {
   if (!map) return;
-  if (props.bounds && props.limitToBounds && !props.editBounds) {
+  if (props.bounds && cropped()) {
     const lb = L.latLngBounds(props.bounds);
     map.setMinZoom(0);
-    map.setMaxBounds(lb.pad(0.02));
+    map.setMaxBounds(lb);
     map.options.maxBoundsViscosity = 1;
-    map.setMinZoom(Math.max(0, map.getBoundsZoom(lb) - 0.5));
+    map.setMinZoom(Math.max(0, map.getBoundsZoom(lb)));
   } else {
     map.setMaxBounds(null as unknown as L.LatLngBounds);
     map.setMinZoom(0);
@@ -120,7 +128,7 @@ function applyLimits() {
   }
 }
 
-function maskOf(b: Bounds, opacity: number) {
+function maskOf(b: Bounds, opacity: number, color = "#030712") {
   return L.polygon(
     [
       [
@@ -136,7 +144,7 @@ function maskOf(b: Bounds, opacity: number) {
         [b[0][0], b[1][1]],
       ],
     ],
-    { stroke: false, fillColor: "#030712", fillOpacity: opacity, interactive: false },
+    { stroke: false, fillColor: color, fillOpacity: opacity, interactive: false },
   );
 }
 
@@ -249,6 +257,8 @@ function redraw() {
   layer.clearLayers();
   if (props.bounds) {
     if (props.editBounds) boundsEditor(layer, props.bounds);
+    // Cropped, the outside is covered in the canvas colour where the area's shape differs from the canvas's.
+    else if (props.limitToBounds) maskOf(props.bounds, 1, "#f3f4f6").addTo(layer);
     else maskOf(props.bounds, 0.12).addTo(layer);
   }
   for (const line of props.lines) {
@@ -269,7 +279,7 @@ function redraw() {
 }
 
 watch(() => [props.bounds, props.editBounds, props.markers, props.lines], redraw, { deep: true });
-watch(() => [props.bounds, props.editBounds, props.limitToBounds], () => {
+watch(() => [props.bounds, props.frame, props.editBounds, props.limitToBounds], () => {
   applyLimits();
   fitIfAsked();
 }, { deep: true });

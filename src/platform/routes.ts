@@ -1,4 +1,4 @@
-import { apiRequest } from "./api";
+import { apiRequest, completeSave } from "./api";
 import { syncMedia, toMediaBindings, type MediaBinding, type MediaBindingResponse } from "./assets";
 import type { ResourceStatus } from "./places";
 import type { ResourceReference } from "./references";
@@ -186,29 +186,29 @@ export async function updateRoute(projectId: string, routeId: string, input: Upd
     method: "PUT",
     body: { ...body, version: input.version },
   });
-
-  const path = stopsPath(projectId, routeId);
-  const wanted = new Set(stops.flatMap((s) => (s.id ? [s.id] : [])));
-  for (const current of saved.stops.filter((s) => !wanted.has(s.id))) {
-    await apiRequest(`${path}/${encodeURIComponent(current.id)}`, { method: "DELETE" });
-  }
-  const order: string[] = [];
-  for (const stop of stops) {
-    const body = { poiId: stop.poiId, translations: stop.translations };
-    if (stop.id) {
-      await apiRequest(`${path}/${encodeURIComponent(stop.id)}`, { method: "PUT", body });
-      order.push(stop.id);
-    } else {
-      order.push((await apiRequest<StopResponse>(path, { method: "POST", body })).id);
+  return completeSave(async () => {
+    const path = stopsPath(projectId, routeId);
+    const wanted = new Set(stops.flatMap((s) => (s.id ? [s.id] : [])));
+    for (const current of saved.stops.filter((s) => !wanted.has(s.id))) {
+      await apiRequest(`${path}/${encodeURIComponent(current.id)}`, { method: "DELETE" });
     }
-  }
-  const after = await apiRequest<StopResponse[]>(path);
-  if (after.map((s) => s.id).join() !== order.join()) {
-    await apiRequest(`${path}:order`, { method: "PUT", body: { ids: order } });
-  }
-  await setResourceCategory(projectId, "routes", routeId, categoryId);
-  await syncMedia(projectId, "routes", routeId, media);
-  return fetchRoute(projectId, routeId);
+    const order: string[] = [];
+    for (const stop of stops) {
+      const body = { poiId: stop.poiId, translations: stop.translations };
+      if (stop.id) {
+        await apiRequest(`${path}/${encodeURIComponent(stop.id)}`, { method: "PUT", body });
+        order.push(stop.id);
+      } else {
+        order.push((await apiRequest<StopResponse>(path, { method: "POST", body })).id);
+      }
+    }
+    const after = await apiRequest<StopResponse[]>(path);
+    if (after.map((s) => s.id).join() !== order.join()) {
+      await apiRequest(`${path}:order`, { method: "PUT", body: { ids: order } });
+    }
+    await setResourceCategory(projectId, "routes", routeId, categoryId);
+    await syncMedia(projectId, "routes", routeId, media);
+  }, () => fetchRoute(projectId, routeId));
 }
 
 /**

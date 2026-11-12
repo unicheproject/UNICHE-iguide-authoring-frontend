@@ -4,7 +4,7 @@ import AppDialog from "@/components/AppDialog.vue";
 import { SLUG_PATTERN, slugify } from "@/lib/format";
 import { ApiError } from "@/platform/api";
 import type { ProjectLanguage } from "@/platform/languages";
-import { createPlace, PLACE_SETTING_LABELS, PLACE_SETTINGS, type Place, type PlaceSetting, type PlaceType } from "@/platform/places";
+import { createPlace, type Place, type PlaceSetting, type PlaceType } from "@/platform/places";
 import type { PlaceOption } from "./placeTree";
 import { useFocusOnErrors } from "@/lib/focus";
 
@@ -16,20 +16,21 @@ const props = defineProps<{
 const emit = defineEmits<{ close: []; created: [place: Place] }>();
 
 const title = ref("");
-// The mockup's three steps: where it is, whether it sits inside another place, and its title.
-const setting = ref<PlaceSetting | null>(null);
+// Two steps: whether it sits inside another place, and its title. The setting is not asked (DECISIONS.md D-057).
 const sub = ref<boolean | null>(null);
 const parentPlaceId = ref("");
-const step2 = computed(() => !!setting.value);
-const step3 = computed(() => step2.value && (sub.value === false || (sub.value === true && !!parentPlaceId.value)));
+const step2 = computed(() => sub.value === false || (sub.value === true && !!parentPlaceId.value));
 
 function chooseLevel(subPlace: boolean) {
   sub.value = subPlace;
   parentPlaceId.value = subPlace ? parentPlaceId.value || props.parentOptions[0]?.id || "" : "";
 }
 
-/** The type the setting suggests; the editor offers the others. */
-const type = computed<PlaceType>(() => (setting.value === "INDOOR" ? (sub.value ? "ROOM" : "BUILDING") : "AREA"));
+/** A sub-place takes over its parent's setting, a top-level place starts outdoor; the editor's type changes it. */
+const setting = computed<PlaceSetting>(() =>
+  sub.value ? (props.parentOptions.find((o) => o.id === parentPlaceId.value)?.setting ?? "OUTDOOR") : "OUTDOOR",
+);
+const type = computed<PlaceType>(() => (setting.value === "INDOOR" ? "ROOM" : "AREA"));
 const slug = ref("");
 const slugEdited = ref(false);
 const submitting = ref(false);
@@ -51,8 +52,8 @@ const titleLabel = computed(() => `Title · ${props.defaultLanguage.displayName}
 async function submit() {
   errors.value = {};
   formError.value = null;
-  if (!step3.value) {
-    formError.value = "Choose the setting and whether the place sits inside another one.";
+  if (!step2.value) {
+    formError.value = "Choose whether the place sits inside another one.";
     return;
   }
   if (!title.value.trim()) errors.value.title = "Enter a title in the default language.";
@@ -67,7 +68,7 @@ async function submit() {
       title: title.value.trim(),
       slug: slug.value,
       type: type.value,
-      setting: setting.value!,
+      setting: setting.value,
       parentPlaceId: sub.value ? parentPlaceId.value || null : null,
     });
     emit("created", place);
@@ -98,26 +99,8 @@ async function submit() {
     <form id="create-place-form" novalidate class="flex flex-col gap-4" @submit.prevent="submit">
       <p v-if="formError" role="alert" class="text-[13px] font-semibold text-destructive">{{ formError }}</p>
 
-      <div class="flex flex-col gap-2" role="group" aria-labelledby="place-setting-label">
-        <span id="place-setting-label" class="field-label">1 · Setting</span>
-        <div class="grid grid-cols-2 gap-2.5">
-          <button
-            v-for="s in PLACE_SETTINGS"
-            :key="s"
-            type="button"
-            :aria-pressed="setting === s"
-            class="flex flex-col gap-1 rounded-lg border-[1.5px] px-3.5 py-3 text-left"
-            :class="setting === s ? 'border-primary bg-[#f5f0fb]' : 'border-gray-200 bg-white hover:border-primary'"
-            @click="setting = s"
-          >
-            <span class="text-[13px] font-bold"><span v-if="setting === s" aria-hidden="true" class="text-primary">✓ </span>{{ PLACE_SETTING_LABELS[s].label }}</span>
-            <span class="text-xs text-muted-foreground">{{ PLACE_SETTING_LABELS[s].hint }}</span>
-          </button>
-        </div>
-      </div>
-
-      <div v-if="step2" class="flex flex-col gap-2" role="group" aria-labelledby="place-level-label">
-        <span id="place-level-label" class="field-label">2 · Level</span>
+      <div class="flex flex-col gap-2" role="group" aria-labelledby="place-level-label">
+        <span id="place-level-label" class="field-label">1 · Level</span>
         <div class="grid grid-cols-2 gap-2.5">
           <button
             v-for="level in ([[false, 'Top-level place', 'Stands on its own'], [true, 'Sub-place', 'Sits inside another place']] as const)"
@@ -149,17 +132,10 @@ async function submit() {
         <span v-if="errors.parentPlaceId" id="place-parent-error" class="text-xs font-semibold text-destructive">⚠ {{ errors.parentPlaceId }}</span>
       </div>
 
-      <template v-if="step3">
-        <p class="text-xs text-muted-foreground">
-          {{
-            setting === "INDOOR"
-              ? "Indoor places position their Points of Interest on a floor plan."
-              : "Outdoor places position their Points of Interest on a geographic map."
-          }}
-          Link one in the editor's Place setup.
-        </p>
+      <template v-if="step2">
+        <p class="text-xs text-muted-foreground">Link its map or floor plan afterwards, in the editor's Place setup.</p>
       <div class="flex flex-col gap-1.5">
-        <label for="place-title" class="field-label">3 · {{ titleLabel }}</label>
+        <label for="place-title" class="field-label">2 · {{ titleLabel }}</label>
         <input
           id="place-title"
           v-model="title"

@@ -1,4 +1,4 @@
-import { ApiError, apiRequest } from "./api";
+import { ApiError, apiRequest, completeSave } from "./api";
 import { syncMedia, toMediaBindings, type MediaBinding, type MediaBindingResponse } from "./assets";
 import type { ResourceStatus } from "./places";
 import type { ResourceReference } from "./references";
@@ -222,33 +222,33 @@ export async function updateGuide(projectId: string, guideId: string, input: Upd
       translations: input.translations,
     },
   });
-
-  const path = blocksPath(projectId, guideId);
-  const existing = new Set(saved.blocks.map((b) => b.id));
-  const kept = new Set(input.blocks.flatMap((b) => (b.id && existing.has(b.id) ? [b.id] : [])));
-  for (const stale of saved.blocks.filter((b) => !kept.has(b.id))) {
-    await apiRequest(`${path}/${encodeURIComponent(stale.id)}`, { method: "DELETE" });
-  }
-  const order: string[] = [];
-  for (const [i, block] of input.blocks.entries()) {
-    try {
-      if (block.id && kept.has(block.id)) {
-        await apiRequest(`${path}/${encodeURIComponent(block.id)}`, { method: "PUT", body: blockBody(block) });
-        order.push(block.id);
-      } else {
-        order.push((await apiRequest<BlockResponse>(path, { method: "POST", body: blockBody(block) })).id);
-      }
-    } catch (e) {
-      throw atBlock(e, i);
+  return completeSave(async () => {
+    const path = blocksPath(projectId, guideId);
+    const existing = new Set(saved.blocks.map((b) => b.id));
+    const kept = new Set(input.blocks.flatMap((b) => (b.id && existing.has(b.id) ? [b.id] : [])));
+    for (const stale of saved.blocks.filter((b) => !kept.has(b.id))) {
+      await apiRequest(`${path}/${encodeURIComponent(stale.id)}`, { method: "DELETE" });
     }
-  }
-  const after = await apiRequest<BlockResponse[]>(path);
-  const current = [...after].sort((a, b) => a.sortOrder - b.sortOrder).map((b) => b.id);
-  if (current.join() !== order.join()) {
-    await apiRequest(`${path}:order`, { method: "PUT", body: { ids: order } });
-  }
-  await syncMedia(projectId, "guides", guideId, input.media);
-  return fetchGuide(projectId, guideId);
+    const order: string[] = [];
+    for (const [i, block] of input.blocks.entries()) {
+      try {
+        if (block.id && kept.has(block.id)) {
+          await apiRequest(`${path}/${encodeURIComponent(block.id)}`, { method: "PUT", body: blockBody(block) });
+          order.push(block.id);
+        } else {
+          order.push((await apiRequest<BlockResponse>(path, { method: "POST", body: blockBody(block) })).id);
+        }
+      } catch (e) {
+        throw atBlock(e, i);
+      }
+    }
+    const after = await apiRequest<BlockResponse[]>(path);
+    const current = [...after].sort((a, b) => a.sortOrder - b.sortOrder).map((b) => b.id);
+    if (current.join() !== order.join()) {
+      await apiRequest(`${path}:order`, { method: "PUT", body: { ids: order } });
+    }
+    await syncMedia(projectId, "guides", guideId, input.media);
+  }, () => fetchGuide(projectId, guideId));
 }
 
 /**

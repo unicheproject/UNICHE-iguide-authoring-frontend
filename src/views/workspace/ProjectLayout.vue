@@ -74,11 +74,12 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="flex min-w-0 flex-1 items-stretch">
+  <!-- Fills the shell below the header: the menu column and the page's <main> each scroll on their own (D-062). -->
+  <div class="flex min-h-0 min-w-0 flex-1 flex-col items-stretch md:flex-row">
     <WorkspaceNav v-if="project" :project-id="projectId" />
 
-    <main v-if="loading" class="relative min-w-0 flex-1 overflow-y-auto px-7 pb-16 pt-6">
-      <div class="animate-skeleton" aria-busy="true" aria-label="Loading Project workspace">
+    <main v-if="loading" class="relative min-w-0 flex-1 overflow-y-auto px-4 pb-16 pt-6 md:px-7">
+      <div class="animate-skeleton" role="status" aria-busy="true" aria-label="Loading Project workspace">
         <div class="mb-[26px] flex flex-col gap-[11px]">
           <div class="h-2.5 w-[130px] rounded bg-[#e2e3e7]"></div>
           <div class="h-[25px] w-[min(55%,340px)] rounded-md bg-[#dcdde2]"></div>
@@ -93,7 +94,7 @@ onBeforeUnmount(() => {
       </div>
     </main>
 
-    <main v-else-if="error" class="relative min-w-0 flex-1 overflow-y-auto px-7 pb-16 pt-6">
+    <main v-else-if="error" class="relative min-w-0 flex-1 overflow-y-auto px-4 pb-16 pt-6 md:px-7">
       <div role="alert" class="max-w-[640px] rounded-lg border border-l-[3px] border-l-destructive bg-card px-[18px] py-4">
         <template v-if="error.status === 404">
           <strong class="block text-[13px] font-bold text-destructive">This Project is not available</strong>

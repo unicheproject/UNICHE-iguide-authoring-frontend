@@ -56,7 +56,7 @@ export const workspaceNav: WorkspaceNavEntry[] = [
     section(
       "navigation",
       "Navigation",
-      "Menus of the visitor app per context and surface. A surface-specific menu wins over one for all surfaces.",
+      "The main menu and the footer links of the visitor app, shared by every surface; items open content or group it.",
     ),
   ),
   item(section("translations", "Translations", "Completeness of every resource per language")),
@@ -125,6 +125,7 @@ const DEDICATED_ROUTES: Record<string, string> = {
   translations: "project-translations",
   overview: "overview",
   preview: "preview",
+  navigation: "navigation",
 };
 
 export function sectionLocation(projectId: string, slug: string) {

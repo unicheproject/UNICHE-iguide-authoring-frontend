@@ -56,6 +56,18 @@ None. Backend dependencies are tracked in PLAN.md and the backend's PLAN.md.
   (as Guides do), or should `13` say the attract loop skips Places?
 - Consequence: none for now; a featured Place shows no image in the attract loop.
 
+### Q-006 — The Place setting is not asked
+
+- Kind: spec-change-request
+- Source: owner request 2026-11-11; DECISIONS.md D-057. `12` §3 Place: "creation is a dialog that asks, in order,
+  `INDOOR` or `OUTDOOR`, top-level or sub-place with its parent, and the name" and the editor's "Place setup" "shows
+  the same three choices"; `03` §5: "`environment` is chosen when the Place is created".
+- Proposed text: `12` §3 Place: creation asks top-level or sub-place with its parent, and the name; `environment`
+  follows the type (`BUILDING`, `FLOOR`, `ROOM` are `INDOOR`, `OTHER` keeps its value, the others are `OUTDOOR`), a
+  sub-place starts with its parent's; "Place setup" shows the level and the map or floor plan link. `03` §5:
+  "`environment` is set from the Place's type".
+- Consequence until resolved: the CMS departs from `12` §3 as D-057 records.
+
 ### Open decisions of `09` that shape CMS steps
 
 | `09` | Shapes |

@@ -9,9 +9,10 @@ export const buttonVariants = cva(
       variant: {
         default:
           "bg-primary text-primary-foreground shadow hover:bg-primary/90",
-        // Primary call to action of the mockup: the UNICHE gradient.
+        // Primary call to action of the mockup: the UNICHE gradient, its stops deepened so white text keeps at
+        // least 5.9:1 on every part of it (`14` §2 and §4, DECISIONS.md D-053).
         brand:
-          "bg-[linear-gradient(135deg,#f832a4_0%,#b05fd6_50%,#29f8fd_100%)] text-white shadow-[0_3px_16px_rgba(176,95,214,0.3)] [text-shadow:0_1px_3px_rgba(76,29,139,0.45)] hover:brightness-105",
+          "bg-[linear-gradient(135deg,#b3156f_0%,#7b3aa8_50%,#0b6f7c_100%)] text-white shadow-[0_3px_16px_rgba(123,58,168,0.3)] hover:brightness-105",
         destructive:
           "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
         outline:
