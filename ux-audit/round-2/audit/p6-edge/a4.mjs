@@ -1,0 +1,31 @@
+import { open, go, P, ids, shot, settle, alerts, focused, main, problem, AP } from "./lib.mjs";
+import { call, closeAll } from "../../../tools/lib.mjs";
+const I = ids(); const PP = `/projects/${P}`;
+const { browser, page } = await open("curator", { viewport: "1440" });
+await go(page, `${PP}/pois/${I.poiB}`); await settle(page, 600);
+await page.evaluate(() => localStorage.clear());
+await go(page, `${PP}/pois/${I.poiB}`); await settle(page, 600);
+await shot(page, "poi-editor__active-baseline");
+await page.locator("#f-summary").fill("MINE apply summary");
+await page.waitForTimeout(500);
+console.log("BUTTONS", await page.evaluate(() => [...document.querySelectorAll("button")].filter(e=>e.offsetParent).map(e=>(e.getAttribute("aria-label")||e.textContent).trim().replace(/\s+/g," ").slice(0,50)).filter(t=>/save|apply|discard|activ|archive/i.test(t))));
+await shot(page, "poi-editor__active-edited");
+await page.getByRole("button", { name: /Save draft/ }).first().click(); await page.waitForTimeout(2500);
+console.log("after save draft", JSON.stringify(await alerts(page)).slice(0,300));
+// colleague applies a change
+const wc = await call("curator", "GET", `${PP}/pois/${I.poiB}/working-copy`);
+console.log("wc keys", Object.keys(wc), "base", wc.baseVersion, "v", wc.version);
+const payload = { ...wc.payload, translations: { en: { ...wc.payload.translations.en, summary: "THEIRS applied by colleague", title: "UX-R2-p6 POI Beta (theirs)" } } };
+await call("curator", "PUT", `${PP}/pois/${I.poiB}/working-copy`, { baseVersion: wc.baseVersion, workingCopyVersion: wc.version, payload });
+await call("curator", "POST", `${PP}/pois/${I.poiB}/working-copy:apply`);
+console.log("colleague applied");
+await page.getByRole("button", { name: /Apply changes/ }).first().click(); await page.waitForTimeout(1500);
+console.log("DIALOG1", await page.locator("[role=dialog],[role=alertdialog]").first().innerText().catch(() => "(none)"));
+await shot(page, "poi-editor__apply-confirm");
+const confirm = page.locator("[role=dialog],[role=alertdialog]").getByRole("button", { name: /apply/i }).last();
+if (await confirm.count()) { await confirm.click(); await page.waitForTimeout(2500); }
+console.log("DIALOG2", await page.locator("[role=dialog],[role=alertdialog]").first().innerText().catch(() => "(none)"));
+console.log("ALERTS", JSON.stringify(await alerts(page)).slice(0,600));
+console.log("FOCUS", await focused(page));
+await shot(page, "poi-editor__apply-409-real");
+await closeAll(); await browser.close();

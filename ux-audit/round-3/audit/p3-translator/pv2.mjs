@@ -1,0 +1,10 @@
+import { open, go, base, shot } from "./lib.mjs";
+const { browser, page } = await open("admin", { viewport: "1440" });
+await go(page, base+"/preview"); await page.waitForSelector("h1"); await page.waitForTimeout(3000);
+await page.getByRole("tab",{name:"Italiano"}).click().catch(()=>page.getByText("Italiano").first().click());
+await page.waitForTimeout(2500);
+await shot(page,"preview__italiano__1440");
+console.log(await page.evaluate(()=>{const els=[...document.querySelectorAll("*")].filter(e=>e.children.length===0&&getComputedStyle(e).textTransform==="uppercase"&&e.innerText&&e.innerText.trim()); return els.slice(0,10).map(e=>`${e.tagName} lang=${e.closest("[lang]")?.getAttribute("lang")} text="${e.innerText.trim().slice(0,40)}"`).join("\n")}));
+console.log(await page.evaluate(()=>document.body.innerText.match(/.{0,60}missing.{0,60}/gi)?.slice(0,4).join(" // ")));
+console.log(await page.evaluate(()=>[...document.querySelectorAll("a,button")].filter(a=>/missing|translat/i.test(a.innerText)).map(a=>a.innerText.trim().slice(0,60)+" -> "+(a.getAttribute("href")||"btn")).join("\n")));
+await browser.close();

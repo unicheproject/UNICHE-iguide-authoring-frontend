@@ -1,0 +1,14 @@
+import * as L from "./lib.mjs";
+const { page, browser } = await L.open("curator", { viewport: "1440" });
+const k = page.keyboard;
+await L.nav(page, L.P("/preview"), 2500);
+await L.watchLive(page);
+L.log("t28", "title", await page.title(), "focus", await L.focus(page));
+await L.shot(page, "preview__initial__1440");
+L.log("t28", "axe", await L.axe(page, "preview-page"));
+L.log("t28", "landmarks", await page.evaluate(() => [...document.querySelectorAll("header,nav,main,aside,footer,[role=region],[role=banner],section[aria-label],iframe")].map((e) => e.tagName + ":" + (e.getAttribute("aria-label") ?? e.getAttribute("title") ?? ""))));
+L.log("t28", "headings", await page.evaluate(() => [...document.querySelectorAll("h1,h2,h3")].map((h) => h.tagName + " " + h.textContent.trim().slice(0, 40) + (h.closest("[inert]") ? " [inert]" : ""))));
+L.log("t28", "aria", (await L.snap(page, "preview-page", "main")).split("\n").slice(0, 80).join("\n"));
+await page.evaluate(() => document.querySelector("h1")?.focus());
+const t = await L.tabs(page, 22); L.log("t28", "tab seq", t.map((x, i) => i + 1 + ": " + x));
+await browser.close();

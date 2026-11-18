@@ -1,0 +1,36 @@
+import { open, go, P, ids, shot, settle, alerts, focused, main, problem, AP } from "./lib.mjs";
+const I = ids(); const PP = `/projects/${P}`;
+const { browser, context, page } = await open("curator", { viewport: "1440" });
+await go(page, `${PP}/pois/${I.poiA}`); await settle(page, 600);
+await page.evaluate(() => localStorage.clear());
+await go(page, `${PP}/pois/${I.poiA}`); await settle(page, 600);
+// slow save
+let puts = 0;
+await page.route(AP, async (r) => { if (r.request().method() === "PUT") { puts++; await new Promise(s => setTimeout(s, 8000)); } return r.continue(); });
+await page.locator("#f-summary").fill("slow save edit " + Date.now());
+const saveBtn = () => page.getByRole("button", { name: /^Save|^Saving/ }).first();
+const t0 = Date.now();
+await saveBtn().click();
+const snap = async (label) => console.log(label, Date.now() - t0, "ms | btn:", JSON.stringify((await saveBtn().innerText()).replace(/\n/g," ")), "disabled:", await saveBtn().isDisabled().catch(()=>"?"), "aria-disabled:", await saveBtn().getAttribute("aria-disabled"), "| alerts:", JSON.stringify(await alerts(page)).slice(0, 300));
+await page.waitForTimeout(150); await snap("t+0.15");
+await saveBtn().click({ force: true }).catch(() => {}); await page.keyboard.press("Control+s");
+await page.waitForTimeout(400); await snap("t+0.5s"); await shot(page, "poi-editor__saving-slow-0p5s");
+await page.waitForTimeout(3000); await snap("t+3.5s"); await shot(page, "poi-editor__saving-slow-3p5s");
+await page.waitForTimeout(6000); await snap("t+9.5s");
+console.log("PUT count (should be 1)", puts);
+await page.unroute(AP);
+// offline mid-save
+await page.locator("#f-summary").fill("offline edit");
+await context.setOffline(true);
+await page.getByRole("button", { name: /^Save/ }).first().click(); await page.waitForTimeout(2500);
+console.log("\nOFFLINE ALERTS", JSON.stringify(await alerts(page)).slice(0, 700));
+console.log("FOCUS", await focused(page));
+console.log("controls disabled:", await page.evaluate(() => [...document.querySelectorAll("button")].filter(b => b.offsetParent && (b.disabled || b.getAttribute("aria-disabled") === "true")).map(b => (b.textContent||"").trim().replace(/\s+/g," ").slice(0,30) + (b.title? " title="+b.title:"") + (b.getAttribute("aria-describedby")? " desc="+document.getElementById(b.getAttribute("aria-describedby"))?.textContent?.trim().slice(0,60):""))));
+await shot(page, "poi-editor__offline-after-save");
+console.log("BANNER", await page.evaluate(() => [...document.querySelectorAll("[role=alert],[role=status]")].map(e=>e.textContent.trim().slice(0,200))));
+await context.setOffline(false); await page.waitForTimeout(3500);
+console.log("\nONLINE ALERTS", JSON.stringify(await alerts(page)).slice(0, 500));
+await shot(page, "poi-editor__back-online");
+await page.getByRole("button", { name: /^Save/ }).first().click(); await page.waitForTimeout(2500);
+console.log("retry save ALERTS", JSON.stringify(await alerts(page)).slice(0, 400));
+await browser.close();

@@ -1,0 +1,25 @@
+import { open, go } from "../../../tools/session.mjs";
+const P = "6958c18f-60d2-4140-a524-5a43f8a2f6b5";
+const A = "07927651-be7a-44e9-85eb-843d8ed219f7";
+const vp = process.argv[2] ?? "1280";
+const { browser, page } = await open("admin", { viewport: vp });
+const log = (...a) => console.log(...a);
+await go(page, `/projects/${P}/pois/${A}`);
+await page.waitForSelector("[data-sticky-bar]", { timeout: 30000 }); await page.waitForTimeout(2000);
+const summary = page.getByLabel(/^summary$/i).first();
+const ypos = () => page.evaluate(() => Math.round(document.querySelector("[data-path='translations.en.summary']").getBoundingClientRect().top));
+const y0 = await ypos();
+await summary.fill("Edited summary " + Date.now());
+await page.waitForTimeout(400);
+log("dirty buttons:", await page.evaluate(() => [...document.querySelectorAll(".editor-header button, [data-working-copy-banner] button")].map((b) => b.textContent.trim().replace(/\s+/g, " ") + "|" + b.getAttribute("aria-disabled")).filter((t) => t.length > 3)));
+await page.screenshot({ path: `after/active-dirty-${vp}.png` });
+// 503
+await page.route("**/working-copy*", (r) => r.request().method() === "PUT" ? r.fulfill({ status: 503, contentType: "application/problem+json", body: JSON.stringify({ status: 503, code: "SERVICE_UNAVAILABLE", requestId: "req-test-503", detail: "NullPointerException at X" }) }) : r.continue());
+await page.route("**/working-copies/**", (r) => r.request().method() === "PUT" ? r.fulfill({ status: 503, contentType: "application/problem+json", body: JSON.stringify({ status: 503, code: "SERVICE_UNAVAILABLE", requestId: "req-test-503", detail: "NullPointerException at X" }) }) : r.continue());
+await page.getByRole("button", { name: /^Save draft$/ }).first().click();
+await page.waitForTimeout(1200);
+const y1 = await ypos();
+log("503: shift", y1 - y0, "focus on summary:", await page.evaluate(() => document.activeElement?.hasAttribute("data-error-summary")), "text has detail leak:", await page.evaluate(() => /NullPointer/.test(document.body.innerText)), "reqid:", await page.evaluate(() => /req-test-503/.test(document.body.innerText)));
+await page.screenshot({ path: `after/save-503-${vp}.png` });
+await page.unroute("**/working-copy*"); await page.unroute("**/working-copies/**");
+await browser.close();

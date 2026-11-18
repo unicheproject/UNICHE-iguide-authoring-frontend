@@ -1,0 +1,22 @@
+after typing [{"t":3068,"role":"status","text":"1 of 97 points of interest","why":"add"},{"t":4788,"role":"status","text":"UX-R3-p5 POI A loaded","why":"add"},{"t":5672,"role":"status","text":"Unsaved changes","why":"add"}]
+state line [":Unsaved changes",":UX-R3-p5 POI A loaded"]
+ctrl+s textarea "UX-R3-p5 POI A – Parthenon test" 281,339,686,40  solid 2px rgb(76, 29, 139) off 2px [{"t":6937,"role":"status","text":"Saving…","why":"add"},{"t":7285,"role":"status","text":"Saved 11:12","why":"add"}]
+state line after ["Saved 11:12","UX-R3-p5 POI A loaded"]
+[langtab] ArrowRight -> button[tab] "ΕλληνικάMissing" 390,211,97,52  solid 2px rgb(76, 29, 139) off 2px | live=[]
+   tabpanel/selected: false/-1 true/0 false/-1
+[langtab] ArrowRight -> button[tab] "ItalianoMissing" 487,211,97,52  solid 2px rgb(76, 29, 139) off 2px | live=[]
+   tabpanel/selected: false/-1 false/-1 true/0
+[langtab] ArrowRight -> button[tab] "Englishdefault1 of 5" 256,211,135,52  solid 2px rgb(76, 29, 139) off 2px | live=[]
+   tabpanel/selected: true/0 false/-1 false/-1
+[langtab] ArrowLeft -> button[tab] "ItalianoMissing" 487,211,97,52  solid 2px rgb(76, 29, 139) off 2px | live=[]
+   tabpanel/selected: false/-1 false/-1 true/0
+[langtab] End -> button[tab] "ItalianoMissing" 487,211,97,52  solid 2px rgb(76, 29, 139) off 2px | live=[]
+   tabpanel/selected: false/-1 false/-1 true/0
+[langtab] Home -> button[tab] "Englishdefault1 of 5" 256,211,135,52  solid 2px rgb(76, 29, 139) off 2px | live=[]
+   tabpanel/selected: true/0 false/-1 false/-1
+tab Greek focus chk {"w":2,"off":2,"style":"solid","ring":"rgb(76, 29, 139)","ringOnWrapper":false,"vsOutside":10.37,"bg":"244,245,247","clipped":"DIV.flex min-w-0 flex-1 overflow-x-auto T4,B4","obscured":null,"offscreen":false,"rect":[390,211,97,52]}
+tab key from tab -> ["button \"Copy source for Title\" 281,399,138,32  solid 2px rgb(76, 29, 139) off 2px"]
+copy buttons ["Copy source for Title","Copy source for SummaryThere is no source text to copy","Copy source for DescriptionThere is no source text to copy"]
+[copy source] Enter -> textarea "UX-R3-p5 POI A – Parthenon test" 632,353,335,40  solid 2px rgb(76, 29, 139) off 2px | live=["Unsaved changes"]
+[next missing] Enter -> textarea "" 632,428,335,60  solid 2px rgb(76, 29, 139) off 2px | live=["Ελληνικά: moving to the first missing text."]
+after next missing {"w":2,"off":2,"style":"solid","ring":"rgb(76, 29, 139)","ringOnWrapper":false,"vsOutside":11.32,"bg":"255,255,255","clipped":null,"obscured":null,"offscreen":false,"rect":[632,428,335,60]}

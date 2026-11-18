@@ -1,0 +1,12 @@
+import { open, go, P, shot, settle } from "./h.mjs";
+const vp = process.argv[2] ?? "1440";
+const { browser, page } = await open("admin", { viewport: vp });
+await go(page, `/projects/${P}/media/c6cccb66-be81-4a35-93db-c06072a5bafc`); await page.waitForTimeout(2500);
+console.log("panel", await page.evaluate(()=>document.querySelector("main").innerText.replace(/\n+/g," | ").match(/Before you activate.{0,500}/)?.[0]));
+await page.getByRole("button", { name: /^Activate/ }).first().click(); await page.waitForTimeout(800);
+await page.getByRole("dialog").getByRole("button", { name: /^Activate$/ }).click(); await page.waitForTimeout(2500);
+console.log("after", await page.evaluate(()=>({dlg: document.querySelector("[role=dialog],[role=alertdialog]")?.innerText.replace(/\n+/g," | "), toast:[...document.querySelectorAll("[role=status],[role=alert]")].map(e=>e.textContent.trim().slice(0,200)), focus: document.activeElement.tagName+" "+document.activeElement.textContent.trim().slice(0,30)})));
+await shot(page, `editor__activate-result__${vp}`);
+await go(page, `/projects/${P}/media?q=${encodeURIComponent("UX-R3-s13 retry2")}`); await settle(page);
+console.log("row", await page.evaluate(()=>document.querySelector("ul[aria-label='Media files'] > li")?.innerText.replace(/\n+/g," | ")));
+await browser.close();

@@ -1,0 +1,15 @@
+{
+ "tag": "after",
+ "vp": "1440",
+ "tabsFromHeaderPrimaryToEndOfPlacement": 19,
+ "inPlacement": 7,
+ "seq": [
+  "SELECT#f-place.ui-field appearance-none pr-9",
+  "SELECT#f-category.ui-field appearance-none pr-9",
+  "INPUT#f-lat.ui-field font-mono text-compac",
+  "INPUT#f-lng.ui-field font-mono text-compac",
+  "A.sr-only focus:not-sr-only focu",
+  "DIV.picker relative z-0 h-[260px] ",
+  "BUTTON#v-18.flex min-h-control items-cente"
+ ]
+}

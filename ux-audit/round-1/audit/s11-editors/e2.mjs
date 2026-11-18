@@ -1,0 +1,10 @@
+import { start, goP, log, dump, state, focused } from "./lib.mjs";
+const s = await start("1440"); const { page } = s;
+await page.goto("http://localhost:5173" + state().eventUrl); await page.waitForTimeout(3000);
+await page.getByRole("button", { name: /add occurrence/i }).click(); await page.waitForTimeout(800);
+await s.shot("event-occurrence-added");
+log("focus", await focused(page));
+const sec = await page.locator("section, div").filter({ hasText: /^OCCURRENCES/ }).first().innerText().catch(()=>"");
+log(await page.evaluate(() => { const h=[...document.querySelectorAll("*")].find(e=>e.children.length===0&&/^Occurrences \(/.test(e.textContent)); const c=h?.closest("section,div.rounded-lg,div"); return c?.parentElement?.innerText.slice(0,900); }));
+log("inputs:", await page.evaluate(()=>[...document.querySelectorAll("input,select")].filter(e=>e.type==="datetime-local"||e.type==="date"||e.type==="time"||/occ|start|end|status|tz/i.test(e.id+e.name+(e.getAttribute("aria-label")||""))).map(e=>`${e.tagName}[${e.type}] id=${e.id} label=${e.getAttribute("aria-label")||document.querySelector(`label[for="${e.id}"]`)?.textContent}`)));
+await s.browser.close();

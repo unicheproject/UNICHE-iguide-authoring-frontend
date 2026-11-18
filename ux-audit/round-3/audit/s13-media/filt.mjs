@@ -1,0 +1,11 @@
+import { open, go, P, shot, settle } from "./h.mjs";
+const vp = process.argv[2] ?? "1440";
+const { browser, page } = await open("admin", { viewport: vp });
+await go(page, `/projects/${P}/media`); await settle(page);
+const out = {};
+await page.getByRole("button", { name: /Filters/ }).click(); await page.waitForTimeout(500);
+await shot(page, `lib__filters-open__${vp}`);
+out.pop = await page.evaluate(() => { const p = document.querySelector("[role=dialog],[data-radix-popper-content-wrapper]"); const b = p?.getBoundingClientRect(); return { box: b && [Math.round(b.x), Math.round(b.y), Math.round(b.width), Math.round(b.height)], text: p?.innerText.replace(/\n+/g, " | "), ctrls: [...(p?.querySelectorAll("button,input,select,[role=radio],[role=checkbox],[role=combobox]") ?? [])].map((e) => { const r = e.getBoundingClientRect(); return `${e.tagName}:${(e.getAttribute("aria-label") || e.textContent || e.value || "").trim().slice(0, 28)}@${Math.round(r.x)},${Math.round(r.y)} ${Math.round(r.width)}x${Math.round(r.height)}`; }) }; });
+out.activeEl = await page.evaluate(() => `${document.activeElement.tagName} ${document.activeElement.textContent.trim().slice(0,30)}`);
+console.log(JSON.stringify(out, null, 1));
+await browser.close();

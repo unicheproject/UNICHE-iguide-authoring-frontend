@@ -1,46 +1,68 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, watch } from "vue";
-import ReorderControls from "@/components/ReorderControls.vue";
-import TriggerChips from "@/components/TriggerChips.vue";
-import { groupTriggersByTarget, listProjectTriggers, type Trigger } from "@/platform/triggers";
-import { saveOrder } from "@/platform/ordering";
-import { dropLineClass, useReorder } from "@/workspace/useReorder";
+/**
+ * Points of Interest list (plan 2.2, D-076): the shared list scaffold with this kind's columns (title with slug, Place,
+ * exhibit code and trigger chips; Category; status; translations), Category and Featured filters in the toolbar, manual
+ * order with "Move to position...", and activation through the shared confirm. Filters, sort and search live in the URL.
+ */
+import { Star } from "lucide-vue-next";
+import { computed, onBeforeUnmount, ref, useId, watch } from "vue";
 import { useRouter } from "vue-router";
-import StatusChangeDialog from "@/components/StatusChangeDialog.vue";
+import ListEmpty from "@/components/list/ListEmpty.vue";
+import ListFooter from "@/components/list/ListFooter.vue";
+import ListTable, { type ListColumn } from "@/components/list/ListTable.vue";
+import FilterField from "@/components/list/FilterField.vue";
+import ListRowTitle from "@/components/list/ListRowTitle.vue";
+import { Select } from "@/components/ui/select";
+import ListSourceNotice from "@/components/list/ListSourceNotice.vue";
+import ListToolbar from "@/components/list/ListToolbar.vue";
+import RowMenu from "@/components/list/RowMenu.vue";
+import ListLoadError from "@/components/list/ListLoadError.vue";
+import MatchHint from "@/components/list/MatchHint.vue";
+import { matchesStatus, segmentTotal, statusCounts, useListQuery, useResultAnnouncer, useScrollRestore } from "@/components/list/useListQuery";
+import { useCreateParam } from "@/components/list/useCreateParam";
+import PageFrame from "@/components/PageFrame.vue";
+import PageHead from "@/components/PageHead.vue";
 import StatusChip from "@/components/StatusChip.vue";
 import TranslationDots from "@/components/TranslationDots.vue";
-import CategoryFilterSelect from "@/components/CategoryFilterSelect.vue";
-import PageHead from "@/components/PageHead.vue";
+import TriggerChips from "@/components/TriggerChips.vue";
+import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { formatDate } from "@/lib/format";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Chip } from "@/components/ui/chip";
+import { focusHeading } from "@/lib/focus";
+import { formatDateTime, NBSP } from "@/lib/format";
 import { ApiError } from "@/platform/api";
-import { listPlaces, placeTitle, type Place, type ResourceStatus } from "@/platform/places";
+import { categoryLabel } from "@/platform/categories";
+import { listPlaces, placeTitle, type Place } from "@/platform/places";
 import { changePoiStatus, fetchPoiReferences, listPois, poiCompleteness, poiTitle, type Poi } from "@/platform/pois";
-import type { ResourceReference } from "@/platform/references";
+import { saveOrder } from "@/platform/ordering";
+import { groupTriggersByTarget, listProjectTriggers, triggerLabel, type Trigger } from "@/platform/triggers";
 import { showToast } from "@/stores/toast";
-import { handOffActivationErrors, isMissingFieldsError } from "@/workspace/activationHandoff";
 import { useCurrentProject } from "@/workspace/currentProject";
-import { referenceLink } from "@/workspace/referenceLinks";
+import type { ActiveFilter } from "@/workspace/listFilters";
 import { findSection } from "@/workspace/sections";
 import { useCategoryFilter } from "@/workspace/useCategoryFilter";
-import { STATUS_FILTER_OPTIONS, categoryFilterChip, choiceFilter, useListFilters } from "@/workspace/listFilters";
-import ListFilterMenu from "@/components/ListFilterMenu.vue";
-import FilterChoiceGroup from "@/components/FilterChoiceGroup.vue";
-import SearchLanguageSelect from "@/components/SearchLanguageSelect.vue";
-import FeaturedFilterChip from "@/components/FeaturedFilterChip.vue";
 import { useProjectLanguages } from "@/workspace/useProjectLanguages";
+import { useReorder } from "@/workspace/useReorder";
 import { parentOptions } from "../places/placeTree";
 import CreatePoiDialog from "./CreatePoiDialog.vue";
+import LifecycleDialogs from "../LifecycleDialogs.vue";
+import { matchedInOtherLanguage, searchTitles, sortByQuery, translationScore } from "../listRows";
+import { fold } from "@/lib/utils";
+import { useListLifecycle } from "../useListLifecycle";
 
 const section = findSection("pois")!;
 const project = useCurrentProject();
 const router = useRouter();
 const projectId = computed(() => project.value.id);
-const { languages, defaultLanguage, error: languagesError, loading: languagesLoading } = useProjectLanguages(projectId);
+const { languages, defaultLanguage, error: languagesError, loading: languagesLoading, reload: reloadLanguages } = useProjectLanguages(projectId);
 
+const query = useListQuery();
 const pois = ref<Poi[]>([]);
 const places = ref<Place[]>([]);
-/** Non-archived triggers by POI; null when they could not be read, so the list shows no trigger line at all. */
+/** The Places could not be read (a 403 included): rows still list, without Place names or the Place choice in "New". */
+const placesFailed = ref(false);
+/** Non-archived triggers by POI; null when they could not be read (each row then says "Triggers not loaded"). */
 const triggersByPoi = ref<Map<string, Trigger[]> | null>(null);
 const loading = ref(true);
 const loadError = ref<ApiError | null>(null);
@@ -53,11 +75,38 @@ async function load() {
   loadError.value = null;
   try {
     const signal = controller.signal;
-    // The chips are a hint: a failure to read them must not hide the list (and must not go unhandled when the
-    // list itself fails first).
-    const triggers = listProjectTriggers(projectId.value, signal).catch(() => null);
-    [pois.value, places.value] = await Promise.all([listPois(projectId.value, signal), listPlaces(projectId.value, signal)]);
-    triggersByPoi.value = groupTriggersByTarget(await triggers, "POI");
+    // The chips are a hint: a failure to read them must not hide the list (it is reported as a notice).
+    const triggers = listProjectTriggers(projectId.value, signal).then(
+      (found) => {
+        query.reportError("triggers", null);
+        return found;
+      },
+      (e: unknown) => {
+        if (e instanceof DOMException && e.name === "AbortError") throw e;
+        query.reportError("triggers", e);
+        return null;
+      },
+    );
+    // The Places only name a row's location: a failed read (a 403 included) must not fail the list (C2-46).
+    const placeRead = listPlaces(projectId.value, signal).then(
+      (found) => {
+        query.reportError("places", null);
+        return { found, failed: false };
+      },
+      (e: unknown) => {
+        if (e instanceof DOMException && e.name === "AbortError") throw e;
+        if (!(e instanceof ApiError)) throw e;
+        query.reportError("places", e);
+        return { found: [] as Place[], failed: true };
+      },
+    );
+    // The rows are set only once the triggers read has settled, so the chips do not grow rows that are already
+    // on screen (C3-91: the skeleton stays until then).
+    const [found, placeResult, triggerRows] = await Promise.all([listPois(projectId.value, signal), placeRead, triggers]);
+    pois.value = found;
+    places.value = placeResult.found;
+    placesFailed.value = placeResult.failed;
+    triggersByPoi.value = triggerRows ? groupTriggersByTarget(triggerRows, "POI") : null;
   } catch (e) {
     if (e instanceof DOMException && e.name === "AbortError") return;
     if (!(e instanceof ApiError)) throw e;
@@ -67,359 +116,269 @@ async function load() {
   }
 }
 watch(projectId, load, { immediate: true });
-
 onBeforeUnmount(() => controller?.abort());
 
-type StatusFilter = "ALL" | ResourceStatus | "PENDING";
-const statusFilter = ref<StatusFilter>("ALL");
+const categoryId = useId();
 const categoryFilter = useCategoryFilter(projectId, "POI", defaultLanguage);
-const categorySelected = categoryFilter.selected;
-const query = ref("");
-const filters = useListFilters();
-const { featuredOnly, searchLanguage } = filters;
-/** The filters in force, shown as chips beside the Filters button. */
-const activeFilters = computed(() => [
-  ...choiceFilter("status", "Status", statusFilter, STATUS_FILTER_OPTIONS, "ALL"),
-  ...categoryFilterChip(categorySelected, categoryFilter.options.value),
-  ...filters.active(languages.value),
-]);
-
-function normalize(text: string): string {
-  return text.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
-}
-
-const placeNames = computed(() => new Map(places.value.map((p) => [p.id, placeTitle(p, null, defaultLanguage.value)])));
-
-const rows = computed(() => {
-  const q = normalize(query.value.trim());
-  return [...pois.value]
-    .sort((a, b) => a.sortOrder - b.sortOrder)
-    .filter((poi) => {
-      if (statusFilter.value === "PENDING" ? !poi.hasWorkingCopy : statusFilter.value !== "ALL" && poi.status !== statusFilter.value) return false;
-      if (!categoryFilter.matches(poi.categoryId)) return false;
-      if (featuredOnly.value && !poi.featured) return false;
-      if (!q) return true;
-      const haystack = [poi.slug, poi.code ?? "", ...filters.texts(poi.translations, "title")];
-      return haystack.some((text) => normalize(text).includes(q));
-    });
+// The Category choice lives in the URL (`cat`); the filter helper reads "ALL" for none.
+const categoryChoice = computed<string>({
+  get: () => query.cat.value || "ALL",
+  set: (value) => (query.cat.value = value === "ALL" ? "" : value),
 });
+watch(() => query.cat.value, (value) => (categoryFilter.selected.value = value || "ALL"), { immediate: true });
+watch(() => categoryFilter.error.value, (error) => query.reportError("categories", error), { immediate: true });
+const categoryChip = computed<ActiveFilter[]>(() => {
+  if (!query.cat.value) return [];
+  const label = query.cat.value === "NONE" ? "In no category" : (categoryFilter.options.value.find((o) => o.id === query.cat.value)?.label ?? "Unknown");
+  return [{ key: "category", label: `Category: ${label}`, clear: () => (query.cat.value = "") }];
+});
+
+const title = (poi: Poi) => poiTitle(poi, defaultLanguage.value);
+const placeNames = computed(() => new Map(places.value.map((p) => [p.id, placeTitle(p, null, defaultLanguage.value)])));
+const categoryName = (poi: Poi) => {
+  const category = categoryFilter.categories.value.find((c) => c.id === poi.categoryId);
+  return category ? categoryLabel(category, categoryFilter.categories.value, defaultLanguage.value) : null;
+};
+
+/** Rows that pass every filter except the status segment: the segment counts come from these (no false zeros). */
+const filtered = computed(() => {
+  const q = fold(query.q.value.trim());
+  return pois.value.filter((poi) => {
+    if (query.pending.value && !poi.hasWorkingCopy) return false;
+    if (query.missing.value && poiCompleteness(poi, query.missing.value) === "complete") return false;
+    if (!categoryFilter.matches(poi.categoryId)) return false;
+    if (query.featured.value && !poi.featured) return false;
+    if (!q) return true;
+    const triggerTexts = (triggersByPoi.value?.get(poi.id) ?? []).map(triggerLabel);
+    return [poi.slug, poi.code ?? "", ...searchTitles(poi.translations, query.lang.value), ...triggerTexts].some((t) => fold(t).includes(q));
+  });
+});
+const counts = computed(() => statusCounts(filtered.value));
+const rows = computed(() =>
+  sortByQuery(
+    filtered.value.filter((poi) => matchesStatus(poi, query.status.value)),
+    query,
+    (poi) => ({
+      title: title(poi),
+      status: poi.status,
+      updated: poi.updatedAt,
+      translations: translationScore(languages.value, (code) => poiCompleteness(poi, code)),
+      sortOrder: poi.sortOrder,
+    }),
+  ),
+);
+const total = computed(() => segmentTotal(pois.value, query.status.value));
+
+/** "Matches Ελληνικά: Ακρόπολη" under a row whose title only matches the search in another language (C2-48). */
+function matchOf(poi: Poi) {
+  return matchedInOtherLanguage(poi.translations, query.q.value, defaultLanguage.value ?? "", [title(poi), poi.slug, poi.code ?? ""]);
+}
+const languageName = (code: string) => languages.value.find((l) => l.languageCode === code)?.displayName ?? code;
 
 const defaultLanguageInfo = computed(() => languages.value.find((l) => l.isDefault) ?? null);
 const placeOptions = computed(() => parentOptions(places.value, defaultLanguage.value));
 const noLanguages = computed(() => !languagesLoading.value && !languagesError.value && !languages.value.length);
+/** The optional read to run again from the notice's "Try again". */
+function retrySource(source: "categories" | "places" | "triggers") {
+  // The notice goes when the read succeeds; focus has a successor (D-103).
+  focusHeading();
+  if (source === "categories") void categoryFilter.reload();
+  else void load();
+}
 
-const countText = computed(() => {
-  const total = pois.value.length;
-  const noun = total === 1 ? "point of interest" : "points of interest";
-  return rows.value.length === total ? `${total} ${noun}` : `${rows.value.length} of ${total} ${noun}`;
+const lifecycle = useListLifecycle<Poi>({
+  items: pois,
+  projectId,
+  noun: "point of interest",
+  referenceType: "POI",
+  title,
+  changeStatus: changePoiStatus,
+  fetchReferences: fetchPoiReferences,
+  editorRoute: (poi) => ({ name: "poi-editor", params: { projectId: projectId.value, poiId: poi.id } }),
+  reload: load,
+  completeness: poiCompleteness,
+  languages,
 });
 
-// Lifecycle actions -----------------------------------------------------------------------------------
+// Manual order (spec 12 section 3); off while a search or filter hides rows (D-017); a move steps over hidden ARCHIVED rows.
+const reorder = useReorder<Poi>({
+  items: pois,
+  title,
+  canReorder: query.canReorder,
+  visible: (poi) => matchesStatus(poi, query.status.value),
+  save: (ids) => saveOrder(projectId.value, "pois", ids),
+  reload: load,
+});
 
+const ready = computed(() => !loading.value);
+const { rowKeyFocus } = useScrollRestore(ready);
+
+// Same anatomy as Routes, Guides, Events and Categories (C2-43): Title, the kind's own column, Status 128, Updated 152, Translations 192.
+// The widths leave the Title at least 15 rem at 1280, so the list stays a table (plan section 9, item 7).
+const columns: ListColumn[] = [
+  { key: "title", label: "Title", tree: true, sortKey: "title" },
+  { key: "place", label: "Place and category", class: "w-36" },
+  { key: "status", label: "Status", sortKey: "status", class: "w-32" },
+  { key: "updated", label: "Updated", sortKey: "updated", class: "w-[9.5rem]" },
+  { key: "translations", label: "Translations", sortKey: "translations" },
+];
+const SORTS = [
+  { value: "manual", label: "Manual order" },
+  { value: "title", label: "Title" },
+  { value: "status", label: "Status" },
+  { value: "updated", label: "Updated" },
+  { value: "translations", label: "Translations" },
+];
+
+useResultAnnouncer(computed(() => rows.value.length), total, ready, "points of interest", { query, options: SORTS });
+
+const editorRoute = (poi: Poi) => ({ name: "poi-editor", params: { projectId: projectId.value, poiId: poi.id } });
 const creating = ref(false);
-const pendingId = ref<string | null>(null);
-const confirm = ref<{ poi: Poi; target: ResourceStatus; blockedBy?: ResourceReference[] } | null>(null);
+useCreateParam(creating, computed(() => !!defaultLanguageInfo.value));
+const createDisabledReason = computed(() => (defaultLanguageInfo.value ? undefined : languagesError.value ? "The languages could not be loaded" : "Add a language first"));
 
-function title(poi: Poi): string {
-  return poiTitle(poi, defaultLanguage.value);
+function onSelect(poi: Poi, key: string) {
+  if (key === "restore-order") query.restoreManualOrder();
+  else lifecycle.onSelect(poi, key);
 }
-
-function toggleLabel(poi: Poi): string {
-  return poi.status === "DRAFT" ? "Activate" : poi.status === "ACTIVE" ? "Deactivate" : "Restore";
-}
-
-function onToggle(poi: Poi) {
-  if (poi.status === "DRAFT") void transition(poi, "ACTIVE");
-  else if (poi.status === "ACTIVE") confirm.value = { poi, target: "DRAFT" };
-  else void transition(poi, "DRAFT");
-}
-
-async function transition(poi: Poi, target: ResourceStatus) {
-  pendingId.value = poi.id;
-  try {
-    const updated = await changePoiStatus(projectId.value, poi.id, target, poi.version);
-    pois.value = pois.value.map((p) => (p.id === updated.id ? updated : p));
-    confirm.value = null;
-    const messages: Record<ResourceStatus, [string, string]> = {
-      ACTIVE: ["Activated", `${title(updated)} is complete and visible to visitors.`],
-      DRAFT: poi.status === "ARCHIVED"
-        ? ["Restored", `${title(updated)} is a draft again.`]
-        : ["Deactivated", `${title(updated)} is a draft again and no longer visible to visitors.`],
-      ARCHIVED: ["Archived", `${title(updated)} is archived.`],
-    };
-    const [heading, body] = messages[target];
-    showToast(heading, body, target === "ACTIVE" ? "success" : "warning");
-  } catch (e) {
-    if (!(e instanceof ApiError)) throw e;
-    if (e.code === "RESOURCE_IN_USE" && confirm.value) {
-      confirm.value = { ...confirm.value, blockedBy: (e.body.references as ResourceReference[]) ?? [] };
-      return;
-    }
-    confirm.value = null;
-    if (isMissingFieldsError(e)) {
-      // The editor shows every missing field and focuses the first (`12` §3, DECISIONS.md D-036).
-      handOffActivationErrors(poi.id, e);
-      showToast("Cannot activate yet", `${title(poi)} opens at the first missing field.`, "error");
-      void router.push({ name: "poi-editor", params: { projectId: projectId.value, poiId: poi.id } });
-    } else if (e.code === "VERSION_CONFLICT") {
-      showToast("It changed meanwhile", "The list was reloaded; check it and try again.", "warning");
-      void load();
-    } else {
-      showToast("The change was not saved", e.platformUnavailable ? "The UNICHE platform is not reachable." : e.message, "error");
-    }
-  } finally {
-    pendingId.value = null;
-  }
-}
-
-// A trigger that opens the poi being changed links to its editor's "How visitors reach it" card.
-const toReference = (r: ResourceReference) =>
-  referenceLink(projectId.value, r, confirm.value && { resourceType: "POI", resourceId: confirm.value.poi.id });
 
 function onCreated(poi: Poi) {
   creating.value = false;
   showToast("Point of interest created", "It is a draft. Add its texts, then activate it.");
-  void router.push({ name: "poi-editor", params: { projectId: projectId.value, poiId: poi.id } });
+  void router.push(editorRoute(poi));
 }
-
-const confirmCopy = computed(() => {
-  const c = confirm.value;
-  if (!c) return null;
-  return c.target === "ARCHIVED"
-    ? {
-        heading: `Archive ${title(c.poi)}?`,
-        body: "An archived point of interest leaves the visitor app and the default lists. Restoring it makes it a draft again.",
-        action: "Archive",
-      }
-    : {
-        heading: `Deactivate ${title(c.poi)}?`,
-        body: "Visitors stop seeing it on their next refresh. It becomes a draft you can edit.",
-        action: "Deactivate",
-      };
-});
-// Manual order (spec 12 section 3); off while a search or filter hides rows (DECISIONS.md D-017).
-const reorder = useReorder<Poi>({
-  items: pois,
-  save: (ids) => saveOrder(projectId.value, "pois", ids),
-  title: (poi) => title(poi),
-  canReorder: computed(() => !query.value.trim() && !featuredOnly.value && statusFilter.value === "ALL" && categorySelected.value === "ALL"),
-  reload: load,
-});
 </script>
 
 <template>
-  <main class="relative min-w-0 flex-1 overflow-y-auto px-4 pb-16 pt-6 md:px-7">
-    <PageHead :title="section.title" :subtitle="section.subtitle">
+  <PageFrame>
+    <PageHead :title="section.title" :subtitle="section.subtitle" section="pois">
       <template #actions>
-        <Button variant="brand" :disabled="!defaultLanguageInfo" @click="creating = true">New point of interest</Button>
+        <Button :disabled-reason="createDisabledReason" @click="creating = true">New point of interest</Button>
       </template>
     </PageHead>
 
-    <div
-      v-if="noLanguages"
-      class="mb-5 flex flex-wrap items-center gap-3.5 rounded-lg border-l-[3px] border-l-[#855400] bg-[rgba(154,98,0,0.07)] px-[18px] py-3.5 text-[13px]"
-    >
-      <div class="min-w-[min(100%,260px)] flex-1">
-        <strong class="mb-0.5 block text-[13px] font-bold">Add a language first</strong>
-        <span class="text-gray-700">Every point of interest has its title and texts per language, starting with the default language.</span>
-      </div>
-      <RouterLink
-        :to="{ name: 'project-languages', params: { projectId } }"
-        class="whitespace-nowrap text-[11px] font-bold uppercase tracking-[0.06em] text-primary"
-      >
-        Set up languages
-      </RouterLink>
-    </div>
-
-    <div
-      v-if="loadError"
-      role="alert"
-      class="max-w-[640px] rounded-lg border border-l-[3px] border-l-destructive bg-card px-[18px] py-4"
-    >
-      <strong class="block text-[13px] font-bold text-destructive">
-        {{ loadError.platformUnavailable ? "The UNICHE platform is not reachable" : "The points of interest could not be loaded" }}
-      </strong>
-      <p class="mt-1 text-[13px] text-gray-700">{{ loadError.message }}</p>
-      <p v-if="loadError.requestId" class="mt-1 font-mono text-[11px] text-muted-foreground">Request id {{ loadError.requestId }}</p>
-      <Button variant="outline" size="sm" class="mt-3" @click="load">Try again</Button>
-    </div>
-
-    <div v-else class="overflow-hidden rounded-lg border bg-card shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-      <div class="flex flex-wrap items-center gap-2.5 border-b px-[18px] py-3.5">
-        <label for="pois-search" class="text-[11px] font-bold uppercase tracking-[0.06em] text-muted-foreground">Search</label>
-        <input
-          id="pois-search"
-          v-model="query"
-          type="search"
-          placeholder="Search titles and exhibit codes"
-          class="min-w-[min(100%,200px)] flex-1 rounded-lg border-[1.5px] px-3 py-[9px] text-[13px] focus:border-primary focus:outline-none"
-        />
-        <ListFilterMenu :active="activeFilters">
-          <FilterChoiceGroup v-model="statusFilter" legend="Status" :options="STATUS_FILTER_OPTIONS" />
-          <CategoryFilterSelect v-model="categorySelected" :options="categoryFilter.options.value" />
-          <FeaturedFilterChip v-model="featuredOnly" />
-          <SearchLanguageSelect v-model="searchLanguage" :languages="languages" />
-        </ListFilterMenu>
-        <span class="ml-auto text-[11px] text-muted-foreground">
-          {{ reorder.enabled || reorder.saving ? "Sorted by order · drag or use the arrows to reorder" : "Clear the search and filters to reorder" }}
-        </span>
-        <p class="sr-only" aria-live="polite">{{ reorder.announcement }}</p>
-      </div>
-
-      <div v-if="loading" class="animate-skeleton" role="status" aria-busy="true" aria-label="Loading points of interest">
-        <div v-for="n in 4" :key="n" class="flex items-center gap-3.5 border-b border-gray-100 px-[18px] py-4">
-          <div class="h-[13px] w-1/3 rounded bg-[#e2e3e7]"></div>
-          <div class="flex-1"></div>
-          <div class="h-2.5 w-[90px] rounded bg-[#eceef1]"></div>
-        </div>
-      </div>
-
-      <div v-else-if="rows.length" class="overflow-x-auto">
-        <table class="w-full min-w-[560px] table-fixed border-collapse">
-          <thead>
-            <tr>
-              <th class="th w-[56px] px-2"><span class="sr-only">Order</span></th>
-              <th class="th w-[41%] px-[18px]">Title</th>
-              <th class="th w-[15%] px-3">Status</th>
-              <th class="th w-[14%] px-3">Translations</th>
-              <th class="th w-[30%] px-[18px] text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="poi in rows" :key="poi.id"
-              class="hover:bg-muted"
-              :class="dropLineClass(reorder.dropLine(poi))"
-              @dragover="reorder.dragOver(poi, $event)"
-              @drop="reorder.drop(poi, $event)"
-            >
-              <td class="td px-2"><ReorderControls :reorder="reorder" :item="poi" :title="title(poi)" /></td>
-              <td class="td px-[18px]">
-                <div class="flex flex-wrap items-center gap-2">
-                  <RouterLink
-                    :to="{ name: 'poi-editor', params: { projectId, poiId: poi.id } }"
-                    class="text-left text-[13px] font-semibold no-underline hover:underline"
-                    :class="poi.status === 'ARCHIVED' ? 'text-muted-foreground' : 'text-foreground'"
-                  >
-                    {{ title(poi) }}
-                  </RouterLink>
-                  <span
-                    v-if="poi.code"
-                    class="rounded-full border bg-muted px-2 py-0.5 font-mono text-[9px] font-extrabold tracking-[0.04em] text-muted-foreground"
-                    :title="`Exhibit code ${poi.code}`"
-                  >
-                    {{ poi.code }}
-                  </span>
-                </div>
-                <div class="mt-[3px] break-words text-[11px] text-gray-500">
-                  <span class="font-mono">{{ poi.slug }}</span>
-                  <template v-if="poi.placeId"> · in {{ placeNames.get(poi.placeId) ?? "an unavailable place" }}</template>
-                  · {{ formatDate(poi.updatedAt) }}
-                </div>
-                <TriggerChips
-                  v-if="triggersByPoi"
-                  :triggers="triggersByPoi.get(poi.id) ?? []"
-                  empty-text="No trigger, only reachable by browsing"
-                />
-              </td>
-              <td class="td px-3">
-                <StatusChip :status="poi.status" />
-                <StatusChip
-                  v-if="poi.hasWorkingCopy"
-                  status="PENDING"
-                  label="Pending changes"
-                  class="ml-1"
-                  title="Has pending changes that visitors do not see yet"
-                />
-              </td>
-              <td class="td px-3">
-                <TranslationDots :languages="languages" :completeness="(code) => poiCompleteness(poi, code)" />
-              </td>
-              <td class="td px-[18px]">
-                <div class="flex flex-wrap items-center justify-end gap-2.5">
-                  <button
-                    type="button"
-                    class="whitespace-nowrap rounded-full border bg-muted px-[13px] py-1.5 text-[10px] font-bold uppercase tracking-[0.06em] text-gray-700 disabled:opacity-50"
-                    :disabled="pendingId === poi.id"
-                    @click="onToggle(poi)"
-                  >
-                    {{ toggleLabel(poi) }}
-                  </button>
-                  <button
-                    v-if="poi.status !== 'ARCHIVED'"
-                    type="button"
-                    class="whitespace-nowrap text-[10px] font-bold uppercase tracking-[0.06em] text-destructive disabled:opacity-50"
-                    :disabled="pendingId === poi.id"
-                    @click="confirm = { poi, target: 'ARCHIVED' }"
-                  >
-                    Archive
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div v-else class="px-6 py-12 text-center">
-        <p class="mx-auto mb-[18px] max-w-[420px] text-[13px] text-muted-foreground">
-          {{
-            pois.length
-              ? "No point of interest matches the search or the filters."
-              : "Points of interest are the objects and spots visitors open directly: an exhibit, a statue, a viewpoint. Give each an exhibit code so visitors can type it in."
-          }}
-        </p>
-        <Button v-if="!pois.length" variant="brand" :disabled="!defaultLanguageInfo" @click="creating = true">
-          New point of interest
+    <Alert v-if="noLanguages" tone="warning" title="Add a language first" class="mb-5">
+      Every point of interest has its title and texts per language, starting with the default language.
+      <template #actions>
+        <Button as-child variant="secondary" size="sm">
+          <RouterLink :to="{ name: 'project-languages', params: { projectId } }">Set up languages</RouterLink>
         </Button>
-      </div>
+      </template>
+    </Alert>
 
-      <div class="border-t border-gray-100 px-[18px] py-3 text-[11px] text-muted-foreground">{{ countText }}</div>
+    <ListLoadError v-if="languagesError" :error="languagesError" what="the project languages" class="!mx-0 mb-4" @retry="reloadLanguages" />
+    <ListLoadError v-if="loadError" :error="loadError" what="the points of interest" @retry="load" />
+
+    <template v-else>
+    <ListSourceNotice :errors="query.errors" @retry="retrySource" />
+    <div class="rounded-lg border border-border bg-card shadow-1">
+      <template v-if="loading || pois.length">
+        <ListToolbar
+          :query="query"
+          :counts="counts"
+          :loading="loading"
+          :languages="languages"
+          search-placeholder="Search title, slug, code or trigger"
+          :sort-options="SORTS"
+        >
+          <template #filters>
+            <FilterField v-if="categoryFilter.options.value.length || query.cat.value" label="Category" :for="categoryId">
+              <Select :id="categoryId" v-model="categoryChoice" size="sm">
+                <option value="ALL">All categories</option>
+                <option value="NONE">In no category</option>
+                <option v-for="o in categoryFilter.options.value" :key="o.id" :value="o.id">{{ o.label }}</option>
+              </Select>
+            </FilterField>
+          </template>
+          <template #filters-extra>
+            <Checkbox v-model="query.featured.value">
+              <span class="inline-flex items-center gap-1.5">
+                <Star class="size-4" :class="query.featured.value ? 'fill-current text-primary' : 'text-muted-foreground'" aria-hidden="true" />
+                Featured only
+              </span>
+            </Checkbox>
+          </template>
+        </ListToolbar>
+        <ListTable
+          :columns="columns"
+          :rows="rows"
+          :loading="loading"
+          :query="query"
+          :reorder="reorder"
+          :row-label="title"
+          :row-key-focus="rowKeyFocus"
+          label="Points of interest"
+          openable
+          @open="(poi) => router.push(editorRoute(poi))"
+        >
+          <template #cell-title="{ row }">
+            <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+              <ListRowTitle :to="editorRoute(row)" :muted="row.status === 'ARCHIVED'" :missing="query.missing.value">{{ title(row) }}</ListRowTitle>
+              <Chip v-if="row.code" tone="outline" class="mono" :title="`Exhibit code ${row.code}`">{{ row.code }}</Chip>
+              <Chip v-if="row.featured" tone="brand" :icon="Star">Featured</Chip>
+            </div>
+            <p class="mono truncate text-compact text-muted-foreground" :title="row.slug">{{ row.slug }}</p>
+            <TriggerChips :triggers="triggersByPoi?.get(row.id) ?? []" :unavailable="triggersByPoi === null" empty-text="No trigger" />
+            <MatchHint v-if="matchOf(row)" :match="matchOf(row)!" :language-name="languageName(matchOf(row)!.languageCode)" />
+          </template>
+          <template #cell-place="{ row }">
+            <p class="truncate text-sm" :class="!row.placeId || placesFailed ? 'text-muted-foreground' : ''" :title="row.placeId ? placeNames.get(row.placeId) : undefined">
+              {{ !row.placeId ? "No place" : placesFailed ? "Not loaded" : (placeNames.get(row.placeId) ?? "An unavailable place") }}
+            </p>
+            <p v-if="!categoryFilter.failed.value" class="truncate text-compact text-muted-foreground" :title="categoryName(row) ?? undefined">
+              {{ categoryName(row) ?? "No category" }}
+            </p>
+          </template>
+          <template #cell-updated="{ row }">
+            <time :datetime="row.updatedAt" class="tabular whitespace-nowrap text-compact text-muted-foreground">{{ formatDateTime(row.updatedAt).replaceAll(" ", NBSP) }}</time>
+          </template>
+          <template #cell-status="{ row }">
+            <div class="flex flex-wrap gap-1">
+              <StatusChip :status="row.status" />
+              <StatusChip v-if="row.hasWorkingCopy" status="PENDING" label="Pending changes" title="Has pending changes that visitors do not see yet" wrap />
+            </div>
+          </template>
+          <template #cell-translations="{ row }">
+            <TranslationDots names :languages="languages" :route="editorRoute(row)" :completeness="(code) => poiCompleteness(row, code)" />
+          </template>
+          <template #menu="{ row }">
+            <RowMenu
+              :title="title(row)"
+              :actions="lifecycle.actionsFor(row)"
+              :reorder="reorder"
+              :item="row"
+              :reorder-reason="query.reorderReason.value"
+              @select="(key) => onSelect(row, key)"
+            />
+          </template>
+        </ListTable>
+      </template>
+      <ListEmpty
+        v-if="!loading && !rows.length"
+        noun="points of interest"
+        empty-title="No points of interest yet"
+        :filtered="pois.length > 0"
+        :filters="query.chips(categoryChip, languages)"
+        :counts="counts"
+        :status="query.status.value"
+        header-action
+      >
+        Points of interest are the objects and spots visitors open directly: an exhibit, a statue, a viewpoint. Give each an exhibit code so visitors can type it in.
+      </ListEmpty>
+      <ListFooter v-if="loading || pois.length" :loading="loading" :shown="rows.length" :total="total" noun="points of interest" :filtered="query.isFiltered.value" legend paged />
     </div>
+    </template>
 
     <CreatePoiDialog
       v-if="creating && defaultLanguageInfo"
       :project-id="projectId"
       :default-language="defaultLanguageInfo"
       :place-options="placeOptions"
+      :places-failed="placesFailed"
+      :category-options="categoryFilter.options.value"
       @close="creating = false"
       @created="onCreated"
     />
-
-    <StatusChangeDialog
-      v-if="confirm && confirmCopy"
-      :heading="confirmCopy.heading"
-      :body="confirmCopy.body"
-      :action-label="confirmCopy.action"
-      :danger="confirm.target === 'ARCHIVED'"
-      :busy="pendingId === confirm.poi.id"
-      :load-references="() => fetchPoiReferences(projectId, confirm!.poi.id)"
-      :blocked-by="confirm.blockedBy ?? null"
-      :link-for="toReference"
-      @close="confirm = null"
-      @confirm="transition(confirm.poi, confirm.target)"
-    />
-  </main>
+    <LifecycleDialogs :lifecycle="lifecycle" />
+  </PageFrame>
 </template>
-
-<style scoped>
-.th {
-  border-bottom: 1px solid #e5e7eb;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  text-align: left;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: #6b7280;
-}
-.th.text-right {
-  text-align: right;
-}
-.td {
-  border-bottom: 1px solid #f3f4f6;
-  padding-top: 11px;
-  padding-bottom: 11px;
-  vertical-align: top;
-}
-</style>

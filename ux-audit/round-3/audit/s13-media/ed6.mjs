@@ -1,0 +1,15 @@
+import { open, go, P, shot, settle } from "./h.mjs";
+const { browser, page } = await open("admin", { viewport: "1440" });
+await go(page, `/projects/${P}/media?q=${encodeURIComponent("UX-R3-s13 one")}`); await settle(page);
+await page.locator("ul[aria-label='Media files'] a").first().click(); await page.waitForTimeout(2500);
+const st = () => page.evaluate(()=>({cbs:[...document.querySelectorAll("input[type=checkbox]")].map(c=>c.getAttribute("aria-describedby")+":"+c.checked), alt: document.querySelector("textarea")?.disabled, dirty: document.querySelector("main,body").innerText.match(/Unsaved[^\n]*|unsaved[^\n]*|No unsaved[^\n]*/g)?.[0], tabs:[...document.querySelectorAll("[role=tab]")].map(t=>t.innerText.replace(/\n+/g," "))}));
+console.log("init", JSON.stringify(await st()));
+await page.getByLabel("Decorative image").check(); await page.waitForTimeout(500);
+await page.keyboard.press("Escape"); await page.waitForTimeout(500);
+console.log("esc", JSON.stringify(await st()));
+await shot(page, `editor__decorative-after-esc__1440`);
+await page.getByLabel("Decorative image").uncheck(); await page.waitForTimeout(300);
+await page.getByLabel("Decorative image").check(); await page.waitForTimeout(500);
+await page.getByRole("button", {name:"Keep it described"}).click(); await page.waitForTimeout(500);
+console.log("keep", JSON.stringify(await st()));
+await browser.close();

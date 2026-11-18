@@ -1,0 +1,28 @@
+import { open, go, P, shot, settle } from "./h.mjs";
+let { browser, page } = await open("admin", { viewport: "1280", forcedColors: "active" });
+await go(page, `/projects/${P}/media?alt=1`); await settle(page);
+await shot(page, `lib__forced-colors__1280`);
+await page.locator("ul[aria-label='Media files'] a").first().click(); await page.waitForTimeout(2500);
+await shot(page, `editor__forced-colors__1280`);
+await browser.close();
+({ browser, page } = await open("admin", { viewport: "1280" }));
+// Describe now flow
+await go(page, `/projects/${P}/media`); await settle(page);
+const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==", "base64");
+await page.getByRole("button", { name: "Upload files" }).first().click(); await page.waitForTimeout(400);
+await page.locator("input[type=file]").setInputFiles([{ name: "UX-R3-s13 describe.png", mimeType: "image/png", buffer: Buffer.concat([png, Buffer.from("s13d")]) }]);
+await page.waitForTimeout(2500);
+await page.getByRole("button", { name: /Describe now/ }).click(); await page.waitForTimeout(1200);
+console.log("describe", await page.evaluate(() => ({ dlg: [...document.querySelectorAll("[role=dialog]")].map(d=>d.innerText.replace(/\n+/g," | ").slice(0,600)), focus: document.activeElement.tagName+" "+(document.activeElement.getAttribute("aria-label")||document.activeElement.textContent).trim().slice(0,40), n: document.querySelectorAll("[role=dialog]").length })));
+await shot(page, `upload__describe-now__1280`);
+await page.keyboard.press("Escape"); await page.waitForTimeout(500);
+console.log("after esc", await page.evaluate(()=>({n: document.querySelectorAll("[role=dialog]").length, focus: document.activeElement.tagName+" "+document.activeElement.textContent.trim().slice(0,30)})));
+await browser.close();
+({ browser, page } = await open("admin", { viewport: "768" }));
+await go(page, `/projects/${P}/media?view=list`); await settle(page);
+console.log("768 list", await page.evaluate(()=>({tbl: !!document.querySelector("table"), count: document.querySelector("[data-media-count]")?.textContent, url: location.search, hscroll: document.documentElement.scrollWidth>innerWidth})));
+await shot(page, `lib__list-url__768`);
+await go(page, `/projects/${P}/media?q=${encodeURIComponent("Ελληνικά عربى")}`); await settle(page);
+console.log("greek/rtl search", await page.evaluate(()=>document.querySelector("main").innerText.match(/No files[^\n]*|Search:[^\n]*/g)));
+await shot(page, `lib__search-rtl__768`);
+await browser.close();

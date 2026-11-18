@@ -1,0 +1,13 @@
+import { open, go, shot, P, settle } from "./lib.mjs";
+const { browser, page } = await open("curator", { viewport: "1440" });
+const t0 = Date.now();
+await go(page, `/projects/${P}/pois`);
+await page.getByRole("heading", { level: 1 }).first().waitFor();
+await settle(page, 1500);
+console.log("cold list ms", Date.now() - t0, page.url(), await page.title());
+await shot(page, "pois-list__default__1440");
+await shot(page, "pois-list__default-full__1440", true);
+const rows = await page.locator("tbody tr, [role=row], li").count();
+console.log("rows", rows);
+console.log((await page.locator("main").innerText()).slice(0, 2500));
+await browser.close();

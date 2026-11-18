@@ -1,3 +1,25 @@
+import {
+  Archive,
+  Blocks,
+  Calendar,
+  FileText,
+  Image,
+  LayoutDashboard,
+  Languages,
+  Map,
+  MapPin,
+  Menu,
+  Eye,
+  Paintbrush,
+  Rocket,
+  Route,
+  ScrollText,
+  Landmark,
+  Tags,
+  BookOpen,
+  type LucideIcon,
+} from "lucide-vue-next";
+
 /**
  * Primary navigation of the Project workspace, in the order and grouping of the CMS mockup
  * (`navSpec` in iGuide CMS.html). Titles and subtitles are the mockup's page heads. Some sections are
@@ -12,7 +34,8 @@ export interface WorkspaceSection {
   subtitle: string;
 }
 
-export type WorkspaceNavEntry = { group: string } | { section: WorkspaceSection };
+/** A menu entry: a group label, a Section, or a bare divider (Media sits between Content and Visitor app). */
+export type WorkspaceNavEntry = { group: string } | { section: WorkspaceSection } | { divider: true };
 
 const section = (slug: string, title: string, subtitle: string): WorkspaceSection => ({ slug, title, subtitle });
 const item = (s: WorkspaceSection): WorkspaceNavEntry => ({ section: s });
@@ -40,8 +63,10 @@ export const workspaceNav: WorkspaceNavEntry[] = [
   item(section("guides", "Guides", "Entries with text and an optional story: reading pieces, products, businesses, archive items")),
   item(section("events", "Events", "Dated happenings visitors can plan around")),
   item(section("categories", "Categories", "Taxonomy used to group and filter content")),
-  item(section("media", "Media", "Images, audio, video, documents and 3D models used by your content")),
   item(maps),
+  // Media is a top-level item in `12` §3 (it was nested under Content).
+  { divider: true },
+  item(section("media", "Media", "Images, audio, video, documents and 3D models used by your content")),
   { group: "Visitor app" },
   item(
     section(
@@ -64,7 +89,7 @@ export const workspaceNav: WorkspaceNavEntry[] = [
     section(
       "preview",
       "Preview",
-      "The runtime rendered with your unpublished content, per surface and language. Preview never changes what visitors see.",
+      "A stand-in drawn from your content, per surface and language. Preview never changes what visitors see.",
     ),
   ),
   item(section("launch", "Launch", "Readiness, the Application status, preview links, and Deployment Packages")),
@@ -131,4 +156,29 @@ const DEDICATED_ROUTES: Record<string, string> = {
 export function sectionLocation(projectId: string, slug: string) {
   const name = DEDICATED_ROUTES[slug];
   return name ? { name, params: { projectId } } : { name: "project-section", params: { projectId, section: slug } };
+}
+
+/** The 20 px icon of each menu item (D-073); the Dashboard's is `LayoutDashboard`. */
+const SECTION_ICONS: Record<string, LucideIcon> = {
+  places: Landmark,
+  pois: MapPin,
+  routes: Route,
+  guides: BookOpen,
+  events: Calendar,
+  categories: Tags,
+  maps: Map,
+  media: Image,
+  overview: Blocks,
+  "app-settings": Paintbrush,
+  pages: FileText,
+  navigation: Menu,
+  translations: Languages,
+  preview: Eye,
+  launch: Rocket,
+  "audit-log": ScrollText,
+};
+
+/** The icon of a menu item by section slug. */
+export function sectionIcon(slug: string | null): LucideIcon {
+  return slug === null ? LayoutDashboard : (SECTION_ICONS[slug] ?? Archive);
 }

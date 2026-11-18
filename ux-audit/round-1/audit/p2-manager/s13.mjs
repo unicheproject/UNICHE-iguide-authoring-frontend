@@ -1,0 +1,15 @@
+import { shot, CMS } from "./h.mjs";
+import { open, go } from "../../../tools/session.mjs";
+const E="/projects/65f8958a-144a-46fe-851b-f1176b2a597e";
+const { browser, page } = await open("admin", { viewport: "1440" });
+await go(page, E+"/pois"); await page.waitForTimeout(1200);
+await shot(page, "pois-empty__list", "1440");
+await page.getByRole("button", { name: /new point/i }).first().click(); await page.waitForTimeout(600);
+const d=page.getByRole("dialog");
+await shot(page, "poi-create__dialog", "1440");
+console.log("DIALOG:", (await d.innerText()).replace(/\n+/g," | "));
+await d.getByRole("button",{name:/create/i}).click(); await page.waitForTimeout(500);
+await shot(page, "poi-create__empty-submit", "1440");
+console.log("EMPTY:", (await d.innerText()).replace(/\n+/g," | "));
+console.log("controls:", await d.locator("input,select,textarea,button").evaluateAll(es=>es.map(e=>e.tagName+":"+(e.id||e.textContent.trim().slice(0,20)))));
+await browser.close();

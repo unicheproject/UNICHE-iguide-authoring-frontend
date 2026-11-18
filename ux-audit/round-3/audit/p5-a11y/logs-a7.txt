@@ -1,0 +1,15 @@
+[dashboard] #2 a "Preview the app" -> LOWRING 1
+[dashboard] #36 body "Skip to content  iGuide CMS UX Audit – PopulatedApp: Draft. " -> BODY
+[dashboard] 45 stops, 2 flagged
+[poi-list] #1 button "New point of interest" -> LOWRING 1.09
+[poi-list] #3 input "NOT_ARCHIVED" -> OBSCURED svg.[object SVGAnimatedString]
+[poi-list] 45 stops, 2 flagged
+[places] #1 button "New place" -> LOWRING 1.09
+[places] #3 input "NOT_ARCHIVED" -> OBSCURED svg.[object SVGAnimatedString]
+[places] 45 stops, 2 flagged
+[media] #1 button "Upload files" -> LOWRING 1.09
+[media] #3 input "NOT_ARCHIVED" -> OBSCURED svg.[object SVGAnimatedString]
+[media] 45 stops, 2 flagged
+[routes] #1 button "New route" -> LOWRING 1.09
+[routes] #3 input "NOT_ARCHIVED" -> OBSCURED svg.[object SVGAnimatedString]
+[routes] 45 stops, 2 flagged

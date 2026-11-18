@@ -1,0 +1,3 @@
+menu highlight {"highlightBg":"rgb(238, 240, 243)","menuBg":"rgb(255, 255, 255)","ratio":1.14,"outline":"none"}
+helphint ["What does the visitor app status mean? 32x32"]
+preview the app ring {"w":2,"off":2,"style":"solid","ring":"rgb(255, 255, 255)","ringOnWrapper":false,"vsOutside":1,"bg":"255,255,255","clipped":null,"obscured":null,"offscreen":false,"rect":[313,291,152,40]}

@@ -1,0 +1,157 @@
+{
+ "vp": "1440",
+ "firstTileMs": 2226,
+ "reqs": [
+  {
+   "url": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/assets?size=200&page=0",
+   "t": 2123,
+   "bytes": 134162
+  },
+  {
+   "url": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/assets?size=200&page=0",
+   "t": 4757,
+   "bytes": 134162
+  },
+  {
+   "url": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/assets?size=200&page=0",
+   "t": 8377,
+   "bytes": 134162
+  },
+  {
+   "url": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/assets?size=200&page=0",
+   "t": 11595,
+   "bytes": 134162
+  },
+  {
+   "url": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/assets?size=200&page=0",
+   "t": 14810,
+   "bytes": 134162
+  },
+  {
+   "url": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/assets?size=200&page=0",
+   "t": 17796,
+   "bytes": 134162
+  },
+  {
+   "url": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/assets?size=200&page=0",
+   "t": 21713,
+   "bytes": 134162
+  },
+  {
+   "url": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/assets?size=200&page=0",
+   "t": 27803,
+   "bytes": 134162
+  },
+  {
+   "url": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/assets?size=200&page=0",
+   "t": 32527,
+   "bytes": 134162
+  }
+ ],
+ "grid": {
+  "n": 48,
+  "count": "Showing 48 of 115 files (1 archived)",
+  "firstCardY": 265,
+  "rows": [
+   {
+    "chipBottoms": [
+     534,
+     534,
+     534,
+     534,
+     534
+    ],
+    "spread": 0
+   },
+   {
+    "chipBottoms": [
+     889,
+     873,
+     873,
+     889,
+     873
+    ],
+    "spread": 16
+   },
+   {
+    "chipBottoms": [
+     1190,
+     1190,
+     1190,
+     1190,
+     1190
+    ],
+    "spread": 0
+   },
+   {
+    "chipBottoms": [
+     1507,
+     1507,
+     1507,
+     1507,
+     1507
+    ],
+    "spread": 0
+   }
+  ]
+ },
+ "probes": {
+  "alt": {
+   "filters": "Filters",
+   "count": "Showing 48 of 55 files (1 archived)",
+   "chips": [
+    "No alt text in English"
+   ],
+   "text": false
+  },
+  "audioAlt": {
+   "filters": "Filters",
+   "count": "0 files (1 archived)",
+   "chips": [
+    "Type: Audio",
+    "No alt text in English"
+   ],
+   "empty": "No files match",
+   "text": false
+  },
+  "unused": {
+   "filters": "Filters",
+   "count": "Showing 48 of 88 files (1 archived)",
+   "chips": [
+    "Unused"
+   ],
+   "text": false
+  },
+  "dec": {
+   "filters": "Filters",
+   "count": "3 files (1 archived)",
+   "chips": [
+    "Decorative"
+   ],
+   "text": false
+  },
+  "typeOnly": {
+   "filters": "Filters",
+   "count": "9 files (1 archived)",
+   "chips": [
+    "Type: Document"
+   ],
+   "text": false
+  },
+  "archivedFilter": {
+   "filters": "Filters",
+   "count": "0 files (1 archived)",
+   "chips": [
+    "Type: Audio",
+    "No alt text in English"
+   ],
+   "empty": "No files match",
+   "text": false
+  }
+ },
+ "skeleton": {
+  "top": 213,
+  "firstChild": 229,
+  "loadedFirstCard": 265
+ }
+}

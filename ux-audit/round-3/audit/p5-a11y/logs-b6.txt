@@ -1,0 +1,23 @@
+group label: Site map: pin position. Arrow keys move the pin, Plus and Minus zoom; the latitude and longitude fields set it exactly.
+group chk {"w":2,"off":2,"style":"solid","ring":"rgb(76, 29, 139)","ringOnWrapper":false,"vsOutside":11.32,"bg":"255,255,255","clipped":null,"obscured":null,"offscreen":false,"rect":[281,519,686,220]}
+group label: Site map: pin position. Arrow keys move the pin, Plus and Minus zoom; the latitude and longitude fields set it exactly.
+group chk {"w":2,"off":2,"style":"solid","ring":"rgb(76, 29, 139)","ringOnWrapper":false,"vsOutside":11.32,"bg":"255,255,255","clipped":null,"obscured":null,"offscreen":false,"rect":[281,519,686,220]}
+before  
+[pin] ArrowUp -> div[group] "Site map: pin position. Arrow keys move the pin, Plus and Mi" 281,519,686,220  solid 2px rgb(76, 29, 139) off 2px | live=["1 of 97 points of interest","UX-R3-p5 POI A – Parthenon test loaded","Unsaved changes","Pin moved to 37.97218, 23.72505"]
+   -> 37.97218 23.72505
+[pin] ArrowRight -> div[group] "Site map: pin position. Arrow keys move the pin, Plus and Mi" 281,519,686,220  solid 2px rgb(76, 29, 139) off 2px | live=["Pin moved to 37.97218, 23.72604"]
+   -> 37.97218 23.72604
+[pin] Shift+ArrowDown -> div[group] "Site map: pin position. Arrow keys move the pin, Plus and Mi" 281,519,686,220  solid 2px rgb(76, 29, 139) off 2px | live=["Pin moved to 37.97094, 23.72604"]
+   -> 37.97094 23.72604
+[pin] ArrowLeft -> div[group] "Site map: pin position. Arrow keys move the pin, Plus and Mi" 281,519,686,220  solid 2px rgb(76, 29, 139) off 2px | live=["Pin moved to 37.97094, 23.72505"]
+   -> 37.97094 23.72505
+[pin] + -> div[group] "Site map: pin position. Arrow keys move the pin, Plus and Mi" 281,519,686,220  solid 2px rgb(76, 29, 139) off 2px | live=[]
+   -> 37.97094 23.72505
+[pin] - -> div[group] "Site map: pin position. Arrow keys move the pin, Plus and Mi" 281,519,686,220  solid 2px rgb(76, 29, 139) off 2px | live=[]
+   -> 37.97094 23.72505
+[pin esc] Escape -> div[group] "Site map: pin position. Arrow keys move the pin, Plus and Mi" 281,519,686,220  solid 2px rgb(76, 29, 139) off 2px | live=[]
+shift-tab from group: a "Skip map" 281,519,83,29  solid 2px rgb(76, 29, 139) off 2px
+[skip map] Enter -> button "Nearby points of interest (60)" 281,764,236,40  solid 2px rgb(76, 29, 139) off 2px | live=[]
+axe w/ map open
+AXE {"label":"poi-editor-map-open","url":"http://localhost:5173/projects/PID/pois/e51249c1-755b-42d5-9a20-5912046ea9c9","counts":{},"v":[]}
+[save] Control+s -> button "Nearby points of interest (60)" 281,764,236,40  solid 2px rgb(76, 29, 139) off 2px | live=["Saving…","Saved 11:14"]

@@ -1,0 +1,23 @@
+import { start, goP, log, dump, state, focused } from "./lib.mjs";
+import { addStops } from "./lib2.mjs";
+const s = await start("1440"); const { page } = s;
+const U = "http://localhost:5173" + state().routeUrl;
+await page.goto(U); await page.waitForTimeout(2000);
+await addStops(page, ["Alpha"]);
+log("save btn", await page.getByRole("button", { name: /^save/i }).first().isDisabled());
+await page.getByRole("button", { name: /^save/i }).first().click(); await page.waitForTimeout(1800);
+await s.shot("route-1-stop__saved");
+log("TOAST/alerts:", await page.evaluate(()=>[...document.querySelectorAll("[role=alert],[role=status],[aria-live]")].map(e=>e.textContent.trim().slice(0,150)).filter(Boolean)));
+log("stops card text:", (await page.locator("text=/At least|usually/").allInnerTexts()));
+await addStops(page, ["Bravo","Charlie","Delta","Echo"]);
+await page.getByRole("button", { name: "Hiking" }).click();
+await page.getByRole("button", { name: "Moderate" }).click();
+await page.getByLabel(/route total/i).fill("95");
+await page.getByLabel(/distance/i).fill("2400.5");
+await s.shot("route-dirty-before-leave");
+// leave guard
+await page.getByRole("link", { name: "Routes" }).first().click(); await page.waitForTimeout(800);
+log("after leaving: url", page.url(), "dialogs", await page.locator("[role=dialog],[role=alertdialog]").count());
+await s.shot("route-leave-guard");
+log(await dump(page, "[role=dialog],[role=alertdialog]").catch(()=>"-"));
+await s.browser.close();

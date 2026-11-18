@@ -1,4 +1,7 @@
+import { formatBytes } from "@/lib/format";
+import { fold } from "@/lib/utils";
 import { ApiError, apiRequest, apiUpload } from "./api";
+import { assetNeedsText } from "./completeness";
 import type { ResourceStatus } from "./places";
 import type { ResourceReference } from "./references";
 
@@ -225,16 +228,16 @@ export function formatDuration(seconds: number): string {
 }
 
 /** Search over the name, the file name, and the title in every language (iGuide spec 12, media library). */
-export function assetMatches(asset: Asset, query: string): boolean {
+export function assetMatches(asset: Asset, query: string, languageCode = ""): boolean {
   const q = fold(query.trim());
   if (!q) return true;
-  return [asset.internalName, asset.originalFilename, ...Object.values(asset.translations).map((t) => t.title ?? "")].some((text) =>
+  const titles = languageCode ? [asset.translations[languageCode]?.title ?? ""] : Object.values(asset.translations).map((t) => t.title ?? "");
+  return [asset.internalName, asset.originalFilename, ...titles].some((text) =>
     fold(text ?? "").includes(q),
   );
 }
 
 /** Lowercase without accents, so "κυμη" finds "Κύμη" and "cafe" finds "Café". */
-const fold = (text: string) => text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
 /** The type the backend will give a file, from its MIME type or name, to check the size limit first. */
 export function assetTypeOf(file: File): AssetType {
@@ -248,6 +251,71 @@ export function assetTypeOf(file: File): AssetType {
   return "OTHER";
 }
 
+/** One line of "Accepted formats": what a type holds, with the file extensions that name it. */
+export interface AcceptedFormat {
+  type: AssetType;
+  /** Plain words, shown to authors. */
+  formats: string;
+}
+
+/**
+ * What the library takes (client allow-list, `12` §5; the backend accepts any type, G-032, Q-015): images, audio, video,
+ * PDF documents and 3D models. Anything else is held back with a warning until the author confirms it.
+ */
+export const ACCEPTED_FORMATS: AcceptedFormat[] = [
+  { type: "IMAGE", formats: "JPG, PNG, WebP, GIF, SVG, AVIF" },
+  { type: "AUDIO", formats: "MP3, WAV, M4A, OGG, FLAC" },
+  { type: "VIDEO", formats: "MP4, WebM, MOV" },
+  { type: "DOCUMENT", formats: "PDF" },
+  { type: "THREE_D_MODEL", formats: "GLB, GLTF" },
+];
+
+/** Whether a file belongs to one of the {@link ACCEPTED_FORMATS}; text files, scripts and archives do not. */
+export function isAcceptedFile(file: File): boolean {
+  const type = assetTypeOf(file);
+  if (type === "IMAGE" || type === "AUDIO" || type === "VIDEO" || type === "THREE_D_MODEL") return true;
+  const name = file.name.toLowerCase();
+  return type === "DOCUMENT" && (file.type === "application/pdf" || name.endsWith(".pdf"));
+}
+
+/** The text of the "choose files" dialog's `accept`, for the given types (empty: no restriction). */
+export function acceptAttributeFor(types: readonly AssetType[]): string {
+  const map: Partial<Record<AssetType, string>> = {
+    IMAGE: "image/*",
+    FLOOR_PLAN: "image/*",
+    AUDIO: "audio/*",
+    VIDEO: "video/*",
+    DOCUMENT: ".pdf,application/pdf",
+    THREE_D_MODEL: ".glb,.gltf,model/gltf-binary",
+  };
+  return types.map((t) => map[t] ?? "").filter(Boolean).join(",");
+}
+
+/** The Asset that a file looks like a copy of (same file name and size), or null. */
+export function duplicateOf(file: File, assets: readonly Asset[]): Asset | null {
+  return assets.find((a) => a.sizeBytes === file.size && a.originalFilename.toLowerCase() === file.name.toLowerCase()) ?? null;
+}
+
+/**
+ * Whether an Asset still needs text work in a language: an image that is not decorative has no alternative text, or
+ * any Asset has no title. Drives the library's "Needs translation" filter.
+ */
+export function missingTextIn(asset: Asset, languageCode: string): boolean {
+  return assetNeedsText(asset, languageCode);
+}
+
+/**
+ * What exactly is missing in a language, in the words a worklist row shows ("alt text", "title"; C2-51). The same two
+ * checks as {@link missingTextIn} (one definition of complete: title, plus alternative text of an image that is not
+ * decorative), so the filter, the row and the Asset editor never disagree. Empty when nothing is missing.
+ */
+export function missingTextNames(asset: Asset, languageCode: string): string[] {
+  const names: string[] = [];
+  if (missingAlternativeText(asset, languageCode)) names.push("alt text");
+  if (!asset.translations[languageCode]?.title?.trim()) names.push("title");
+  return names;
+}
+
 const TYPE_LABELS: Record<AssetType, string> = {
   IMAGE: "Image",
   AUDIO: "Audio",
@@ -258,12 +326,6 @@ const TYPE_LABELS: Record<AssetType, string> = {
   OTHER: "Other",
 };
 export const assetTypeLabel = (type: AssetType) => TYPE_LABELS[type];
-
-export function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
 
 /** "1600 × 1067 · 420 KB", "03:12 · 4.1 MB", or "audio/mpeg · 3.1 MB". */
 export function assetMeta(asset: Asset): string {

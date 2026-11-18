@@ -1,0 +1,22 @@
+import { open, go, rec, P, shot, ready, tall, SH, axe } from "./h.mjs";
+const { browser, page } = await open("curator", { viewport: "1440" });
+const errs=[]; page.on("pageerror",e=>errs.push(e.message)); page.on("console",m=>{if(m.type()==="error")errs.push(m.text().slice(0,150))});
+const log=(...a)=>console.log(...a);
+const focus=()=>page.evaluate(()=>{const a=document.activeElement;return a?`${a.tagName}#${a.id}.${(a.getAttribute("aria-label")||a.textContent||"").trim().slice(0,40)}`:null});
+await go(page, `/projects/${P}/pois/${rec.poiA}`); await ready(page);
+await page.getByRole("button",{name:/^Activate$/}).click(); await page.waitForTimeout(800);
+await page.getByRole("dialog").getByRole("button",{name:/^Activate$/}).click(); await page.waitForTimeout(2500);
+log("focus after activate", await focus());
+log("toasts", await page.locator("[role=status],[role=alert]").allInnerTexts());
+log("hdr", await page.evaluate(()=>document.querySelector("[data-editor-primary]")?.closest("div[class*=sticky]")?.innerText.replace(/\n+/g," | ")));
+log("side", await page.evaluate(()=>document.querySelector("aside")?.innerText.replace(/\n+/g," | ").slice(0,900)));
+await page.screenshot({path:SH+"poi-editor__active-after-activate__1440.png"});
+await ready(page,500);
+log(await tall(page,"poi-editor__active__1440"));
+// make pending: edit and save draft
+await page.locator("#f-summary").fill("A bronze statue found near the north gate. Edited in a working copy.");
+await page.waitForTimeout(600);
+await page.screenshot({path:SH+"poi-editor__active-dirty__1440.png"});
+log("hdr dirty", await page.evaluate(()=>document.querySelector("[data-editor-primary]")?.closest("div[class*=sticky]")?.innerText.replace(/\n+/g," | ")));
+log("primary", await page.evaluate(()=>{const b=document.querySelector("[data-editor-primary]");return b.textContent.trim()+" / "+b.className.includes("primary")+" / "+getComputedStyle(b).backgroundColor}));
+await browser.close(); log(errs);

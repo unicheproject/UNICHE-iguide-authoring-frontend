@@ -1,0 +1,26 @@
+import { open, go, rec, P, ready, SH, tall } from "./h.mjs";
+const { browser, page } = await open("curator", { viewport: "1440" });
+const log=(...a)=>console.log(...a);
+const focus=()=>page.evaluate(()=>{const a=document.activeElement;return a?`${a.tagName}#${a.id}.${(a.getAttribute("aria-label")||a.textContent||"").trim().slice(0,40)}`:null});
+await go(page, `/projects/${P}/pois/${rec.poiB}`); await ready(page);
+const LONG_EN="UX-R2-s10 POI B: Temporary Exhibitions Hall, “The Acropolis Through the Eyes of Travellers, Antiquarians and Photographers from the Seventeenth Century to Today”";
+const LONG_EL="UX-R2-s10 Αίθουσα Προσωρινών Εκθέσεων: «Η Ακρόπολη μέσα από τα μάτια ταξιδιωτών, αρχαιοδιφών και φωτογράφων από τον δέκατο έβδομο αιώνα έως σήμερα»";
+await page.locator("#f-title").fill(LONG_EN);
+await page.keyboard.press("Control+s"); await page.waitForTimeout(3000);
+log("hdr", await page.evaluate(()=>document.querySelector("[data-editor-primary]")?.closest("div[class*=sticky]")?.innerText.replace(/\n+/g," | ")));
+await page.screenshot({path:SH+"poi-editor__long-title-en__1440.png"});
+// Greek tab
+await page.getByRole("tab",{name:/Ελληνικά/}).click(); await page.waitForTimeout(800);
+log("focus after tab click", await focus());
+await page.screenshot({path:SH+"poi-editor__greek-tab-empty__1440.png"});
+await page.locator("#f-title").fill(LONG_EL);
+await page.locator("#f-summary").fill("Ένας σύντομος τόνος: πώς φτάνει ο επισκέπτης εδώ, ύστερα από την είσοδο του μουσείου.");
+await page.keyboard.press("Control+s"); await page.waitForTimeout(3000);
+log("tab arrow keys:");
+await page.getByRole("tab",{name:/Ελληνικά/}).focus(); await page.keyboard.press("ArrowRight"); await page.waitForTimeout(300);
+log("focus after ArrowRight", await focus(), "tabindex of tabs", await page.getByRole("tab").evaluateAll(els=>els.map(e=>e.tabIndex+":"+e.getAttribute("aria-selected")+":"+e.getAttribute("lang"))));
+await page.getByRole("tab",{name:/Ελληνικά/}).click(); await page.waitForTimeout(600);
+log(await tall(page,"poi-editor__greek-tab-long-title__1440"));
+log("hdr", await page.evaluate(()=>document.querySelector("[data-editor-primary]")?.closest("div[class*=sticky]")?.innerText.replace(/\n+/g," | ")));
+log("lang attrs", await page.evaluate(()=>[...document.querySelectorAll("[lang]")].map(e=>e.tagName+":"+e.lang+":"+e.textContent.trim().slice(0,20)).slice(0,12)));
+await browser.close();

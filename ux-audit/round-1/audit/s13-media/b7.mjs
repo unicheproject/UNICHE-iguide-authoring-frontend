@@ -1,0 +1,13 @@
+import { start, go, P } from "./common.mjs";
+const vp = process.argv[2] ?? "1440";
+const s = await start(vp); const { page } = s;
+await go(page, `${P}/media`); await page.waitForSelector("main ul li a");
+await page.fill("#media-search","UX-s13-media portrait"); await page.waitForTimeout(400);
+await page.locator("main ul li a").first().click();
+await page.waitForSelector("h1"); await page.waitForTimeout(2500);
+console.log(page.url());
+await s.shot("editor__image-draft-top");
+await page.screenshot({path: new URL(`./shots/editor__image-draft-full__${vp}.png`, import.meta.url).pathname.replace(/^\/([A-Z]:)/,"$1"), fullPage:true});
+const info = await page.evaluate(()=>{const m=document.querySelector("main"); return {mainScroll:m.scrollHeight+"/"+m.clientHeight, h2:[...document.querySelectorAll("h2")].map(h=>h.innerText), text:m.innerText.slice(0,2500)}});
+console.log(JSON.stringify(info,null,1));
+await s.browser.close();

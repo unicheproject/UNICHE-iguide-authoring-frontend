@@ -1,0 +1,13 @@
+import { start, go, P, shotDir } from "./common.mjs";
+const s = await start(); const p=s.page;
+await go(p, P + "/pois/40cab7b2-a7f7-4057-b56e-5605a589156f"); await p.waitForTimeout(1500);
+console.log("summary kept:", await p.getByLabel("Summary").inputValue(), "| lat", await p.locator("#f-lat").inputValue());
+await p.getByRole("button",{name:/\+ QR code/}).scrollIntoViewIfNeeded();
+await p.getByRole("button",{name:/\+ QR code/}).click(); await p.waitForTimeout(600);
+await s.shot("poi-editor__trigger-qr-added");
+console.log((await p.getByText("How visitors reach it").first().locator("xpath=ancestor::section|ancestor::div[3]").first().innerText()).slice(0,1500));
+await p.getByRole("button",{name:/\+ Geo-proximity/}).click(); await p.waitForTimeout(600);
+await s.shot("poi-editor__trigger-geo-added");
+console.log("----\n"+(await p.getByText("How visitors reach it").first().locator("xpath=ancestor::section|ancestor::div[3]").first().innerText()).slice(0,2500));
+await p.screenshot({path:shotDir+"poi-editor__triggers-full__1440.png"});
+await s.browser.close();

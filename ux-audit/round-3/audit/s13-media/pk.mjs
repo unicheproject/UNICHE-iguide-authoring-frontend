@@ -1,0 +1,13 @@
+import { open, go, P, shot, settle } from "./h.mjs";
+const vp = process.argv[2] ?? "1440";
+const { browser, page } = await open("admin", { viewport: vp });
+await go(page, `/projects/${P}/pois`); await page.waitForTimeout(3000);
+await page.locator("tbody a, ul a").filter({hasText:/./}).first().click(); await page.waitForTimeout(3000);
+console.log("url", page.url().replace(/.*projects\/[^/]+/, ""));
+const btn = page.getByRole("button", { name: /Add Primary image/ }).first();
+console.log("btns", await page.evaluate(()=>[...document.querySelectorAll("main button")].map(b=>b.textContent.trim()).filter(t=>/image|media|library|photo/i.test(t))));
+await btn.scrollIntoViewIfNeeded(); await btn.click(); await page.waitForTimeout(1500);
+const d = await page.evaluate(() => { const dl = document.querySelector("[role=dialog]"); const f = (e) => e && (r => [Math.round(r.x), Math.round(r.y), Math.round(r.width), Math.round(r.height)])(e.getBoundingClientRect()); const tiles=[...dl.querySelectorAll("[role=listbox] *, [role=option], [role=radio]")].slice(0,3); return { box: f(dl), text: dl.innerText.replace(/\n+/g," | ").slice(0,700), focus: document.activeElement.tagName+" "+(document.activeElement.getAttribute("aria-label")||document.activeElement.textContent).trim().slice(0,40), tabStops: [...dl.querySelectorAll("[tabindex='0']")].length, tileRole: dl.querySelector("[role=listbox],[role=grid],[role=radiogroup]")?.getAttribute("role"), tilesN: dl.querySelectorAll("[role=option],[role=radio],[data-asset-tile]").length, hasDetails: dl.querySelector("details")?.open, foot: f([...dl.querySelectorAll("button")].find(b=>/Use this image/.test(b.textContent))) }; });
+console.log(JSON.stringify(d, null, 1));
+await shot(page, `picker__open__${vp}`);
+await browser.close();

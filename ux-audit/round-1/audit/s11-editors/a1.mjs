@@ -1,0 +1,10 @@
+import { start, goP, log, dump } from "./lib.mjs";
+const s = await start("1440"); const { page } = s;
+await goP(page, "/routes");
+await s.shot("routes-list", true);
+log(await dump(page));
+await page.getByRole("button", { name: /new route|create|add/i }).first().click();
+await page.waitForTimeout(600);
+await s.shot("route-create-dialog");
+log(await dump(page, "[role=dialog]"));
+await s.browser.close();

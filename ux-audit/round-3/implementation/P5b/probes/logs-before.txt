@@ -1,0 +1,10 @@
+key o-1-hint
+key o-1
+end before {"d":"10","m":"3","y":"2026","h":"14","mi":"00"}
+end after hour 25 {"d":"1","m":"1","y":"2000","h":"2","mi":"00"}
+hour err Hour must be from 0 to 23.
+readiness ["\"Warning:  English: 2 texts missing\"","\"Warning:  Ελληνικά: 3 texts missing\"","\"Warning:  Italiano: 3 texts missing\""]
+readiness innerText ["Warning: English: 2 texts missing","Warning: Ελληνικά: 3 texts missing","Warning: Italiano: 3 texts missing"]
+ended chip count 4
+opacity ["0.8","1"]
+axe [{"id":"color-contrast","impact":"serious","nodes":15,"sample":"div[aria-labelledby=\"occ-title-o-1\"] > .grid-cols-\\[repeat\\(auto-fit\\,minmax\\(min\\(100\\%\\,22rem\\)\\,1fr\\)\\)\\].gap-x-6.gap-y-4 > fieldset:nth-child(1) > legend > .ml-1.font-medium.text-muted-foreground"}]

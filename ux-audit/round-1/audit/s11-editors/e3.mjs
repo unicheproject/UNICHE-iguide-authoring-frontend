@@ -1,0 +1,22 @@
+import { start, goP, log, dump, state, focused } from "./lib.mjs";
+const s = await start("1440"); const { page } = s;
+page.on("response", r => { if (r.request().method() !== "GET" && r.url().includes("/api/")) log("NET", r.request().method(), r.url().replace(/.*iguide\/api\/v1\/projects\/[^/]+/, ""), r.status()); });
+await page.goto("http://localhost:5173" + state().eventUrl); await page.waitForTimeout(3000);
+await page.getByRole("button", { name: /add occurrence/i }).click(); await page.waitForTimeout(500);
+const starts = page.locator("input[type=datetime-local]");
+log("labels:", await starts.evaluateAll(els => els.map(e => e.getAttribute("aria-label") || e.labels?.[0]?.textContent || "NONE")));
+await starts.nth(0).fill("2026-12-20T18:00"); await starts.nth(1).fill("2026-12-20T17:00");
+await page.waitForTimeout(400);
+await s.shot("event-end-before-start");
+log("inline msg:", await page.evaluate(()=>[...document.querySelectorAll("[role=alert],.text-destructive,[id*=err]")].map(e=>e.innerText.slice(0,200)).filter(Boolean)));
+await page.getByRole("button", { name: /^save/i }).first().click(); await page.waitForTimeout(2000);
+await page.evaluate(()=>document.querySelector("main")?.scrollTo(0,0));
+await s.shot("event-save-end-before-start");
+log("alerts:", await page.evaluate(()=>[...document.querySelectorAll("[role=alert],[role=status]")].map(e=>e.innerText.slice(0,300))));
+log("focus", await focused(page));
+// fix + repeat weekly
+await starts.nth(1).fill("2026-12-20T20:00");
+await page.getByRole("button", { name: /repeat weekly/i }).click(); await page.waitForTimeout(600);
+await s.shot("event-repeat-weekly-open");
+log("repeat panel:", await page.evaluate(()=>document.activeElement.closest("[role=dialog],section,div")?.innerText.slice(0,400)));
+await s.browser.close();

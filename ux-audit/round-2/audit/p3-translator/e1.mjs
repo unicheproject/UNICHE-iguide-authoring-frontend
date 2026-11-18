@@ -1,0 +1,13 @@
+import { open, go, PID, shot, settle, fs } from "./lib.mjs";
+const ids = JSON.parse(fs.readFileSync(new URL("./ids.json", import.meta.url)));
+const { browser, page } = await open("curator", { viewport: "1440" });
+await go(page, `/projects/${PID}/pois/${ids.poi}`);
+await page.waitForFunction(() => document.querySelector("h1")?.innerText.includes("UX-R2"), null, { timeout: 40000 }).catch(()=>{});
+await page.waitForTimeout(1500);
+await shot(page, "poi-editor__en-tab");
+console.log(await page.locator("[role=tab]").evaluateAll(e => e.map(x => x.innerText.replace(/\n/g," ")+" |lang="+x.getAttribute("lang")+" sel="+x.getAttribute("aria-selected"))));
+await page.getByRole("tab", { name: /Ελληνικά/ }).click();
+await page.waitForTimeout(800);
+await shot(page, "poi-editor__el-tab");
+console.log((await page.locator("main").innerText()).replace(/\n+/g," | ").slice(0, 2500));
+await browser.close();

@@ -1,0 +1,8 @@
+  - plugin vite:css-post transform (22%, 3.4s, 21 calls)
+  - plugin vite:build-html transform (10%, 1.5s, 1 call)
+Additional callback time came from the callbacks below and from callbacks under 1s.
+2 callbacks are listed without a time. Their calls overlapped, so the time inside one call includes work from other calls. To find their cost, profile the build with `node --cpu-prof`:
+  - plugin vite:css transform (21 calls)
+  - plugin vite:vue transform (349 calls)
+See https://rolldown.rs/reference/InputOptions.checks#bundlertimings for more details.
+[39m

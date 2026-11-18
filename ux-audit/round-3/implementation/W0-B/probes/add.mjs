@@ -1,0 +1,10 @@
+import { call, closeAll } from "../../../../tools/lib.mjs";
+import { readFileSync, writeFileSync } from "node:fs";
+const f = new URL("./ids.json", import.meta.url); const ids = JSON.parse(readFileSync(f));
+const PID = "6958c18f-60d2-4140-a524-5a43f8a2f6b5"; const W = (m, p, b) => call("admin", m, `/projects/${PID}${p}`, b);
+const c = await W("POST", "/categories", { name: "UX-R3-W0B Category used", scope: "POI", parentCategoryId: null });
+await W("POST", `/categories/${c.id}/status`, { targetStatus: "ACTIVE", version: c.version });
+const p = await W("POST", "/pois", { title: "UX-R3-W0B POI uses cat", placeId: ids.place, code: null });
+const cur = await W("GET", `/pois/${p.id}`); const body = { ...cur }; for (const k of ["id","projectId","status","archivedAt","createdAt","updatedAt","hasWorkingCopy","workingCopyUpdatedAt","sortOrder"]) delete body[k];
+body.categoryIds = [c.id]; await W("PUT", `/pois/${p.id}`, body);
+ids.catUsed = c.id; writeFileSync(f, JSON.stringify(ids)); console.log("ok"); await closeAll();

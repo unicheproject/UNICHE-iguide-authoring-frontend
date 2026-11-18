@@ -7,6 +7,7 @@ import { onBeforeUnmount, ref, watch } from "vue";
 import QrCodePreview from "@/components/editor/QrCodePreview.vue";
 import { ApiError } from "@/platform/api";
 import { fetchQrImage } from "@/platform/triggers";
+import { problemText } from "@/lib/problemText";
 
 const props = defineProps<{
   projectId: string;
@@ -39,7 +40,7 @@ watch(
       if (!(e instanceof ApiError)) throw e;
       release();
       failed.value = e.platformUnavailable
-        ? "The UNICHE platform is not reachable."
+        ? problemText(e.status, e.code).body
         : e.code === "NO_PUBLIC_BASE_URL" || e.details.some((d) => d.startsWith("publicBaseUrl:"))
           ? "the visitor app has no public web address. Set it in App settings → Surfaces."
           : e.message;
@@ -55,7 +56,5 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <QrCodePreview :url="runtimeUrl" :code="code" :image-src="objectUrl">
-    <p v-if="failed" class="font-semibold text-destructive">The QR image could not be loaded: {{ failed }}</p>
-  </QrCodePreview>
+  <QrCodePreview :url="runtimeUrl" :code="code" :image-src="objectUrl" :reason="failed ? `The QR image could not be loaded: ${failed}` : objectUrl ? null : 'Loading the QR image.'" />
 </template>

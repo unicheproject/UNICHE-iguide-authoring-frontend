@@ -1,0 +1,197 @@
+{
+ "vp": "1440",
+ "firstTileMs": 1711,
+ "reqs": [
+  {
+   "url": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/assets?size=48&page=0",
+   "t": 1533,
+   "bytes": 49686
+  },
+  {
+   "url": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/assets?size=200&page=0",
+   "t": 1676,
+   "bytes": 136176
+  },
+  {
+   "url": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/assets?size=48&page=0",
+   "t": 4018,
+   "bytes": 50002
+  },
+  {
+   "url": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/assets?size=200&page=0",
+   "t": 4222,
+   "bytes": 136492
+  },
+  {
+   "url": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/assets?size=48&page=0",
+   "t": 7324,
+   "bytes": 50003
+  },
+  {
+   "url": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/assets?size=200&page=0",
+   "t": 7467,
+   "bytes": 136493
+  },
+  {
+   "url": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/assets?size=48&page=0",
+   "t": 10518,
+   "bytes": 50003
+  },
+  {
+   "url": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/assets?size=200&page=0",
+   "t": 10689,
+   "bytes": 136493
+  },
+  {
+   "url": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/assets?size=48&page=0",
+   "t": 13952,
+   "bytes": 50003
+  },
+  {
+   "url": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/assets?size=200&page=0",
+   "t": 14174,
+   "bytes": 136493
+  },
+  {
+   "url": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/assets?size=48&page=0",
+   "t": 17169,
+   "bytes": 50003
+  },
+  {
+   "url": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/assets?size=200&page=0",
+   "t": 17324,
+   "bytes": 136493
+  },
+  {
+   "url": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/assets?size=48&page=0",
+   "t": 20280,
+   "bytes": 50003
+  },
+  {
+   "url": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/assets?size=200&page=0",
+   "t": 20438,
+   "bytes": 136493
+  },
+  {
+   "url": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/assets?size=48&page=0",
+   "t": 26995,
+   "bytes": 50003
+  },
+  {
+   "url": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/assets?size=200&page=0",
+   "t": 29688,
+   "bytes": 136493
+  },
+  {
+   "url": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/assets?size=48&page=0",
+   "t": 34468,
+   "bytes": 50003
+  }
+ ],
+ "grid": {
+  "n": 48,
+  "count": "Showing 48 of 117 files (1 archived)",
+  "firstCardY": 265,
+  "rows": [
+   {
+    "chipBottoms": [
+     574,
+     574,
+     574,
+     574,
+     574
+    ],
+    "spread": 0
+   },
+   {
+    "chipBottoms": [
+     924,
+     924,
+     924,
+     924,
+     924
+    ],
+    "spread": 0
+   },
+   {
+    "chipBottoms": [
+     1260,
+     1260,
+     1260,
+     1260,
+     1260
+    ],
+    "spread": 0
+   },
+   {
+    "chipBottoms": [
+     1596,
+     1596,
+     1596,
+     1596,
+     1596
+    ],
+    "spread": 0
+   }
+  ]
+ },
+ "probes": {
+  "alt": {
+   "filters": "Filters",
+   "count": "Showing 48 of 55 files",
+   "chips": [
+    "No alt text in English"
+   ],
+   "text": false
+  },
+  "audioAlt": {
+   "filters": "Filters",
+   "count": "0 files",
+   "chips": [
+    "Type: Audio",
+    "No alt text in English"
+   ],
+   "empty": "No files match",
+   "text": true
+  },
+  "unused": {
+   "filters": "Filters",
+   "count": "Showing 48 of 90 files (1 archived)",
+   "chips": [
+    "Not used yet"
+   ],
+   "text": false
+  },
+  "dec": {
+   "filters": "Filters",
+   "count": "3 files",
+   "chips": [
+    "Decorative"
+   ],
+   "text": false
+  },
+  "typeOnly": {
+   "filters": "Filters",
+   "count": "9 files (1 archived)",
+   "chips": [
+    "Type: Document"
+   ],
+   "text": false
+  },
+  "archivedFilter": {
+   "filters": "Filters",
+   "count": "0 files",
+   "chips": [
+    "Type: Audio",
+    "No alt text in English"
+   ],
+   "empty": "No files match",
+   "text": true
+  }
+ },
+ "skeleton": {
+  "top": 249,
+  "firstChild": 265,
+  "loadedFirstCard": 265
+ }
+}

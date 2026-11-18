@@ -1,0 +1,21 @@
+import { open, go } from "../../../tools/session.mjs";
+import { readFileSync } from "node:fs";
+const P = "6958c18f-60d2-4140-a524-5a43f8a2f6b5";
+const r = JSON.parse(readFileSync("records.json", "utf8"));
+const log = (...a) => console.log(...a);
+const { browser, page } = await open("admin", { viewport: "1440" });
+const posts = [];
+page.on("request", (q) => { if (/\/triggers/.test(q.url()) && q.method() !== "GET") posts.push(q.method() + " " + q.url().split("/api")[1]); });
+await go(page, `/projects/${P}/pois/${r.poi}`);
+await page.waitForSelector("[data-sticky-bar]", { timeout: 30000 }); await page.waitForTimeout(2000);
+// 1. empty beacon and geo rows
+await page.getByRole("button", { name: /^Add Beacon/ }).click();
+await page.getByRole("button", { name: /^Add Geo-proximity/ }).click();
+await page.getByRole("button", { name: /^Save$|^Save draft$/ }).first().click();
+await page.waitForTimeout(1500);
+log("requests after saving empty rows:", JSON.stringify(posts));
+log("summary:", (await page.locator("[data-editor-summary], [role=alert]").allInnerTexts()).join(" | ").slice(0, 900));
+log("invalid fields:", await page.locator('[aria-invalid="true"]').evaluateAll((els) => els.map((e) => e.getAttribute("data-path"))));
+log("focus on:", await page.evaluate(() => document.activeElement?.tagName + " " + (document.activeElement?.getAttribute("data-path") ?? document.activeElement?.id)));
+await page.screenshot({ path: "after/empty-rows-1440.png" });
+await browser.close();

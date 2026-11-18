@@ -1,0 +1,21 @@
+import {open,go,P,shot,btns} from "./lib.mjs";
+const { browser, page } = await open("admin",{viewport:"1440"});
+await go(page, P+"/pois/d2e48820-a468-4539-9f62-545eed5b06a6");
+await page.waitForTimeout(1500);
+await page.locator("#f-summary").fill("Alpha summary for the R3 editor walk.");
+await page.locator("#f-description").fill("Alpha description. A longer text about the object for visitors.");
+await page.getByRole("button",{name:/Add\s*Primary image/}).click();
+await page.getByRole("button",{name:/^klepsydra/}).click();
+await page.getByRole("button",{name:/Use this image/}).click();
+await page.getByRole("button",{name:/English : choose audio/}).click();
+await page.getByRole("button",{name:/^Audio\s*audio-parthenon-overview|audio-parthenon-overview/}).first().click();
+await page.getByRole("button",{name:/Use this file/}).click();
+await page.waitForTimeout(600);
+// position via map
+await page.getByRole("button",{name:/Set position on the map/}).click();
+await page.waitForTimeout(2500);
+await shot(page,"poi-editor__set-position-map__1440");
+console.log("dlg?",await page.getByRole("dialog").count());
+console.log(await btns(page,"[role=dialog]"));
+console.log((await page.evaluate(()=>document.querySelector("[role=dialog]")?.innerText||"")).slice(0,600));
+await browser.close();

@@ -1,0 +1,15 @@
+import { open, go, base, shot } from "./lib.mjs";
+const { browser, page } = await open("admin", { viewport: "1440" });
+await go(page, base + "/categories?create=1");
+await page.waitForSelector("[role=dialog] input[type=text]");
+await page.locator("[role=dialog] input[type=text]").first().fill("UX-R3-p3 Category");
+await page.locator("[role=dialog] button[type=submit]").click();
+await page.waitForTimeout(800);
+await shot(page, "categories-create-dialog__empty-submit__1440");
+console.log(await page.evaluate(()=>document.querySelector("[role=dialog]").innerText));
+await page.getByText("Groups points of interest").click();
+await page.getByText("A main group with its own").click();
+await page.locator("[role=dialog] button[type=submit]").click();
+await page.waitForTimeout(2000);
+console.log(page.url());
+await browser.close();

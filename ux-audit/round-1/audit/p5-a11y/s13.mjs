@@ -1,0 +1,27 @@
+import { start, go, P, focusInfo, tabWalk, tabTo, live, openPoi, axe } from "./common.mjs";
+const s = await start("1440"); const { page } = s;
+await openPoi(page, s, "edited");
+console.log("aria-current", await page.evaluate(()=>[...document.querySelectorAll("nav a[aria-current]")].map(a=>a.textContent.trim()+"="+a.getAttribute("aria-current"))));
+await tabTo(page, /^Choose asset$/);
+await page.keyboard.press("Enter"); await page.waitForTimeout(1500);
+console.log("picker focus", JSON.stringify(await focusInfo(page)));
+console.log(await page.locator("[role=dialog]").first().ariaSnapshot().then(t=>t.split("\n").slice(0,45).join("\n")));
+await s.shot("asset-picker__open");
+console.log("axe", JSON.stringify((await axe(page,"asset-picker")).map(v=>v.id+":"+v.impact+":"+v.nodes+":"+v.sample[0])));
+const w = await tabWalk(page, 14); w.forEach((x,i)=>console.log(i+1,x.tag,x.role,x.name,"|",(x.ring||"").slice(0,22),x.dialog?"in":"OUT",x.w+"x"+x.h));
+// select first image by keyboard
+await page.keyboard.press("Escape"); await page.waitForTimeout(500);
+console.log("after esc", JSON.stringify(await focusInfo(page)));
+await page.keyboard.press("Enter"); await page.waitForTimeout(1200);
+const btns = page.locator("[role=dialog] button[aria-pressed]");
+console.log("pressable", await btns.count());
+await btns.first().focus(); await page.keyboard.press("Enter"); await page.waitForTimeout(400);
+console.log("pressed state", await btns.first().getAttribute("aria-pressed"), "live", JSON.stringify(await live(page)));
+await s.shot("asset-picker__selected");
+const useBtn = page.locator("[role=dialog]").getByRole("button",{name:/^(Use|Choose|Select|Attach|Done)/});
+console.log("confirm buttons", await useBtn.allTextContents());
+await useBtn.first().focus(); await page.keyboard.press("Enter"); await page.waitForTimeout(1200);
+console.log("after attach focus", JSON.stringify(await focusInfo(page)), "live", JSON.stringify(await live(page)));
+await s.shot("poi-editor__image-attached");
+console.log(await page.locator("main").ariaSnapshot().then(t=>t.split("\n").filter(l=>/Primary|image|Remove|Change|alt|Choose asset/i.test(l)).slice(0,12).join("\n")));
+await s.browser.close();

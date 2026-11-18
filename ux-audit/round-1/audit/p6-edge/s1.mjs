@@ -1,0 +1,11 @@
+import { open, go, P, shot, log, alerts, focused } from "./lib.mjs";
+const { browser, page } = await open("curator", { viewport: "1440" });
+await go(page, `/projects/${P}/pois`); await page.waitForTimeout(1000);
+await shot(page, "pois__list__1440");
+const btns = await page.getByRole("button").allTextContents(); log(btns.map(b=>b.trim()).filter(Boolean).slice(0,30));
+await page.getByRole("button", { name: /new point|new poi|create/i }).first().click(); await page.waitForTimeout(500);
+await shot(page, "poi-create__open__1440"); log("focus", await focused(page));
+await page.getByRole("button", { name: /^create/i }).last().click(); await page.waitForTimeout(500);
+await shot(page, "poi-create__empty-submit__1440"); log("focus", await focused(page), await alerts(page));
+log(await page.locator("dialog,[role=dialog]").first().innerText());
+await browser.close();

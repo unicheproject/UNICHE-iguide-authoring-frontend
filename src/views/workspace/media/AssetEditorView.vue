@@ -1,17 +1,26 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from "vue";
+import { Copy, Download, Info, Replace } from "lucide-vue-next";
+import HelpHint from "@/components/ui/help-hint/HelpHint.vue";
+import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from "vue";
+import AssetPreview from "@/components/media/AssetPreview.vue";
+import EditorSection from "@/components/editor/EditorSection.vue";
 import EditorShell from "@/components/editor/EditorShell.vue";
+import OtherSettings from "@/components/editor/OtherSettings.vue";
 import UploadEntryRow from "@/components/media/UploadEntryRow.vue";
 import UploadLimits from "@/components/media/UploadLimits.vue";
 import TranslationsPanel, { type TextFieldGroup, type TextFieldMeta } from "@/components/editor/TranslationsPanel.vue";
-import { formatDate } from "@/lib/format";
+import { Button } from "@/components/ui/button";
+import Checkbox from "@/components/ui/checkbox/Checkbox.vue";
+import FormField from "@/components/ui/field/FormField.vue";
+import Input from "@/components/ui/input/Input.vue";
+import { say } from "@/lib/announcer";
+import { formatBytes, formatDate } from "@/lib/format";
 import {
   assetTypeLabel,
   changeAssetStatus,
   fetchAsset,
   fetchAssetDownload,
   fetchAssetReferences,
-  formatBytes,
   formatDuration,
   replaceAssetFile,
   isImage,
@@ -20,6 +29,8 @@ import {
   type AssetTranslation,
 } from "@/platform/assets";
 import { askConfirm } from "@/stores/confirm";
+import { assetAltSlots, completenessOf } from "@/platform/completeness";
+import { filledFields, translationStatus } from "@/workspace/translationStatus";
 import { useAssetUpload } from "@/workspace/useAssetUpload";
 import { ApiError } from "@/platform/api";
 import { showToast } from "@/stores/toast";
@@ -108,21 +119,83 @@ const groups = computed<TextFieldGroup[]>(() => [
   { id: "more", label: "More texts", keys: timed.value ? ["credits", "transcript"] : ["credits"], open: true },
 ]);
 
+// Where it is used: the editor lists the references; the library's count can differ (G-030).
+const references = ref<ResourceReference[] | null>(null);
+watch(
+  () => [asset.value?.id, asset.value?.version] as const,
+  async ([id], _old, onCleanup) => {
+    let stale = false;
+    onCleanup(() => (stale = true));
+    if (!id) return;
+    try {
+      const found = await fetchAssetReferences(projectId.value, id);
+      if (!stale) references.value = found;
+    } catch {
+      if (!stale) references.value = null;
+    }
+  },
+  { immediate: true },
+);
+/** The count the editor shows is the list of places below, read from the references; the library's own counter can differ (G-030). */
+const usedCount = computed(() => references.value?.length ?? asset.value?.usageCount ?? 0);
+const usedText = computed(() => (usedCount.value === 0 ? "Not used yet" : usedCount.value === 1 ? "1 resource" : `${usedCount.value} resources`));
+const usedDiffers = computed(() => !!asset.value && !!references.value && references.value.length !== asset.value.usageCount);
+const usedHint = computed(() =>
+  usedDiffers.value
+    ? `The media library shows ${asset.value?.usageCount} for this file; the list here shows ${usedCount.value}. The library's number comes from a counter that also counts images inside Guide text, which the list of places does not name. Trust the list: it is read for this file.`
+    : "The places that use this file are listed under Used in, in the side column.",
+);
+
+/** The facts of the file: only those the API gives, with the filename, size and duration an audio, video or PDF needs. */
 const facts = computed(() => {
   const a = asset.value;
   if (!a) return [];
   return [
-    { label: "Type", value: assetTypeLabel(a.type) },
     { label: "File", value: a.originalFilename },
-    { label: "Format", value: a.mimeType },
+    { label: "Type", value: `${assetTypeLabel(a.type)} (${a.mimeType})` },
     { label: "Size", value: formatBytes(a.sizeBytes) },
     ...(a.width && a.height ? [{ label: "Dimensions", value: `${a.width} × ${a.height} px` }] : []),
     ...(a.durationSeconds ? [{ label: "Duration", value: formatDuration(a.durationSeconds) }] : []),
     { label: "Uploaded", value: formatDate(a.createdAt) },
-    { label: "Used in", value: a.usageCount === 1 ? "1 resource" : `${a.usageCount} resources` },
-    { label: "Checksum", value: `${a.checksum.slice(0, 12)}…` },
+    { label: "Used in", value: usedText.value, hint: usedHint.value },
   ];
 });
+
+const checksumCopied = ref(false);
+async function copyChecksum() {
+  if (!asset.value) return;
+  try {
+    await navigator.clipboard.writeText(asset.value.checksum);
+    checksumCopied.value = true;
+    say("Checksum copied.");
+    setTimeout(() => (checksumCopied.value = false), 2500);
+  } catch {
+    showToast("Could not copy", "Select the checksum and copy it by hand.", "warning");
+  }
+}
+
+// Layout: from 1180 px the preview leads the sticky side column; below it a thumbnail row leads the form.
+const wideQuery = typeof window !== "undefined" ? window.matchMedia("(min-width: 1180px)") : null;
+const wide = ref(wideQuery?.matches ?? true);
+const onWide = (e: MediaQueryListEvent) => (wide.value = e.matches);
+onMounted(() => wideQuery?.addEventListener("change", onWide));
+onBeforeUnmount(() => wideQuery?.removeEventListener("change", onWide));
+/**
+ * The live form's completeness: tab marks, the Translations card, Next missing and "Before you activate" count typing as
+ * it happens (D-090). One definition of "Complete", the library row's (C3-37): a title, plus alternative text for an
+ * image. The caption is optional and never counts. Only alternative text (or decorative) blocks activation (D-107,
+ * `14` §4), so a missing title is a warning, never "no text yet".
+ */
+const translationRows = computed(() => translationStatus(languages.value, 1, (code) => filledFields(form.translations[code], ["title"] as const)));
+const liveCompleteness = computed(() =>
+  completenessOf({
+    baseBlocks: false,
+    languages: languages.value,
+    base: translationRows.value.map((s) => ({ languageCode: s.language.languageCode, filled: s.filled, total: s.total })),
+    slots: asset.value ? assetAltSlots({ type: asset.value.type, decorative: form.decorative, translations: form.translations }) : [],
+  }),
+);
+const preferredAlt = computed(() => form.translations[defaultLanguage.value ?? ""]?.alternativeText ?? "");
 
 // Replace and download --------------------------------------------------------------------------------------
 
@@ -192,21 +265,37 @@ const activationHint = computed(() =>
   plainImage.value ? "Activate it once it has alternative text in the default language, or mark it decorative." : "Activate it when it is ready to be used.",
 );
 
-/** Marking an image decorative is confirmed (`14` §2): screen readers then skip it. */
-async function setDecorative(event: Event) {
-  const box = event.target as HTMLInputElement;
-  if (!box.checked) {
+/** True while a non-default language is being written: the language-independent controls fold (D-079, C3-52). */
+const otherFolded = computed(() => !!editor.activeLanguage && editor.activeLanguage !== defaultLanguage.value);
+
+const decorativeBox = ref<{ $el: HTMLElement } | null>(null);
+/** The native box inside the Decorative checkbox. */
+const decorativeInput = () => decorativeBox.value?.$el.querySelector<HTMLInputElement>('input[type="checkbox"]') ?? null;
+/** Makes the drawn box say what the model says: the native box has already toggled when the change arrives (C3-77). */
+function syncDecorative() {
+  const input = decorativeInput();
+  if (input) input.checked = form.decorative;
+}
+
+/**
+ * Marking an image decorative is confirmed (`14` §2): screen readers then skip it. The box is controlled: it stays
+ * unticked while the question is open, and Esc or "Keep it described" leave it unticked, with the model unchanged.
+ */
+async function setDecorative(on: boolean) {
+  if (!on) {
     form.decorative = false;
+    syncDecorative();
     return;
   }
-  const confirmed = await askConfirm({
+  syncDecorative();
+  form.decorative = await askConfirm({
     title: "Mark the image decorative?",
     body: "Screen readers will skip it and it needs no alternative text. Choose this only when removing the image would lose nothing; a primary image of an exhibit is never decorative.",
     confirmLabel: "Mark decorative",
     cancelLabel: "Keep it described",
   });
-  form.decorative = confirmed;
-  box.checked = confirmed;
+  await nextTick();
+  syncDecorative();
 }
 </script>
 
@@ -220,58 +309,11 @@ async function setDecorative(event: Event) {
     :activation-hint="activationHint"
     :reference-link="toReference"
     :pending="languagesLoading"
+    :translations="translationRows"
+    :completeness="liveCompleteness"
   >
-    <section v-if="asset" class="overflow-hidden rounded-lg border bg-card">
-      <div class="flex justify-center bg-muted p-3.5">
-        <img v-if="isImage(asset)" :src="asset.url" :alt="form.translations[defaultLanguage ?? '']?.alternativeText || ''" class="max-h-[320px] max-w-full rounded object-contain" />
-        <audio v-else-if="asset.type === 'AUDIO'" :src="asset.url" controls class="w-full"></audio>
-        <video v-else-if="asset.type === 'VIDEO'" :src="asset.url" controls class="max-h-[320px] max-w-full"></video>
-        <a v-else :href="asset.url" target="_blank" rel="noopener" class="py-6 text-[13px] font-bold">Open the file ↗</a>
-      </div>
-      <dl class="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-x-4 gap-y-2.5 px-5 py-4 text-xs">
-        <div v-for="f in facts" :key="f.label" class="min-w-0">
-          <dt class="text-[10px] font-extrabold uppercase tracking-[0.09em] text-muted-foreground">{{ f.label }}</dt>
-          <dd class="break-words font-semibold" :class="{ 'font-mono font-normal': f.label === 'Checksum' }">{{ f.value }}</dd>
-        </div>
-      </dl>
-      <div class="flex flex-wrap items-center gap-2.5 border-t border-gray-100 px-5 py-3">
-        <button
-          type="button"
-          class="rounded-full border bg-muted px-4 py-2 text-[10px] font-bold uppercase tracking-[0.06em] text-gray-700 disabled:opacity-50"
-          :disabled="!editor.editable || !!replaceBlocked || replacing"
-          aria-describedby="replace-help"
-          @click="chooseReplacement"
-        >
-          {{ replacing ? "Replacing…" : "Replace file" }}
-        </button>
-        <input ref="replaceInput" type="file" class="sr-only" aria-label="Replacement file" tabindex="-1" :accept="replaceAccept" @change="onReplacement" />
-        <button
-          type="button"
-          class="rounded-full border bg-muted px-4 py-2 text-[10px] font-bold uppercase tracking-[0.06em] text-gray-700 disabled:opacity-50"
-          :disabled="downloading"
-          @click="download"
-        >
-          Download
-        </button>
-        <span v-if="replaceBlocked" id="replace-help" class="text-xs text-muted-foreground">{{ replaceBlocked }}</span>
-        <span v-else id="replace-help" class="text-xs text-muted-foreground">
-          A replacement must be {{ assetTypeLabel(asset.type).toLowerCase() }} too; texts and every use are kept.
-        </span>
-      </div>
-      <div v-if="replaceEntries.length" class="border-t border-gray-100 px-5 py-3">
-        <UploadLimits :limits="replacer.limits.value" :failed="replacer.limitsFailed.value" :types="[asset.type]" @reload="replacer.ensureLimits" />
-        <ul class="mt-2 rounded-lg border">
-          <UploadEntryRow
-            v-for="entry in replaceEntries"
-            :key="entry.key"
-            :entry="entry"
-            @retry="replacer.retry(entry)"
-            @cancel="replacer.cancel(entry)"
-          />
-        </ul>
-      </div>
-      <p class="sr-only" aria-live="polite">{{ replacer.announcement.value }}</p>
-    </section>
+    <!-- Below 1180 px the preview is one thumbnail row above the form, so the alternative text stays above the fold (C2-80). -->
+    <AssetPreview v-if="asset && !wide" :asset="asset" :alt="preferredAlt" compact />
 
     <TranslationsPanel
       v-if="asset"
@@ -289,45 +331,74 @@ async function setDecorative(event: Event) {
       title-required-hint="Required in the default language before the image can be activated, unless it is decorative."
     />
 
-    <section class="overflow-hidden rounded-lg border bg-card">
-      <div class="border-b px-5 py-3.5">
-        <h2 class="text-[11px] font-extrabold uppercase tracking-[0.09em] text-muted-foreground">Details</h2>
-      </div>
-      <div class="flex flex-col gap-3.5 px-5 py-[18px]">
-        <div class="flex flex-col gap-1.5">
-          <label for="f-name" class="small-label">Name</label>
-          <input
-            id="f-name"
-            v-model="form.internalName"
-            :readonly="!editor.editable"
-            class="field-input"
-            :class="{ invalid: editor.fieldError('internalName') }"
-            aria-describedby="f-name-help"
-          />
-          <span v-if="editor.fieldError('internalName')" id="f-name-help" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("internalName") }}</span>
-          <span v-else id="f-name-help" class="text-xs text-muted-foreground">Only authors see it; it is what the media library searches.</span>
-        </div>
-        <label v-if="image" class="flex items-start gap-2.5 text-[13px] font-semibold">
-          <input
-            :checked="form.decorative"
-            type="checkbox"
-            :disabled="!editor.editable"
-            class="mt-0.5 h-4 w-4 accent-primary"
-            @change="setDecorative"
-          />
-          <span>
-            Decorative: the image carries no information
-            <span class="block text-xs font-normal text-muted-foreground">
-              Screen readers skip it, and it needs no alternative text. Only when removing it would lose nothing.
-            </span>
-          </span>
-        </label>
-        <p v-if="floorPlan" class="text-xs text-muted-foreground">
-          For a floor plan, the alternative text summarises what the plan shows and points visitors to the list of what
-          is on it.
+    <OtherSettings :folded="otherFolded" :section-ids="['image-settings', 'details']" :summary="image ? 'Decorative image, Details' : 'Details'">
+      <EditorSection v-if="image" id="image-settings" title="Image settings">
+        <Checkbox
+          ref="decorativeBox"
+          :model-value="form.decorative"
+          :disabled="!editor.editable"
+          description="No alternative text is needed. Screen readers skip it. Only when removing the image would lose nothing. It applies to every language."
+          @update:model-value="setDecorative"
+        >
+          Decorative image
+        </Checkbox>
+        <p v-if="form.decorative" class="flex items-start gap-1.5 text-xs text-muted-foreground">
+          <Info class="mt-px size-4 shrink-0" aria-hidden="true" />Alternative text is not required while this is on. Text already written is kept but not used.
         </p>
-      </div>
-    </section>
+        <p v-if="floorPlan" class="text-xs text-muted-foreground">
+          For a floor plan, the alternative text summarises what the plan shows and points visitors to the list of what is on it.
+        </p>
+      </EditorSection>
 
+      <EditorSection id="details" title="Details">
+        <FormField label="Name" :error="editor.fieldError('internalName')" hint="Only authors see it; it is what the media library searches." v-slot="f">
+          <Input :id="f.id" v-model="form.internalName" :readonly="!editor.editable" :aria-describedby="f.describedBy" :invalid="f.invalid" />
+        </FormField>
+      </EditorSection>
+    </OtherSettings>
+
+    <template #aside>
+      <div v-if="asset" class="order-first flex flex-col gap-4">
+        <AssetPreview v-if="wide" :asset="asset" :alt="preferredAlt" />
+        <section class="rounded-lg border border-border bg-card p-4 shadow-1" aria-labelledby="file-heading">
+          <h2 id="file-heading" class="mb-2 text-sm font-bold">File</h2>
+          <dl class="flex flex-col gap-1.5 text-compact">
+            <div v-for="f in facts" :key="f.label" class="min-w-0">
+              <dt class="inline font-semibold text-ink-2">{{ f.label }}:</dt>
+              <dd class="ml-1 inline break-words">{{ f.value }}<HelpHint v-if="f.hint" label="Why the library may show another number" class="ml-0.5 size-6 align-text-bottom">{{ f.hint }}</HelpHint></dd>
+            </div>
+          </dl>
+          <details class="mt-2 text-compact">
+            <summary class="cursor-pointer font-semibold text-ink-2">Checksum</summary>
+            <p class="mono mt-1 break-all">{{ asset.checksum }}</p>
+            <Button variant="secondary" size="sm" class="mt-1" @click="copyChecksum"><Copy aria-hidden="true" />{{ checksumCopied ? "Copied" : "Copy checksum" }}</Button>
+          </details>
+          <div class="mt-3 flex flex-wrap gap-2 border-t border-border pt-3">
+            <Button
+              variant="secondary"
+              size="sm"
+              :loading="replacing"
+              :disabled-reason="!editor.editable ? 'This item cannot be edited' : (replaceBlocked ?? undefined)"
+              aria-describedby="replace-help"
+              @click="chooseReplacement"
+            >
+              <Replace aria-hidden="true" />{{ replacing ? "Replacing…" : "Replace file" }}
+            </Button>
+            <input ref="replaceInput" type="file" class="sr-only" aria-label="Replacement file" tabindex="-1" :accept="replaceAccept" @change="onReplacement" />
+            <Button variant="secondary" size="sm" :loading="downloading" @click="download"><Download aria-hidden="true" />Download</Button>
+          </div>
+          <p id="replace-help" class="mt-2 text-xs text-muted-foreground">
+            {{ replaceBlocked ?? `A replacement must be ${assetTypeLabel(asset.type).toLowerCase()} too; texts and every use are kept.` }}
+          </p>
+          <div v-if="replaceEntries.length" class="mt-3">
+            <UploadLimits :limits="replacer.limits.value" :failed="replacer.limitsFailed.value" :types="[asset.type]" @reload="replacer.ensureLimits" />
+            <ul class="mt-2 rounded-lg border border-border" aria-label="Replacement">
+              <UploadEntryRow v-for="entry in replaceEntries" :key="entry.key" :entry="entry" @retry="replacer.retry(entry)" @cancel="replacer.cancel(entry)" @confirm="replacer.confirmHeld(entry)" @skip="replacer.skipHeld(entry)" />
+            </ul>
+          </div>
+          <div role="log" aria-label="Replacement activity" aria-live="polite" class="sr-only"><p v-for="item in replacer.log.value" :key="item.id">{{ item.text }}</p></div>
+        </section>
+      </div>
+    </template>
   </EditorShell>
 </template>

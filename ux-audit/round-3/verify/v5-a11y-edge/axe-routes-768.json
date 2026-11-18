@@ -1,0 +1,138 @@
+[
+ {
+  "label": "dashboard",
+  "v": []
+ },
+ {
+  "label": "places",
+  "v": []
+ },
+ {
+  "label": "pois",
+  "v": []
+ },
+ {
+  "label": "routes",
+  "v": []
+ },
+ {
+  "label": "guides",
+  "v": []
+ },
+ {
+  "label": "events",
+  "v": []
+ },
+ {
+  "label": "categories",
+  "v": []
+ },
+ {
+  "label": "maps",
+  "v": []
+ },
+ {
+  "label": "floorplans",
+  "v": []
+ },
+ {
+  "label": "media",
+  "v": []
+ },
+ {
+  "label": "preview",
+  "v": []
+ },
+ {
+  "label": "poi-active-wc",
+  "v": []
+ },
+ {
+  "label": "poi-draft",
+  "v": []
+ },
+ {
+  "label": "place",
+  "v": []
+ },
+ {
+  "label": "route",
+  "v": []
+ },
+ {
+  "label": "guide",
+  "v": []
+ },
+ {
+  "label": "event",
+  "v": []
+ },
+ {
+  "label": "category",
+  "v": []
+ },
+ {
+  "label": "map",
+  "v": []
+ },
+ {
+  "label": "floorplan",
+  "v": []
+ },
+ {
+  "label": "asset",
+  "v": []
+ },
+ {
+  "label": "oos-overview",
+  "v": []
+ },
+ {
+  "label": "oos-languages",
+  "v": []
+ },
+ {
+  "label": "oos-surfaces",
+  "v": []
+ },
+ {
+  "label": "oos-translations",
+  "v": []
+ },
+ {
+  "label": "oos-navigation",
+  "v": []
+ },
+ {
+  "label": "oos-pages",
+  "v": []
+ },
+ {
+  "label": "oos-launch",
+  "v": []
+ },
+ {
+  "label": "oos-audit",
+  "v": []
+ },
+ {
+  "label": "home",
+  "v": []
+ },
+ {
+  "label": "create-project",
+  "v": []
+ },
+ {
+  "label": "notfound",
+  "v": []
+ },
+ {
+  "label": "project404",
+  "v": []
+ },
+ {
+  "label": "app-preview",
+  "v": []
+ }
+]

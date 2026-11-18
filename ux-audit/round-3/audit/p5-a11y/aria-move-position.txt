@@ -1,0 +1,9 @@
+- dialog "Move East Pediment Fragments":
+  - heading "Move East Pediment Fragments" [level=2]
+  - button "Close dialog"
+  - text: New position
+  - paragraph: Now at 2 of 93. Choose 1 to 93.
+  - textbox "New position": "2"
+  - contentinfo:
+    - button "Cancel"
+    - button "Move"

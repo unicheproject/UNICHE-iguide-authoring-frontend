@@ -1,0 +1,10 @@
+import { start, go, P } from "./common.mjs";
+const s = await start();
+const t0=Date.now();
+await go(s.page, P + "/pois");
+console.log("load ms", Date.now()-t0);
+await s.page.waitForTimeout(1000);
+await s.shot("pois-list__default");
+console.log(await s.page.title(), s.page.url());
+console.log((await s.page.locator("main").innerText()).slice(0,1800));
+await s.browser.close();

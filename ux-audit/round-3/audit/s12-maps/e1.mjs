@@ -1,0 +1,25 @@
+import { open, go, shot, POP, run, axe, focusDesc, log, start } from "./lib.mjs";
+import { readFileSync, writeFileSync } from "node:fs";
+import { join, dirname } from "node:path"; import { fileURLToPath } from "node:url";
+const here = dirname(fileURLToPath(import.meta.url));
+const vp = process.argv[2] || "1440";
+await run(async () => { try {
+  const { browser, page } = await start(vp); log("=== e1 new floor plan", vp);
+  await go(page, `/projects/${POP}/floor-plans`); await page.waitForTimeout(1200);
+  await page.getByRole("button", { name: "New floor plan" }).click(); await page.waitForTimeout(800);
+  const dlg = page.getByRole("dialog");
+  log("focus on open", await focusDesc(page), JSON.stringify(await dlg.boundingBox()));
+  await shot(page, "new-plan__open", vp);
+  await page.getByRole("button", { name: "Create floor plan" }).click(); await page.waitForTimeout(700);
+  log("after empty submit focus", await focusDesc(page), "summary:", await dlg.locator('[role=alert], [role=status]').allInnerTexts());
+  await shot(page, "new-plan__empty-submit", vp);
+  log("place options", await page.locator("#fp-place option").allInnerTexts());
+  await page.getByRole("button", { name: /Plan image: Choose image/ }).click(); await page.waitForTimeout(1500);
+  const dlgs = page.getByRole("dialog"); log("dialogs open", await dlgs.count());
+  await shot(page, "new-plan__picker", vp);
+  const top = dlgs.last();
+  log("picker text", (await top.innerText()).slice(0,600).replace(/\n+/g," | "));
+  log("picker type select", await top.locator("select").evaluateAll(s=>s.map(x=>({label:x.getAttribute("aria-label")||x.id, val:x.value, opts:[...x.options].map(o=>o.text).join(",")}))));
+  log("picker tiles", await top.locator("button").evaluateAll(b=>b.slice(0,12).map(x=>(x.getAttribute("aria-label")||x.innerText).trim().replace(/\n/g," ").slice(0,50))));
+  await browser.close();
+} catch(e){ log("FAIL", e.message.slice(0,500)); } });

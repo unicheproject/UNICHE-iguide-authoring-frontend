@@ -1,0 +1,10 @@
+import { open, go, rec, P, shot, ready, tall, SH, axe } from "./h.mjs";
+const { browser, page } = await open("curator", { viewport: "1440" });
+const log=(...a)=>console.log(...a);
+await go(page, `/projects/${P}/pois/${rec.poiA}`); await ready(page);
+await page.locator("#triggers").scrollIntoViewIfNeeded();
+await page.getByRole("link",{name:/Test in preview/}).first().click(); await page.waitForTimeout(5000);
+log(page.url());
+log("controls", await page.locator("main").innerText().then(t=>t.slice(0,900)));
+await page.screenshot({path:SH+"preview__from-test-in-preview__1440.png"});
+await browser.close();

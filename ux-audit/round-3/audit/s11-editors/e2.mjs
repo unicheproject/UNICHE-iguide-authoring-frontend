@@ -1,0 +1,11 @@
+import { open, go, P, shot, settle, IDS, url, txt } from "./lib.mjs";
+const { browser, page } = await open("admin", { viewport: "1440" });
+await go(page, url("events", IDS.event)); await settle(page,1500);
+await page.locator("#occ-add").click(); await settle(page,500);
+console.log("focus", await page.evaluate(()=>document.activeElement.outerHTML.slice(0,200)));
+await page.locator("#dates").scrollIntoViewIfNeeded().catch(()=>{});
+const sec = page.locator("section").filter({has: page.getByRole("heading",{name:/^Dates/})});
+console.log((await sec.innerText()).replace(/\n+/g," | "));
+await shot(page,"event__dates-added__1440");
+console.log((await sec.evaluate(e=>e.outerHTML)).replace(/<svg.*?<\/svg>/g,"<svg/>").replace(/class="[^"]*"/g,"").slice(0,6500));
+await browser.close();

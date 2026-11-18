@@ -1,0 +1,150 @@
+{
+ "pois": [
+  {
+   "total": 0.0167,
+   "shifts": [
+    {
+     "v": 0.0167,
+     "t": 421,
+     "s": [
+      "BODY. h892->900 y8->0"
+     ]
+    },
+    {
+     "v": 0,
+     "t": 1735,
+     "s": [
+      "LABEL.relative inline-flex min-h-8 c h32->32 y168->168",
+      "LABEL.relative inline-flex min-h-8 c h32->32 y168->168",
+      "LABEL.relative inline-flex min-h-8 c h32->32 y168->168"
+     ]
+    }
+   ]
+  },
+  {
+   "total": 0,
+   "shifts": [
+    {
+     "v": 0,
+     "t": 2572,
+     "s": [
+      "LABEL.relative inline-flex min-h-8 c h32->32 y168->168",
+      "LABEL.relative inline-flex min-h-8 c h32->32 y168->168",
+      "LABEL.relative inline-flex min-h-8 c h32->32 y168->168"
+     ]
+    }
+   ]
+  },
+  {
+   "total": 0.0167,
+   "shifts": [
+    {
+     "v": 0.0167,
+     "t": 361,
+     "s": [
+      "BODY. h892->900 y8->0"
+     ]
+    },
+    {
+     "v": 0,
+     "t": 2053,
+     "s": [
+      "LABEL.relative inline-flex min-h-8 c h32->32 y168->168",
+      "LABEL.relative inline-flex min-h-8 c h32->32 y168->168",
+      "LABEL.relative inline-flex min-h-8 c h32->32 y168->168"
+     ]
+    }
+   ]
+  }
+ ],
+ "places": [
+  {
+   "total": 0.0001,
+   "shifts": [
+    {
+     "v": 0.0001,
+     "t": 1842,
+     "s": [
+      "DIV.inline-flex max-w-full flex-wr h38->38 y165->165"
+     ]
+    }
+   ]
+  },
+  {
+   "total": 0.0168,
+   "shifts": [
+    {
+     "v": 0.0167,
+     "t": 323,
+     "s": [
+      "BODY. h892->900 y8->0"
+     ]
+    },
+    {
+     "v": 0.0001,
+     "t": 2681,
+     "s": [
+      "DIV.inline-flex max-w-full flex-wr h38->38 y165->165"
+     ]
+    }
+   ]
+  },
+  {
+   "total": 0.0001,
+   "shifts": [
+    {
+     "v": 0.0001,
+     "t": 4081,
+     "s": [
+      "DIV.inline-flex max-w-full flex-wr h38->38 y165->165"
+     ]
+    }
+   ]
+  }
+ ],
+ "routes": [
+  {
+   "total": 0.0002,
+   "shifts": [
+    {
+     "v": 0.0002,
+     "t": 2358,
+     "s": [
+      "DIV.inline-flex max-w-full flex-wr h38->38 y165->165"
+     ]
+    }
+   ]
+  },
+  {
+   "total": 0.0002,
+   "shifts": [
+    {
+     "v": 0.0002,
+     "t": 1615,
+     "s": [
+      "DIV.inline-flex max-w-full flex-wr h38->38 y165->165"
+     ]
+    }
+   ]
+  },
+  {
+   "total": 0.0169,
+   "shifts": [
+    {
+     "v": 0.0167,
+     "t": 500,
+     "s": [
+      "BODY. h892->900 y8->0"
+     ]
+    },
+    {
+     "v": 0.0002,
+     "t": 1853,
+     "s": [
+      "DIV.inline-flex max-w-full flex-wr h38->38 y165->165"
+     ]
+    }
+   ]
+  }
+ ]
+}

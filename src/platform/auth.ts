@@ -1,6 +1,7 @@
 import Keycloak, { type KeycloakTokenParsed } from "keycloak-js";
 import { reactive, readonly } from "vue";
 import { ConfigurationError, loadConfig, type PlatformConfig } from "./config";
+import { markSessionEnded } from "@/stores/sessionNotice";
 
 /**
  * The CMS session against the shared UNICHE Keycloak realm.
@@ -23,9 +24,17 @@ export interface SessionUser {
   initials: string;
 }
 
+/** What stopped the sign-in, so the error page can word the next step: only `unreachable` and `session-loop` can be retried by the author. */
+export type SessionErrorKind = "configuration" | "unreachable" | "unusable-token" | "session-loop";
+
 export interface SessionError {
+  kind: SessionErrorKind;
+  /** Short headline, in the author's words. */
   title: string;
+  /** What happened and what to do next, with no operator vocabulary. */
   detail: string;
+  /** Operator detail (names of settings, hosts, clients) for the collapsed "Technical details". */
+  technical: string | null;
 }
 
 interface SessionState {
@@ -65,8 +74,10 @@ export async function initSession(): Promise<void> {
   } catch (e) {
     if (e instanceof ConfigurationError) {
       fail(
-        "The CMS is not configured",
-        `Set ${e.missing.join(", ")} in public/config.js or as VITE_* variables in .env.local.`,
+        "configuration",
+        "iGuide CMS is not set up yet",
+        "This copy of the CMS is missing settings it needs to sign you in. Nothing is wrong with your account. Tell the person who runs this CMS, and include the technical details below.",
+        `Missing: ${e.missing.join(", ")}. Set them in public/config.js or as VITE_* variables in .env.local.`,
       );
       return;
     }
@@ -96,7 +107,9 @@ export async function initSession(): Promise<void> {
     // Keycloak answers an unknown client or a disallowed redirect URI with its own error page, which
     // never reports back to the silent check, so both look like a timeout from here.
     fail(
-      "Sign-in with UNICHE could not start",
+      "unreachable",
+      "Sign-in with UNICHE did not start",
+      "The UNICHE sign-in service did not answer. Check your connection and try again. If it keeps happening, tell the person who runs this CMS.",
       `Keycloak at ${config.idpUrl} did not answer the sign-in check. Either it is not reachable, or the ` +
         `"${config.clientId}" client is not registered in the "${config.realm}" realm with ` +
         `${window.location.origin}/* as a redirect URI and ${window.location.origin} as a web origin.`,
@@ -104,6 +117,8 @@ export async function initSession(): Promise<void> {
     return;
   }
 
+  // The sign-in response (code, state, session_state) must not stay in the address bar or in a Back entry (C2-14).
+  clearCallbackFromAddressBar();
   if (!authenticated) {
     state.status = "unauthenticated";
     return;
@@ -111,7 +126,22 @@ export async function initSession(): Promise<void> {
   acceptToken();
 }
 
+/** Browser-session key holding when the last sign-in redirect started (a time, never a token). */
+const REDIRECT_KEY = "iguide.signInRedirectAt";
+/** A persistent `401` may send the author to sign-in at most once in this many milliseconds (plan 2.4). */
+const REDIRECT_WINDOW_MS = 30_000;
+
+/**
+ * Sends the browser to the UNICHE sign-in and back to this URL. It notes the time (never a token), so a `401` that
+ * survives signing in cannot send the author round and round: a second one inside 30 seconds ends on the "session keeps
+ * ending" page instead (`sessionExpired`).
+ */
 export function login(): Promise<void> {
+  try {
+    window.sessionStorage.setItem(REDIRECT_KEY, String(Date.now()));
+  } catch {
+    // Storage blocked: sign-in still works, only the loop cap is lost.
+  }
   return requireKeycloak().login({ redirectUri: returnUrl() });
 }
 
@@ -143,6 +173,23 @@ function returnUrl(): string {
   return url.toString();
 }
 
+/**
+ * Replaces the current history entry with the address without the sign-in response (fragment or query), so Back never
+ * returns to a URL that carries a spent authorization code. Replaces, never pushes: the history length is unchanged.
+ */
+function clearCallbackFromAddressBar(): void {
+  const url = new URL(window.location.href);
+  const fragment = new URLSearchParams(url.hash.slice(1));
+  const query = url.searchParams;
+  if (!CALLBACK_PARAMS.some((name) => fragment.has(name) || query.has(name))) return;
+  CALLBACK_PARAMS.forEach((name) => {
+    fragment.delete(name);
+    query.delete(name);
+  });
+  url.hash = fragment.toString();
+  window.history.replaceState(window.history.state, "", url.toString());
+}
+
 export function logout(): Promise<void> {
   state.user = null;
   return requireKeycloak().logout({ redirectUri: `${window.location.origin}/` });
@@ -169,9 +216,30 @@ export async function forceTokenRefresh(): Promise<void> {
   await refreshToken(-1);
 }
 
-/** Sends the user back to Keycloak and returns to the current URL afterwards. Never resolves. */
+function recentRedirect(): boolean {
+  try {
+    return Date.now() - Number(window.sessionStorage.getItem(REDIRECT_KEY) ?? 0) < REDIRECT_WINDOW_MS;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * The session ended: shows the "Your session ended" dialog (edits stay in this browser) and waits for the author to sign
+ * in again, instead of redirecting silently. Never resolves. When the session ended again right after a sign-in, the
+ * page says so rather than looping (C1-62).
+ */
 export async function sessionExpired(): Promise<never> {
-  await login();
+  if (recentRedirect()) {
+    fail(
+      "session-loop",
+      "Your session keeps ending",
+      "You signed in, but the CMS was refused again straight away. Your unsaved edits are still in this browser. Wait a moment and sign in again; if it keeps happening, tell the person who runs this CMS.",
+      "A request returned 401 within 30 seconds of the last sign-in redirect, so no further automatic redirect was made.",
+    );
+  } else {
+    markSessionEnded();
+  }
   return new Promise<never>(() => {});
 }
 
@@ -186,14 +254,21 @@ async function refreshToken(minValidity: number): Promise<void> {
 function acceptToken(): void {
   const token = requireKeycloak().tokenParsed;
   if (!token?.sub) {
-    fail("Sign-in returned an unusable token", "The token carries no subject.");
+    fail(
+      "unusable-token",
+      "Your sign-in cannot be used by the CMS",
+      "UNICHE signed you in, but the CMS cannot read who you are. Tell the person who runs this CMS.",
+      "The token carries no subject.",
+    );
     return;
   }
   // The backends reject any token without the platform audience. Checking it here turns a
   // misconfigured Keycloak client into a clear message instead of a 401 on the first API call.
   if (!hasAudience(token, platformConfig().audience)) {
     fail(
+      "unusable-token",
       "Your sign-in cannot be used by the CMS",
+      "UNICHE signed you in, but this CMS is not yet allowed to act for you. Nothing is wrong with your account. Tell the person who runs this CMS.",
       `The access token does not carry the "${platformConfig().audience}" audience. ` +
         `The "${platformConfig().clientId}" client needs an audience mapper in Keycloak.`,
     );
@@ -240,10 +315,10 @@ function initialsOf(given: string | null, family: string | null, displayName: st
   return letters.toUpperCase();
 }
 
-function fail(title: string, detail: string): void {
+function fail(kind: SessionErrorKind, title: string, detail: string, technical: string | null): void {
   state.status = "error";
   state.user = null;
-  state.error = { title, detail };
+  state.error = { kind, title, detail, technical };
 }
 
 function requireKeycloak(): Keycloak {

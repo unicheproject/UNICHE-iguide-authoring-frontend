@@ -1,0 +1,10 @@
+import { open, go } from "../../../tools/session.mjs";
+import { readFileSync } from "node:fs";
+const seed = JSON.parse(readFileSync(new URL("../../../tools/seed.json", import.meta.url), "utf8"));
+const { browser, page } = await open("curator", { viewport: "1440" });
+page.on("console", (m) => m.type() === "error" && console.log("console:", m.text().slice(0, 300)));
+page.on("pageerror", (e) => console.log("pageerror:", e.message.slice(0, 300)));
+await go(page, `/projects/${seed.projects.populated.id}/preview`);
+await page.waitForTimeout(8000);
+console.log(page.url(), (await page.locator("body").innerText()).slice(0, 300));
+await browser.close();

@@ -1,0 +1,12 @@
+import { start, goP, log, dump, save, focused } from "./lib.mjs";
+const s = await start("1440"); const { page } = s;
+await goP(page, "/categories");
+await s.shot("categories-list", false);
+log((await dump(page)).slice(0, 500));
+await page.getByRole("button", { name: /new category/i }).first().click(); await page.waitForTimeout(500);
+await s.shot("category-create-dialog");
+log(await dump(page, "[role=dialog]"));
+await page.getByRole("button", { name: /create category/i }).click(); await page.waitForTimeout(500);
+await s.shot("category-create-empty-submit");
+log("EMPTY:", await dump(page, "[role=dialog]"));
+await s.browser.close();

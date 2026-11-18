@@ -1,0 +1,12 @@
+## guard link {"url":"http://localhost:5173/projects/PID/pois/86e64373-b09c-4b8e-acbb-3fc84fdfc697","msgs":["Unsaved changes","3 warnings, nothing blocks.","Leave without saving? You have unsaved changes to this point of interest. They stay in this browser as a draft: you can restore them when you open it again, but nobody else sees them and visitors never do. Keep editing Leave without saving"],"focus":"h2#dialog-hyqhkkp \"Leave without saving?\""}
+guard buttons ["","Keep editing","Leave without saving"]
+guard esc {"url":"http://localhost:5173/projects/PID/pois/86e64373-b09c-4b8e-acbb-3fc84fdfc697","dialogs":0,"focus":"h1 \"UX-R3-p6 POI A e2 slow\""}
+## guard link {"url":"http://localhost:5173/projects/PID/pois/86e64373-b09c-4b8e-acbb-3fc84fdfc697","msgs":["Unsaved changes","3 warnings, nothing blocks.","Leave without saving? You have unsaved changes to this point of interest. They stay in this browser as a draft: you can restore them when you open it again, but nobody else sees them and visitors never do. Keep editing Leave without saving"],"focus":"h2#dialog-lfuygpj \"Leave without saving?\""}
+guard buttons ["","Keep editing","Leave without saving"]
+guard esc {"url":"http://localhost:5173/projects/PID/pois/86e64373-b09c-4b8e-acbb-3fc84fdfc697","dialogs":0,"focus":"h1 \"UX-R3-p6 POI A e2 slow\""}
+## guard back {"url":"http://localhost:5173/projects/PID/pois/86e64373-b09c-4b8e-acbb-3fc84fdfc697","dialogs":0,"msgs":["Unsaved changes","3 warnings, nothing blocks.","Places loaded"]}
+switcher UX Audit – Populated App: Draft . Switch project
+## guard all-projects link {"url":"http://localhost:5173/projects/PID/pois/86e64373-b09c-4b8e-acbb-3fc84fdfc697","dialogs":1,"msgs":["Unsaved changes","3 warnings, nothing blocks.","Places loaded"]}
+guard btns2 ["","Keep editing","Leave without saving"]
+reload dialogs ["beforeunload: "] url http://localhost:5173/projects/PID/pois/86e64373-b09c-4b8e-acbb-3fc84fdfc697
+restore row {"msgs":["Unsaved changes"],"title":"UX-R3-p6 POI A e2 slow guard1"}

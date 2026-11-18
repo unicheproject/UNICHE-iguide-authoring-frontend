@@ -1,0 +1,17 @@
+import { open, go } from "../../../tools/session.mjs";
+const D = "ux-audit/round-2/implementation/P3b/after";
+const P = "6958c18f-60d2-4140-a524-5a43f8a2f6b5";
+const { browser, page } = await open("admin", { viewport: "1440" });
+await go(page, `/projects/${P}/categories?create=1`); await page.waitForTimeout(3000);
+console.log("url", page.url(), "dialog", await page.getByRole("dialog").count());
+const d = page.getByRole("dialog");
+await d.getByRole("textbox").first().fill("UX-R2-P3b sub");
+await d.getByText("POI", { exact: false }).first();
+await d.getByLabel(/Points of Interest/).first().check({ force: true }).catch(() => {});
+await d.getByLabel("Subcategory").check({ force: true });
+let reqs = 0; page.on("request", (r) => { if (r.method() === "POST") reqs++; });
+await d.getByRole("button", { name: /Create and open/ }).click(); await page.waitForTimeout(800);
+await page.screenshot({ path: `${D}/create-category-no-parent.png` });
+console.log("errors", await d.locator("[data-error-summary]").innerText().catch(() => "none"), "posts", reqs);
+console.log("select options", await d.locator("select option").allInnerTexts());
+await browser.close();

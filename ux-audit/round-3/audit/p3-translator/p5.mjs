@@ -1,0 +1,14 @@
+import { open, go, base, shot } from "./lib.mjs";
+import { readFileSync } from "node:fs";
+const R = JSON.parse(readFileSync("ux-audit/round-3/audit/p3-translator/records.json","utf8"));
+const { browser, page } = await open("admin", { viewport: "1440" });
+await go(page, R.pois);
+await page.waitForSelector("h1"); await page.waitForTimeout(1800);
+await page.getByRole("button",{name:/^Apply changes/}).first().click();
+await page.waitForTimeout(600);
+await page.locator("[role=dialog]").getByRole("button",{name:/^Apply changes$/}).click();
+await page.waitForTimeout(1200);
+await shot(page,"poi-editor__after-apply__1440");
+console.log("focus:", await page.evaluate(()=>document.activeElement?.tagName+" "+(document.activeElement?.innerText||document.activeElement?.id||"").slice(0,40)));
+console.log("toast/live:", await page.evaluate(()=>[...document.querySelectorAll("[role=status],[role=alert],[aria-live]")].map(e=>e.innerText.trim().replace(/\s+/g," ")).filter(Boolean).join(" || ")));
+await browser.close();

@@ -1,144 +1,248 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, watch } from "vue";
+/**
+ * Dashboard (`12` §3, plan 2.5, D-077, D-092, D-112): the answer to "what do I do now". One status line ("Visitor app:
+ * Draft · Content revision N"), the first-run guide until it is done or dismissed, the Status card (how the visitor app
+ * goes live), "Waiting for you to apply", warnings with one row per Resource, the content counts and the Project
+ * details. Everything is requested at once. Translation bars and latest packages are absent until their endpoints exist
+ * (G-023, G-024); nothing here approximates them.
+ *
+ * Layout: from 1100 px two columns (guide, status, pending and warnings on the left, counts and details on the right);
+ * below it one column in which the counts come second, so the Tab order always follows the visual order (C3-55). The
+ * blocks are placed from one list, so the DOM order is the visual order in both layouts.
+ */
+import { CircleCheck, CircleDashed, CirclePause, CircleQuestionMark } from "lucide-vue-next";
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import PageFrame from "@/components/PageFrame.vue";
 import PageHead from "@/components/PageHead.vue";
-import { formatDate } from "@/lib/format";
+import { Alert, ProblemAlert } from "@/components/ui/alert";
+import { Chip } from "@/components/ui/chip";
+import { HelpHint } from "@/components/ui/help-hint";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { hints, statusWord } from "@/lib/glossary";
 import { ApiError } from "@/platform/api";
-import { describeIssue, fetchReadiness, issueLink, kindName, type Readiness, type ReadinessIssue } from "@/platform/readiness";
+import { fetchDashboardData, type DashboardData } from "@/platform/dashboardData";
+import { dashboardIssues, fetchReadiness, issueRows, type Readiness } from "@/platform/readiness";
 import { findOrganisation } from "@/stores/projects";
 import { useCurrentProject } from "@/workspace/currentProject";
+import ContentCounts from "./dashboard/ContentCounts.vue";
+import FirstRunGuide from "./dashboard/FirstRunGuide.vue";
+import { useGuideMemory } from "./dashboard/guideState";
+import PendingChanges from "./dashboard/PendingChanges.vue";
+import ProjectDetails from "./dashboard/ProjectDetails.vue";
+import ReadinessGroups from "./dashboard/ReadinessGroups.vue";
+import StatusCard from "./dashboard/StatusCard.vue";
 
 const project = useCurrentProject();
+/** Null while the organisations are still loading: the subtitle then shows the Project name alone (no placeholder word). */
+const organisationName = computed(() => findOrganisation(project.value.orgId)?.name ?? null);
+const subtitle = computed(() => (organisationName.value ? `${project.value.name} · ${organisationName.value}` : project.value.name));
 
-const organisationName = computed(() => findOrganisation(project.value.orgId)?.name ?? "Organisation");
-
-// Readiness: one status card answering "what do I do now" (spec 12 section 3 Dashboard, DECISIONS.md D-022).
+const data = ref<DashboardData | null>(null);
 const readiness = ref<Readiness | null>(null);
-const readinessError = ref<ApiError | null>(null);
-const showAll = ref(false);
+const dataError = ref<unknown>(null);
+const readinessError = ref<unknown>(null);
+const loading = ref(true);
 let controller: AbortController | null = null;
 
-async function loadReadiness() {
-  controller?.abort();
-  controller = new AbortController();
-  readinessError.value = null;
+const isAbort = (e: unknown) => e instanceof DOMException && e.name === "AbortError";
+
+/** Readiness, with a failed read kept as an error to show instead of the Status card. */
+async function loadReadiness(id: string, signal: AbortSignal): Promise<Readiness | ApiError> {
   try {
-    readiness.value = await fetchReadiness(project.value.id, controller.signal);
+    return await fetchReadiness(id, signal);
   } catch (e) {
-    if (e instanceof DOMException && e.name === "AbortError") return;
-    if (!(e instanceof ApiError)) throw e;
-    readinessError.value = e;
+    if (e instanceof ApiError) return e;
+    throw e;
   }
 }
-watch(() => project.value.id, loadReadiness, { immediate: true });
+
+async function load() {
+  controller?.abort();
+  const mine = (controller = new AbortController());
+  const id = project.value.id;
+  loading.value = true;
+  dataError.value = null;
+  readinessError.value = null;
+  data.value = null;
+  readiness.value = null;
+  if (!project.value.initialized) {
+    loading.value = false;
+    return;
+  }
+  try {
+    // One round of requests: counts, pending, settings, languages, menu and readiness together (C2-73).
+    const [loaded, checked] = await Promise.all([fetchDashboardData(id, mine.signal), loadReadiness(id, mine.signal)]);
+    if (mine.signal.aborted) return;
+    data.value = loaded;
+    if (checked instanceof ApiError) readinessError.value = checked;
+    else readiness.value = checked;
+  } catch (e) {
+    if (isAbort(e)) return;
+    if (!(e instanceof ApiError)) throw e;
+    dataError.value = e;
+  } finally {
+    if (controller === mine) loading.value = false;
+  }
+}
+watch(() => project.value.id, load, { immediate: true });
 onBeforeUnmount(() => controller?.abort());
 
-const blocking = computed(() => readiness.value?.blocking ?? []);
-const warnings = computed(() => readiness.value?.warnings ?? []);
-const shownBlocking = computed(() => (showAll.value ? blocking.value : blocking.value.slice(0, 3)));
-const link = (issue: ReadinessIssue) => issueLink(project.value.id, issue);
-const where = (issue: ReadinessIssue) =>
-  issue.resourceType === "PROJECT" ? "Project" : `${kindName(issue.resourceType)}${issue.title ? ` “${issue.title}”` : ""}`;
+/** Whether the two-column layout applies (the `nav` breakpoint, 1100 px). */
+const wide = ref(false);
+let query: MediaQueryList | null = null;
+const syncWide = () => (wide.value = query?.matches ?? false);
+onMounted(() => {
+  query = window.matchMedia("(min-width: 1100px)");
+  syncWide();
+  query.addEventListener("change", syncWide);
+});
+onBeforeUnmount(() => query?.removeEventListener("change", syncWide));
 
-const details = computed(() => [
-  { label: "Organisation", value: organisationName.value },
-  { label: "Slug", value: project.value.slug, mono: true },
-  ...(project.value.template ? [{ label: "Template", value: `${project.value.template.name} v${project.value.template.version}` }] : []),
-  { label: "Created", value: formatDate(project.value.createdAt) },
-  { label: "Last updated", value: formatDate(project.value.updatedAt) },
-]);
+const countOf = (path: string) => {
+  const c = data.value?.counts.find((x) => x.kind.path === path);
+  return c ? c.active + c.draft : 0;
+};
+const guide = useGuideMemory(computed(() => project.value.id));
+/** Nothing to show but the guide: no Place or no Point of interest and nothing live. */
+const firstRun = computed(() => data.value !== null && data.value.activeTotal === 0 && (countOf("places") === 0 || countOf("pois") === 0));
+/**
+ * Whether the guide still has something to teach: with live content the Status card already says what to do next
+ * (D-092). It stays until the viewer dismisses it, and Project details can bring it back (D-112).
+ */
+const guideApplies = computed(() => data.value !== null && (firstRun.value || data.value.activeTotal === 0));
+const guideShown = computed(() => guideApplies.value && !guide.dismissed.value);
+const canRestoreGuide = computed(() => guideApplies.value && guide.dismissed.value);
+
+/** Warnings without pending-changes noise, and the blockers: the same rows the Status card and the list count. */
+const warnings = computed(() => dashboardIssues(readiness.value?.warnings ?? []));
+const warningCount = computed(() => issueRows(warnings.value).length);
+
+/** The warnings list, bound by a function ref because it sits inside the column loop. */
+let warningsList: InstanceType<typeof ReadinessGroups> | null = null;
+const bindWarnings = (el: unknown) => (warningsList = (el as InstanceType<typeof ReadinessGroups> | null) ?? null);
+async function reviewWarnings() {
+  await nextTick();
+  warningsList?.reveal();
+}
+
+type Block = "guide" | "status" | "pending" | "warnings" | "counts" | "details";
+/** The blocks present, in reading order for each layout: one column below 1100 px, two from it. */
+const blocks = computed<Block[][]>(() => {
+  const guideOnly = guideShown.value && firstRun.value;
+  const head: Block[] = [];
+  if (guideShown.value) head.push("guide");
+  if (!guideOnly) head.push("status");
+  const rest: Block[] = [];
+  if (data.value && (data.value.pending.total > 0 || data.value.pendingError)) rest.push("pending");
+  if (warnings.value.length && !guideOnly) rest.push("warnings");
+  return wide.value ? [[...head, ...rest], ["counts", "details"]] : [[...head, "counts", ...rest, "details"]];
+});
+
+/** Placeholder heights that mirror the loaded blocks of each layout (status, counts, pending, details), so nothing jumps. */
+const skeletons = computed(() =>
+  wide.value ? [["h-44", "h-[34rem]"], ["h-[33.5rem]", "h-14"]] : [["h-44", "h-48", "h-[34rem]", "h-14"]],
+);
+
+const appStatus = computed(() => data.value?.settings?.applicationStatus ?? null);
+const statusIcon = computed(() => (appStatus.value === "LIVE" ? CircleCheck : appStatus.value === "SUSPENDED" ? CirclePause : appStatus.value === "DRAFT" ? CircleDashed : CircleQuestionMark));
+/** "Draft", "Live" or "Suspended"; a status this CMS does not know is "unknown", never the server's word. */
+const statusLabel = computed(() => (appStatus.value === "LIVE" || appStatus.value === "DRAFT" || appStatus.value === "SUSPENDED" ? statusWord(appStatus.value) : "unknown"));
+const statusTone = computed(() => (appStatus.value === "LIVE" ? "success" : appStatus.value === "SUSPENDED" ? "warning" : "neutral"));
+
+/** A failure the viewer cannot cure by trying again: no access, a Project that is gone, a request the platform rejected. */
+const dataStatus = computed(() => (dataError.value instanceof ApiError ? dataError.value.status : 0));
+const noRetry = computed(() => [403, 404, 422].includes(dataStatus.value));
+const noRetryText = computed(() => {
+  switch (dataStatus.value) {
+    case 403:
+      return { title: "You no longer have access to this Project", body: "Your account cannot open the Dashboard of this Project. Ask a Project manager to check your membership." };
+    case 404:
+      return { title: "This Project was not found", body: "It may have been removed, or it is not one of your Projects." };
+    default:
+      return { title: "The Dashboard could not be read", body: "The platform rejected the request for this Project's data. Nothing was changed. Choose another Project, or give the request id to support." };
+  }
+});
+const dataRequestId = computed(() => (dataError.value instanceof ApiError ? dataError.value.requestId : null));
 </script>
 
 <template>
-  <main class="relative min-w-0 flex-1 overflow-y-auto px-4 pb-16 pt-6 md:px-7">
-    <PageHead
-      title="Dashboard"
-      :subtitle="`${project.name} · ${organisationName}. The UNICHE Catalogue confirmed your access to this Project.`"
-      :status="project.status"
-    />
-
-    <section
-      v-if="!project.initialized"
-      class="mb-5 rounded-lg border border-l-[3px] border-l-[#855400] bg-card px-[18px] py-4"
-      aria-labelledby="setup-title"
-    >
-      <h2 id="setup-title" class="text-[15px] font-bold">This Project is not initialized</h2>
-      <p class="mt-1 text-[13px] text-gray-700">
-        It has no Template yet: pick a Template and a style, then its languages and surfaces, to finish setting it up.
-      </p>
-      <RouterLink
-        :to="{ name: 'project-create', query: { resume: project.id } }"
-        class="mt-3 inline-block rounded-full bg-primary px-[22px] py-2.5 text-[11px] font-bold uppercase tracking-[0.06em] text-primary-foreground no-underline hover:bg-[#3a1469] hover:text-primary-foreground hover:no-underline"
-      >
-        Resume initialization
-      </RouterLink>
-    </section>
-
-    <section
-      class="mb-5 rounded-lg border border-l-[3px] bg-card px-[18px] py-4"
-      :class="readiness && !readiness.activatable ? 'border-l-destructive' : 'border-l-[#0c6d62]'"
-      aria-labelledby="readiness-heading"
-      aria-live="polite"
-    >
-      <p v-if="readinessError" class="text-[13px] text-gray-700">
-        <strong id="readiness-heading" class="block text-[13px] font-bold">Readiness could not be checked</strong>
-        {{ readinessError.platformUnavailable ? "The UNICHE platform is not reachable." : readinessError.message }}
-        <button type="button" class="ml-2 text-[11px] font-bold uppercase tracking-[0.06em] text-primary" @click="loadReadiness">Try again</button>
-      </p>
-      <p v-else-if="!readiness" id="readiness-heading" class="text-[13px] text-muted-foreground" aria-busy="true">Checking what visitors would see…</p>
-      <template v-else>
-        <h2 id="readiness-heading" class="text-[15px] font-bold">
-          {{
-            readiness.activatable
-              ? "Ready for visitors"
-              : `${blocking.length} ${blocking.length === 1 ? "thing blocks" : "things block"} going live`
-          }}
-        </h2>
-        <p class="mt-1 text-[13px] text-gray-700">
-          {{
-            readiness.activatable
-              ? "Nothing blocks the application from going live with its active content."
-              : "The application cannot go live until these are fixed in the active content."
-          }}
-          <template v-if="warnings.length">
-            {{ warnings.length }} {{ warnings.length === 1 ? "warning does" : "warnings do" }} not block, but deserve a look.
+  <PageFrame :busy="loading">
+    <PageHead title="Dashboard" :subtitle="subtitle">
+      <template v-if="project.initialized" #status>
+        <div v-if="data && !loading" class="flex min-h-6 flex-wrap items-center gap-x-2 gap-y-1 text-compact text-muted-foreground" data-testid="app-status-line">
+          <template v-if="data.settings">
+            <Chip :tone="statusTone" :icon="statusIcon">Visitor app: {{ statusLabel }}</Chip>
+            <HelpHint label="What does the visitor app status mean?" class="-my-2 -ml-1">
+              <p><strong>Draft</strong>: visitors cannot open the visitor app yet. <strong>Live</strong>: they can. {{ hints.launchPlaceholder }}</p>
+              <p class="mt-2">The content revision goes up each time something visitors could see changes.</p>
+            </HelpHint>
+            <span class="tabular">Content revision {{ data.settings.contentRevision }}</span>
           </template>
-        </p>
-        <ul v-if="blocking.length" class="mt-3 flex flex-col gap-1.5">
-          <li v-for="(issue, i) in shownBlocking" :key="`${issue.resourceId}-${issue.path}-${issue.code}-${i}`" class="text-[13px]">
-            <RouterLink v-if="link(issue)" :to="link(issue)!" class="font-semibold text-primary no-underline hover:underline">{{ where(issue) }}</RouterLink>
-            <span v-else class="font-semibold">{{ where(issue) }}</span>:
-            {{ describeIssue(issue) }}<template v-if="issue.languageCode"> ({{ issue.languageCode }})</template>
-          </li>
-        </ul>
-        <button
-          v-if="blocking.length > 3"
-          type="button"
-          class="mt-2 text-[11px] font-bold uppercase tracking-[0.06em] text-primary"
-          :aria-expanded="showAll"
-          @click="showAll = !showAll"
-        >
-          {{ showAll ? "Show fewer" : `Show all ${blocking.length}` }}
-        </button>
-        <details v-if="warnings.length" class="mt-3 text-[13px]">
-          <summary class="cursor-pointer text-[12px] font-bold text-[#855400]">Warnings ({{ warnings.length }})</summary>
-          <ul class="mt-2 flex flex-col gap-1.5">
-            <li v-for="(issue, i) in warnings" :key="`w-${issue.resourceId}-${issue.path}-${issue.code}-${i}`">
-              <RouterLink v-if="link(issue)" :to="link(issue)!" class="font-semibold text-primary no-underline hover:underline">{{ where(issue) }}</RouterLink>
-              <span v-else class="font-semibold">{{ where(issue) }}</span>:
-              {{ describeIssue(issue) }}<template v-if="issue.languageCode"> ({{ issue.languageCode }})</template>
-            </li>
-          </ul>
-        </details>
+          <span v-else>The visitor app status could not be read.</span>
+        </div>
+        <div v-else-if="loading" class="flex min-h-6 items-center gap-2" aria-hidden="true"><Skeleton class="h-6 w-40" /><Skeleton class="h-4 w-36" /></div>
       </template>
-    </section>
+    </PageHead>
 
-    <div class="grid grid-cols-[repeat(auto-fill,minmax(190px,1fr))] gap-3.5">
-      <div v-for="d in details" :key="d.label" class="min-w-0 rounded-[10px] border bg-card p-[18px]">
-        <span class="block text-[10px] font-extrabold uppercase tracking-[0.1em] text-muted-foreground">{{ d.label }}</span>
-        <span class="mt-1 block break-words text-[15px] font-bold" :class="d.mono ? 'font-mono text-[13px]' : ''">
-          {{ d.value }}
-        </span>
+    <Alert v-if="!project.initialized" tone="warning" title="Finish setting up this Project">
+      It has no Template yet. Pick a Template and a style, then its languages and surfaces.
+      <template #actions>
+        <Button as-child>
+          <RouterLink :to="{ name: 'project-create', query: { resume: project.id } }">Resume initialization</RouterLink>
+        </Button>
+      </template>
+    </Alert>
+
+    <Alert v-else-if="dataError && noRetry" tone="danger" :title="noRetryText.title" :request-id="dataRequestId">
+      <p>{{ noRetryText.body }}</p>
+      <template #actions>
+        <Button as-child variant="secondary" size="sm"><RouterLink :to="{ name: 'home' }">Choose another Project</RouterLink></Button>
+      </template>
+    </Alert>
+
+    <ProblemAlert v-else-if="dataError" :error="dataError" action="load the Dashboard" title="The Dashboard could not be loaded" @retry="load" />
+
+    <div v-else-if="loading" class="flex flex-col gap-5 nav:grid nav:grid-cols-[minmax(0,1fr)_22.5rem] nav:items-start" data-testid="dashboard-skeleton">
+      <p role="status" class="sr-only">Loading dashboard</p>
+      <div v-for="(column, c) in skeletons" :key="c" class="flex min-w-0 flex-col gap-5" aria-hidden="true">
+        <Skeleton v-for="(height, i) in column" :key="i" :class="['w-full rounded-lg', height]" />
       </div>
     </div>
-  </main>
+
+    <div v-else-if="data" class="flex flex-col gap-5 nav:grid nav:grid-cols-[minmax(0,1fr)_22.5rem] nav:items-start">
+      <div v-for="(column, c) in blocks" :key="c" class="flex min-w-0 flex-col gap-5">
+        <template v-for="block in column" :key="block">
+          <FirstRunGuide
+            v-if="block === 'guide'"
+            :project-id="project.id"
+            :place-count="countOf('places')"
+            :poi-count="countOf('pois')"
+            :navigation-filled="data.navigationFilled"
+            :draft-by-kind="data.draftByKind"
+            :has-drafts="!firstRun"
+          />
+          <template v-else-if="block === 'status'">
+            <ProblemAlert v-if="readinessError" :error="readinessError" action="check what needs attention" title="What needs attention could not be checked" @retry="load" />
+            <StatusCard
+              v-else-if="readiness"
+              :project-id="project.id"
+              :readiness="readiness"
+              :data="data"
+              :warning-count="warningCount"
+              :guide-open="guideShown"
+              @review-warnings="reviewWarnings"
+            />
+          </template>
+          <template v-else-if="block === 'pending'">
+            <ProblemAlert v-if="data.pendingError" :error="data.pendingError" action="read the pending changes" title="Waiting for you to apply could not be loaded" @retry="load" />
+            <PendingChanges v-else :project-id="project.id" :pending="data.pending" />
+          </template>
+          <ReadinessGroups v-else-if="block === 'warnings'" :ref="bindWarnings" :project-id="project.id" :warnings="warnings" />
+          <ContentCounts v-else-if="block === 'counts'" :project-id="project.id" :counts="data.counts" />
+          <ProjectDetails v-else :project="project" :organisation-name="organisationName" :can-restore-guide="canRestoreGuide" />
+        </template>
+      </div>
+    </div>
+  </PageFrame>
 </template>

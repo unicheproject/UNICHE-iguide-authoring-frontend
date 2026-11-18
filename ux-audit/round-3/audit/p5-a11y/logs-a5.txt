@@ -1,0 +1,22 @@
+create via ?create=1: ae input "" 457,302,526,40  solid 2px rgb(76, 29, 139) off 2px {"title":"Points of Interest · UX Audit – Populated · iGuide CMS","h1":"Points of Interest","ae":"INPUT#fd-v-11-title"}
+dialog {"name":"New point of interest","modal":"true"}
+tab order in dialog:
+0 select "Not inside a PlaceAthens Historic Centre   Acropolis Museum " 457,389,526,40  solid 2px rgb(76, 29, 139) off 2px {"outlineW":"2px","off":"2px","style":"solid","ringVsOutside":11.32,"ringVsOwnBg":11.32,"bg":"255,255,255","ring":"rgb(76, 29, 139)"}
+1 select "No categoryMonuments and TemplesMonuments and Temples › UX-R" 457,476,526,40  solid 2px rgb(76, 29, 139) off 2px {"outlineW":"2px","off":"2px","style":"solid","ringVsOutside":11.32,"ringVsOwnBg":11.32,"bg":"255,255,255","ring":"rgb(76, 29, 139)"}
+2 input "" 457,585,526,40  solid 2px rgb(76, 29, 139) off 2px {"outlineW":"2px","off":"2px","style":"solid","ringVsOutside":11.32,"ringVsOwnBg":11.32,"bg":"255,255,255","ring":"rgb(76, 29, 139)"}
+3 button "Edit slug" 668,645,83,32  solid 2px rgb(76, 29, 139) off 2px {"outlineW":"2px","off":"2px","style":"solid","ringVsOutside":11.32,"ringVsOwnBg":11.32,"bg":"255,255,255","ring":"rgb(76, 29, 139)"}
+4 button "Cancel" 739,702,83,40  solid 2px rgb(76, 29, 139) off 2px {"outlineW":"2px","off":"2px","style":"solid","ringVsOutside":11.32,"ringVsOwnBg":11.32,"bg":"255,255,255","ring":"rgb(76, 29, 139)"}
+5 button "Create and open" 829,702,154,40  solid 2px rgb(255, 255, 255) off 2px {"outlineW":"2px","off":"2px","style":"solid","ringVsOutside":1,"ringVsOwnBg":11.32,"bg":"255,255,255","ring":"rgb(255, 255, 255)"}
+6 button "Close dialog" 951,162,40,40  solid 2px rgb(76, 29, 139) off 2px {"outlineW":"2px","off":"2px","style":"solid","ringVsOutside":11.32,"ringVsOwnBg":11.32,"bg":"255,255,255","ring":"rgb(76, 29, 139)"}
+7 input "" 457,302,526,40  solid 2px rgb(76, 29, 139) off 2px {"outlineW":"2px","off":"2px","style":"solid","ringVsOutside":11.32,"ringVsOwnBg":11.32,"bg":"255,255,255","ring":"rgb(76, 29, 139)"}
+8 select "Not inside a PlaceAthens Historic Centre   Acropolis Museum " 457,389,526,40  solid 2px rgb(76, 29, 139) off 2px {"outlineW":"2px","off":"2px","style":"solid","ringVsOutside":11.32,"ringVsOwnBg":11.32,"bg":"255,255,255","ring":"rgb(76, 29, 139)"}
+9 select "No categoryMonuments and TemplesMonuments and Temples › UX-R" 457,476,526,40  solid 2px rgb(76, 29, 139) off 2px {"outlineW":"2px","off":"2px","style":"solid","ringVsOutside":11.32,"ringVsOwnBg":11.32,"bg":"255,255,255","ring":"rgb(76, 29, 139)"}
+empty submit -> div[alert] "1 thing to fixTitle: Enter a title in the default language." 457,205,526,76  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) [{"t":3913,"role":"alert","text":"1 thing to fixTitle: Enter a title in the default language.","why":"add"},{"t":3913,"role":"alert","text":"Enter a title in the default language.","why":"add"}]
+summary <div role="alert" data-error-summary="" tabindex="-1" class="rounded-lg border border-destructive/30 bg-destructive-tint px-4 py-3 text-destructive"><p class="flex items-center gap-2 text-sm font-bold"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide size-5 shrink-0 lucide-circle-alert-icon lucide-circle-alert size-5 shrink-0" aria-hidden="true"><circl
+AXE {"label":"poi-create-errors","url":"http://localhost:5173/projects/PID/pois","counts":{},"v":[]}
+422 -> div[alert] "2 things to fixSlug: Slug is not valid (forced)Title must no" 457,130,526,129  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) [{"t":8642,"role":"alert","text":"2 things to fixSlug: Slug is not valid (forced)Title must not be blank (forced)Request id req-r3-p5-422","why":"add"},{"t":8642,"role":"alert","text":"Slug is not valid (forced)","why":"add"}]
+summary links ["Slug: Slug is not valid (forced)"]
+[summary link] Enter -> input "ux-r3-p5-poi-422" 457,739,526,40  solid 2px rgb(76, 29, 139) off 2px | live=[]
+AXE {"label":"poi-create-422","url":"http://localhost:5173/projects/PID/pois","counts":{},"v":[]}
+[esc dialog] Escape -> h2 "Discard what you typed?" 521,371,354,26  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) | live=[]
+after esc http://localhost:5173/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois {"title":"Points of Interest · UX Audit – Populated · iGuide CMS","h1":"Points of Interest","ae":"H2#dialog-8hbe8fe"}

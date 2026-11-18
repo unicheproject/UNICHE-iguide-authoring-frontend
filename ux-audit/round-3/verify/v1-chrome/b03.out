@@ -1,0 +1,18 @@
+===== project-404 | "Skip to content / iGuide CMS / UX Audit – Populated / . Switch project / PA / P. Admin / , account menu / This Project is not available / It no longer exists in the UNICHE Catalogue, or you are not a member of it any more. It has been taken out of your list of Projects. / A deleted Project can be restored, and membership asked for, in the UNICHE Platform Portal. / Choose another Project / Request id req-v1chrome-123 / Copy request id"
+canary false reqId true alerts 1 h1 [ 'This Project is not available' ] focus H1 This Project is not available btns [ 'Choose another Project', 'Copy request id' ]
+axe [] card { x: 336, y: 80, w: 768, h: 324 }
+===== project-403 | "Skip to content / iGuide CMS / UX Audit – Populated / . Switch project / PA / P. Admin / , account menu / You no longer have access to this Project / Your account is not a member of this Project, or your membership was removed. Ask a Project manager to add you, or choose another Project. Your unsaved edits stay in this browser. / Choose another Project / Request id req-v1chrome-123 / Copy request id"
+canary false reqId true alerts 1 h1 [ 'You no longer have access to this Project' ] focus H1 You no longer have access to this Projec btns [ 'Choose another Project', 'Copy request id' ]
+axe [] card { x: 336, y: 80, w: 768, h: 295 }
+===== project-502 | "Skip to content / iGuide CMS / UX Audit – Populated / . Switch project / PA / P. Admin / , account menu / The UNICHE platform did not answer / The CMS could not open this Project. Nothing was changed. Try again in a moment. / Try again / Choose another Project / Request id req-v1chrome-123 / Copy request id"
+canary false reqId true alerts 1 h1 [ 'The UNICHE platform did not answer' ] focus H1 The UNICHE platform did not answer btns [ 'Try again', 'Choose another Project', 'Copy request id' ]
+axe [] card { x: 336, y: 80, w: 768, h: 274 }
+===== project-503 | "Skip to content / iGuide CMS / UX Audit – Populated / . Switch project / PA / P. Admin / , account menu / The platform is busy / The platform is busy or down for maintenance. Nothing was changed. Try again in a few minutes. / Try again / Choose another Project / Request id req-v1chrome-123 / Copy request id"
+canary false reqId true alerts 1 h1 [ 'The platform is busy' ] focus H1 The platform is busy btns [ 'Try again', 'Choose another Project', 'Copy request id' ]
+axe [] card { x: 336, y: 80, w: 768, h: 274 }
+===== project-504 | "Skip to content / iGuide CMS / UX Audit – Populated / . Switch project / PA / P. Admin / , account menu / The UNICHE platform did not answer / The CMS could not open this Project. Nothing was changed. Try again in a moment. / Try again / Choose another Project / Request id req-v1chrome-123 / Copy request id"
+canary false reqId true alerts 1 h1 [ 'The UNICHE platform did not answer' ] focus H1 The UNICHE platform did not answer btns [ 'Try again', 'Choose another Project', 'Copy request id' ]
+axe [] card { x: 336, y: 80, w: 768, h: 274 }
+===== poilist-503 | "Skip to content / iGuide CMS / UX Audit – Populated / Visitor app: Draft / . Switch project / PA / P. Admin / , account menu / Dashboard / Content / Places / Points of Interest / Routes / Guides / Events / Categories / Maps & Floor Plans / Media / Visitor app / Overview / App settings / Pages / Navigation / Translations / Preview / Launch / Project / Audit log / Points of Interest / Objects and spots visitors can open directly"
+canary false reqId true alerts 2 h1 [ 'Points of Interest' ] focus H1 Points of Interest btns [ 'New point of interest', 'Try again', 'Copy request id' ]
+axe [] card { x: 256, y: 80, w: 1160, h: 221 }

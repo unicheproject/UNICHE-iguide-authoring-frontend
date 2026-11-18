@@ -1,0 +1,35 @@
+import { open, go, P, shot, settle, alerts, focused, FILES, problem, AP } from "./lib.mjs";
+const PP = `/projects/${P}`;
+const { browser, page } = await open("curator", { viewport: "1440" });
+await go(page, `${PP}/media`); await settle(page, 2000);
+await page.getByRole("button", { name: /upload/i }).first().click(); await page.waitForTimeout(800);
+const d = page.locator("[role=dialog]").first();
+const input = d.locator("input[type=file]");
+const rows = async () => (await d.innerText()).replace(/\n+/g, " | ").split("before you confirm them. |")[1]?.slice(0, 700);
+// slow upload with cancel
+let posts = 0, aborted = 0;
+await page.route(AP, async (r) => { if (r.request().method() === "POST" && /\/assets$/.test(r.request().url())) { posts++; await new Promise(s => setTimeout(s, 7000)); return r.continue().catch(() => { aborted++; }); } return r.continue(); });
+await input.setInputFiles(FILES + "UX-R2-p6-many-1.png"); await page.waitForTimeout(1200);
+console.log("uploading:", await rows());
+console.log("buttons", await d.getByRole("button").allInnerTexts());
+await shot(page, "upload__in-progress");
+const cancel = d.getByRole("button", { name: /cancel/i }).first();
+console.log("cancel btn count", await cancel.count());
+await cancel.click().catch(() => {}); await page.waitForTimeout(1500);
+console.log("after cancel:", await rows()); console.log("ALERTS", JSON.stringify(await alerts(page)).slice(-250));
+await shot(page, "upload__cancelled");
+await page.waitForTimeout(7000);
+console.log("posts", posts, "after 8s:", await rows());
+await page.unroute(AP);
+// 12 at once
+const many = Array.from({ length: 12 }, (_, i) => FILES + `UX-R2-p6-many-${i + 1}.png`);
+await input.setInputFiles(many); 
+await page.waitForTimeout(700); await shot(page, "upload__12-in-progress");
+await page.waitForFunction(() => /12 of 12 uploaded|uploaded ·/.test(document.querySelector("[role=dialog]")?.innerText ?? ""), null, { timeout: 90000 }).catch(() => {});
+await page.waitForTimeout(1500);
+console.log("12 files footer:", (await d.innerText()).split("\n").slice(-4).join(" | "));
+console.log("duplicate holds among 12?", (await d.innerText()).match(/looks like a copy/g)?.length);
+console.log("ALERTS tail", JSON.stringify(await alerts(page)).slice(-400));
+await shot(page, "upload__12-done");
+console.log("scrollable list?", await d.evaluate(d => [...d.querySelectorAll("*")].filter(e => e.scrollHeight > e.clientHeight + 4 && /auto|scroll/.test(getComputedStyle(e).overflowY)).map(e => e.tagName + "." + e.className.toString().slice(0,40) + " " + e.clientHeight + "/" + e.scrollHeight)));
+await browser.close();

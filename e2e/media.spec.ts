@@ -10,7 +10,7 @@ import { expectNoAxeViolations } from "./support/a11y.ts";
 test("an uploaded recording shows its duration", async ({ page }) => {
   const project = await newProject("media");
   await page.goto(`/projects/${project.id}/media`);
-  await page.getByRole("button", { name: /^Upload$/ }).first().click();
+  await page.getByRole("button", { name: /^Upload files$/ }).first().click();
   const dialog = page.getByRole("dialog");
   await dialog.locator("input[type=file][aria-label='Files to upload']").setInputFiles({
     name: "narration.wav",
@@ -25,7 +25,29 @@ test("an uploaded recording shows its duration", async ({ page }) => {
 
   await page.getByRole("link", { name: /narration\.wav/ }).first().click();
   await expect(page.getByRole("heading", { level: 1, name: "narration.wav" })).toBeVisible();
-  await expect(page.getByText("Duration", { exact: true })).toBeVisible();
+  await expect(page.getByText("Duration:", { exact: true })).toBeVisible();
   await expect(page.getByText("00:03", { exact: true })).toBeVisible();
   await expectNoAxeViolations(page, "Asset editor of an audio file");
+});
+
+/*
+ * Media library worklist and upload (D-094): the list view is a URL state, every row says what is missing in the
+ * language in force, and "Upload anyway" keeps its visible words at the start of its accessible name (WCAG 2.5.3).
+ */
+test("the list view is in the URL and a held file can be uploaded anyway", async ({ page }) => {
+  const project = await newProject("media-worklist");
+  await page.goto(`/projects/${project.id}/media?view=list`);
+  await page.getByRole("button", { name: /^Upload files$/ }).first().click();
+  const dialog = page.getByRole("dialog");
+  await expect(dialog.getByRole("heading", { name: "Upload files" })).toBeFocused();
+  await dialog.locator("input[type=file][aria-label='Files to upload']").setInputFiles({
+    name: "tool.exe",
+    mimeType: "application/x-msdownload",
+    buffer: Buffer.from("MZ"),
+  });
+  await expect(dialog.getByRole("button", { name: "Upload anyway, tool.exe" })).toBeVisible();
+  await dialog.getByRole("button", { name: "Skip, tool.exe" }).click();
+  await expect(dialog.getByRole("button", { name: "Undo skip, tool.exe" })).toBeVisible();
+  await dialog.getByRole("button", { name: "Close", exact: true }).last().click();
+  await expect(page).toHaveURL(/view=list/);
 });

@@ -1,0 +1,14 @@
+dialog ["BUTTON:Close dialog","INPUT:Name · English(required)","INPUT:Points of InterestGroups points of inter","INPUT:RoutesGroups routes, such as Short tours","INPUT:Top-levelA main group with its own subca","INPUT:SubcategorySits under a top-level catego","BUTTON:Edit code","INPUT:Code","BUTTON:Cancel","BUTTON:Create and open"]
+selects 0
+[create category] Enter -> div[alert] "1 thing to fixApplies to: Choose what the category applies t" 457,218,526,97  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) | live=["1 thing to fixApplies to: Choose what the category applies to: points of interest or routes."]
+http://localhost:5173/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/categories {"title":"Categories · UX Audit – Populated · iGuide CMS","h1":"Categories","ae":"DIV"}
+headings ["H1 Categories","H2 New category"]
+radios ["INPUT:null:v-8","INPUT:null:v-8","INPUT:null:v-8","INPUT:null:v-8","INPUT:null:v-107","INPUT:null:v-107"]
+dialog ["BUTTON:Close dialog","INPUT:Name · English(required)","INPUT:Points of InterestGroups points of inter","INPUT:RoutesGroups routes, such as Short tours","INPUT:Top-levelA main group with its own subca","INPUT:SubcategorySits under a top-level catego","BUTTON:Edit code","INPUT:Code","BUTTON:Cancel","BUTTON:Create and open"]
+after title tab: input "POI" 471,412,1,1  solid 2px rgb(76, 29, 139) off 2px
+checked: true
+selects 0
+[create category] Enter -> h1 "UX-R3-p5 Category" 256,132,195,26  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) | live=["Category createdIt is a draft. Add its names, then activate it.","UX-R3-p5 Category loaded"]
+http://localhost:5173/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/categories/3f0324d2-0b32-456a-aaae-ab7faa25481d {"title":"UX-R3-p5 Category · UX Audit – Populated · iGuide CMS","h1":"UX-R3-p5 Category","ae":"H1"}
+headings ["H1 UX-R3-p5 Category","H2 Texts","H2 Category setup","H2 Details Code set","H2 Status","H2 Before you activate","H3 Texts (3)","H2 On this page","H2 Translations","H2 Used in (0)"]
+radios ["INPUT:null:v-121","INPUT:null:v-121","INPUT:null:v-122","INPUT:null:v-122","INPUT:null:cat-icon","INPUT:null:cat-icon"]

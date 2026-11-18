@@ -1,0 +1,10 @@
+import * as L from "./lib.mjs";
+const { page, browser } = await L.open("curator", { viewport: "1440" });
+const k = page.keyboard;
+await L.nav(page, L.P("/routes"), 1200);
+await page.getByRole("button", { name: /^New route/i }).focus(); await k.press("Enter"); await page.waitForTimeout(600);
+await k.type("UX-R2-p5 Route"); await k.press("Tab");
+await page.getByRole("combobox", { name: /Setting/ }).selectOption({ label: /Outdoor/.test("x") ? "" : "Outdoor: On a site or in a city. Drawn on a map" });
+await page.getByRole("button", { name: /^Create/ }).last().focus(); await k.press("Enter"); await page.waitForTimeout(3500);
+L.log("t17", "after create url", page.url(), "title", await page.title(), "focus", await L.focus(page));
+await browser.close();

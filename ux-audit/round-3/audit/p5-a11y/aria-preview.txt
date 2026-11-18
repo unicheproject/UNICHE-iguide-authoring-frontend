@@ -1,0 +1,37 @@
+- main:
+  - heading "Preview" [level=1]
+  - paragraph: The visitor app as it will look, per surface and language. Nothing here changes what visitors see.
+  - button "Open in new tab"
+  - text: Surface
+  - tablist "Surface":
+    - tab "Web" [selected]
+    - tab "Mobile"
+    - tab "Kiosk"
+  - text: Language
+  - tablist "Language":
+    - tab "English" [selected]
+    - tab "Ελληνικά"
+    - tab "Italiano"
+  - text: Content
+  - tablist "Content":
+    - tab "Working" [selected]
+    - tab "Live"
+  - text: Fire a trigger
+  - searchbox "Filter triggers"
+  - combobox "Fire a trigger":
+    - option "Choose a trigger…" [selected]
+  - button "Fire Choose a trigger first." [disabled]
+  - paragraph: "6 beacon triggers not offered: beacons only work on Mobile."
+  - link "Skip preview":
+    - /url: "#preview-end-v-17"
+  - 'region "Preview: Web, English, working content"':
+    - paragraph: Desktop browser, 1280 × 800. Shown at 91 %.
+    - tablist "Size":
+      - tab "Fit width" [selected]
+      - tab "100 %"
+      - tab "50 %"
+    - button "Interact with the preview"
+  - text: End of preview
+  - status: Drafts and 15 pending changes of active items shown.
+  - paragraph: An approximation in the Project's theme (Aegean Network); the visitor app is not available yet. A default menu stands in until Navigation has one. Dashed outlines mark missing texts.
+  - paragraph: No missing titles in English.

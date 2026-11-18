@@ -1,0 +1,16 @@
+import { start, go, P, shotDir } from "./common.mjs";
+const s = await start(); const p=s.page;
+await go(p, P + "/pois/40cab7b2-a7f7-4057-b56e-5605a589156f"); await p.waitForTimeout(1500);
+console.log("state: unsaved?", await p.getByText(/unsaved changes/i).count(), "triggers rows:", await p.getByText(/^(QR CODE|GEO-PROXIMITY)$/i).count(), "version", await p.getByText(/version \d+/).first().innerText());
+console.log("cat", await p.getByLabel("Category").inputValue(), "place", await p.getByLabel("Place").inputValue());
+await p.getByLabel("Category").selectOption({label:"Monuments and Temples"});
+console.log("cat after select", await p.getByLabel("Category").inputValue());
+let t=Date.now();
+p.on("response", r=>{ if(r.request().method()!=="GET") console.log(r.request().method(), r.url().replace(/.*api\/v1/,""), r.status(), Date.now()-t,"ms"); });
+await p.getByRole("button",{name:/^save$/i}).click();
+await p.waitForFunction(()=>!/Saving/i.test(document.body.innerText),null,{timeout:20000});
+console.log("save total ms", Date.now()-t);
+await p.reload(); await p.waitForTimeout(1500);
+console.log("cat after reload", await p.getByLabel("Category").inputValue(),"triggers rows:", await p.getByText(/^(QR CODE|GEO-PROXIMITY)$/i).count());
+await s.shot("poi-editor__alpha-reloaded");
+await s.browser.close();

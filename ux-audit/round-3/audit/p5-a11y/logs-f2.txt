@@ -1,0 +1,33 @@
+[add date] Enter -> input "DD" 298,521,64,40  solid 2px rgb(76, 29, 139) off 2px | live=["1 of 19 events","UX-R3-p5 Event loaded","Unsaved changes","Date 1 added."]
+fields 
+dates controls ["DIV:group:Date 1Wed 18 Nov 2026 · 10:00–11:00Starts(required::","FIELDSET::Starts(required)Format: day, month name, year, 24-::","INPUT::Day:numeric:DD","SELECT::Month::","INPUT::Year:numeric:YYYY","INPUT::Hour (0 to 23):numeric:HH","INPUT::Minute:numeric:MM","FIELDSET::Ends(required)Format: day, month name, year, 24-ho::","INPUT::Day:numeric:DD","SELECT::Month::","INPUT::Year:numeric:YYYY","INPUT::Hour (0 to 23):numeric:HH","INPUT::Minute:numeric:MM","INPUT:switch:Cancelled::","BUTTON::Remove date 1::","BUTTON::Add a date::","BUTTON::Repeat weekly::"]
+first input "DD" 298,521,64,40  solid 2px rgb(76, 29, 139) off 2px
+auto-advance? input "DD" 298,521,64,40  solid 2px rgb(76, 29, 139) off 2px
+ after 02 input "DD" 298,521,64,40  solid 2px rgb(76, 29, 139) off 2px
+ after 2027 input "DD" 298,521,64,40  solid 2px rgb(76, 29, 139) off 2px
+ hour 25 input "DD" 298,521,64,40  solid 2px rgb(76, 29, 139) off 2px
+ minute 61 input "DD" 298,521,64,40  solid 2px rgb(76, 29, 139) off 2px
+live typed []
+after tab select "MonthJanuaryFebruaryMarchAprilMayJuneJulyAugustSeptemberOcto" 374,521,160,40  solid 2px rgb(76, 29, 139) off 2px []
+invalid inputs []
+AXE {"label":"event-date-invalid","url":"http://localhost:5173/projects/PID/events/2ff0df72-9d2f-4bfe-82d6-c8ac13e3bf3e","counts":{},"v":[]}
+[save invalid] Control+s -> button "SaveNo unsaved changes to save" 1296,64,68,40  solid 2px rgb(76, 29, 139) off 2px | live=["Saving…","Saved 11:18"]
+live []
+summary 
+[add date] Enter -> input "DD" 298,554,64,40  solid 2px rgb(76, 29, 139) off 2px | live=["1 of 19 events","UX-R3-p5 Event loaded","Unsaved changes","Date 2 added."]
+fields 
+dates controls ["DIV:group:Date 1Wed 18 Nov 2026 · 10:00–11:00Starts(required::","FIELDSET::Starts(required)Format: day, month name, year, 24-::","INPUT::Day:numeric:DD","SELECT::Month::","INPUT::Year:numeric:YYYY","INPUT::Hour (0 to 23):numeric:HH","INPUT::Minute:numeric:MM","FIELDSET::Ends(required)Format: day, month name, year, 24-ho::","INPUT::Day:numeric:DD","SELECT::Month::","INPUT::Year:numeric:YYYY","INPUT::Hour (0 to 23):numeric:HH","INPUT::Minute:numeric:MM","INPUT:switch:Cancelled::","BUTTON::Remove date 1::","DIV:group:Date 2Thu 19 Nov 2026 · 10:00–11:00Starts(required::","FIELDSET::Starts(required)Format: day, month name, year, 24-::","INPUT::Day:numeric:DD","SELECT::Month::","INPUT::Year:numeric:YYYY","INPUT::Hour (0 to 23):numeric:HH","INPUT::Minute:numeric:MM","FIELDSET::Ends(required)Format: day, month name, year, 24-ho::","INPUT::Day:numeric:DD","SELECT::Month::","INPUT::Year:numeric:YYYY","INPUT::Hour (0 to 23):numeric:HH","INPUT::Minute:numeric:MM","INPUT:switch:Cancelled::","BUTTON::Remove date 2::","BUTTON::Add a date::","BUTTON::Repeat weekly::"]
+first input "DD" 298,173,64,40  solid 2px rgb(76, 29, 139) off 2px
+typed day=31 -> focus select "MonthJanuaryFebruaryMarchAprilMayJuneJulyAugustSeptemberOcto" 374,173,160,40  solid 2px rgb(76, 29, 139) off 2px | live=[]
+month 2
+typed year=2027 -> focus input "HH" 654,173,64,40  solid 2px rgb(76, 29, 139) off 2px | live=[]
+typed hour=25 -> focus input "MM" 765,173,64,40  solid 2px rgb(76, 29, 139) off 2px | live=[]
+typed minute=61 -> focus input "DD" 298,300,64,40  solid 2px rgb(76, 29, 139) off 2px | live=[]
+invalid inputs ["occ-start-o-1-hour -> ","occ-start-o-1-minute -> "]
+fieldset legend/desc ["Starts(required) | Format: day, month name, year, 24-hour time HH:MM.","Ends(required) | Format: day, month name, year, 24-hour time HH:MM."]
+AXE {"label":"event-date-invalid","url":"http://localhost:5173/projects/PID/events/2ff0df72-9d2f-4bfe-82d6-c8ac13e3bf3e","counts":{"serious":1},"v":[{"id":"color-contrast","impact":"serious","n":15,"sel":["fieldset[aria-describedby=\"occ-start-o-1-hint\"] > legend > .ml-1.font-medium.text-muted-foreground :: <span class=\"ml-1 font-medium text-muted-foreground\">(required)</span>","#occ-start-o-1-hint :: <p id=\"occ-start-o-1-hint\" class=\"mb-1.5 text-xs text-muted-foreground\">Format: day, month name, year, 24-hour time HH:MM.</p>"]}]}
+[save invalid] Control+s -> div[alert] "1 thing to fixOccurrence 1: Set when it starts." 256,120,736,76  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) | live=[]
+live []
+summary 1 thing to fix
+
+Occurrence 1: Set when it starts.

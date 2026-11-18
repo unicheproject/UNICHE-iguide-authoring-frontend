@@ -3,11 +3,17 @@
  * "New map" (mockup `nm`): search the area by name on OpenStreetMap Nominatim, pick a result, adjust its
  * bounds by dragging, name the map, and optionally link it to an outdoor Place.
  */
-import { computed, ref } from "vue";
+import { computed, reactive, ref, watch } from "vue";
 import AppDialog from "@/components/AppDialog.vue";
+import { coordinateError, formatCoordinate, parseDecimal, tidyCoordinate } from "@/components/map/coordinates";
 import GeoMapCanvas, { type Bounds } from "@/components/map/GeoMapCanvas.vue";
+import { Alert } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { FormField } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
 import { ApiError } from "@/platform/api";
-import { createMap, searchArea, type AreaResult, type GeoMap } from "@/platform/maps";
+import { AreaSearchError, createMap, searchArea, type AreaResult, type GeoMap } from "@/platform/maps";
 import type { Place } from "@/platform/places";
 import { placeTitle } from "@/platform/places";
 
@@ -51,8 +57,9 @@ async function search() {
   try {
     results.value = await searchArea(q, props.defaultLanguage);
     searched.value = true;
-  } catch {
-    searchError.value = "Search failed. Check the connection and try again.";
+  } catch (err) {
+    if (!(err instanceof AreaSearchError)) throw err;
+    searchError.value = err.userMessage;
   } finally {
     searching.value = false;
   }
@@ -80,11 +87,55 @@ const adjusted = computed(() => {
   return Math.abs(s - south) + Math.abs(n - north) + Math.abs(w - west) + Math.abs(e - east) > 1e-6;
 });
 
-const bboxText = computed(() => {
-  if (!bounds.value) return "";
-  const [[s, w], [n, e]] = bounds.value;
-  return `${s.toFixed(4)}, ${w.toFixed(4)} → ${n.toFixed(4)}, ${e.toFixed(4)}`;
+// The bounds as text, so they can be typed as well as dragged (the keyboard alternative to the handles).
+const boundsText = reactive({ s: "", w: "", n: "", e: "" });
+const boundsErrors = reactive<Record<"s" | "w" | "n" | "e", string | null>>({ s: null, w: null, n: null, e: null });
+watch(
+  bounds,
+  (b) => {
+    if (!b) return;
+    boundsText.s = formatCoordinate(b[0][0]);
+    boundsText.w = formatCoordinate(b[0][1]);
+    boundsText.n = formatCoordinate(b[1][0]);
+    boundsText.e = formatCoordinate(b[1][1]);
+    for (const k of ["s", "w", "n", "e"] as const) boundsErrors[k] = null;
+  },
+  { immediate: true },
+);
+/**
+ * Whether any bounds field reads differently from the bounds on the map: after a typed value that is not valid the map
+ * keeps its bounds, so "Reset" must be offered then too (C3-74).
+ */
+const typedDiffers = computed(() => {
+  const b = bounds.value;
+  if (!b) return false;
+  const now = { s: b[0][0], w: b[0][1], n: b[1][0], e: b[1][1] };
+  return (["s", "w", "n", "e"] as const).some((k) => {
+    const typed = parseDecimal(boundsText[k]);
+    return typed === null || Math.abs(typed - now[k]) > 1e-9;
+  });
 });
+const canReset = computed(() => adjusted.value || typedDiffers.value);
+
+/** Applies the typed bounds once all four are valid and in order; otherwise shows what is wrong next to the field. */
+function applyTyped(key?: "s" | "w" | "n" | "e") {
+  if (key) boundsText[key] = tidyCoordinate(boundsText[key]);
+  const axes = { s: "latitude", n: "latitude", w: "longitude", e: "longitude" } as const;
+  let ok = true;
+  for (const k of ["s", "w", "n", "e"] as const) {
+    boundsErrors[k] = coordinateError(boundsText[k], axes[k]);
+    if (boundsErrors[k]) ok = false;
+  }
+  if (!ok) return;
+  const [s, w, n, e] = [boundsText.s, boundsText.w, boundsText.n, boundsText.e].map((t) => parseDecimal(t) as number);
+  if (s >= n) boundsErrors.n = "North must be greater than south.";
+  if (w >= e) boundsErrors.e = "East must be greater than west.";
+  if (s >= n || w >= e) return;
+  bounds.value = [
+    [s, w],
+    [n, e],
+  ];
+}
 
 async function create() {
   if (!selected.value || !bounds.value) return;
@@ -116,52 +167,57 @@ async function create() {
 </script>
 
 <template>
-  <AppDialog title="New map" width="820px" :busy="creating" @close="emit('close')">
-    <p class="mb-4 text-[13px] text-gray-700">
-      Search for the area. The map opens framed on it and you can place Points of Interest right away.
-    </p>
-    <p v-if="formError" role="alert" class="mb-3 text-[13px] font-semibold text-destructive">{{ formError }}</p>
+  <AppDialog title="New map" size="xl" :busy="creating" @close="emit('close')">
+    <p class="mb-4 text-sm text-ink-2">Search for the area. The map opens framed on it and you can place Points of Interest right away.</p>
 
-    <label for="nm-q" class="small-label mb-1.5 block">Find area</label>
-    <form class="mb-3 flex gap-2.5" role="search" @submit.prevent="search">
-      <input id="nm-q" v-model="query" type="search" placeholder="such as Apollonas, Naxos" class="field-input flex-1" />
-      <button type="submit" class="dialog-primary bg-primary" :disabled="searching || !query.trim()">{{ searching ? "Searching…" : "Search" }}</button>
+    <form role="search" class="mb-3 flex flex-wrap items-end gap-2" @submit.prevent="search">
+      <FormField id="nm-q" label="Find area" class="min-w-[min(100%,16rem)] flex-1" v-slot="f">
+        <Input :id="f.id" v-model="query" type="search" placeholder="such as Apollonas, Naxos" autocomplete="off" />
+      </FormField>
+      <Button type="submit" :loading="searching" :disabled-reason="query.trim() ? undefined : 'Type a place name first'">{{ searching ? "Searching" : "Search" }}</Button>
     </form>
-    <p v-if="searchError" role="alert" class="mb-2 text-xs font-semibold text-destructive">{{ searchError }}</p>
-    <p v-else-if="searched && !results.length" class="mb-2 text-xs text-muted-foreground">No areas found. Try a broader name.</p>
+    <!-- One reserved message line: a failure or "No areas found" fills it and the dialog does not move (C3-74). -->
+    <div class="mb-3 min-h-16" data-message-slot>
+      <Alert v-if="formError" tone="danger" class="py-2">{{ formError }}</Alert>
+      <Alert v-else-if="searchError" tone="danger" class="py-2">{{ searchError }}</Alert>
+      <p v-else-if="searched && !results.length && !searching" class="py-2 text-sm text-muted-foreground" role="status">No areas found. Try a broader name.</p>
+    </div>
 
-    <div class="flex flex-wrap gap-4">
-      <div class="flex min-w-[min(100%,240px)] flex-1 flex-col gap-2">
-        <ul v-if="results.length" class="max-h-[300px] overflow-y-auto rounded-lg border" aria-label="Results from OpenStreetMap Nominatim">
-          <li v-for="r in results" :key="r.placeId" class="border-b border-gray-100 last:border-b-0">
+    <!-- Both columns and their height are there from the start, so the dialog does not jump when results or the bounds fields appear (C2-87). -->
+    <div class="grid gap-4 md:min-h-[33rem] md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] md:content-start">
+      <div class="flex min-w-0 flex-col gap-3">
+        <ul v-if="results.length" class="max-h-72 divide-y divide-border overflow-y-auto rounded-md border border-border" aria-label="Search results">
+          <li v-for="r in results" :key="r.placeId">
             <button
               type="button"
-              class="w-full px-3 py-2.5 text-left text-xs"
-              :class="selected?.placeId === r.placeId ? 'bg-[#f5f0fb]' : 'hover:bg-muted'"
+              class="min-h-control w-full px-3 py-2 text-left text-sm hover:bg-surface-hover"
+              :class="selected?.placeId === r.placeId ? 'bg-accent' : ''"
               :aria-pressed="selected?.placeId === r.placeId"
               @click="pick(r)"
             >
-              <span class="block text-[13px] font-bold">{{ r.name }}</span>
-              <span class="block truncate text-muted-foreground">{{ r.rest }}</span>
-              <span v-if="r.kind" class="mt-0.5 block text-[10px] font-bold uppercase tracking-[0.06em] text-muted-foreground">{{ r.kind }}</span>
+              <span class="block font-semibold">{{ r.name }}</span>
+              <span class="block truncate text-xs text-muted-foreground">{{ r.rest }}</span>
+              <span v-if="r.kind" class="mt-0.5 block text-xs font-medium text-ink-2">{{ r.kind }}</span>
             </button>
           </li>
         </ul>
-        <span v-if="results.length" class="text-[10px] text-muted-foreground">Results from OpenStreetMap Nominatim</span>
+        <p v-if="results.length" class="text-xs text-muted-foreground">Results from OpenStreetMap Nominatim.</p>
+        <p v-else-if="!searched && !searching" class="text-sm text-muted-foreground">Results appear here.</p>
 
         <template v-if="selected">
-          <label for="nm-name" class="small-label mt-2">Map name</label>
-          <input id="nm-name" v-model="name" class="field-input" />
-          <label for="nm-place" class="small-label mt-1">Link to Place (optional)</label>
-          <select id="nm-place" v-model="placeId" class="field-input">
-            <option value="">No place</option>
-            <option v-for="p in outdoorPlaces" :key="p.id" :value="p.id">{{ p.label }}</option>
-          </select>
-          <span class="text-xs text-muted-foreground">The Place page shows this map, and its Points of Interest open on it.</span>
+          <FormField id="nm-name" label="Map name" v-slot="f">
+            <Input :id="f.id" v-model="name" />
+          </FormField>
+          <FormField id="nm-place" label="Link to Place (optional)" hint="The Place page shows this map, and its Points of Interest open on it." v-slot="f">
+            <Select :id="f.id" v-model="placeId" :aria-describedby="f.describedBy">
+              <option value="">No place</option>
+              <option v-for="p in outdoorPlaces" :key="p.id" :value="p.id">{{ p.label }}</option>
+            </Select>
+          </FormField>
         </template>
       </div>
 
-      <div class="flex min-w-[min(100%,360px)] flex-[2] flex-col gap-1.5">
+      <div class="flex min-w-0 flex-col gap-3">
         <GeoMapCanvas
           ref="canvas"
           :view="{ lat: 38.3, lng: 23.8, zoom: 5 }"
@@ -173,22 +229,30 @@ async function create() {
           @bounds-change="bounds = $event"
         />
         <template v-if="selected">
-          <span class="text-xs text-muted-foreground">
-            Drag the corners or the centre handle. Visitors only see the area inside the bounds. Without a pointer, keep
-            the search result's bounds and type exact values in the map editor's Bounds fields after creating it.
-          </span>
-          <span class="font-mono text-[11px] text-muted-foreground">{{ bboxText }}</span>
-          <button v-if="adjusted" type="button" class="self-start text-[11px] font-bold text-primary" @click="resetBounds">Reset to search result</button>
+          <p class="text-sm text-muted-foreground">Drag the corners or the centre handle, or focus one and use the arrow keys. You can also type the bounds. Visitors only see the area inside them.</p>
+          <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <FormField id="nm-s" label="Min latitude" :error="boundsErrors.s" v-slot="f">
+              <Input :id="f.id" v-model="boundsText.s" inputmode="decimal" autocomplete="off" :aria-describedby="f.describedBy" :invalid="f.invalid" @change="applyTyped('s')" />
+            </FormField>
+            <FormField id="nm-n" label="Max latitude" :error="boundsErrors.n" v-slot="f">
+              <Input :id="f.id" v-model="boundsText.n" inputmode="decimal" autocomplete="off" :aria-describedby="f.describedBy" :invalid="f.invalid" @change="applyTyped('n')" />
+            </FormField>
+            <FormField id="nm-w" label="Min longitude" :error="boundsErrors.w" v-slot="f">
+              <Input :id="f.id" v-model="boundsText.w" inputmode="decimal" autocomplete="off" :aria-describedby="f.describedBy" :invalid="f.invalid" @change="applyTyped('w')" />
+            </FormField>
+            <FormField id="nm-e" label="Max longitude" :error="boundsErrors.e" v-slot="f">
+              <Input :id="f.id" v-model="boundsText.e" inputmode="decimal" autocomplete="off" :aria-describedby="f.describedBy" :invalid="f.invalid" @change="applyTyped('e')" />
+            </FormField>
+          </div>
+          <Button v-if="canReset" variant="secondary" size="sm" class="self-start" @click="resetBounds">Reset to search result</Button>
         </template>
-        <span v-else class="text-xs text-muted-foreground">Search and pick a result to frame the map.</span>
+        <p v-else class="text-sm text-muted-foreground">Search and pick a result to frame the map.</p>
       </div>
     </div>
 
     <template #actions>
-      <button type="button" class="dialog-secondary" :disabled="creating" @click="emit('close')">Cancel</button>
-      <button type="button" class="dialog-primary bg-primary" :disabled="!selected || creating" @click="create">
-        {{ creating ? "Creating…" : "Create map" }}
-      </button>
+      <Button variant="secondary" :disabled="creating" @click="emit('close')">Cancel</Button>
+      <Button :loading="creating" :disabled-reason="selected ? undefined : 'Pick a search result first'" @click="create">{{ creating ? "Creating" : "Create map" }}</Button>
     </template>
   </AppDialog>
 </template>

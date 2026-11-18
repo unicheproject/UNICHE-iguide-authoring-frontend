@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-18T12:00:00Z",
+  "title": "Design System: iGuide CMS",
+  "extensions": {
+    "colorMeta": {
+      "canvas": { "role": "neutral", "displayName": "Canvas Grey", "canonical": "#f4f5f7", "tonalRamp": ["#111827", "#374151", "#566070", "#8a91a0", "#d9dce2", "#e9ebef", "#f4f5f7", "#ffffff"] },
+      "primary": { "role": "primary", "displayName": "UNICHE Purple", "canonical": "#4c1d8b", "tonalRamp": ["#2d0f52", "#3a1469", "#4c1d8b", "#7a55b5", "#b5a0d6", "#e6dcf5", "#efe9f8", "#f8f5fc"] },
+      "highlight": { "role": "secondary", "displayName": "Link Hover Magenta", "canonical": "#a3106a", "tonalRamp": ["#5e0a3d", "#810e41", "#a3106a", "#c0508f", "#d98db8", "#f0c4dc", "#fbe6ef", "#fdf3f8"] },
+      "success": { "role": "tertiary", "displayName": "Heritage Teal", "canonical": "#0b6a5f", "tonalRamp": ["#063a34", "#0b6a5f", "#2f8a7e", "#6ab5aa", "#a8d4cd", "#cde9e4", "#e3f3ee", "#f2faf8"] },
+      "warning": { "role": "tertiary", "displayName": "Ochre Warning", "canonical": "#7a4b00", "tonalRamp": ["#3d2600", "#7a4b00", "#a8730f", "#d19a3d", "#e8bf7a", "#f5dca8", "#fdf0d5", "#fef9ec"] },
+      "destructive": { "role": "tertiary", "displayName": "Berry Danger", "canonical": "#b4135a", "tonalRamp": ["#5e0a3d", "#810e41", "#b4135a", "#d04f86", "#e38cb1", "#f2bfd5", "#fbe6ef", "#fdf3f8"] },
+      "info": { "role": "tertiary", "displayName": "Slate Blue", "canonical": "#1f4e8c", "tonalRamp": ["#0f2646", "#1f4e8c", "#4a77b3", "#7fa1cd", "#b0c8e2", "#d3e1f0", "#e4edf8", "#f2f6fb"] }
+    },
+    "typographyMeta": {
+      "page-title": { "displayName": "Page title", "purpose": "The h1 of every page (PageHead), 20/700." },
+      "title": { "displayName": "Title", "purpose": "Dialog titles, empty-state titles, 16/700." },
+      "body": { "displayName": "Body", "purpose": "Controls, body text, card headings (700), 14/1.5." },
+      "compact": { "displayName": "Compact", "purpose": "Navigation, table cells, list footers, 13/1.45." },
+      "label": { "displayName": "Label", "purpose": "Chips, hints, errors, column heads, 12/1.4." }
+    },
+    "shadows": [
+      { "name": "shadow-1", "value": "0 1px 2px hsl(220 30% 12% / 0.06), 0 1px 3px hsl(220 30% 12% / 0.05)", "purpose": "Cards, state cards, side cards." },
+      { "name": "shadow-2", "value": "0 4px 12px hsl(220 30% 12% / 0.1), 0 1px 3px hsl(220 30% 12% / 0.08)", "purpose": "Popovers, menus, tooltips, toasts, the stuck list toolbar." },
+      { "name": "shadow-3", "value": "0 16px 40px hsl(220 30% 12% / 0.18), 0 2px 8px hsl(220 30% 12% / 0.1)", "purpose": "Dialogs only." }
+    ],
+    "motion": [
+      { "name": "dur-1", "value": "120ms", "purpose": "Hover, press and colour changes." },
+      { "name": "dur-2", "value": "180ms", "purpose": "Fade-in of popovers, menus and the scrim; the switch knob." },
+      { "name": "dur-3", "value": "240ms", "purpose": "Rise-in of dialogs and toasts, the drawer slide." },
+      { "name": "ease-out", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Things that appear." },
+      { "name": "ease-std", "value": "cubic-bezier(0.4, 0, 0.2, 1)", "purpose": "State changes." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "nav", "value": "1100px" },
+      { "name": "edit", "value": "1180px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one primary action of a region.",
+      "html": "<button class=\"ds-btn-primary\">Create and open</button>",
+      "css": ".ds-btn-primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:8px 16px;border:1px solid transparent;border-radius:8px;background:#4c1d8b;color:#fff;font:600 14px/1.5 inherit;white-space:nowrap;cursor:pointer;transition:background-color 120ms cubic-bezier(.4,0,.2,1)}.ds-btn-primary:hover{background:#3a1469}.ds-btn-primary:active{background:#2d0f52}.ds-btn-primary:focus-visible{outline:2px solid #4c1d8b;outline-offset:2px}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Every other action; white with the control border.",
+      "html": "<button class=\"ds-btn-secondary\">Cancel</button>",
+      "css": ".ds-btn-secondary{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:8px 16px;border:1px solid #737b8b;border-radius:8px;background:#fff;color:#111827;font:600 14px/1.5 inherit;white-space:nowrap;cursor:pointer;transition:background-color 120ms cubic-bezier(.4,0,.2,1)}.ds-btn-secondary:hover{background:#eef0f3}.ds-btn-secondary:active{background:#dde1e6}.ds-btn-secondary:focus-visible{outline:2px solid #4c1d8b;outline-offset:2px}"
+    },
+    {
+      "name": "Danger Outline Button",
+      "kind": "button",
+      "refersTo": "button-danger",
+      "description": "Archive and similar; the solid danger button is only inside a confirmation.",
+      "html": "<button class=\"ds-btn-danger\">Archive</button>",
+      "css": ".ds-btn-danger{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:8px 16px;border:1px solid #b4135a;border-radius:8px;background:#fff;color:#b4135a;font:600 14px/1.5 inherit;white-space:nowrap;cursor:pointer}.ds-btn-danger:hover{background:#fbe6ef}.ds-btn-danger:focus-visible{outline:2px solid #4c1d8b;outline-offset:2px}"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Input, Textarea and Select share one field: 40 px, 8 px radius, control border.",
+      "html": "<label class=\"ds-label\" for=\"t\">Title</label><input id=\"t\" class=\"ds-input\" value=\"Archaeological Museum\">",
+      "css": ".ds-label{display:block;margin-bottom:6px;font:600 14px/1.5 inherit;color:#374151}.ds-input{box-sizing:border-box;width:100%;min-height:40px;padding:8px 12px;border:1px solid #737b8b;border-radius:8px;background:#fff;color:#111827;font:400 14px/1.5 inherit}.ds-input:hover{border-color:#111827}.ds-input:focus-visible{border-color:#4c1d8b;outline:2px solid #4c1d8b;outline-offset:2px}"
+    },
+    {
+      "name": "Status Chip",
+      "kind": "chip",
+      "refersTo": "chip-success",
+      "description": "A word, an icon and a tone; never colour alone. 24 px tall.",
+      "html": "<span class=\"ds-chip\">&#10003; Active</span>",
+      "css": ".ds-chip{display:inline-flex;align-items:center;gap:4px;min-height:24px;padding:0 10px;border-radius:9999px;background:#e3f3ee;color:#0b6a5f;font:600 12px/1.4 inherit;white-space:nowrap}"
+    },
+    {
+      "name": "Alert",
+      "kind": "custom",
+      "refersTo": "card",
+      "description": "The one banner: tint fill, 30 % ink border, role icon, body; no side stripe.",
+      "html": "<div class=\"ds-alert\" role=\"alert\"><strong>The place was not saved</strong><p>The CMS could not save the place. Nothing was changed.</p></div>",
+      "css": ".ds-alert{padding:12px 16px;border:1px solid rgba(180,19,90,.3);border-radius:12px;background:#fbe6ef;color:#b4135a;font:400 14px/1.5 inherit}.ds-alert strong{display:block;font-weight:700}.ds-alert p{margin:2px 0 0;color:#111827}"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Surface with a hairline and shadow-1: side cards, state cards, list card.",
+      "html": "<section class=\"ds-card\"><h2>Status</h2><p>Draft. 3 warnings, nothing blocks.</p></section>",
+      "css": ".ds-card{padding:16px;border:1px solid #d9dce2;border-radius:12px;background:#fff;box-shadow:0 1px 2px hsl(220 30% 12% / .06),0 1px 3px hsl(220 30% 12% / .05);font:400 14px/1.5 inherit;color:#111827}.ds-card h2{margin:0 0 8px;font:700 14px/1.5 inherit}.ds-card p{margin:0;color:#374151}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Quiet Workshop",
+    "overview": "A tool for people who maintain heritage guides every day. Calm, light, institutional-but-friendly: a cool grey canvas, white surfaces, one purple that means action, current item and focus, and status told by an icon and a word before any colour. Density is comfortable, rows are 52 px, controls are 40 px (44 on touch). The visitor result and the content lead; the chrome recedes.",
+    "keyCharacteristics": [
+      "Light only, cool neutrals, one purple accent (UNICHE) used for action, current item, links and focus.",
+      "Hairlines for structure, a stronger control border (3:1) for every control edge.",
+      "Four-pixel spacing with half steps; one line-height per type size; Montserrat with a Manrope Greek companion.",
+      "Three cool shadow steps; flat at rest, lifted only for surfaces that float.",
+      "One focus ring (2 px --ring, 2 px offset) everywhere; a state ladder of rest, hover, pressed.",
+      "Every state is a word and an icon; forced colours keep a boundary on every control and surface."
+    ],
+    "rules": [
+      { "name": "The One Voice Rule", "body": "Purple is the action, the current item, links and the focus ring. A page has one primary button per region; nothing else is purple-filled.", "section": "colors" },
+      { "name": "The Hairline Is Not an Edge Rule", "body": "--border is decoration and may be 1.4:1. Every control edge uses --input (4.26:1 on white).", "section": "colors" },
+      { "name": "The One Height Rule", "body": "Each type size has exactly one line-height, set by the size token. No leading-* utility in chrome.", "section": "typography" },
+      { "name": "The Flat-At-Rest Rule", "body": "Cards carry shadow-1 and a hairline; only popovers, menus, toasts and a stuck toolbar use shadow-2; only dialogs use shadow-3.", "section": "elevation" },
+      { "name": "The Gap Shows the Surface Rule", "body": "The focus ring is 2 px with a 2 px offset so it reads against the canvas and a filled button alike. No halo, no white ring.", "section": "components" }
+    ],
+    "dos": [
+      "Do use the ui/ primitives (Button, Chip, FormField, Input, Alert, AppDialog) and the tokens; never a local copy.",
+      "Do state status as an icon plus a word (DRAFT, ACTIVE, ARCHIVED; never 'published').",
+      "Do give a blocked control a reason (disabled-reason) and keep it focusable.",
+      "Do put one sentence per failure, chosen by code, with one request-id row.",
+      "Do use a 44 px hit area for text links in dense rows (hit-44)."
+    ],
+    "donts": [
+      "Don't use text-[Npx], rounded-[, shadow-[, z-[, tracking-[, uppercase or a hex colour in CMS chrome.",
+      "Don't use a coloured side stripe, a gradient CTA, glassmorphism or an eyebrow label.",
+      "Don't use .field-input, .field-label, .dialog-* or the Button aliases in new screens.",
+      "Don't remove a focus ring; replace the ring only on a control that draws its own focus state.",
+      "Don't show the server's detail text; never print an unstyled error message."
+    ]
+  }
+}

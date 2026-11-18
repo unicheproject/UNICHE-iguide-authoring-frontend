@@ -1,0 +1,12 @@
+[add paragraph] Enter -> textarea "Write the paragraph in English" 294,586,660,81  solid 2px rgb(76, 29, 139) off 2px | live=["1 of 18 guides","UX-R3-p5 Guide loaded","Unsaved changes","Added paragraph 1 at position 1."]
+[add heading] Enter -> input "Heading in English" 294,764,660,40  solid 2px rgb(76, 29, 139) off 2px | live=["2 warnings, nothing blocks.","Added heading 2 at position 2.","3 warnings, nothing blocks."]
+[add paragraph 2] Enter -> textarea "Write the paragraph in English" 294,770,660,81  solid 2px rgb(76, 29, 139) off 2px | live=["2 warnings, nothing blocks.","Added paragraph 3 at position 3.","3 warnings, nothing blocks."]
+block buttons ["2 warnings, nothing blocks in this guide: show what needs at","Drag handle for paragraph 1","Move paragraph 1 up","Move paragraph 1 down","Remove paragraph 1","Drag handle for heading 2","Move heading 2 up","Move heading 2 down","Remove heading 2","Drag handle for paragraph 3","Move paragraph 3 up","Move paragraph 3 down","Remove paragraph 3"]
+remove count 3
+[remove block 2] Enter -> button "Undo removing Heading 2Ctrl+Z" 763,745,144,32  solid 2px rgb(76, 29, 139) off 2px | live=["Unsaved changes","Heading 2 removed. Press Ctrl+Z or use Undo next to the list to bring it back."]
+chk {"w":2,"off":2,"style":"solid","ring":"rgb(76, 29, 139)","ringOnWrapper":false,"vsOutside":11.32,"bg":"255,255,255","clipped":null,"obscured":null,"offscreen":false,"rect":[763,745,144,32]}
+[undo] Enter -> input "Heading in English" 294,764,660,40  solid 2px rgb(76, 29, 139) off 2px | live=["Saved 11:17","Heading 2 restored at position 2 of 3."]
+after undo 3
+[ctrl+z] Control+z -> textarea "Write the paragraph in English" 294,566,660,81  solid 2px rgb(76, 29, 139) off 2px | live=["Saved 11:17","Paragraph 1 restored at position 1 of 3."]
+after ctrl+z 3
+AXE {"label":"guide-editor","url":"http://localhost:5173/projects/PID/guides/6e5776ad-26de-48dd-90ab-ced84aa5ec46","counts":{},"v":[]}

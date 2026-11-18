@@ -1,0 +1,21 @@
+import { open, go } from "../../../tools/session.mjs";
+import { shot } from "./lib.mjs";
+const ID="600c4311-3e81-4235-91b0-5b3e336918fc";
+const { browser, page } = await open("admin", { viewport: "1440" });
+await go(page, "/projects/"+ID+"/places?create=1");
+await page.waitForTimeout(1500);
+const dlg = page.getByRole("dialog");
+await dlg.getByRole("textbox").first().fill("UX-R3-p2 Lakeside Camp");
+await shot(page, "firstrun-place__dialog-filled__1440");
+await dlg.getByRole("button",{name:/Create and open/}).click();
+await page.waitForURL(/places\/[0-9a-f-]{36}/, {timeout:20000}).catch(()=>console.log("no editor", page.url()));
+await page.waitForTimeout(2500);
+console.log("url", page.url());
+await shot(page, "firstrun-place__editor-new__1440", true);
+console.log("EDITOR TEXT\n", await page.evaluate(()=>document.querySelector("main")?.innerText.slice(0,2500)));
+// back to dashboard
+await go(page, "/projects/"+ID);
+await page.waitForTimeout(2000);
+await shot(page, "dashboard-new__after-place__1440", true);
+console.log("DASH\n", await page.evaluate(()=>document.querySelector("main")?.innerText));
+await browser.close();

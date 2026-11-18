@@ -1,0 +1,27 @@
+import {open,go,P,shot,btns,hdr} from "./lib.mjs";
+const { browser, page } = await open("admin",{viewport:"1440"});
+const B=P+"/pois/6fa36cd3-d7cc-44ce-85ba-9c42592be3cc";
+await go(page,B); await page.waitForTimeout(1000);
+await page.locator("#f-summary").fill("Beta EDIT to be discarded");
+// leave with unsaved changes
+await page.getByRole("link",{name:"Points of Interest"}).first().click();
+await page.waitForTimeout(700);
+console.log("leave dialog:",await page.getByRole("dialog").count(), (await page.evaluate(()=>document.querySelector("[role=dialog]")?.innerText||"")).replace(/\n+/g," | "));
+await shot(page,"poi-editor__leave-unsaved-dialog__1440");
+console.log("focus:",await page.evaluate(()=>document.activeElement.tagName+":"+(document.activeElement.innerText||"").slice(0,40)));
+await page.keyboard.press("Escape"); await page.waitForTimeout(400);
+console.log("after Esc focus:",await page.evaluate(()=>document.activeElement.tagName+"#"+document.activeElement.id+":"+(document.activeElement.innerText||"").slice(0,30)),"url",page.url().split("/").pop());
+await page.keyboard.press("Control+s"); await page.waitForTimeout(2000);
+await page.getByRole("button",{name:/^Discard changes/}).first().click();
+await page.waitForSelector("[role=dialog]"); await page.waitForTimeout(400);
+await shot(page,"poi-discard-confirm__beta__1440");
+console.log((await page.evaluate(()=>document.querySelector("[role=dialog]").innerText)).replace(/\n+/g," | "));
+console.log(await btns(page,"[role=dialog]"));
+await page.getByRole("dialog").getByRole("button",{name:/^Discard/}).last().click();
+await page.waitForFunction(()=>!document.querySelector("[role=dialog]"));
+await page.waitForTimeout(900);
+console.log("toasts:",await page.evaluate(()=>[...document.querySelectorAll("[role=status]")].map(e=>e.innerText.trim().slice(0,120))));
+console.log("focus:",await page.evaluate(()=>document.activeElement.tagName+":"+(document.activeElement.innerText||"").slice(0,40)));
+console.log("summary now:",await page.locator("#f-summary").inputValue());
+await shot(page,"poi-editor__beta-discarded__1440");
+await browser.close();

@@ -1,0 +1,290 @@
+{
+ "guides@1440": {
+  "mode": "table",
+  "rows": 25,
+  "titleMin": 382,
+  "titleMax": 382,
+  "overlaps": 0,
+  "overflow": 2,
+  "rowH": {
+   "median": 81,
+   "max": 127,
+   "min": 81
+  },
+  "slugMulti": 3,
+  "slugCut": 0,
+  "updMulti": 25,
+  "usedMulti": 0,
+  "updColors": [
+   "rgb(55, 65, 81)"
+  ],
+  "theadH": [
+   48,
+   48,
+   48,
+   48,
+   48,
+   48,
+   48
+  ],
+  "docOverflow": false
+ },
+ "events@1440": {
+  "mode": "table",
+  "rows": 26,
+  "titleMin": 334,
+  "titleMax": 334,
+  "overlaps": 0,
+  "overflow": 0,
+  "rowH": {
+   "median": 81,
+   "max": 99,
+   "min": 81
+  },
+  "slugMulti": 1,
+  "slugCut": 0,
+  "updMulti": 26,
+  "usedMulti": 0,
+  "updColors": [
+   "rgb(55, 65, 81)"
+  ],
+  "theadH": [
+   48,
+   48,
+   48,
+   48,
+   48,
+   48,
+   48
+  ],
+  "docOverflow": false
+ },
+ "categories@1440": {
+  "mode": "table",
+  "rows": 40,
+  "titleMin": 398,
+  "titleMax": 398,
+  "overlaps": 0,
+  "overflow": 0,
+  "rowH": {
+   "median": 83,
+   "max": 83,
+   "min": 81
+  },
+  "slugMulti": 0,
+  "slugCut": 0,
+  "updMulti": 40,
+  "usedMulti": 27,
+  "updColors": [
+   "rgb(55, 65, 81)"
+  ],
+  "theadH": [
+   48,
+   48,
+   48,
+   48,
+   48,
+   48,
+   48
+  ],
+  "docOverflow": false
+ },
+ "guides@1280": {
+  "mode": "cards",
+  "rows": 25,
+  "titleMin": 922,
+  "titleMax": 922,
+  "overlaps": 0,
+  "overflow": 0,
+  "rowH": {
+   "median": 114,
+   "max": 117,
+   "min": 114
+  },
+  "slugMulti": 0,
+  "slugCut": 0,
+  "updMulti": 0,
+  "usedMulti": 0,
+  "updColors": [
+   "rgb(55, 65, 81)"
+  ],
+  "theadH": [],
+  "docOverflow": false
+ },
+ "events@1280": {
+  "mode": "cards",
+  "rows": 26,
+  "titleMin": 922,
+  "titleMax": 922,
+  "overlaps": 0,
+  "overflow": 0,
+  "rowH": {
+   "median": 114,
+   "max": 147,
+   "min": 106
+  },
+  "slugMulti": 0,
+  "slugCut": 0,
+  "updMulti": 0,
+  "usedMulti": 0,
+  "updColors": [
+   "rgb(55, 65, 81)"
+  ],
+  "theadH": [],
+  "docOverflow": false
+ },
+ "categories@1280": {
+  "mode": "cards",
+  "rows": 40,
+  "titleMin": 874,
+  "titleMax": 922,
+  "overlaps": 0,
+  "overflow": 0,
+  "rowH": {
+   "median": 128,
+   "max": 128,
+   "min": 128
+  },
+  "slugMulti": 0,
+  "slugCut": 0,
+  "updMulti": 0,
+  "usedMulti": 0,
+  "updColors": [
+   "rgb(55, 65, 81)"
+  ],
+  "theadH": [],
+  "docOverflow": false
+ },
+ "guides@1024": {
+  "mode": "cards",
+  "rows": 25,
+  "titleMin": 914,
+  "titleMax": 914,
+  "overlaps": 0,
+  "overflow": 0,
+  "rowH": {
+   "median": 114,
+   "max": 117,
+   "min": 114
+  },
+  "slugMulti": 0,
+  "slugCut": 0,
+  "updMulti": 0,
+  "usedMulti": 0,
+  "updColors": [
+   "rgb(55, 65, 81)"
+  ],
+  "theadH": [],
+  "docOverflow": false
+ },
+ "events@1024": {
+  "mode": "cards",
+  "rows": 26,
+  "titleMin": 914,
+  "titleMax": 914,
+  "overlaps": 0,
+  "overflow": 0,
+  "rowH": {
+   "median": 114,
+   "max": 147,
+   "min": 106
+  },
+  "slugMulti": 0,
+  "slugCut": 0,
+  "updMulti": 0,
+  "usedMulti": 0,
+  "updColors": [
+   "rgb(55, 65, 81)"
+  ],
+  "theadH": [],
+  "docOverflow": false
+ },
+ "categories@1024": {
+  "mode": "cards",
+  "rows": 40,
+  "titleMin": 866,
+  "titleMax": 914,
+  "overlaps": 0,
+  "overflow": 0,
+  "rowH": {
+   "median": 128,
+   "max": 128,
+   "min": 128
+  },
+  "slugMulti": 0,
+  "slugCut": 0,
+  "updMulti": 0,
+  "usedMulti": 0,
+  "updColors": [
+   "rgb(55, 65, 81)"
+  ],
+  "theadH": [],
+  "docOverflow": false
+ },
+ "guides@768": {
+  "mode": "cards",
+  "rows": 25,
+  "titleMin": 658,
+  "titleMax": 658,
+  "overlaps": 0,
+  "overflow": 0,
+  "rowH": {
+   "median": 114,
+   "max": 155,
+   "min": 114
+  },
+  "slugMulti": 0,
+  "slugCut": 0,
+  "updMulti": 0,
+  "usedMulti": 0,
+  "updColors": [
+   "rgb(55, 65, 81)"
+  ],
+  "theadH": [],
+  "docOverflow": false
+ },
+ "events@768": {
+  "mode": "cards",
+  "rows": 26,
+  "titleMin": 658,
+  "titleMax": 658,
+  "overlaps": 0,
+  "overflow": 0,
+  "rowH": {
+   "median": 114,
+   "max": 152,
+   "min": 106
+  },
+  "slugMulti": 0,
+  "slugCut": 0,
+  "updMulti": 0,
+  "usedMulti": 0,
+  "updColors": [
+   "rgb(55, 65, 81)"
+  ],
+  "theadH": [],
+  "docOverflow": false
+ },
+ "categories@768": {
+  "mode": "cards",
+  "rows": 40,
+  "titleMin": 610,
+  "titleMax": 658,
+  "overlaps": 0,
+  "overflow": 0,
+  "rowH": {
+   "median": 128,
+   "max": 128,
+   "min": 128
+  },
+  "slugMulti": 0,
+  "slugCut": 0,
+  "updMulti": 0,
+  "usedMulti": 0,
+  "updColors": [
+   "rgb(55, 65, 81)"
+  ],
+  "theadH": [],
+  "docOverflow": false
+ }
+}

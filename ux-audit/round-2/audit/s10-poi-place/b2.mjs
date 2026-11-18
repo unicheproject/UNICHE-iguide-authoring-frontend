@@ -1,0 +1,10 @@
+import { open, go, rec, P, ready, SH } from "./h.mjs";
+const { browser, page } = await open("curator", { viewport: "1440" });
+const log=(...a)=>console.log(...a);
+await go(page, `/projects/${P}/pois/${rec.poiA}`); await ready(page);
+await page.locator("#triggers").scrollIntoViewIfNeeded();
+await page.getByRole("link",{name:/Test in preview/}).first().click(); await page.waitForTimeout(5000);
+log("URL", page.url());
+log("select value", await page.locator("select").last().inputValue(), "options", await page.locator("select").last().locator("option").allInnerTexts().then(a=>a.filter(x=>/R2/.test(x))));
+log("fired chip", await page.locator("body").innerText().then(t=>/Fired/.test(t)));
+await browser.close();

@@ -1,0 +1,21 @@
+import { open, go } from "../../../tools/session.mjs";
+import { shot, text } from "./lib.mjs";
+const { browser, page } = await open("admin", { viewport: "1440" });
+await go(page, "/projects/new");
+await page.waitForTimeout(800);
+await page.getByLabel("Project name").fill("UX-R3-p2 Trail");
+await page.waitForTimeout(300);
+console.log("slug auto:", await page.getByLabel(/^Slug/).inputValue());
+await shot(page, "wizard-1__filled__1440");
+const t0 = Date.now();
+await page.getByRole("button", { name: /Create Project and continue/ }).click();
+// loading state
+await page.waitForTimeout(150);
+await shot(page, "wizard-1__submitting__1440");
+await page.waitForFunction(() => /Template and style/.test(document.querySelector("#step-heading")?.textContent ?? "") , null, { timeout: 30000 }).catch(()=>console.log("no step 2"));
+console.log("ms", Date.now()-t0, "url", page.url());
+await page.waitForTimeout(1500);
+await shot(page, "wizard-2__first-view__1440");
+console.log("focus", await page.evaluate(()=>document.activeElement?.outerHTML.slice(0,140)));
+console.log("STEP2 TEXT\n", await page.evaluate(()=>document.querySelector("main")?.innerText ?? document.body.innerText));
+await browser.close();

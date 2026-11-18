@@ -1,0 +1,13 @@
+import { open, go, CMS } from "../../../tools/session.mjs";
+import fs from "node:fs";
+export { open, go, CMS };
+export const P = "6958c18f-60d2-4140-a524-5a43f8a2f6b5";
+export const ids = JSON.parse(fs.readFileSync(new URL("./ids.json", import.meta.url).pathname.replace(/^\/([A-Z]:)/, "$1"), "utf8"));
+export const SH = new URL("./shots/", import.meta.url).pathname.replace(/^\/([A-Z]:)/, "$1");
+export const shot = (page, n, full=false) => page.screenshot({ path: SH + n + ".png", fullPage: full }).catch(e => console.log("shotfail", n, e.message));
+export const wait = (page, ms = 800) => page.waitForTimeout(ms);
+export const url = (k, id) => `/projects/${P}/${k}/${id}`;
+export const active = (page) => page.evaluate(() => { const e = document.activeElement; return e ? `${e.tagName}#${e.id}.${(e.className||"").toString().slice(0,40)} [${(e.getAttribute("aria-label")||e.textContent||"").trim().slice(0,50)}]` : "none"; });
+export const txt = (page, sel="main") => page.locator(sel).first().evaluate(e=>e.innerText.replace(/\n+/g," | "));
+export const live = async (page) => { await page.evaluate(()=>{ if(window.__live) return; window.__live=[]; const mo=new MutationObserver(ms=>{ for(const m of ms){ const el=(m.target.nodeType===1?m.target:m.target.parentElement)?.closest("[aria-live],[role=status],[role=alert]"); if(el){ const t=el.textContent.trim(); if(t) window.__live.push(t.slice(0,160)); } } }); mo.observe(document.body,{subtree:true,childList:true,characterData:true}); }); };
+export const liveLog = (page) => page.evaluate(()=>{ const a=[...new Set(window.__live||[])]; window.__live=[]; return a; });

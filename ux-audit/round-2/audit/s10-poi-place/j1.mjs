@@ -1,0 +1,16 @@
+import { open, go, rec, P, ready, SH } from "./h.mjs";
+const log=(...a)=>console.log(...a);
+const focus=(page)=>page.evaluate(()=>{const a=document.activeElement;return a?`${a.tagName}#${a.id}.${(a.getAttribute("aria-label")||a.textContent||"").trim().slice(0,40)}`:null});
+const { browser, page } = await open("curator", { viewport: "1440" });
+await go(page, `/projects/${P}/pois/${rec.poiA}`); await ready(page);
+await page.getByRole("button",{name:/Add primary image/}).click(); await page.waitForTimeout(2500);
+log("dialog focus", await focus(page));
+await page.screenshot({path:SH+"poi-editor__asset-picker__1440.png"});
+log("dialog buttons", await page.getByRole("dialog").getByRole("button").allInnerTexts().then(a=>a.map(x=>x.trim()).filter(Boolean).slice(0,14)));
+await page.getByRole("dialog").getByText("klepsydra",{exact:true}).click(); await page.waitForTimeout(500);
+await page.getByRole("button",{name:/^Use this image$/}).click(); await page.waitForTimeout(2000);
+log("after attach focus", await focus(page), "dialog", await page.getByRole("dialog").count());
+log("toasts", await page.locator("[role=status],[role=alert]").allInnerTexts().then(a=>a.filter(Boolean)));
+log("media card", await page.locator("#media").innerText().catch(()=>"?").then(t=>t.slice(0,300)));
+await page.screenshot({path:SH+"poi-editor__image-attached__1440.png"});
+await browser.close();

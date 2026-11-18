@@ -1,0 +1,13 @@
+blocked-reason []
+deactivate disabled null false
+dialog Deactivate UX-R3-P5b Category A?
+
+It is still used by the items below. Remove it from them first, then try again.
+
+Used in
+Point of interest
+UX-R3-P5b Parthenon Παρθενώνας
+(opens its editor)
+Draft
+Close
+dialog buttons ["","Close"]

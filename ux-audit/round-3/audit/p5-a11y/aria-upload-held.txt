@@ -1,0 +1,28 @@
+- dialog "Upload files":
+  - heading "Upload files" [level=2]
+  - button "Close dialog"
+  - paragraph: Drop files here, or
+  - button "Choose files"
+  - button "Files to upload"
+  - checkbox "Upload images as floor plans"
+  - text: Upload images as floor plans
+  - group: Accepted formats and largest file
+  - paragraph: You can add several files at once. Other file types are held back until you confirm them.
+  - list "Files":
+    - listitem:
+      - link "UX-R3-p5 upload a.png":
+        - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/media/ef57eb37-69d1-4da0-9879-838b2bc9e317
+      - text: Image · 780 B Uploaded
+    - listitem:
+      - link "UX-R3-p5 upload b.png":
+        - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/media/2915c4bd-2ec6-4a11-b320-4caf6b504b6e
+      - text: Image · 590 B Uploaded
+  - log "Upload activity":
+    - paragraph: Uploading 2 files.
+    - paragraph: UX-R3-p5 upload a.png uploaded.
+    - paragraph: UX-R3-p5 upload b.png uploaded.
+    - paragraph: 2 uploaded.
+  - contentinfo:
+    - text: 2 of 2 uploaded
+    - button "Describe now (2)"
+    - button "Close"

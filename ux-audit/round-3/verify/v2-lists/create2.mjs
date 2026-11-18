@@ -1,0 +1,12 @@
+import { open, go, P, ready, shot, save, focusDesc } from "./h.mjs";
+const { browser, page } = await open("admin", { viewport: "1440" });
+await go(page, `/projects/${P}/categories?create=1`); await ready(page);
+await page.getByRole("dialog").getByLabel(/^Name/).first().fill("UX-R3V-v2 Category");
+const r = page.getByRole("radio", { name: /^Points of Interest/ });
+console.log("radios", await page.getByRole("radio").count(), await r.count());
+await r.check({ force: true }).catch(async (e) => { console.log("check fail", e.message.slice(0,100)); await page.getByRole("dialog").locator("label", { hasText: "Points of Interest" }).first().click(); });
+await shot(page, "create-categories__filled__1440");
+await page.getByRole("button", { name: /^Create and open/ }).click();
+await page.waitForTimeout(2500);
+console.log(page.url(), await page.locator("h1").first().innerText());
+await browser.close();

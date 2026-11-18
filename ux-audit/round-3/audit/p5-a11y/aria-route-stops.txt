@@ -1,0 +1,68 @@
+- region "Stops 3":
+  - heading "Stops 3" [level=2]
+  - text: Acropolis and South Slope – visitor map Map of Acropolis of Athens
+  - link "Open map":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/maps/5eef6cab-a61e-419e-adff-053edfff9939
+  - region "Route map on Acropolis and South Slope – visitor map, 3 of 3 stops drawn in order":
+    - region "Map"
+    - img
+    - text: 1 2 3
+    - button "Zoom in"
+    - button "Zoom out"
+    - link "Leaflet":
+      - /url: https://leafletjs.com
+    - text: ©
+    - link "OpenStreetMap":
+      - /url: https://www.openstreetmap.org/copyright
+    - text: contributors
+  - paragraph: The line is the route, joining its stops in stop order; numbered pins are the stops.
+  - paragraph: Stops are joined in order.
+  - button "Show as list"
+  - paragraph: Added Parthenon (Temple of Athena Parthenos) as stop 3.
+  - list:
+    - listitem:
+      - 'link "Stop 1: Dionysos, Hestia and Aphrodite"':
+        - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/65785e7e-aced-47d6-ab2e-662ca86153ae
+      - button "Drag handle for stop 1, Dionysos, Hestia and Aphrodite"
+      - text: Drag with the mouse, or press the Up and Down arrow keys to move it. Move up, Move down and Position do the same. Position of stop 1, Dionysos, Hestia and Aphrodite
+      - combobox "Position of stop 1, Dionysos, Hestia and Aphrodite":
+        - option "1" [selected]
+        - option "2"
+        - option "3"
+      - button "Move stop 1, Dionysos, Hestia and Aphrodite up" [disabled]
+      - button "Move stop 1, Dionysos, Hestia and Aphrodite down"
+      - button "Remove stop 1, Dionysos, Hestia and Aphrodite"
+      - text: Description
+      - textbox "Description"
+      - 'button "More stop texts: walking instructions, title, narrative"'
+    - listitem:
+      - 'link "Stop 2: East Pediment Fragments"':
+        - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/9d32bf3f-6d1b-4ab1-a129-f52f4a890403
+      - button "Drag handle for stop 2, East Pediment Fragments"
+      - text: Drag with the mouse, or press the Up and Down arrow keys to move it. Move up, Move down and Position do the same. Position of stop 2, East Pediment Fragments
+      - combobox "Position of stop 2, East Pediment Fragments":
+        - option "1"
+        - option "2" [selected]
+        - option "3"
+      - button "Move stop 2, East Pediment Fragments up"
+      - button "Move stop 2, East Pediment Fragments down"
+      - button "Remove stop 2, East Pediment Fragments"
+      - text: Description
+      - textbox "Description"
+      - 'button "More stop texts: walking instructions, title, narrative"'
+    - listitem:
+      - 'link "Stop 3: Parthenon (Temple of Athena Parthenos)"':
+        - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/e2905a9e-2c6a-49a3-89f6-5639c94ee9fe
+      - button "Drag handle for stop 3, Parthenon (Temple of Athena Parthenos)"
+      - text: Drag with the mouse, or press the Up and Down arrow keys to move it. Move up, Move down and Position do the same. Position of stop 3, Parthenon (Temple of Athena Parthenos)
+      - combobox "Position of stop 3, Parthenon (Temple of Athena Parthenos)":
+        - option "1"
+        - option "2"
+        - option "3" [selected]
+      - button "Move stop 3, Parthenon (Temple of Athena Parthenos) up"
+      - button "Move stop 3, Parthenon (Temple of Athena Parthenos) down" [disabled]
+      - button "Remove stop 3, Parthenon (Temple of Athena Parthenos)"
+      - text: Description
+      - textbox "Description"
+      - 'button "More stop texts: walking instructions, title, narrative"'
+  - button "Add stops"

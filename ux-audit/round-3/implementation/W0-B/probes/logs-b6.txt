@@ -1,0 +1,13 @@
+pois side cards ["Status|14px|16px|h2count=1","What needs att|14px|16px|h2count=1","On this page|14px|16px|h2count=1","Translations|14px|16px|h2count=1","Used in (0)|14px|16px|h2count=1"]
+pois texts gap 0
+pois revision 2
+places side cards ["Status|14px|16px|h2count=1","Before you act|14px|16px|h2count=1","On this page|14px|16px|h2count=1","Translations|14px|16px|h2count=1","Used in (0)|14px|16px|h2count=1"]
+places texts gap 0
+places revision 1
+routes side cards ["Status|14px|16px|h2count=1","Before you act|14px|16px|h2count=1","On this page|14px|16px|h2count=1","Translations|14px|16px|h2count=1","Used in (0)|14px|16px|h2count=1"]
+routes texts gap 0
+routes revision 1
+B11 breadcrumb href: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois
+B11 url after click: 
+B10 selected option text: ["UX-R3-W0B Place A","Uncategorised"]
+B10 offline primary aria-disabled: true

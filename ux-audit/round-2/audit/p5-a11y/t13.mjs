@@ -1,0 +1,22 @@
+import * as L from "./lib.mjs";
+const { page, browser } = await L.open("curator", { viewport: "1440" });
+const k = page.keyboard;
+const POI = "35d91cba-d64a-43ce-9773-1e472226d028";
+await L.nav(page, L.P("/pois/" + POI), 1500);
+await L.watchLive(page);
+const lat = page.getByRole("textbox", { name: "Latitude" }), lng = page.getByRole("textbox", { name: "Longitude" });
+await lat.focus(); L.log("t13", "saved lat", await lat.inputValue(), await lng.inputValue());
+await lat.fill("999"); await lng.focus(); await page.waitForTimeout(500);
+L.log("t13", "lat=999 w/ lng: invalid", await lat.getAttribute("aria-invalid"), await lat.evaluate((e) => (e.getAttribute("aria-describedby") ?? "").split(" ").map((i) => document.getElementById(i)?.textContent)), "live", (await L.liveLog(page)).slice(-2));
+await k.press("Control+s"); await page.waitForTimeout(1500);
+L.log("t13", "save with bad lat: focus", await L.focus(page), "alerts", await page.locator("[role=alert]").allTextContents(), "live", (await L.liveLog(page)).slice(-3));
+await L.shot(page, "poi-editor__bad-lat-save__1440");
+await lat.fill("37.9715");
+// Asset picker
+await page.getByRole("button", { name: /Add primary image/ }).focus(); await k.press("Enter"); await page.waitForTimeout(1500);
+L.log("t13", "picker open: focus", await L.focus(page));
+await L.shot(page, "asset-picker__open__1440");
+L.log("t13", "picker aria", (await L.snap(page, "asset-picker", "[role=dialog]")).split("\n").slice(0, 60).join("\n"));
+L.log("t13", "axe picker", await L.axe(page, "asset-picker"));
+L.log("t13", "picker tabs", await L.tabs(page, 16));
+await browser.close();

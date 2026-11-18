@@ -1,0 +1,145 @@
+{
+ "hover": {
+  "primary": {
+   "rest": "rgb(76, 29, 139)",
+   "hover": "rgb(58, 20, 105)",
+   "active": "rgb(58, 20, 105)"
+  },
+  "secondary": {
+   "rest": "rgb(255, 255, 255)",
+   "hover": "rgb(238, 240, 243)",
+   "active": "rgb(233, 235, 239)"
+  },
+  "ghost": {
+   "rest": "rgba(0, 0, 0, 0)",
+   "hover": "rgb(238, 240, 243)",
+   "active": "rgb(233, 235, 239)"
+  }
+ },
+ "toastCount": 1,
+ "toast": {
+  "role": "status",
+  "text": "Place createdIt is a draft. Add its texts, then activate it.",
+  "icon": "lucide mt-0.5 size-5 flex-none text-success lucide-circle-check-icon lucide-circ",
+  "svgClass": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" str",
+  "titleColor": "rgb(11, 106, 95)",
+  "titleSize": "14px",
+  "bg": "rgb(255, 255, 255)",
+  "border": "rgb(217, 220, 226)",
+  "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(21, 28, 40, 0.1) 0px 4px 12px 0px, rgba(21, 28, 40, 0.08) 0px 1px 3px 0px",
+  "rect": [
+   612,
+   795,
+   384,
+   89
+  ],
+  "z": "60",
+  "animation": "ui-rise-in 0.24s"
+ },
+ "afterCreateUrl": "http://localhost:5173/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/places/e16ebf50-de0f-46d8-8f72-47d10e9a1324",
+ "editorStack": [
+  {
+   "el": "DIV.editor-header sticky -top-6 z-sticky -mx-[var(--gu",
+   "pos": "sticky",
+   "z": "10",
+   "top": "-24px",
+   "rect": [
+    232,
+    117,
+    1208,
+    56
+   ],
+   "shadow": ""
+  },
+  {
+   "el": "ASIDE.side-more flex min-w-0 flex-col gap-4 edit:sticky ",
+   "pos": "sticky",
+   "z": "auto",
+   "top": "48px",
+   "rect": [
+    1012,
+    189,
+    352,
+    756
+   ],
+   "shadow": ""
+  },
+  {
+   "el": "DIV.pointer-events-none fixed inset-x-4 z-toast flex f",
+   "pos": "fixed",
+   "z": "60",
+   "top": "795px",
+   "rect": [
+    612,
+    795,
+    384,
+    89
+   ],
+   "shadow": ""
+  }
+ ],
+ "errorAlert": {
+  "text": "The server hit a problemThe CMS could not load the places. Nothing was changed. Try again; if it keeps happening, send the request id to support.Request id req-",
+  "bg": "rgb(251, 230, 239)",
+  "border": "rgba(180, 19, 90, 0.3)",
+  "radius": "12px",
+  "pad": "12px 16px",
+  "cls": "flex gap-3 rounded-lg border px-4 py-3 border-destructive/30 bg-destructive-tint"
+ },
+ "skeleton": [],
+ "reduced": [
+  {
+   "n": "ui-fade-in",
+   "d": 120,
+   "it": 1
+  },
+  {
+   "n": "ui-fade-in",
+   "d": 120,
+   "it": 1
+  }
+ ],
+ "reducedPanel": {
+  "name": "ui-fade-in",
+  "dur": "0.12s",
+  "overlay": "ui-fade-in 0.12s"
+ },
+ "reducedList": {
+  "anims": 0,
+  "transitionsOnButton": "0.001s"
+ },
+ "fcMenu": {
+  "border": "rgb(0, 0, 0) 1px"
+ },
+ "fcDialog": {
+  "border": "rgb(0, 0, 0) 1px"
+ },
+ "places_768": {
+  "sw": 768,
+  "cw": 768,
+  "mainSw": 768,
+  "mainCw": 768,
+  "small": 108
+ },
+ "dashboard_768": {
+  "sw": 768,
+  "cw": 768,
+  "mainSw": 768,
+  "mainCw": 768,
+  "small": 53
+ },
+ "places_zoom200": {
+  "sw": 640,
+  "cw": 640,
+  "mainSw": 640,
+  "mainCw": 640,
+  "small": 108
+ },
+ "dashboard_zoom200": {
+  "sw": 640,
+  "cw": 640,
+  "mainSw": 640,
+  "mainCw": 640,
+  "small": 52
+ }
+}

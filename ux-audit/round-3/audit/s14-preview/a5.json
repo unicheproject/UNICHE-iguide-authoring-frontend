@@ -1,0 +1,161 @@
+[
+ [
+  "deep-beacon",
+  {
+   "surf": [
+    "Mobile"
+   ],
+   "mode": [
+    "Working"
+   ],
+   "sel": "Bluetooth beacon, Excavated Athenian Neighbourhood",
+   "chip": "Fired: Bluetooth beacon, Excavated Athenian Neighbourhood",
+   "notes": [],
+   "y": 337,
+   "scrollY": 0,
+   "url": "?trigger=432c66f3-86b0-4a49-836b-e575f41fa19a",
+   "standIn": "UX Audit – Populated SEARCH EN ◎ Nearby: Excavated Athenian Neighbourhood Open × UX Audit – Populated HIGHLIGHTS Moschophoros (The Calf-Bearer) A closer look at"
+  }
+ ],
+ [
+  "deep-qrDraft",
+  {
+   "surf": [
+    "Web"
+   ],
+   "mode": [
+    "Working"
+   ],
+   "sel": "QR code, Parthenon Frieze – North Side",
+   "chip": "Fired: QR code, Parthenon Frieze – North Side",
+   "notes": [],
+   "y": 353.796875,
+   "scrollY": 0,
+   "url": "?trigger=0e570ab5-c25a-456f-8c1c-02e3b1a41cd7",
+   "standIn": "UX Audit – Populated Home Places Points of interest Routes Guides Events SEARCH EN Opened by QR code frieze-101 Parthenon Frieze – North Side (revised wording) "
+  }
+ ],
+ [
+  "deep-qrActive",
+  {
+   "surf": [
+    "Web"
+   ],
+   "mode": [
+    "Working"
+   ],
+   "sel": "QR code, UX-p1-editor Alpha Kouros",
+   "chip": "Fired: QR code, UX-p1-editor Alpha Kouros",
+   "notes": [],
+   "y": 353.796875,
+   "scrollY": 0,
+   "url": "?trigger=db6975b1-1257-4512-b34b-dacedf4951b5",
+   "standIn": "UX Audit – Populated Home Places Points of interest Routes Guides Events SEARCH EN Opened by QR code av54v8fy UX-p1-editor Alpha Kouros A marble kouros used for"
+  }
+ ],
+ [
+  "deep-geo",
+  {
+   "surf": [
+    "Web"
+   ],
+   "mode": [
+    "Working"
+   ],
+   "sel": "Geo-proximity, Hekatompedon Pediment Lions",
+   "chip": "Fired: Geo-proximity, Hekatompedon Pediment Lions",
+   "notes": [],
+   "y": 353.796875,
+   "scrollY": 0,
+   "url": "?trigger=3f89bdda-4e20-470e-8ee0-a6602bfbd21e",
+   "standIn": "UX Audit – Populated Home Places Points of interest Routes Guides Events SEARCH EN ◎ Nearby: Hekatompedon Pediment Lions Open × UX Audit – Populated HIGHLIGHTS "
+  }
+ ],
+ [
+  "deep-unknown",
+  {
+   "surf": [
+    "Web"
+   ],
+   "mode": [
+    "Working"
+   ],
+   "sel": "Choose a trigger…",
+   "notes": [
+    "The trigger from the link was not found. It may have been archived or deleted."
+   ],
+   "y": 386.796875,
+   "scrollY": 0,
+   "url": "?trigger=00000000-0000-4000-8000-000000000000",
+   "standIn": "UX Audit – Populated Home Places Points of interest Routes Guides Events SEARCH EN UX Audit – Populated HIGHLIGHTS Moschophoros (The Calf-Bearer) A closer look "
+  }
+ ],
+ [
+  "deep-garbage",
+  {
+   "surf": [
+    "Web"
+   ],
+   "mode": [
+    "Working"
+   ],
+   "sel": "Choose a trigger…",
+   "notes": [
+    "The trigger from the link was not found. It may have been archived or deleted."
+   ],
+   "y": 386.796875,
+   "scrollY": 0,
+   "url": "?trigger=not-a-uuid",
+   "standIn": "UX Audit – Populated Home Places Points of interest Routes Guides Events SEARCH EN UX Audit – Populated HIGHLIGHTS Moschophoros (The Calf-Bearer) A closer look "
+  }
+ ],
+ [
+  "missingSummary",
+  "163 missing titles in Italiano"
+ ],
+ [
+  "missingLinks",
+  [
+   [
+    "Show them in the list of places",
+    "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/places?missing=it"
+   ],
+   [
+    "Show them in the list of point of interests",
+    "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois?missing=it"
+   ],
+   [
+    "Show them in the list of routes",
+    "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/routes?missing=it"
+   ],
+   [
+    "Show them in the list of guides",
+    "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/guides?missing=it"
+   ],
+   [
+    "Show them in the list of events",
+    "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/events?missing=it"
+   ]
+  ]
+ ],
+ [
+  "summaryStyle",
+  {
+   "fs": "14px",
+   "fw": "600",
+   "col": "rgb(76, 29, 139)",
+   "h": 21,
+   "w": 768,
+   "cursor": "pointer",
+   "deco": "none"
+  }
+ ],
+ [
+  "afterLink",
+  "http://localhost:5173/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/places?missing=it"
+ ],
+ [
+  "greekSummary",
+  "115 missing titles in Ελληνικά"
+ ]
+]

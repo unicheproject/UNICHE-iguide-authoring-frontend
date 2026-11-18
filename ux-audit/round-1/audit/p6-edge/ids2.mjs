@@ -1,0 +1,12 @@
+import { call, closeAll } from "../../../tools/lib.mjs";
+import { writeFileSync } from "node:fs";
+const P = "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5";
+const a = await call("curator","GET",P+"/assets?size=200");
+const items = a.content ?? a.items ?? a;
+const mine = items.filter(x=>(x.filename||x.originalFilename||x.title||"").includes("UX-p6-edge"));
+console.log(mine.map(x=>[x.id,x.filename||x.originalFilename,x.status,x.version]));
+const m = await call("curator","GET",P+"/maps"); const maps = (m.content ?? m.items ?? m);
+const f = await call("curator","GET",P+"/floor-plans").catch(()=>[]); const fps=(f.content ?? f.items ?? f);
+console.log("maps", maps.slice(0,3).map(x=>[x.id,x.internalName]), "fps", (fps||[]).slice(0,3).map(x=>[x.id,x.name||x.internalName]));
+writeFileSync("ux-audit/round-1/audit/p6-edge/ids2.json", JSON.stringify({assets:mine.map(x=>x.id), map:maps[0]?.id, fp:fps?.[0]?.id}));
+await closeAll();

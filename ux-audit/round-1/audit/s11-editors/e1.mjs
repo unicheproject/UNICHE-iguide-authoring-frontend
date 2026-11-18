@@ -1,0 +1,15 @@
+import { start, goP, log, dump, save, focused } from "./lib.mjs";
+const s = await start("1440"); const { page } = s;
+await goP(page, "/events");
+await s.shot("events-list");
+log((await dump(page)).slice(0, 700));
+await page.getByRole("button", { name: /new event/i }).first().click(); await page.waitForTimeout(500);
+await s.shot("event-create-dialog");
+log(await dump(page, "[role=dialog]"));
+await page.getByLabel(/title/i).fill("UX-s11-editors Event");
+await page.getByRole("button", { name: /create event/i }).click();
+await page.waitForURL(/events\/[0-9a-f-]+/, { timeout: 20000 }); await page.waitForTimeout(2000);
+save({ eventUrl: page.url().replace(/^https?:\/\/[^/]+/, "") });
+await s.tall("event-editor__new-tall");
+log(await dump(page));
+await s.browser.close();

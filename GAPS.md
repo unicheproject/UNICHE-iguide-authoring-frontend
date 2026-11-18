@@ -248,3 +248,108 @@ prototype inventory).
 - Closed 2026-10-08 (C0a, configuration part): the mock and `dev/docker-compose.yml` use tool slug
   `iguide` (backend `uniche.tool.slug` default); `dev/README.md` lists only the backend settings in its
   current `application.properties`.
+
+## Open: UX overhaul, Round 1 (found 2026-11-12, still open)
+
+### G-023 — Project statistics endpoint
+- Found: `GET /projects/{id}/statistics` returns 404. The Dashboard counts content from list `totalElements`
+  with `status` filters (two requests per kind).
+- Consequence: no per-language translation bars, no navigation counts; no approximate bars are drawn.
+
+### G-024 — Deployment Package list
+- Found: no endpoint for packages with status, `stale`, `contentRevision`, `createdAt`; ICAgent ingestion status
+  (Milestone 12) is also absent.
+- Consequence: the Dashboard has no "latest packages" slot.
+
+### G-025 — Last editor of a Working Copy
+- Found: list rows carry `workingCopyUpdatedAt` but no `workingCopyUpdatedBy`.
+- Consequence: "Waiting for you to apply" and "edited by me" show time only.
+
+### G-026 — Readiness on a Project without ACTIVE content
+- Found: readiness reports `activatable: true` for a Project with no ACTIVE Resource.
+- Consequence: the CMS derives "ready" from `status=ACTIVE` totals; wanted: `activeResourceCount` or an `empty` flag.
+
+### G-027 — Readiness for DRAFT Resources
+- Found: readiness covers ACTIVE rows only; missing Place, Category, coordinates or primary image are never flagged,
+  and a DRAFT has no "before you activate" list.
+- Consequence: the editor shows client-known checks only; wanted: a per-Resource readiness read for DRAFT.
+
+### G-028 — `pending=true` on assets
+- Found: `GET /assets?pending=true` is ignored and returns every asset.
+- Consequence: no pending count for Media.
+
+### G-029 — `initialized` on the Project list
+- Found: the picker issues one `GET /projects/{id}` per Project to learn `initialized`.
+- Consequence: slow picker; the CMS fetches lazily until the list carries the flag.
+
+### G-030 — Asset `usageCount` disagrees with references
+- Found: library shows 3, the editor lists 4 (inline Guide bindings not counted).
+- Consequence: the CMS shows the editor's references number.
+
+### G-031 — Thumbnail renditions
+- Found: thumbnails are presigned originals (up to 1.5 MB each).
+- Consequence: heavy library grid.
+
+### G-032 — Upload type policy
+- Found: any file type is accepted (`.exe`, `.txt`); `OTHER` allowed.
+- Consequence: see Q-015.
+
+### G-033 — Event activation without dates
+- Found: an Event with no occurrences activates.
+- Question for the backend: are dates required?
+
+### G-034 — Working Copy content for the Preview
+- Found: list endpoints used by the Preview page may not return Working Copy rows, so "Working" content cannot show
+  pending edits of ACTIVE items.
+- Consequence: honest copy on the page; the editor preview shows the unsaved form.
+
+### G-035 — Conflict bodies
+- Found: a `409` may not carry the author and time of `currentVersion` nor `conflictingFields` for Apply.
+- Consequence: the conflict dialogs show values only.
+
+### G-036 — Duration and transcript status
+- Found: some audio and video assets return no duration; transcript status is not in asset rows.
+- Consequence: Asset editor shows what exists.
+
+### G-037 — Does the backend count a Resource's own triggers as users? (verify)
+- Need: Deactivate and archive refusals list references. The UI shows "Used by 1 item" for a Point of Interest whose
+  only user is its own QR or geo trigger. If the backend refuses because of own triggers, change it (deactivate
+  them with the Resource); otherwise the CMS filters them client-side (already done).
+- Backend item: the where-used rule behind `409` on deactivate. UX overhaul round 2, C2-59.
+
+### G-038 — Pending Working Copies across kinds, newest first
+- Need: one request (or a `sort=updatedAt,desc` with `pending=true` per kind) so the Dashboard shows the most
+  recently saved Working Copies. Today it reads every kind's `pending=true` list in manual order. C2-27.
+
+### G-039 — Readiness code for a Guide with an empty story
+- Need: a readiness code for empty story blocks (and for a DRAFT asset without alt text if not already
+  covered by G-027). Today a Guide with five empty blocks reports 0 blocking. C2-34, Q-019.
+
+### G-040 — Language-aware missing-text filter for assets
+- Need: `missingTextIn=<language>` on the asset list. The CMS filters client-side (fine at about 100 assets). C2-51.
+
+### G-041 — Counts and filters for paged lists
+- Need: per-status counts, and `missing=<language>` and search across languages, from the list endpoints so the
+  CMS can page on the server. Today the CMS reads every page (`size=200`) and windows the rows (D-091). C2-37.
+
+### G-042 — Verify two silent limits
+- Need: confirm whether the Event "repeat weekly 99" becoming 52 is the client or the server, and whether any list
+  endpoint truncates silently above `size=200`. C2-37, C2-72.
+
+### G-043 — Does the backend block activation of an asset without a title? (verify)
+- Need: `14` blocks activation on missing alt text or the decorative flag only. The audit saw an asset blocker
+  remain after alt text was added. If the backend refuses on a missing title, change it to a warning; otherwise
+  the CMS drops its own title blocker (done). UX overhaul round 3, C3-14.
+
+### G-044 — Readiness for one Resource while it is a DRAFT
+- Need: a per-Resource readiness read (blockers and warnings with codes and paths) before activation, so the
+  card, the confirm and the toast share one list from the server. Today the platform items appear only on
+  activation, so the CMS says "plus checks run on activation". C3-14.
+
+### G-045 — Working Copy 409 payload and request id on Apply (verify)
+- Need: confirm that the Working Copy save/apply `409` carries `current` (the other version's values) and the
+  `requestId`; the three-way dialog needs both. C3-32.
+
+### G-046 — Authorization-code cleanup is client-only (record)
+- Need: none from the backend. Recorded so the identity-provider redirect (`code`, `state`, `iss` in the
+  address bar) is not mistaken for a backend defect; the CMS removes them after `keycloak.init`. C3-84.

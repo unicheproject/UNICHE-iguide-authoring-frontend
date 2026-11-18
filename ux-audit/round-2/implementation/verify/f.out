@@ -1,0 +1,17 @@
+skip: first Tab -> a "Skip to content"
+skip: after Enter -> main#main "Points of InterestObjects and spots visitors can o"
+route change -> title: Places · UX Audit – Populated · iGuide CMS | focus: h1 "Places" | live: Places loaded
+rowmenu open focus: div "Deactivate"
+rowmenu Esc -> focus: button#radix-vue-dropdown-menu-trigger-v-11 "Actions for Parthenon Frieze – North Side"
+setpos dialog focus: input#pos-v-163 ""
+setpos Esc -> focus: button#radix-vue-dropdown-menu-trigger-v-11 "Actions for Parthenon Frieze – North Side"
+activate dialog focus: h2#dialog-zjho6t3 "Activate The Horsemen of the Panathenaic Processio"
+activate Esc -> focus: button "Activate"
+preview interact focus: button "Stop interacting with the preview"
+preview Esc#1 -> focus: button "Interact with the preview" | panel open: 1
+preview Esc#2 -> focus: button "Preview in app" | panel open: 0
+preview Esc#3 -> focus: button "Preview in app" | panel open: 0
+FAIL toast locator.click: Timeout 30000ms exceeded.
+page errors: [] console: []
+768 buttons: ["Menu","UX Audit – PopulatedApp: Draft. Switch p","PAP. Admin, account menu","Apply changes","More actions","What is a Working Copy?","Save draftNothing to save: no edits sinc","Discard changes","Active · 2 warnings, nothing blocks","Preview in app","Next missing: Italiano","Practical detailsAll filledShow","Edit position on the map","Add Primary image (recommended)","Add Video","Add Gallery","Add 3D model","English: choose audio narration","Ελληνικά: choose audio narration","Italiano: choose audio narration","All languages: choose audio narration","Remove QR code","Copy link","Add Beacon (Bluetooth)","Add Geo-proximity"]
+FAIL drawer locator.focus: Timeout 30000ms exceeded.

@@ -1,0 +1,26 @@
+import { open, go, P, shot, settle, IDS, url, txt } from "./lib.mjs";
+const vp=process.argv[2]||"1440";
+const { browser, page } = await open("admin", { viewport: vp });
+await go(page, url("events", IDS.event)); await settle(page,1500);
+await page.locator("#occ-add").click(); await settle(page,300);
+await page.locator("#occ-start-o-1-year").fill("2026");await page.locator("#occ-start-o-1-day").fill("10"); await page.locator("#occ-start-o-1-month").selectOption("1"); await page.keyboard.press("Tab"); await settle(page,300);
+console.log(await page.evaluate(()=>{const lum=c=>{const a=c.map(v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)});return .2126*a[0]+.7152*a[1]+.0722*a[2]};
+ const li=document.querySelector("#dates li"); const bg=getComputedStyle(li).backgroundColor.match(/\d+/g).map(Number); const p=getComputedStyle(li.parentElement.closest("section")).backgroundColor.match(/\d+/g).map(Number);
+ const f=document.querySelector("#dates li label"); const fg=getComputedStyle(f).color.match(/\d+/g).map(Number);
+ const op=.8; const bgc=bg; const eff=fg.map((v,i)=>v*op+bgc[i]*(1-op)); const effbg=bgc.map((v,i)=>v*op+p[i]*(1-op)); // element bg also fades onto section bg
+ const cr=(a,b)=>{const x=lum(a),y=lum(b);return ((Math.max(x,y)+.05)/(Math.min(x,y)+.05)).toFixed(2)};
+ return "label fg "+fg+" li bg "+bg+" section bg "+p+" -> contrast "+cr(fg.map((v,i)=>v*op+p[i]*(1-op)),effbg)+" (full opacity would be "+cr(fg,bg)+")"}));
+const poi = page.locator("#f-poiId"); await poi.scrollIntoViewIfNeeded(); await poi.focus(); await page.keyboard.press("ArrowDown"); const lb=await poi.getAttribute("aria-controls"); await settle(page,200);
+await page.keyboard.type("eclair",{delay:30}); await settle(page,500);
+console.log("poi 'eclair' value:", await poi.inputValue(), await page.locator("#"+lb+" [role=option]").allInnerTexts().then(a=>a.slice(0,4)));
+await poi.fill(""); await page.keyboard.type("αγιος",{delay:30}); await settle(page,500);
+console.log("poi 'αγιος':", await page.locator("#"+lb+" [role=option]").allInnerTexts().then(a=>a.slice(0,4)));
+await poi.fill(""); await page.keyboard.type("ΑΓΙΟΣ",{delay:30}); await settle(page,500);
+console.log("poi 'ΑΓΙΟΣ':", await page.locator("#"+lb+" [role=option]").allInnerTexts().then(a=>a.slice(0,4)));
+await poi.fill(""); await page.keyboard.type("UX-R3-s11",{delay:30}); await settle(page,500);
+console.log("poi UX:", await page.locator("#"+lb+" [role=option]").allInnerTexts().then(a=>a.slice(0,6)));
+await shot(page,`event__combo-filtered__${vp}`);
+await page.keyboard.press("ArrowDown"); await page.keyboard.press("Enter"); await settle(page,300);
+console.log("value", JSON.stringify(await poi.inputValue()));
+await page.keyboard.press("Escape"); 
+await browser.close();

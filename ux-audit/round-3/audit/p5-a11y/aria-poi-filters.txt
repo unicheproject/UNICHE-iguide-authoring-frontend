@@ -1,0 +1,41 @@
+- dialog:
+  - text: Search in
+  - combobox "Search in":
+    - option "All languages" [selected]
+    - option "English"
+    - option "Ελληνικά"
+    - option "Italiano"
+  - text: Sort by
+  - combobox "Sort by":
+    - option "Manual order" [selected]
+    - option "Title"
+    - option "Status"
+    - option "Updated"
+    - option "Translations"
+  - checkbox "Pending changes"
+  - text: Pending changes
+  - checkbox "Needs translation"
+  - text: Needs translation Category
+  - combobox "Category":
+    - option "All categories" [selected]
+    - option "In no category"
+    - option "Monuments and Temples"
+    - option "Monuments and Temples › UX-R2-s9 Subcat"
+    - option "Sculpture"
+    - option "Pottery and Everyday Life"
+    - option "Visitor Services"
+    - option "Visitor Services › Food and Drink"
+    - option "Visitor Services › Shops"
+    - option "Viewpoints"
+    - option "UX-p3-translator categorie"
+    - option "UX-p6-edge Category"
+    - option "UX-p6-edge dup categories"
+    - option "UX-P5b category"
+    - option "UX-R2-p3 Marketplace Life"
+    - option "UX-R2-p5 Category"
+    - option "UX-R2-p6 Category"
+    - option "UX-R2-s7-chrome category"
+    - option "UX-R2-s9 Category"
+    - option "UX-R2-P5b Category"
+  - checkbox "Featured only"
+  - text: Featured only

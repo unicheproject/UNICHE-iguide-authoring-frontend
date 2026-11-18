@@ -1,34 +1,52 @@
 <script setup lang="ts">
 /*
- * Visitor app → Preview (`12` §3 Preview, mockup screen 14): the stand-in visitor app (DECISIONS.md D-015)
- * per surface and language, with drafts ("Working content") or only active content ("Live content"), a
- * "fire trigger" control, and "Open in new tab" under the author's own session. Nothing here is shareable
- * or changes what visitors see.
+ * Visitor app → Preview (`12` §3 Preview, mockup screen 14; D-082): the stand-in visitor app (DECISIONS.md D-015) per
+ * surface and language, with "Working" content (drafts, and the pending changes of active items where the API returns
+ * them, G-034) or "Live" content (active only), a "fire a trigger" control, and "Open in new tab" under the author's own
+ * session. The frame is a named region, its screen inert until the author chooses to interact (Esc stops it). One compact
+ * toolbar comes first so the picture starts high on the page (D-093); `?trigger=<id>` (the editors' "Test in preview")
+ * chooses the surface the trigger reaches, selects it and fires it (C2-61). Nothing here is shareable or changes what
+ * visitors see, and no analytics event is sent.
  */
-import { computed, onBeforeUnmount, ref, watch } from "vue";
-import { useRouter } from "vue-router";
+import { ExternalLink } from "lucide-vue-next";
+import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue";
+import { RouterLink, useRoute, useRouter } from "vue-router";
+import PageFrame from "@/components/PageFrame.vue";
 import PageHead from "@/components/PageHead.vue";
-import DeviceFrame from "@/components/preview/DeviceFrame.vue";
+import FireTrigger from "@/components/preview/FireTrigger.vue";
 import PreviewApp from "@/components/preview/PreviewApp.vue";
-import { SURFACES, type Surface } from "@/components/preview/surfaces";
+import PreviewControls from "@/components/preview/PreviewControls.vue";
+import PreviewPane from "@/components/preview/PreviewPane.vue";
+import PreviewSize from "@/components/preview/PreviewSize.vue";
+import { firstEnabledSurface, SURFACE_KEYS, SURFACES, triggerReaches, type Orientation, type Surface, type Zoom } from "@/components/preview/surfaces";
+import { ProblemAlert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { say } from "@/lib/announcer";
+import { hints } from "@/lib/glossary";
 import { ApiError } from "@/platform/api";
 import { listNavigations, type Navigation } from "@/platform/navigation";
+import { fetchSurfaces } from "@/platform/surfaces";
 import { TRIGGER_LABELS, type Trigger } from "@/platform/triggers";
 import { useCurrentProject } from "@/workspace/currentProject";
 import { previewMenu } from "@/workspace/navigationMenu";
-import { loadPreviewData, visibleData, type PreviewData, type PreviewMode } from "@/workspace/previewData";
-import { titleOf } from "@/workspace/previewModels";
+import { loadPreviewData, visibleData, withWorkingCopies, type PreviewData, type PreviewMode, type WorkingOverlay } from "@/workspace/previewData";
+import { titleMissing, titleOf, type PreviewContext } from "@/workspace/previewModels";
 import { useProjectSettings } from "@/workspace/projectSettings";
 import { themeStyle, useProjectTheme } from "@/workspace/projectTheme";
-import { findSection } from "@/workspace/sections";
+import { findSection, sectionLocation } from "@/workspace/sections";
 
 const section = findSection("preview")!;
 const project = useCurrentProject();
 const projectId = computed(() => project.value.id);
 const router = useRouter();
+const route = useRoute();
 
+/** The rows as the list endpoints return them: drafts and active items, the active ones as they are live. */
 const all = ref<PreviewData | null>(null);
+/** The same with each active item's Working Copy drawn in place of its live row (`12` §3), once read. */
+const working = ref<PreviewData | null>(null);
+const overlay = ref<WorkingOverlay | null>(null);
+const overlayFailed = ref(false);
 /** The Project's menus; the app falls back to its default menu without them (D-055). */
 const menus = ref<Navigation[]>([]);
 const loading = ref(true);
@@ -36,9 +54,21 @@ const loadError = ref<ApiError | null>(null);
 let controller: AbortController | null = null;
 
 const surface = ref<Surface>("WEB");
+const orientation = ref<Orientation>("portrait");
+const zoom = ref<Zoom>("fit");
 const language = ref<string | null>(null);
 const mode = ref<PreviewMode>("WORKING");
+const interactive = ref(false);
+/** The trigger last fired, as the chip names it; cleared when the surface, language or content changes. */
+const fired = ref<string | null>(null);
 const app = ref<InstanceType<typeof PreviewApp> | null>(null);
+const firing = ref<InstanceType<typeof FireTrigger> | null>(null);
+/** The scale "Fit width" gives, so a size choice that would look the same is not offered. */
+const fitScale = ref(1);
+/** A phone, or a screen that already fits at real size, is always drawn by Fit width. */
+const effectiveZoom = computed<Zoom>(() => (surface.value === "MOBILE" || (zoom.value === "100" && fitScale.value >= 0.995) ? "fit" : zoom.value));
+/** Why `?trigger=` could not be fired, said next to the picture. */
+const triggerNote = ref("");
 const theme = useProjectTheme(projectId);
 const settings = useProjectSettings(projectId);
 
@@ -48,167 +78,305 @@ async function load() {
   const signal = controller.signal;
   loading.value = true;
   loadError.value = null;
+  working.value = null;
+  overlay.value = null;
+  overlayFailed.value = false;
   try {
-    [all.value, menus.value] = await Promise.all([
+    const [data, navigations, surfaces] = await Promise.all([
       loadPreviewData(projectId.value, signal),
       listNavigations(projectId.value, signal).catch((e) => {
         if (e instanceof ApiError) return [];
         throw e;
       }),
+      fetchSurfaces(projectId.value, signal).catch((e) => {
+        if (e instanceof ApiError) return [];
+        throw e;
+      }),
     ]);
-    const codes = all.value.languages.map((l) => l.languageCode);
+    all.value = data;
+    menus.value = navigations;
+    const codes = data.languages.map((l) => l.languageCode);
     if (!language.value || !codes.includes(language.value)) language.value = defaultLanguage.value;
+    // The Project's first enabled surface is where the preview opens; the author's own choice is kept on a reload.
+    if (!surfaceChosen) surface.value = firstEnabledSurface(surfaces.filter((s) => s.enabled).map((s) => s.surface));
+    loading.value = false;
+    void loadWorking(data, signal);
+    void applyTriggerParam();
   } catch (e) {
     if (e instanceof DOMException && e.name === "AbortError") return;
     if (!(e instanceof ApiError)) throw e;
     loadError.value = e;
-  } finally {
-    if (!signal.aborted) loading.value = false;
+    loading.value = false;
   }
 }
+/** Reads the pending changes of active items after the page is up, so the first picture is not held back. */
+async function loadWorking(data: PreviewData, signal: AbortSignal) {
+  try {
+    const result = await withWorkingCopies(projectId.value, data, signal);
+    if (signal.aborted) return;
+    working.value = result.data;
+    overlay.value = result.overlay;
+  } catch (e) {
+    if (e instanceof DOMException && e.name === "AbortError") return;
+    if (!(e instanceof ApiError)) throw e;
+    overlayFailed.value = true;
+  }
+}
+let surfaceChosen = false;
 watch(projectId, load, { immediate: true });
 onBeforeUnmount(() => controller?.abort());
 
 const defaultLanguage = computed(() => all.value?.languages.find((l) => l.isDefault)?.languageCode ?? null);
-const data = computed(() => (all.value ? visibleData(all.value, mode.value) : null));
+const data = computed(() => {
+  if (!all.value) return null;
+  return visibleData(mode.value === "WORKING" && working.value ? working.value : all.value, mode.value);
+});
 const menuOf = (context: "PRIMARY" | "FOOTER") =>
   data.value
     ? previewMenu(menus.value.find((m) => m.context === context), { data: data.value, language: language.value, defaultLanguage: defaultLanguage.value })
     : [];
 const activeLanguage = computed(() => all.value?.languages.find((l) => l.languageCode === language.value) ?? null);
+const ctx = computed<PreviewContext | null>(() =>
+  data.value ? { data: data.value, language: language.value, defaultLanguage: defaultLanguage.value } : null,
+);
 
-/** Titles visitors of the chosen language would see in the default language instead. */
-const missingTitles = computed(() => {
+/** The pane's accessible name, also announced when the view changes: "Preview: Kiosk, Ελληνικά, working content". */
+const regionLabel = computed(
+  () => `Preview: ${SURFACES[surface.value].label}, ${activeLanguage.value?.displayName ?? "no language"}, ${mode.value === "WORKING" ? "working" : "live"} content`,
+);
+
+/** The items whose title the chosen language lacks, named by what visitors see instead (the default language's). */
+const missing = computed(() => {
   const d = data.value;
+  const c = ctx.value;
   const code = language.value;
-  if (!d || !code) return 0;
-  const lists: { translations: Record<string, { title: string | null }> }[][] = [d.places, d.pois, d.routes, d.guides, d.events];
-  return lists.flat().filter((r) => !r.translations[code]?.title?.trim()).length;
+  if (!d || !c || !code) return [];
+  const kinds = [
+    ["Place", "PLACE", d.places],
+    ["Point of interest", "POI", d.pois],
+    ["Route", "ROUTE", d.routes],
+    ["Guide", "GUIDE", d.guides],
+    ["Event", "EVENT", d.events],
+  ] as const;
+  return kinds.flatMap(([kind, type, rows]) =>
+    rows.filter((r) => titleMissing(c, { type, id: r.id })).map((r) => ({ key: `${type}:${r.id}`, kind, slug: SLUGS[type], name: titleOf(c, { type, id: r.id }) })),
+  );
 });
-const statusLine = computed(() => {
-  const what = mode.value === "WORKING" ? "Showing drafts and active content." : "Showing active content only, as visitors see it.";
-  const name = activeLanguage.value?.displayName ?? "";
-  const missing = missingTitles.value;
-  return `${what} ${missing ? `${missing} missing title${missing === 1 ? "" : "s"}` : "No missing titles"} in ${name}.`;
+const SLUGS = { PLACE: "places", POI: "pois", ROUTE: "routes", GUIDE: "guides", EVENT: "events" } as const;
+/** The missing titles per kind, each with the filtered list ("Needs translation" in the chosen language) that holds them. */
+const missingKinds = computed(() => {
+  const groups = new Map<string, { kind: string; slug: string; count: number }>();
+  for (const m of missing.value) {
+    const g = groups.get(m.slug) ?? { kind: m.kind, slug: m.slug, count: 0 };
+    g.count += 1;
+    groups.set(m.slug, g);
+  }
+  return [...groups.values()];
+});
+/** The filtered list that holds a kind's missing titles: the worklist language and "Needs translation" (C3-51). */
+const missingLocation = (slug: string) => ({ ...sectionLocation(projectId.value, slug), query: { lang: language.value ?? undefined, missing: language.value ?? undefined } });
+const PLURALS = { Place: "places", "Point of interest": "points of interest", Route: "routes", Guide: "guides", Event: "events" } as Record<string, string>;
+/** No Place, point of interest, Route, Guide or Event shows in this view (C3-68). */
+const isEmpty = computed(() => {
+  const d = data.value;
+  return !!d && d.places.length + d.pois.length + d.routes.length + d.guides.length + d.events.length === 0;
+});
+const hasDrafts = computed(() => {
+  const d = all.value;
+  return !!d && d.places.length + d.pois.length + d.routes.length + d.guides.length + d.events.length > 0;
 });
 
-const firable = computed(() => (data.value?.triggers ?? []).filter((t) => t.status !== "ARCHIVED"));
-function triggerLabel(t: Trigger): string {
-  const c = t.configuration;
-  const detail = t.triggerType === "QR_CODE" ? String(t.code) : t.triggerType === "BEACON" ? `${c.uuid} / ${c.major} / ${c.minor}` : `${c.radiusMeters} m`;
-  const target = data.value ? titleOf({ data: data.value, language: language.value, defaultLanguage: defaultLanguage.value }, { type: t.targetResourceType, id: t.targetResourceId }) : "";
-  return `${TRIGGER_LABELS[t.triggerType]} ${detail} → ${target}`;
+/** What the Working content holds, said plainly (G-034): the pending changes drawn, or why they are not. */
+const workingNote = computed(() => {
+  const o = overlay.value;
+  if (overlayFailed.value) {
+    return "Drafts shown. Pending changes of active items could not be read; they are shown in each editor's preview.";
+  }
+  if (!o) return working.value || !all.value ? "" : "Drafts shown. Reading the pending changes of active items…";
+  if (!o.pending) return "Drafts and active content shown. No active item has pending changes.";
+  if (!o.applied) return "Drafts shown. Pending changes of active items could not be read; they are shown in each editor's preview.";
+  const drawn = `Drafts and ${o.applied} pending change${o.applied === 1 ? "" : "s"} of active items shown.`;
+  return o.failed ? `${drawn} ${o.failed} could not be read; their live content is shown instead.` : drawn;
+});
+const statusLine = computed(() =>
+  mode.value === "WORKING" ? workingNote.value : "Active content only, as visitors see it. Drafts and pending changes are not shown.",
+);
+
+const allTriggers = computed(() => (all.value?.triggers ?? []).filter((t) => t.status !== "ARCHIVED"));
+function targetName(t: Trigger): string {
+  const base = all.value;
+  if (!base) return "";
+  // Names come from the full data, so a trigger whose target is hidden in Live still reads by its name.
+  return titleOf({ data: base, language: language.value, defaultLanguage: defaultLanguage.value }, { type: t.targetResourceType, id: t.targetResourceId });
 }
-const fireId = ref("");
-function fire() {
-  const trigger = firable.value.find((t) => t.id === fireId.value);
-  if (trigger) app.value?.fire(trigger);
-  fireId.value = "";
+/** `?trigger=<id>`: shows the surface the trigger reaches, then chooses and fires it, or says why that is not possible. */
+async function applyTriggerParam() {
+  const id = typeof route.query.trigger === "string" ? route.query.trigger : "";
+  triggerNote.value = "";
+  if (!id || !all.value) return;
+  const trigger = allTriggers.value.find((t) => t.id === id);
+  if (!trigger) {
+    triggerNote.value = "The trigger from the link was not found. It may have been archived or deleted.";
+    dropTriggerParam();
+    return;
+  }
+  if (!triggerReaches(trigger, surface.value)) surface.value = SURFACE_KEYS.find((key) => triggerReaches(trigger, key)) ?? surface.value;
+  if (trigger.status !== "ACTIVE") mode.value = "WORKING";
+  // The trigger list and the stand-in follow the surface and content choice on the next render.
+  await nextTick();
+  await nextTick();
+  if (!firing.value?.fireById(id)) {
+    triggerNote.value = `${TRIGGER_LABELS[trigger.triggerType]}, ${targetName(trigger)} is not offered on ${SURFACES[surface.value].label} in this view.`;
+  }
+  dropTriggerParam();
 }
+/** `?trigger=` is used once: it leaves the address, so a reload or a shared link does not fire it again (C3-69). */
+function dropTriggerParam() {
+  if (route.query.trigger === undefined) return;
+  const { trigger: _used, ...rest } = route.query;
+  void router.replace({ query: rest });
+}
+watch(
+  () => route.query.trigger,
+  () => {
+    if (!loading.value) void applyTriggerParam();
+  },
+);
+function fire(trigger: Trigger, label: string) {
+  app.value?.fire(trigger);
+  triggerNote.value = "";
+  fired.value = label;
+  say(`Fired ${label}`);
+}
+function reset() {
+  app.value?.home();
+  app.value?.clearNotes();
+  fired.value = null;
+  say("Preview reset to Home");
+}
+
+// A note, or a trigger's chip, belongs to the view it was made in: another surface, language or content drops them.
+watch([surface, language, mode], () => {
+  app.value?.clearNotes();
+  fired.value = null;
+  if (!loading.value) say(regionLabel.value);
+});
+watch(surface, () => (surfaceChosen = true));
 
 function openInNewTab() {
   const href = router.resolve({
     name: "app-preview",
     params: { projectId: projectId.value },
-    query: { surface: surface.value, lang: language.value ?? undefined, mode: mode.value },
+    query: {
+      surface: surface.value,
+      lang: language.value ?? undefined,
+      mode: mode.value,
+      orientation: surface.value === "KIOSK" && orientation.value === "landscape" ? "landscape" : undefined,
+      real: zoom.value === "100" ? "1" : undefined,
+    },
   }).href;
-  window.open(href, "_blank", "noopener");
+  // One named tab per Project, so a second click refreshes it instead of piling up tabs; no `opener` link back.
+  const tab = window.open(href, `iguide-preview-${projectId.value}`);
+  if (tab) tab.opener = null;
 }
-
-const chip = (selected: boolean) =>
-  selected ? "bg-primary text-primary-foreground" : "text-gray-700 hover:text-primary";
 </script>
 
 <template>
-  <main class="relative min-w-0 flex-1 overflow-y-auto px-4 pb-16 pt-6 md:px-7">
-    <PageHead :title="section.title" :subtitle="section.subtitle">
+  <PageFrame :busy="loading">
+    <PageHead :title="section.title" subtitle="The visitor app as it will look, per surface and language. Nothing here changes what visitors see.">
       <template #actions>
-        <Button variant="outline" :disabled="!data" @click="openInNewTab">Open in new tab</Button>
+        <Button variant="secondary" :disabled-reason="data ? undefined : 'The preview is still loading.'" @click="openInNewTab">
+          <ExternalLink aria-hidden="true" />Open in new tab
+        </Button>
       </template>
     </PageHead>
 
-    <div v-if="loadError" role="alert" class="max-w-[640px] rounded-lg border border-l-[3px] border-l-destructive bg-card px-[18px] py-4">
-      <strong class="block text-[13px] font-bold text-destructive">
-        {{ loadError.platformUnavailable ? "The UNICHE platform is not reachable" : "The preview could not be loaded" }}
-      </strong>
-      <p class="mt-1 text-[13px] text-gray-700">{{ loadError.message }}</p>
-      <Button variant="outline" size="sm" class="mt-3" @click="load">Try again</Button>
-    </div>
+    <ProblemAlert v-if="loadError" :error="loadError" action="load the preview" @retry="load" />
 
-    <div v-else-if="loading || !data" class="animate-skeleton space-y-4" role="status" aria-busy="true" aria-label="Loading the preview">
-      <div class="h-[64px] rounded-[10px] border bg-card"></div>
-      <div class="mx-auto h-[520px] max-w-[1000px] rounded-xl border bg-card"></div>
+    <div v-else-if="loading || !data" class="animate-skeleton space-y-4" role="status" aria-label="Loading the preview">
+      <div class="h-16 rounded-lg border border-border bg-card"></div>
+      <div class="mx-auto h-stage max-w-4xl rounded-lg border border-border bg-card"></div>
     </div>
 
     <template v-else>
-      <div class="mb-5 flex flex-wrap items-center gap-3 rounded-[10px] border bg-card px-[18px] py-3">
-        <div class="flex rounded-full bg-muted p-1" role="group" aria-label="Surface">
-          <button
-            v-for="key in (['WEB', 'MOBILE', 'KIOSK'] as const)"
-            :key="key"
-            type="button"
-            :aria-pressed="surface === key"
-            class="rounded-full px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.06em]"
-            :class="chip(surface === key)"
-            @click="surface = key"
-          >
-            {{ SURFACES[key].label }}
-          </button>
-        </div>
-        <div v-if="all && all.languages.length" class="flex rounded-full bg-muted p-1" role="group" aria-label="Language">
-          <button
-            v-for="l in all.languages"
-            :key="l.languageCode"
-            type="button"
-            :aria-pressed="language === l.languageCode"
-            class="rounded-full px-4 py-1.5 text-[11px] font-bold tracking-[0.04em]"
-            :class="chip(language === l.languageCode)"
-            @click="language = l.languageCode"
-          >
-            {{ l.displayName }}
-          </button>
-        </div>
-        <div class="flex rounded-full bg-muted p-1" role="group" aria-label="Content">
-          <button type="button" :aria-pressed="mode === 'WORKING'" class="rounded-full px-4 py-1.5 text-[11px] font-bold" :class="chip(mode === 'WORKING')" @click="mode = 'WORKING'">
-            Working content
-          </button>
-          <button type="button" :aria-pressed="mode === 'LIVE'" class="rounded-full px-4 py-1.5 text-[11px] font-bold" :class="chip(mode === 'LIVE')" @click="mode = 'LIVE'">
-            Live content
-          </button>
-        </div>
-        <label class="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.06em] text-muted-foreground">
-          Fire trigger
-          <select v-model="fireId" class="field-input max-w-[300px] py-1.5 text-[12px] normal-case tracking-normal" :disabled="!firable.length" @change="fire">
-            <option value="">{{ firable.length ? "Choose a trigger…" : "No triggers" }}</option>
-            <option v-for="t in firable" :key="t.id" :value="t.id">{{ triggerLabel(t) }}</option>
-          </select>
-        </label>
-        <span class="ml-auto text-xs text-muted-foreground" aria-live="polite">{{ statusLine }}</span>
+      <!-- One compact toolbar: what to show, then what to fire. Sticky where the window is tall enough to spare the room. -->
+      <div class="z-sticky mb-3 flex flex-col gap-1 rounded-lg border border-border bg-card px-3 py-1.5 [@media(min-height:760px)]:sticky [@media(min-height:760px)]:-top-6" data-preview-toolbar>
+        <PreviewControls v-model:surface="surface" v-model:language="language" v-model:mode="mode" :languages="all?.languages ?? []" />
+        <FireTrigger ref="firing" :triggers="allTriggers" :surface="surface" :mode="mode" :target-name="targetName" :fired="fired" @fire="fire" @reset="reset" />
       </div>
+      <p v-if="triggerNote" class="mb-3 text-sm text-warning" role="status">{{ triggerNote }}</p>
 
-      <p class="mb-2 text-center text-[10px] font-extrabold uppercase tracking-[0.1em] text-muted-foreground">{{ SURFACES[surface].caption }}</p>
-      <div class="mx-auto" :class="surface === 'MOBILE' ? 'max-w-[400px]' : surface === 'KIOSK' ? 'max-w-[640px]' : 'max-w-[1000px]'">
-        <DeviceFrame :surface="surface" :dir="activeLanguage?.direction === 'RTL' ? 'rtl' : 'ltr'" :lang="language ?? undefined" browser-chrome :style="themeStyle(theme)">
-          <PreviewApp
-            ref="app"
-            :data="data"
-            :language="language"
-            :default-language="defaultLanguage"
-            :surface="surface"
-            :app-name="project.name"
-            :theme="theme"
-            :time-zone="settings?.timezone"
-            :menu="menuOf('PRIMARY')"
-            :footer="menuOf('FOOTER')"
-          />
-        </DeviceFrame>
+      <!-- Outside the frame: why it is empty, where to add content, and what Working and Live mean (C3-68). -->
+      <section v-if="isEmpty" aria-labelledby="preview-empty" class="mb-3 flex max-w-3xl flex-col gap-1 rounded-lg border border-border bg-card px-4 py-3 text-sm">
+        <h2 id="preview-empty" class="font-semibold">{{ hasDrafts ? "No active content yet" : "This Project has no content yet" }}</h2>
+        <p class="text-ink-2">
+          {{ hasDrafts && mode === "LIVE" ? "Live shows only active items, and none is active yet. Switch Content to Working to see the drafts." : "Add a Place or a point of interest and it appears here." }}
+          {{ hints.previewContent }}
+        </p>
+        <p>
+          <RouterLink :to="sectionLocation(projectId, 'places')" class="hit-44 font-semibold text-primary underline underline-offset-2">Open Places</RouterLink>
+          <span aria-hidden="true"> · </span>
+          <RouterLink :to="sectionLocation(projectId, 'pois')" class="hit-44 font-semibold text-primary underline underline-offset-2">Open points of interest</RouterLink>
+        </p>
+      </section>
+
+      <PreviewPane
+        v-model:interactive="interactive"
+        :surface="surface"
+        :orientation="orientation"
+        :zoom="effectiveZoom"
+        :label="regionLabel"
+        :dir="activeLanguage?.direction === 'RTL' ? 'rtl' : 'ltr'"
+        :lang="language ?? undefined"
+        :style="themeStyle(theme)"
+        browser-chrome
+        @fit="fitScale = $event"
+      >
+        <template #actions>
+          <PreviewSize v-model:zoom="zoom" v-model:orientation="orientation" :surface="surface" :fit-scale="fitScale" />
+        </template>
+        <PreviewApp
+          ref="app"
+          :data="data"
+          :language="language"
+          :default-language="defaultLanguage"
+          :surface="surface"
+          :app-name="project.name"
+          :theme="theme"
+          :time-zone="settings?.timezone"
+          :menu="menuOf('PRIMARY')"
+          :footer="menuOf('FOOTER')"
+        />
+      </PreviewPane>
+
+      <!-- What the picture holds, under it: the content state, an approximation notice and the missing titles. -->
+      <div class="mt-3 flex max-w-3xl flex-col gap-1 text-xs text-muted-foreground">
+        <p role="status">{{ statusLine }}</p>
+        <p>
+          An approximation in {{ theme.styleName ? `the Project's theme (${theme.styleName})` : "the default theme" }}; the visitor app is not available yet.
+          {{ menuOf("PRIMARY").length ? "" : "A default menu stands in until Navigation has one." }} Dashed outlines mark missing texts.
+        </p>
+        <div v-if="missing.length" class="text-sm">
+          <p class="font-semibold text-ink-2">
+            {{ missing.length }} missing title{{ missing.length === 1 ? "" : "s" }} in {{ activeLanguage?.displayName }}.
+            <span class="font-normal text-muted-foreground">Visitors of this language see the default language's title for these.</span>
+          </p>
+          <ul class="flex flex-wrap gap-x-4">
+            <li v-for="g in missingKinds" :key="g.slug">
+              <RouterLink :to="missingLocation(g.slug)" class="hit-44 font-semibold text-primary underline underline-offset-2">
+                {{ g.count }} in {{ PLURALS[g.kind] ?? g.kind.toLowerCase() }}<span class="sr-only">: show them in the list</span>
+              </RouterLink>
+            </li>
+          </ul>
+          <details>
+            <summary class="cursor-pointer py-1 font-semibold text-primary">Which ones</summary>
+            <ul class="mt-1 columns-1 gap-6 sm:columns-2">
+              <li v-for="m in missing" :key="m.key" class="break-inside-avoid py-0.5"><span>{{ m.kind }}:</span> {{ m.name }}</li>
+            </ul>
+          </details>
+        </div>
+        <p v-else>No missing titles in {{ activeLanguage?.displayName }}.</p>
       </div>
-      <p class="mx-auto mt-3 max-w-[760px] text-center text-[11px] text-muted-foreground">
-        An approximation {{ theme.styleName ? `in the Project's theme (${theme.styleName})` : "in the default theme" }}:
-        the visitor app and Pages are not available yet. {{ menuOf("PRIMARY").length ? "The menu is the Project's Navigation." : "With no main menu set up under Navigation, a default menu stands in." }}
-        Red marks texts missing in the chosen language.
-        Nothing here changes what visitors see.
-      </p>
     </template>
-  </main>
+  </PageFrame>
 </template>

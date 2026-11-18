@@ -1,0 +1,5 @@
+{
+  "extends": "../../../../../tsconfig.app.json",
+  "compilerOptions": { "tsBuildInfoFile": "./demo.tsbuildinfo", "paths": { "@/*": ["../../../../../src/*"] } },
+  "include": ["./ListDemo.vue", "../../../../../src/env.d.ts"]
+}

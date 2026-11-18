@@ -1,47 +1,76 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, watch } from "vue";
-import ReorderControls from "@/components/ReorderControls.vue";
-import TriggerChips from "@/components/TriggerChips.vue";
-import { groupTriggersByTarget, listProjectTriggers, type Trigger } from "@/platform/triggers";
-import { saveOrder } from "@/platform/ordering";
-import { dropLineClass, useReorder } from "@/workspace/useReorder";
+/**
+ * Routes list (plan 2.2, D-076): the shared list scaffold with this kind's columns (title with slug and trigger chips;
+ * setting, mode and difficulty; stops; status; translations), Category and Featured filters in the toolbar, manual order
+ * with "Move to position...", and activation through the shared confirm. Filters, sort and search live in the URL.
+ */
+import { Building2, Mountain, Star } from "lucide-vue-next";
+import { computed, onBeforeUnmount, ref, useId, watch } from "vue";
 import { useRouter } from "vue-router";
-import CategoryFilterSelect from "@/components/CategoryFilterSelect.vue";
+import ListEmpty from "@/components/list/ListEmpty.vue";
+import ListFooter from "@/components/list/ListFooter.vue";
+import ListTable, { type ListColumn } from "@/components/list/ListTable.vue";
+import FilterField from "@/components/list/FilterField.vue";
+import ListRowTitle from "@/components/list/ListRowTitle.vue";
+import { Select } from "@/components/ui/select";
+import ListSourceNotice from "@/components/list/ListSourceNotice.vue";
+import ListToolbar from "@/components/list/ListToolbar.vue";
+import RowMenu from "@/components/list/RowMenu.vue";
+import ListLoadError from "@/components/list/ListLoadError.vue";
+import MatchHint from "@/components/list/MatchHint.vue";
+import { matchesStatus, segmentTotal, statusCounts, useListQuery, useResultAnnouncer, useScrollRestore } from "@/components/list/useListQuery";
+import { useCreateParam } from "@/components/list/useCreateParam";
+import PageFrame from "@/components/PageFrame.vue";
 import PageHead from "@/components/PageHead.vue";
 import StatusChip from "@/components/StatusChip.vue";
 import TranslationDots from "@/components/TranslationDots.vue";
-import StatusChangeDialog from "@/components/StatusChangeDialog.vue";
+import TriggerChips from "@/components/TriggerChips.vue";
+import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { formatDate } from "@/lib/format";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Chip } from "@/components/ui/chip";
+import { focusHeading } from "@/lib/focus";
+import { formatDateTime, formatDistance, NBSP, withUnit } from "@/lib/format";
 import { ApiError } from "@/platform/api";
-import type { ResourceStatus } from "@/platform/places";
-import { changeRouteStatus, fetchRouteReferences, listRoutes, routeCompleteness, routeModeLabel, routeTitle, routeTypeLabel, type Route } from "@/platform/routes";
+import { categoryLabel } from "@/platform/categories";
+import {
+  changeRouteStatus,
+  fetchRouteReferences,
+  listRoutes,
+  routeCompleteness,
+  routeDifficultyLabel,
+  routeModeLabel,
+  routeTitle,
+  routeTypeLabel,
+  type Route,
+} from "@/platform/routes";
+import { saveOrder } from "@/platform/ordering";
+import { groupTriggersByTarget, listProjectTriggers, triggerLabel, type Trigger } from "@/platform/triggers";
 import { showToast } from "@/stores/toast";
-import { handOffActivationErrors, isMissingFieldsError } from "@/workspace/activationHandoff";
 import { useCurrentProject } from "@/workspace/currentProject";
-import type { ResourceReference } from "@/platform/references";
-import { referenceLink } from "@/workspace/referenceLinks";
+import type { ActiveFilter } from "@/workspace/listFilters";
 import { findSection } from "@/workspace/sections";
 import { useCategoryFilter } from "@/workspace/useCategoryFilter";
-import { STATUS_FILTER_OPTIONS, categoryFilterChip, choiceFilter, useListFilters } from "@/workspace/listFilters";
-import ListFilterMenu from "@/components/ListFilterMenu.vue";
-import FilterChoiceGroup from "@/components/FilterChoiceGroup.vue";
-import SearchLanguageSelect from "@/components/SearchLanguageSelect.vue";
-import FeaturedFilterChip from "@/components/FeaturedFilterChip.vue";
 import { useProjectLanguages } from "@/workspace/useProjectLanguages";
+import { useReorder } from "@/workspace/useReorder";
 import CreateRouteDialog from "./CreateRouteDialog.vue";
+import LifecycleDialogs from "../LifecycleDialogs.vue";
+import { matchedInOtherLanguage, searchTitles, sortByQuery, translationScore } from "../listRows";
+import { fold } from "@/lib/utils";
+import { useListLifecycle } from "../useListLifecycle";
 
 const section = findSection("routes")!;
 const project = useCurrentProject();
 const router = useRouter();
 const projectId = computed(() => project.value.id);
-const { languages, defaultLanguage, error: languagesError, loading: languagesLoading } = useProjectLanguages(projectId);
+const { languages, defaultLanguage, error: languagesError, loading: languagesLoading, reload: reloadLanguages } = useProjectLanguages(projectId);
 
+const query = useListQuery();
 const routes = ref<Route[]>([]);
+/** Non-archived triggers by Route; null when they could not be read (each row then says "Triggers not loaded"). */
+const triggersByRoute = ref<Map<string, Trigger[]> | null>(null);
 const loading = ref(true);
 const loadError = ref<ApiError | null>(null);
-/** Non-archived triggers by Resource; null when they could not be read, so no chips show. */
-const triggersByTarget = ref<Map<string, Trigger[]> | null>(null);
 let controller: AbortController | null = null;
 
 async function load() {
@@ -51,10 +80,22 @@ async function load() {
   loadError.value = null;
   try {
     const signal = controller.signal;
-    // The chips are a hint: a failure to read them must not hide the list.
-    const triggers = listProjectTriggers(projectId.value, signal).catch(() => null);
-    routes.value = await listRoutes(projectId.value, signal);
-    triggersByTarget.value = groupTriggersByTarget(await triggers, "ROUTE");
+    // The chips are a hint: a failure to read them must not hide the list (it is reported as a notice).
+    const triggers = listProjectTriggers(projectId.value, signal).then(
+      (found) => {
+        query.reportError("triggers", null);
+        return found;
+      },
+      (e: unknown) => {
+        if (e instanceof DOMException && e.name === "AbortError") throw e;
+        query.reportError("triggers", e);
+        return null;
+      },
+    );
+    // The rows are set once the triggers read has settled, so the chips never grow rows already on screen (C3-91).
+    const [found, triggerRows] = await Promise.all([listRoutes(projectId.value, signal), triggers]);
+    routes.value = found;
+    triggersByRoute.value = triggerRows ? groupTriggersByTarget(triggerRows, "ROUTE") : null;
   } catch (e) {
     if (e instanceof DOMException && e.name === "AbortError") return;
     if (!(e instanceof ApiError)) throw e;
@@ -66,288 +107,269 @@ async function load() {
 watch(projectId, load, { immediate: true });
 onBeforeUnmount(() => controller?.abort());
 
-type StatusFilter = "ALL" | ResourceStatus | "PENDING";
-const statusFilter = ref<StatusFilter>("ALL");
+const categoryId = useId();
 const categoryFilter = useCategoryFilter(projectId, "ROUTE", defaultLanguage);
-const categorySelected = categoryFilter.selected;
-const query = ref("");
-const filters = useListFilters();
-const { featuredOnly, searchLanguage } = filters;
-/** The filters in force, shown as chips beside the Filters button. */
-const activeFilters = computed(() => [
-  ...choiceFilter("status", "Status", statusFilter, STATUS_FILTER_OPTIONS, "ALL"),
-  ...categoryFilterChip(categorySelected, categoryFilter.options.value),
-  ...filters.active(languages.value),
-]);
-
-function normalize(text: string): string {
-  return text.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
-}
-
-const rows = computed(() => {
-  const q = normalize(query.value.trim());
-  return [...routes.value]
-    .sort((a, b) => a.sortOrder - b.sortOrder)
-    .filter((route) => {
-      if (statusFilter.value === "PENDING" ? !route.hasWorkingCopy : statusFilter.value !== "ALL" && route.status !== statusFilter.value) return false;
-      if (!categoryFilter.matches(route.categoryId)) return false;
-      if (featuredOnly.value && !route.featured) return false;
-      if (!q) return true;
-      const haystack = [route.slug, ...filters.texts(route.translations, "title")];
-      return haystack.some((text) => normalize(text).includes(q));
-    });
+// The Category choice lives in the URL (`cat`); the filter helper reads "ALL" for none.
+const categoryChoice = computed<string>({
+  get: () => query.cat.value || "ALL",
+  set: (value) => (query.cat.value = value === "ALL" ? "" : value),
 });
+watch(() => query.cat.value, (value) => (categoryFilter.selected.value = value || "ALL"), { immediate: true });
+// A failed Categories read is a notice with Try again, never a silent "Not loaded" column (C3-87).
+watch(() => categoryFilter.error.value, (error) => query.reportError("categories", error), { immediate: true });
+const categoryChip = computed<ActiveFilter[]>(() => {
+  if (!query.cat.value) return [];
+  const label = query.cat.value === "NONE" ? "In no category" : (categoryFilter.options.value.find((o) => o.id === query.cat.value)?.label ?? "Unknown");
+  return [{ key: "category", label: `Category: ${label}`, clear: () => (query.cat.value = "") }];
+});
+
+const title = (route: Route) => routeTitle(route, defaultLanguage.value);
+const categoryName = (route: Route) => {
+  const category = categoryFilter.categories.value.find((c) => c.id === route.categoryId);
+  return category ? categoryLabel(category, categoryFilter.categories.value, defaultLanguage.value) : null;
+};
+
+/** Rows that pass every filter except the status segment: the segment counts come from these (no false zeros). */
+const filtered = computed(() => {
+  const q = fold(query.q.value.trim());
+  return routes.value.filter((route) => {
+    if (query.pending.value && !route.hasWorkingCopy) return false;
+    if (query.missing.value && routeCompleteness(route, query.missing.value) === "complete") return false;
+    if (!categoryFilter.matches(route.categoryId)) return false;
+    if (query.featured.value && !route.featured) return false;
+    if (!q) return true;
+    const triggerTexts = (triggersByRoute.value?.get(route.id) ?? []).map(triggerLabel);
+    return [route.slug, ...searchTitles(route.translations, query.lang.value), ...triggerTexts].some((t) => fold(t).includes(q));
+  });
+});
+const counts = computed(() => statusCounts(filtered.value));
+const rows = computed(() =>
+  sortByQuery(
+    filtered.value.filter((route) => matchesStatus(route, query.status.value)),
+    query,
+    (route) => ({
+      title: title(route),
+      status: route.status,
+      updated: route.updatedAt,
+      translations: translationScore(languages.value, (code) => routeCompleteness(route, code)),
+      sortOrder: route.sortOrder,
+    }),
+  ),
+);
+const total = computed(() => segmentTotal(routes.value, query.status.value));
+
+/** "Matches Ελληνικά: Ακρόπολη" under a row whose title only matches the search in another language (C2-48). */
+function matchOf(route: Route) {
+  return matchedInOtherLanguage(route.translations, query.q.value, defaultLanguage.value ?? "", [title(route), route.slug]);
+}
+const languageName = (code: string) => languages.value.find((l) => l.languageCode === code)?.displayName ?? code;
 
 const defaultLanguageInfo = computed(() => languages.value.find((l) => l.isDefault) ?? null);
 const noLanguages = computed(() => !languagesLoading.value && !languagesError.value && !languages.value.length);
 
-const countText = computed(() => {
-  const total = routes.value.length;
-  const noun = total === 1 ? "route" : "routes";
-  return rows.value.length === total ? `${total} ${noun}` : `${rows.value.length} of ${total} ${noun}`;
+const lifecycle = useListLifecycle<Route>({
+  items: routes,
+  projectId,
+  noun: "route",
+  referenceType: "ROUTE",
+  title,
+  changeStatus: changeRouteStatus,
+  fetchReferences: fetchRouteReferences,
+  editorRoute: (route) => ({ name: "route-editor", params: { projectId: projectId.value, routeId: route.id } }),
+  reload: load,
+  completeness: routeCompleteness,
+  languages,
 });
 
-function facts(route: Route): string {
-  const parts = [route.stops.length === 1 ? "1 stop" : `${route.stops.length} stops`];
-  if (route.mode) parts.unshift(routeModeLabel(route.mode));
-  if (route.estimatedDurationMinutes) parts.push(`${route.estimatedDurationMinutes} min`);
-  if (route.distanceMeters) parts.push(route.distanceMeters >= 1000 ? `${(route.distanceMeters / 1000).toFixed(1)} km` : `${route.distanceMeters} m`);
-  if (route.loop) parts.push("loop");
-  return parts.join(" · ");
+// Manual order (spec 12 section 3); off while a search or filter hides rows (D-017); a move steps over hidden ARCHIVED rows.
+const reorder = useReorder<Route>({
+  items: routes,
+  title,
+  canReorder: query.canReorder,
+  visible: (route) => matchesStatus(route, query.status.value),
+  save: (ids) => saveOrder(projectId.value, "routes", ids),
+  reload: load,
+});
+
+const ready = computed(() => !loading.value);
+const { rowKeyFocus } = useScrollRestore(ready);
+
+// The Category sits on the slug line under the Title, so the one domain column (176) plus Status 128, Updated 152 and
+// Translations 192 leave the Title at least 15 rem at 1280 and the list stays a table (plan section 9, item 7).
+const columns: ListColumn[] = [
+  { key: "title", label: "Title", tree: true, sortKey: "title" },
+  { key: "setting", label: "Setting and stops", class: "w-44" },
+  { key: "status", label: "Status", sortKey: "status", class: "w-32" },
+  { key: "updated", label: "Updated", sortKey: "updated", class: "w-[9.5rem]" },
+  { key: "translations", label: "Translations", sortKey: "translations" },
+];
+/** The optional read to run again from the notice's "Try again". */
+function retrySource(source: "categories" | "places" | "triggers") {
+  // The notice goes when the read succeeds; focus has a successor (D-103).
+  focusHeading();
+  if (source === "categories") void categoryFilter.reload();
+  else void load();
 }
+const SORTS = [
+  { value: "manual", label: "Manual order" },
+  { value: "title", label: "Title" },
+  { value: "status", label: "Status" },
+  { value: "updated", label: "Updated" },
+  { value: "translations", label: "Translations" },
+];
 
-// Lifecycle actions -----------------------------------------------------------------------------------
+useResultAnnouncer(computed(() => rows.value.length), total, ready, "routes", { query, options: SORTS });
 
+const editorRoute = (route: Route) => ({ name: "route-editor", params: { projectId: projectId.value, routeId: route.id } });
+
+/** "12 stops", "45 min · 3.2 km · loop": what the route is made of, for the Stops column. */
+function stopFacts(route: Route): string[] {
+  const facts: string[] = [];
+  if (route.estimatedDurationMinutes) facts.push(withUnit(route.estimatedDurationMinutes, "min"));
+  if (route.distanceMeters) facts.push(formatDistance(route.distanceMeters));
+  if (route.loop) facts.push("loop");
+  return facts;
+}
 const creating = ref(false);
-const pendingId = ref<string | null>(null);
-const confirm = ref<{ route: Route; target: ResourceStatus; blockedBy?: ResourceReference[] } | null>(null);
+useCreateParam(creating, computed(() => !!defaultLanguageInfo.value));
+const createDisabledReason = computed(() => (defaultLanguageInfo.value ? undefined : languagesError.value ? "The languages could not be loaded" : "Add a language first"));
 
-const title = (route: Route) => routeTitle(route, defaultLanguage.value);
-
-function toggleLabel(route: Route): string {
-  return route.status === "DRAFT" ? "Activate" : route.status === "ACTIVE" ? "Deactivate" : "Restore";
+function onSelect(route: Route, key: string) {
+  if (key === "restore-order") query.restoreManualOrder();
+  else lifecycle.onSelect(route, key);
 }
-
-function onToggle(route: Route) {
-  if (route.status === "DRAFT") void transition(route, "ACTIVE");
-  else if (route.status === "ACTIVE") confirm.value = { route, target: "DRAFT" };
-  else void transition(route, "DRAFT");
-}
-
-async function transition(route: Route, target: ResourceStatus) {
-  pendingId.value = route.id;
-  try {
-    const updated = await changeRouteStatus(projectId.value, route.id, target, route.version);
-    routes.value = routes.value.map((r) => (r.id === updated.id ? updated : r));
-    confirm.value = null;
-    const messages: Record<ResourceStatus, [string, string]> = {
-      ACTIVE: ["Activated", `${title(updated)} is complete and visible to visitors.`],
-      DRAFT: route.status === "ARCHIVED"
-        ? ["Restored", `${title(updated)} is a draft again.`]
-        : ["Deactivated", `${title(updated)} is a draft again and no longer visible to visitors.`],
-      ARCHIVED: ["Archived", `${title(updated)} is archived.`],
-    };
-    const [heading, body] = messages[target];
-    showToast(heading, body, target === "ACTIVE" ? "success" : "warning");
-  } catch (e) {
-    if (!(e instanceof ApiError)) throw e;
-    if (e.code === "RESOURCE_IN_USE" && confirm.value) {
-      confirm.value = { ...confirm.value, blockedBy: (e.body.references as ResourceReference[]) ?? [] };
-      return;
-    }
-    confirm.value = null;
-    if (isMissingFieldsError(e)) {
-      // The editor shows every missing field and focuses the first (`12` §3, DECISIONS.md D-036).
-      handOffActivationErrors(route.id, e);
-      showToast("Cannot activate yet", `${title(route)} opens at the first missing field.`, "error");
-      void router.push({ name: "route-editor", params: { projectId: projectId.value, routeId: route.id } });
-    } else if (e.code === "VERSION_CONFLICT") {
-      showToast("It changed meanwhile", "The list was reloaded; check it and try again.", "warning");
-      void load();
-    } else {
-      showToast("The change was not saved", e.platformUnavailable ? "The UNICHE platform is not reachable." : e.message, "error");
-    }
-  } finally {
-    pendingId.value = null;
-  }
-}
-
-// A trigger that opens the route being changed links to its editor's "How visitors reach it" card.
-const toReference = (r: ResourceReference) =>
-  referenceLink(projectId.value, r, confirm.value && { resourceType: "ROUTE", resourceId: confirm.value.route.id });
 
 function onCreated(route: Route) {
   creating.value = false;
   showToast("Route created", "It is a draft. Add its stops, then activate it.");
-  void router.push({ name: "route-editor", params: { projectId: projectId.value, routeId: route.id } });
+  void router.push(editorRoute(route));
 }
-
-const confirmCopy = computed(() => {
-  const c = confirm.value;
-  if (!c) return null;
-  return c.target === "ARCHIVED"
-    ? { heading: `Archive ${title(c.route)}?`, body: "An archived route leaves the visitor app and the default lists. Restoring it makes it a draft again.", action: "Archive" }
-    : { heading: `Deactivate ${title(c.route)}?`, body: "Visitors stop seeing it on their next refresh. It becomes a draft you can edit.", action: "Deactivate" };
-});
-// Manual order (spec 12 section 3); off while a search or filter hides rows (DECISIONS.md D-017).
-const reorder = useReorder<Route>({
-  items: routes,
-  save: (ids) => saveOrder(projectId.value, "routes", ids),
-  title: (route) => title(route),
-  canReorder: computed(() => !query.value.trim() && !featuredOnly.value && statusFilter.value === "ALL" && categorySelected.value === "ALL"),
-  reload: load,
-});
 </script>
 
 <template>
-  <main class="relative min-w-0 flex-1 overflow-y-auto px-4 pb-16 pt-6 md:px-7">
-    <PageHead :title="section.title" :subtitle="section.subtitle">
+  <PageFrame>
+    <PageHead :title="section.title" :subtitle="section.subtitle" section="routes">
       <template #actions>
-        <Button variant="brand" :disabled="!defaultLanguageInfo" @click="creating = true">New route</Button>
+        <Button :disabled-reason="createDisabledReason" @click="creating = true">New route</Button>
       </template>
     </PageHead>
 
-    <div
-      v-if="noLanguages"
-      class="mb-5 flex flex-wrap items-center gap-3.5 rounded-lg border-l-[3px] border-l-[#855400] bg-[rgba(154,98,0,0.07)] px-[18px] py-3.5 text-[13px]"
-    >
-      <div class="min-w-[min(100%,260px)] flex-1">
-        <strong class="mb-0.5 block text-[13px] font-bold">Add a language first</strong>
-        <span class="text-gray-700">Every route has its title and texts per language, starting with the default language.</span>
-      </div>
-      <RouterLink :to="{ name: 'project-languages', params: { projectId } }" class="whitespace-nowrap text-[11px] font-bold uppercase tracking-[0.06em] text-primary">
-        Set up languages
-      </RouterLink>
+    <Alert v-if="noLanguages" tone="warning" title="Add a language first" class="mb-5">
+      Every route has its title and texts per language, starting with the default language.
+      <template #actions>
+        <Button as-child variant="secondary" size="sm">
+          <RouterLink :to="{ name: 'project-languages', params: { projectId } }">Set up languages</RouterLink>
+        </Button>
+      </template>
+    </Alert>
+
+    <ListLoadError v-if="languagesError" :error="languagesError" what="the project languages" class="!mx-0 mb-4" @retry="reloadLanguages" />
+    <ListLoadError v-if="loadError" :error="loadError" what="the routes" @retry="load" />
+
+    <template v-else>
+    <ListSourceNotice :errors="query.errors" @retry="retrySource" />
+    <div class="rounded-lg border border-border bg-card shadow-1">
+      <template v-if="loading || routes.length">
+        <ListToolbar
+          :query="query"
+          :counts="counts"
+          :loading="loading"
+          :languages="languages"
+          search-placeholder="Search title, slug or trigger"
+          :sort-options="SORTS"
+        >
+          <template #filters>
+            <FilterField v-if="categoryFilter.options.value.length || query.cat.value" label="Category" :for="categoryId">
+              <Select :id="categoryId" v-model="categoryChoice" size="sm">
+                <option value="ALL">All categories</option>
+                <option value="NONE">In no category</option>
+                <option v-for="o in categoryFilter.options.value" :key="o.id" :value="o.id">{{ o.label }}</option>
+              </Select>
+            </FilterField>
+          </template>
+          <template #filters-extra>
+            <Checkbox v-model="query.featured.value">
+              <span class="inline-flex items-center gap-1.5">
+                <Star class="size-4" :class="query.featured.value ? 'fill-current text-primary' : 'text-muted-foreground'" aria-hidden="true" />
+                Featured only
+              </span>
+            </Checkbox>
+          </template>
+        </ListToolbar>
+        <ListTable
+          :columns="columns"
+          :rows="rows"
+          :loading="loading"
+          :query="query"
+          :reorder="reorder"
+          :row-label="title"
+          :row-key-focus="rowKeyFocus"
+          label="Routes"
+          openable
+          @open="(route) => router.push(editorRoute(route))"
+        >
+          <template #cell-title="{ row }">
+            <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+              <ListRowTitle :to="editorRoute(row)" :muted="row.status === 'ARCHIVED'" :missing="query.missing.value">{{ title(row) }}</ListRowTitle>
+              <Chip v-if="row.featured" tone="brand" :icon="Star">Featured</Chip>
+            </div>
+            <div class="flex min-w-0 items-center gap-x-1.5 text-compact text-muted-foreground">
+              <span class="mono min-w-0 shrink truncate" :title="row.slug">{{ row.slug }}</span>
+              <template v-if="!categoryFilter.failed.value">
+                <span aria-hidden="true">·</span>
+                <span class="min-w-0 max-w-[50%] shrink-0 truncate" :title="categoryName(row) ?? undefined">{{ categoryName(row) ?? "No category" }}</span>
+              </template>
+            </div>
+            <TriggerChips :triggers="triggersByRoute?.get(row.id) ?? []" :unavailable="triggersByRoute === null" />
+            <MatchHint v-if="matchOf(row)" :match="matchOf(row)!" :language-name="languageName(matchOf(row)!.languageCode)" />
+          </template>
+          <template #cell-updated="{ row }">
+            <time :datetime="row.updatedAt" class="tabular whitespace-nowrap text-compact text-muted-foreground">{{ formatDateTime(row.updatedAt).replaceAll(" ", NBSP) }}</time>
+          </template>
+          <template #cell-setting="{ row }">
+            <Chip
+              tone="outline"
+              :icon="row.type === 'INDOOR' ? Building2 : Mountain"
+              :title="[row.mode ? routeModeLabel(row.mode) : null, row.difficulty ? routeDifficultyLabel(row.difficulty) : null].filter(Boolean).join(' · ') || 'Mode and difficulty not set'"
+            >{{ routeTypeLabel(row.type) }}</Chip>
+            <p class="mt-0.5 text-compact text-muted-foreground">{{ [row.stops.length === 1 ? withUnit(1, "stop") : withUnit(row.stops.length, "stops"), ...stopFacts(row)].join(" · ") }}</p>
+          </template>
+          <template #cell-status="{ row }">
+            <div class="flex flex-wrap gap-1">
+              <StatusChip :status="row.status" />
+              <StatusChip v-if="row.hasWorkingCopy" status="PENDING" label="Pending changes" title="Has pending changes that visitors do not see yet" wrap />
+            </div>
+          </template>
+          <template #cell-translations="{ row }">
+            <TranslationDots names :languages="languages" :route="editorRoute(row)" :completeness="(code) => routeCompleteness(row, code)" />
+          </template>
+          <template #menu="{ row }">
+            <RowMenu
+              :title="title(row)"
+              :actions="lifecycle.actionsFor(row)"
+              :reorder="reorder"
+              :item="row"
+              :reorder-reason="query.reorderReason.value"
+              @select="(key) => onSelect(row, key)"
+            />
+          </template>
+        </ListTable>
+      </template>
+      <ListEmpty
+        v-if="!loading && !rows.length"
+        noun="routes"
+        empty-title="No routes yet"
+        :filtered="routes.length > 0"
+        :filters="query.chips(categoryChip, languages)"
+        :counts="counts"
+        :status="query.status.value"
+        header-action
+      >
+        A route is an ordered walk through your content: stops that are Points of Interest, with a mode, a difficulty and a line on the map or floor plan.
+      </ListEmpty>
+      <ListFooter v-if="loading || routes.length" :loading="loading" :shown="rows.length" :total="total" noun="routes" :filtered="query.isFiltered.value" legend paged />
     </div>
-
-    <div v-if="loadError" role="alert" class="max-w-[640px] rounded-lg border border-l-[3px] border-l-destructive bg-card px-[18px] py-4">
-      <strong class="block text-[13px] font-bold text-destructive">
-        {{ loadError.platformUnavailable ? "The UNICHE platform is not reachable" : "The routes could not be loaded" }}
-      </strong>
-      <p class="mt-1 text-[13px] text-gray-700">{{ loadError.message }}</p>
-      <p v-if="loadError.requestId" class="mt-1 font-mono text-[11px] text-muted-foreground">Request id {{ loadError.requestId }}</p>
-      <Button variant="outline" size="sm" class="mt-3" @click="load">Try again</Button>
-    </div>
-
-    <div v-else class="overflow-hidden rounded-lg border bg-card shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-      <div class="flex flex-wrap items-center gap-2.5 border-b px-[18px] py-3.5">
-        <label for="routes-search" class="text-[11px] font-bold uppercase tracking-[0.06em] text-muted-foreground">Search</label>
-        <input
-          id="routes-search"
-          v-model="query"
-          type="search"
-          placeholder="Search titles"
-          class="min-w-[min(100%,200px)] flex-1 rounded-lg border-[1.5px] px-3 py-[9px] text-[13px] focus:border-primary focus:outline-none"
-        />
-        <ListFilterMenu :active="activeFilters">
-          <FilterChoiceGroup v-model="statusFilter" legend="Status" :options="STATUS_FILTER_OPTIONS" />
-          <CategoryFilterSelect v-model="categorySelected" :options="categoryFilter.options.value" />
-          <FeaturedFilterChip v-model="featuredOnly" />
-          <SearchLanguageSelect v-model="searchLanguage" :languages="languages" />
-        </ListFilterMenu>
-        <span class="ml-auto text-[11px] text-muted-foreground">
-          {{ reorder.enabled || reorder.saving ? "Sorted by order · drag or use the arrows to reorder" : "Clear the search and filters to reorder" }}
-        </span>
-        <p class="sr-only" aria-live="polite">{{ reorder.announcement }}</p>
-      </div>
-
-      <div v-if="loading" class="animate-skeleton" role="status" aria-busy="true" aria-label="Loading routes">
-        <div v-for="n in 3" :key="n" class="flex items-center gap-3.5 border-b border-gray-100 px-[18px] py-4">
-          <div class="h-[13px] w-1/3 rounded bg-[#e2e3e7]"></div>
-          <div class="flex-1"></div>
-          <div class="h-2.5 w-[90px] rounded bg-[#eceef1]"></div>
-        </div>
-      </div>
-
-      <div v-else-if="rows.length" class="overflow-x-auto">
-        <table class="w-full min-w-[560px] table-fixed border-collapse">
-          <thead>
-            <tr>
-              <th class="th w-[56px] px-2"><span class="sr-only">Order</span></th>
-              <th class="th w-[41%] px-[18px]">Title</th>
-              <th class="th w-[15%] px-3">Status</th>
-              <th class="th w-[14%] px-3">Translations</th>
-              <th class="th w-[30%] px-[18px] text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="route in rows" :key="route.id"
-              class="hover:bg-muted"
-              :class="dropLineClass(reorder.dropLine(route))"
-              @dragover="reorder.dragOver(route, $event)"
-              @drop="reorder.drop(route, $event)"
-            >
-              <td class="td px-2"><ReorderControls :reorder="reorder" :item="route" :title="title(route)" /></td>
-              <td class="td px-[18px]">
-                <div class="flex flex-wrap items-center gap-2">
-                  <RouterLink
-                    :to="{ name: 'route-editor', params: { projectId, routeId: route.id } }"
-                    class="text-left text-[13px] font-semibold no-underline hover:underline"
-                    :class="route.status === 'ARCHIVED' ? 'text-muted-foreground' : 'text-foreground'"
-                  >
-                    {{ title(route) }}
-                  </RouterLink>
-                  <span class="rounded-full border bg-muted px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-[0.08em] text-muted-foreground">
-                    {{ routeTypeLabel(route.type) }}
-                  </span>
-                </div>
-                <div class="mt-[3px] break-words text-[11px] text-gray-500">
-                  <span class="font-mono">{{ route.slug }}</span> · {{ facts(route) }} · {{ formatDate(route.updatedAt) }}
-                </div>
-                <TriggerChips v-if="triggersByTarget" :triggers="triggersByTarget.get(route.id) ?? []" />
-              </td>
-              <td class="td px-3">
-                <StatusChip :status="route.status" />
-                <StatusChip
-                  v-if="route.hasWorkingCopy"
-                  status="PENDING"
-                  label="Pending changes"
-                  class="ml-1"
-                  title="Has pending changes that visitors do not see yet"
-                />
-              </td>
-              <td class="td px-3">
-                <TranslationDots :languages="languages" :completeness="(code) => routeCompleteness(route, code)" />
-              </td>
-              <td class="td px-[18px]">
-                <div class="flex flex-wrap items-center justify-end gap-2.5">
-                  <button
-                    type="button"
-                    class="whitespace-nowrap rounded-full border bg-muted px-[13px] py-1.5 text-[10px] font-bold uppercase tracking-[0.06em] text-gray-700 disabled:opacity-50"
-                    :disabled="pendingId === route.id"
-                    @click="onToggle(route)"
-                  >
-                    {{ toggleLabel(route) }}
-                  </button>
-                  <button
-                    v-if="route.status !== 'ARCHIVED'"
-                    type="button"
-                    class="whitespace-nowrap text-[10px] font-bold uppercase tracking-[0.06em] text-destructive disabled:opacity-50"
-                    :disabled="pendingId === route.id"
-                    @click="confirm = { route, target: 'ARCHIVED' }"
-                  >
-                    Archive
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div v-else class="px-6 py-12 text-center">
-        <p class="mx-auto mb-[18px] max-w-[420px] text-[13px] text-muted-foreground">
-          {{
-            routes.length
-              ? "No route matches the search or the filters."
-              : "Routes are ordered journeys through your points of interest, such as a one-hour highlights tour."
-          }}
-        </p>
-        <Button v-if="!routes.length" variant="brand" :disabled="!defaultLanguageInfo" @click="creating = true">New route</Button>
-      </div>
-
-      <div class="border-t border-gray-100 px-[18px] py-3 text-[11px] text-muted-foreground">{{ countText }}</div>
-    </div>
+    </template>
 
     <CreateRouteDialog
       v-if="creating && defaultLanguageInfo"
@@ -356,42 +378,6 @@ const reorder = useReorder<Route>({
       @close="creating = false"
       @created="onCreated"
     />
-
-    <StatusChangeDialog
-      v-if="confirm && confirmCopy"
-      :heading="confirmCopy.heading"
-      :body="confirmCopy.body"
-      :action-label="confirmCopy.action"
-      :danger="confirm.target === 'ARCHIVED'"
-      :busy="pendingId === confirm.route.id"
-      :load-references="() => fetchRouteReferences(projectId, confirm!.route.id)"
-      :blocked-by="confirm.blockedBy ?? null"
-      :link-for="toReference"
-      @close="confirm = null"
-      @confirm="transition(confirm.route, confirm.target)"
-    />
-  </main>
+    <LifecycleDialogs :lifecycle="lifecycle" />
+  </PageFrame>
 </template>
-
-<style scoped>
-.th {
-  border-bottom: 1px solid #e5e7eb;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  text-align: left;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: #6b7280;
-}
-.th.text-right {
-  text-align: right;
-}
-.td {
-  border-bottom: 1px solid #f3f4f6;
-  padding-top: 11px;
-  padding-bottom: 11px;
-  vertical-align: top;
-}
-</style>

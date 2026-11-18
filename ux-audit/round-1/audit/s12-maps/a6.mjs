@@ -1,0 +1,16 @@
+import { start, go, P } from "./common.mjs";
+import { readFileSync } from "node:fs";
+const ids = JSON.parse(readFileSync(new URL("./ids.json", import.meta.url)));
+const s = await start("1440"); const { page } = s;
+page.on("pageerror", e => console.log("STACK", e.stack.split("\n").slice(0,5).join(" | ")));
+await go(page, `${P}/maps/${ids.map}`); await page.waitForTimeout(5000);
+await page.locator("section:has(h2:has-text('Unplaced')) ul button", {hasText:"Place"}).first().click(); await page.waitForTimeout(800);
+const inp = page.locator("section:has(h2:has-text('Placed')) ol li input");
+console.log("STEP clear lat"); await inp.nth(0).fill(""); await page.waitForTimeout(800);
+console.log("STEP type 3"); await inp.nth(0).fill("3"); await page.waitForTimeout(800);
+console.log("STEP type abc"); await inp.nth(0).fill("abc"); await page.waitForTimeout(800);
+console.log("STEP lng 'x'"); await inp.nth(1).fill("x"); await page.waitForTimeout(800);
+console.log("STEP edit bounds with field blank"); 
+const f = page.getByLabel("Min latitude"); await f.fill(""); await page.waitForTimeout(800);
+await f.fill("37.9"); await page.waitForTimeout(800);
+await s.browser.close();

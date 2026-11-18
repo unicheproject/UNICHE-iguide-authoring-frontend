@@ -1,0 +1,12 @@
+route {"title":"Preview · UX Audit – Populated · iGuide CMS","h1":"Preview","ae":"BODY"}
+preview tab 1 button "Open in new tab" 1238,80,178,40  solid 2px rgb(76, 29, 139) off 2px 
+preview tab 2 button[tab] "Web" 320,183,54,40  solid 2px rgb(76, 29, 139) off 2px CLIPPED DIV.flex overflow-x-auto border-border borde L4,T4,B5
+preview tab 3 button[tab] "English" 592,183,74,40  solid 2px rgb(76, 29, 139) off 2px CLIPPED DIV.flex overflow-x-auto border-border borde L4,T4,B5
+preview tab 4 button[tab] "Working" 899,183,82,40  solid 2px rgb(76, 29, 139) off 2px CLIPPED DIV.flex overflow-x-auto border-border borde L4,T4,B5
+preview tab 5 input "Filter triggers" 353,226,144,40  solid 2px rgb(76, 29, 139) off 2px 
+preview tab 6 select "Choose a trigger…QR code, Parthenon Frieze – North SideQR co" 505,226,384,40  solid 2px rgb(76, 29, 139) off 2px 
+preview tab 7 button "FireChoose a trigger first." 897,226,85,40  solid 2px rgb(76, 29, 139) off 2px 
+preview tab 8 a "Skip preview" 256,306,127,40  solid 2px rgb(76, 29, 139) off 2px 
+preview tab 9 button[tab] "Fit width" 1087,306,85,40  solid 2px rgb(76, 29, 139) off 2px CLIPPED DIV.flex overflow-x-auto border-border borde L4,T4,B5
+preview tab 10 button "Interact with the preview" 1302,306,114,40  solid 2px rgb(76, 29, 139) off 2px 
+preview tab 11 body "Skip to content  iGuide CMS UX Audit – PopulatedApp: Draft. " 0,0,1440,900 BODY! (no outline; shadow none) BODY

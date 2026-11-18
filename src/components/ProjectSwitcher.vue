@@ -1,154 +1,98 @@
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
-import { onClickOutside, onKeyStroke } from "@vueuse/core";
+/**
+ * The header Project switcher (D-084): a button naming the open Project and its Application status, opening a popover
+ * with the shared searchable `ProjectList` (search focused, current Project in view, arrow keys, Esc returns focus to
+ * the button). Choosing a Project closes the popover first, so the "Leave without saving?" confirmation is the only
+ * layer on screen (C1-56). The footer offers Create Project to managers and "Manage members" when a Portal is set.
+ */
+import { ChevronsUpDown, ExternalLink, Plus } from "lucide-vue-next";
+import { computed, onBeforeUnmount, onMounted, onUpdated, ref, watch } from "vue";
 import { useRoute } from "vue-router";
-import { formatDate, statusChipStyle } from "@/lib/format";
-import {
-  canCreateProjects,
-  findOrganisation,
-  findProject,
-  loadProjects,
-  needsSetup,
-  projectsState,
-  projectTarget as target,
-} from "@/stores/projects";
+import ProjectList from "@/components/ProjectList.vue";
+import StatusChip from "@/components/StatusChip.vue";
+import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { statusWord } from "@/lib/glossary";
+import { platformConfig } from "@/platform/auth";
+import { offlineReason } from "@/stores/connection";
+import { canCreateProjects, detailState, findProject, projectsState } from "@/stores/projects";
+
+// The popover root renders no element of its own, so the header's layout classes would have nowhere to go.
+defineOptions({ inheritAttrs: false });
 
 const route = useRoute();
 const open = ref(false);
-const root = ref<HTMLElement | null>(null);
+const portalUrl = platformConfig().portalUrl;
 
-const currentId = computed(() =>
-  typeof route.params.projectId === "string" ? route.params.projectId : null,
-);
+const currentId = computed(() => (typeof route.params.projectId === "string" ? route.params.projectId : null));
 const current = computed(() => (currentId.value ? findProject(currentId.value) : undefined));
-const currentOrg = computed(() => (current.value ? findOrganisation(current.value.orgId) : undefined));
-const projectCount = computed(() => projectsState.groups.reduce((n, g) => n + g.projects.length, 0));
-
-const subtitle = computed(() => {
-  if (current.value) return `${currentOrg.value?.name ?? "Organisation"} · ${current.value.slug}`;
-  if (projectsState.status === "loading") return "Loading projects…";
-  if (projectsState.status === "error") return "Projects could not be loaded";
-  return projectCount.value === 1 ? "1 project" : `${projectCount.value} projects`;
+const appStatus = computed(() => (current.value?.detailed && current.value.initialized ? current.value.applicationStatus : null));
+const label = computed(() => {
+  if (current.value) return current.value.name;
+  if (projectsState.status === "loading" || projectsState.status === "idle") return "Loading projects";
+  return "Choose a project";
 });
 
-onClickOutside(root, () => {
-  open.value = false;
-});
-onKeyStroke("Escape", () => {
-  open.value = false;
-});
+// The chip's skeleton shows only while the Project's detail is being read, and for 3 s at most; a failed read or an
+// error page shows nothing, so the header never waits for a status that is not coming (C2-25, W0-A request).
+const SKELETON_MS = 3000;
+const skeletonExpired = ref(false);
+let skeletonTimer: ReturnType<typeof setTimeout> | undefined;
+const chipLoading = computed(() => !!currentId.value && !skeletonExpired.value && detailState(currentId.value) === "loading" && route.name !== "not-found" && route.name !== "project-not-found");
+watch(
+  currentId,
+  () => {
+    clearTimeout(skeletonTimer);
+    skeletonExpired.value = false;
+    skeletonTimer = setTimeout(() => (skeletonExpired.value = true), SKELETON_MS);
+  },
+  { immediate: true },
+);
+onBeforeUnmount(() => clearTimeout(skeletonTimer));
+
+// While the popover is closed the library points `aria-controls` at nothing (an empty id, axe `aria-valid-attr-value`):
+// the attribute is dropped until the popover has content to control (C3-92).
+const trigger = ref<HTMLElement | null>(null);
+function dropEmptyControls() {
+  if (trigger.value?.getAttribute("aria-controls") === "") trigger.value.removeAttribute("aria-controls");
+}
+onMounted(dropEmptyControls);
+onUpdated(dropEmptyControls);
+
 watch(() => route.fullPath, () => {
   open.value = false;
 });
 </script>
 
 <template>
-  <div ref="root" class="relative ml-1.5 min-w-0 flex-[0_1_340px]">
-    <button
-      type="button"
-      class="flex w-full items-center gap-2.5 overflow-hidden rounded-lg border px-3 py-1.5 text-left"
-      :class="open ? 'bg-muted' : 'bg-card hover:bg-muted'"
-      :aria-expanded="open"
-      aria-controls="project-switcher-menu"
-      @click="open = !open"
-    >
-      <span class="min-w-0 flex-1">
-        <span class="block truncate text-[13px] font-bold text-foreground">
-          {{ current?.name ?? "Select a project" }}
-        </span>
-        <span class="block truncate text-[10px] text-muted-foreground">{{ subtitle }}</span>
-      </span>
-      <span
-        v-if="current"
-        class="inline-flex items-center gap-[5px] rounded-full px-2 py-[3px] text-[9px] font-extrabold uppercase tracking-[0.07em]"
-        :style="statusChipStyle(current.status)"
+  <Popover v-model:open="open">
+    <PopoverTrigger as-child>
+      <button
+        ref="trigger"
+        type="button"
+        class="flex min-h-control w-auto min-w-0 max-w-[26rem] items-center gap-2 rounded-md border border-input bg-card px-3 text-left hover:bg-surface-hover"
+        :class="open ? 'bg-surface-hover' : ''"
       >
-        <span class="inline-block h-[5px] w-[5px] rounded-full bg-current"></span>{{ current.status }}
-      </span>
-      <span class="text-[10px] text-muted-foreground" aria-hidden="true">{{ open ? "▴" : "▾" }}</span>
-    </button>
-
-    <div
-      v-if="open"
-      id="project-switcher-menu"
-      class="absolute left-0 top-[calc(100%+8px)] z-[80] flex max-h-[70vh] w-[340px] flex-col overflow-hidden rounded-[10px] border bg-card shadow-[0_18px_44px_rgba(3,7,18,0.18)]"
-    >
-      <!-- Only the list scrolls, so "Create Project" stays in reach however many Projects there are. -->
-      <div class="min-h-0 flex-1 overflow-y-auto">
-        <div v-if="projectsState.status === 'loading'" class="animate-skeleton px-3.5 py-3" aria-busy="true">
-          <div class="mb-2 h-2.5 w-2/5 rounded bg-[#e6e7eb]"></div>
-          <div class="mb-2 h-3 w-3/4 rounded bg-[#dcdde2]"></div>
-          <div class="h-3 w-3/5 rounded bg-[#dcdde2]"></div>
-          <span class="sr-only">Loading projects</span>
-        </div>
-
-        <div v-else-if="projectsState.status === 'error'" role="alert" class="px-3.5 py-3">
-          <p class="text-xs font-bold text-destructive">
-            {{
-              projectsState.error?.platformUnavailable
-                ? "The UNICHE platform is not reachable"
-                : "Projects could not be loaded"
-            }}
-          </p>
-          <p v-if="projectsState.error?.requestId" class="mt-0.5 font-mono text-[10px] text-muted-foreground">
-            Request id {{ projectsState.error.requestId }}
-          </p>
-          <button type="button" class="mt-2 text-xs font-bold text-primary hover:underline" @click="loadProjects()">
-            Try again
-          </button>
-        </div>
-
-        <template v-else>
-          <p v-if="!projectsState.groups.length" class="px-3.5 py-3 text-xs text-muted-foreground">
-            The UNICHE Catalogue lists no organisations or projects for you yet.
-          </p>
-          <div v-for="group in projectsState.groups" :key="group.organisation.id">
-            <div
-              class="border-b bg-muted px-3.5 py-2 text-[9px] font-extrabold uppercase tracking-[0.12em] text-muted-foreground"
-            >
-              {{ group.organisation.name }}
-            </div>
-            <p v-if="!group.projects.length" class="border-b border-gray-100 px-3.5 py-2.5 text-[11px] text-muted-foreground">
-              No projects yet.
-            </p>
-            <ul>
-              <li v-for="project in group.projects" :key="project.id">
-                <RouterLink
-                  :to="target(project)"
-                  class="block border-b border-l-[3px] border-b-gray-100 px-3.5 py-2.5 text-left no-underline hover:bg-muted hover:no-underline"
-                  :class="project.id === currentId ? 'border-l-primary bg-primary/[0.06]' : 'border-l-transparent'"
-                  :aria-current="project.id === currentId ? 'page' : undefined"
-                >
-                  <span class="flex items-center gap-1.5">
-                    <span class="min-w-0 flex-1 break-words text-xs font-bold text-foreground">{{ project.name }}</span>
-                    <span
-                      class="rounded-full px-1.5 py-0.5 text-[8px] font-extrabold uppercase tracking-[0.07em]"
-                      :style="statusChipStyle(needsSetup(project) ? 'DRAFT' : project.status)"
-                    >
-                      {{ needsSetup(project) ? "Setup" : project.status }}
-                    </span>
-                  </span>
-                  <span v-if="needsSetup(project)" class="mt-0.5 block text-[10px] font-bold text-primary">
-                    Not initialized · resume initialization
-                  </span>
-                  <span v-else class="mt-0.5 block break-words text-[10px] text-muted-foreground">
-                    <template v-if="project.template">{{ project.template.name }} · </template>{{ project.slug }} · updated
-                    {{ formatDate(project.updatedAt) }}
-                  </span>
-                </RouterLink>
-              </li>
-            </ul>
-          </div>
-        </template>
+        <span class="min-w-0 flex-1 truncate text-sm font-semibold" :title="current?.name">{{ label }}</span>
+        <StatusChip v-if="appStatus" :status="appStatus" :label="`Visitor app: ${statusWord(appStatus)}`" class="hidden lg:inline-flex" />
+        <span v-else-if="chipLoading" role="status" aria-label="Loading app status" class="hidden h-6 w-24 flex-none animate-skeleton rounded-full bg-muted lg:inline-block"></span>
+        <span class="sr-only">{{ current ? ". Switch project" : "" }}</span>
+        <ChevronsUpDown class="size-4 flex-none text-muted-foreground" aria-hidden="true" />
+      </button>
+    </PopoverTrigger>
+    <PopoverContent class="flex max-h-[calc(100dvh-8rem)] w-[min(26rem,calc(100vw-1rem))] flex-col p-0" align="start" role="dialog" aria-label="Switch project">
+      <ProjectList variant="popover" :current-id="currentId" @navigate="open = false" />
+      <div v-if="canCreateProjects || (portalUrl && current)" class="flex flex-wrap gap-2 border-t border-border p-3">
+        <span v-if="offlineReason()" id="switcher-offline" class="sr-only">{{ offlineReason() }}</span>
+        <Button v-if="canCreateProjects" as-child variant="secondary" size="sm" :disabled-reason="offlineReason()">
+          <RouterLink :to="{ name: 'project-create' }" class="no-underline" :aria-describedby="offlineReason() ? 'switcher-offline' : undefined" @click="open = false"><Plus />Create Project</RouterLink>
+        </Button>
+        <Button v-if="portalUrl && current" as-child variant="ghost" size="sm">
+          <a :href="portalUrl" target="_blank" rel="noopener">
+            <ExternalLink />Manage members<span class="sr-only"> (opens the UNICHE Platform Portal in a new tab)</span>
+          </a>
+        </Button>
       </div>
-
-      <RouterLink
-        v-if="canCreateProjects"
-        :to="{ name: 'project-create' }"
-        class="block flex-shrink-0 border-t bg-card px-3.5 py-3 text-left text-xs font-bold text-primary no-underline shadow-[0_-4px_10px_rgba(3,7,18,0.05)] hover:bg-muted hover:no-underline"
-      >
-        + Create Project
-      </RouterLink>
-    </div>
-  </div>
+    </PopoverContent>
+  </Popover>
 </template>

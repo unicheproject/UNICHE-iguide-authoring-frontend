@@ -1,0 +1,44 @@
+import { start, go, P, shotDir } from "./common.mjs";
+const s = await start(); const p=s.page;
+const B="1af84426-8230-46ee-8ab4-7edecaa9b20f", D="e85c94b4-f31f-4d1c-8711-dd4fe7695fc6";
+p.on("response", r=>{ if(r.request().method()!=="GET") console.log("  ",r.request().method(), r.url().replace(/.*v1\/projects\/[^/]+/,""), r.status()); });
+await go(p, `${P}/pois/${B}`); await p.waitForTimeout(1500);
+const y0 = await p.getByLabel("Summary").evaluate(e=>e.getBoundingClientRect().top);
+await p.getByLabel("Summary").fill("EDITED summary via working copy for Beta.");
+await p.waitForTimeout(300);
+console.log("layout shift on first edit px:", (await p.getByLabel("Summary").evaluate(e=>e.getBoundingClientRect().top))-y0);
+await p.getByLabel("Description").fill("A longer description typed by the curator, edit 1.");
+let t=Date.now();
+await p.getByRole("button",{name:/save draft/i}).click();
+await p.waitForFunction(()=>!/Saving/i.test(document.body.innerText),null,{timeout:15000}).catch(()=>{});
+await p.waitForTimeout(500);
+console.log("save draft ms",Date.now()-t);
+await s.shot("wc__beta-draft-saved");
+console.log("banner:", await p.getByText(/working copy/i).first().locator("xpath=..").innerText());
+// leave to list
+await p.getByRole("link",{name:"Points of Interest"}).first().click(); await p.waitForTimeout(1500);
+await p.getByPlaceholder(/Search titles/).fill("UX-p1-editor Beta"); await p.waitForTimeout(600);
+await s.shot("wc__list-shows-pending");
+console.log("row:", (await p.locator("main").getByText("UX-p1-editor Beta").first().locator("xpath=ancestor::*[self::li or self::tr or @role='row'][1]").innerText().catch(()=>"?")).replace(/\n+/g," | "));
+await p.locator("main").getByText("UX-p1-editor Beta").first().click(); await p.waitForTimeout(1500);
+console.log("reopened banner:", await p.getByText(/working copy/i).first().locator("xpath=..").innerText().catch(()=>"none"));
+console.log("summary:", await p.getByLabel("Summary").inputValue());
+await s.shot("wc__beta-reopened");
+// apply
+await p.getByRole("button",{name:/apply changes/i}).first().click(); await p.waitForTimeout(500);
+await p.getByRole("dialog").getByRole("button",{name:/apply changes/i}).click();
+t=Date.now(); await p.waitForTimeout(2000);
+await s.shot("wc__beta-applied");
+console.log("toasts", await p.locator("[role=status],[role=alert]").allInnerTexts());
+console.log("banner after apply:", await p.getByText(/working copy/i).count());
+// Delta: discard
+await go(p, `${P}/pois/${D}`); await p.waitForTimeout(1500);
+await p.getByLabel("Summary").fill("DISCARD ME summary");
+await p.getByRole("button",{name:/save draft/i}).click(); await p.waitForTimeout(2500);
+await p.getByRole("button",{name:/discard changes/i}).click(); await p.waitForTimeout(600);
+await s.shot("wc__delta-discard-dialog");
+console.log("DLG:", await p.locator("[role=dialog],[role=alertdialog]").first().innerText());
+await p.getByRole("dialog").getByRole("button",{name:/discard/i}).last().click(); await p.waitForTimeout(2000);
+console.log("summary after discard:", await p.getByLabel("Summary").inputValue(), "| banner", await p.getByText(/working copy/i).count());
+await s.shot("wc__delta-discarded");
+await s.browser.close();

@@ -1,0 +1,130 @@
+{
+ "/iguide/api/v1/organizations": {
+  "status": 200,
+  "body": "[{\"id\":\"1bae11ca-671e-4faa-9068-e030d840e56d\",\"name\":\"mobics-test\",\"slug\":\"mobics-test\",\"status\":\"ACTIVE\"},{\"id\":\"b8071661-befa-489c-a02d-dcdbeece8a15\",\"name\":\"Museotek\",\"slug\":\"museotek\",\"status\":\"ACTIVE\"},{\"id\":\"09e95c2c-5985-42f5-a9dd-6d06a8eb4a13\",\"name\":\"Test Museum\",\"slug\":\"test-museum\",\"status\":\"ACTIVE\"}]"
+ },
+ "/iguide/api/v1/me/authorization": {
+  "status": 200,
+  "body": "{\"subject\":\"a0000000-0000-4000-a000-000000000001\",\"platformAdmin\":true,\"managedOrganisations\":[\"09e95c2c-5985-42f5-a9dd-6d06a8eb4a13\"],\"projectMemberships\":[],\"etag\":\"W/\\\"2f42d1b4\\\"\",\"ttlSeconds\":45}"
+ },
+ "/iguide/api/v1/projects/:id/settings": {
+  "status": 200,
+  "body": "{\"applicationStatus\":\"DRAFT\",\"contentRevision\":0,\"timezone\":null,\"featureConfiguration\":{\"MAPS\":true,\"PAGES\":true,\"EVENTS\":true,\"GUIDES\":true,\"ROUTES\":true,\"SEARCH\":true,\"FEEDBACK\":true,\"FLOOR_PLANS\":true,\"QR_TRIGGERS\":true,\"OFFLINE_CONTENT\":true,\"POI_EXPLORATION\":true,\"LOCATION_TRIGGERS\":true},\"capabilities\":[\"PAGES\",\"POI_EXPLORATION\",\"ROUTES\",\"GUIDES\",\"MAPS\",\"FLOOR_PLANS\",\"EVENTS\",\"SEARCH\",\"OFFLINE_CONTENT\",\"LOCATION_TRIGGERS\",\"QR_TRIGGERS\",\"FEEDBACK\"],\"version\":0,\"updatedAt\":\"2026-11-12T11:54:12.485540Z\"}"
+ },
+ "/iguide/api/v1/projects/:id": {
+  "status": 200,
+  "body": "{\"id\":\"1d6971ce-6391-4da8-848e-8d7466d25128\",\"organizationId\":\"09e95c2c-5985-42f5-a9dd-6d06a8eb4a13\",\"name\":\"UX Audit – Empty B\",\"slug\":\"ux-audit-empty-b\",\"status\":\"ACTIVE\",\"localDescription\":null,\"initialized\":true,\"createdAt\":\"2026-11-12T11:54:11.456749Z\",\"updatedAt\":\"2026-11-12T11:54:11.456749Z\",\"initializedAt\":\"2026-11-12T11:54:12.485540Z\",\"template\":{\"id\":\"b2f15a15-5596-30d1-99e7-757c370bd5a9\",\"key\":\"multi-region-network\",\"version\":1,\"name\":\"Multi-region network\"},\"stylePresetKey\":\"aegean-network\",\"applicationStatus\":\"DRAFT\",\"enabledSurfaces\":[\"WEB\",\"MOBILE\",\"KIOSK\"]}"
+ },
+ "/iguide/api/v1/organizations/:id/projects": {
+  "status": 200,
+  "body": "[{\"id\":\"413877ea-0852-4b3a-8f1f-96c4c99ae269\",\"organizationId\":\"09e95c2c-5985-42f5-a9dd-6d06a8eb4a13\",\"name\":\"A Day in Ancient Athens.\",\"slug\":\"a-day-in-ancient-athens\",\"status\":\"ACTIVE\",\"localDescription\":null,\"initialized\":false,\"createdAt\":\"2026-10-07T08:48:10.191054Z\",\"updatedAt\":\"2026-10-07T08:48:10.191054Z\",\"initializedAt\":null,\"template\":null,\"stylePresetKey\":null,\"applicationStatus\":null,\"enabledSurfaces\":[]},{\"id\":\"d0c8c41e-c9bb-4fd5-9248-0d6b1ac4eea7\",\"organizationId\":\"09e95c2c-5985-42f5-a9dd-6d06a8eb4a13\",\"name\":\"athina\",\"slug\":\"athina\",\"status\":\"ACTIVE\",\"localDescription\":null,\"initialized\":false,\"createdAt\":\"2026-11-11T10:09:29.894774Z\",\"updatedAt\":\"2026-11-11T10:09:29.894774Z\",\"initializedAt\":null,\"template\":null,\"stylePresetKey\":null,\"applicationStatus\":null,\"enabledSurfaces\":[]},{\"id\":\"69ce6755-ca52-4c13-b2fc-7e75ab967f72\",\"organizationId\":\"09e95c2c-5985-42f5-a9dd-6d06a8eb4a13\",\"name\":\"Example Project\",\"slug\":\"example-project\",\"status\":\"ACTIVE\",\"localDescription\":null,\"initialized\":false,\"createdAt\":\"2026-10-01T11:17:45.189920Z\",\"updatedAt\":\"2026-10-01T11:17:45.189920Z\",\"initializedAt\":null,\"template\":null,\"stylePresetKey\":null,\"applicationStatus\":null,\"enabledSurfaces\":[]},{\"id\":\"66bb3622-51f3-46a2-bbfc-c0c48694a732\",\"organizationId\":\"09e95c2c-5985-42f5-a9dd-6d06a8eb4a13\",\"name\":\"iguide-test\",\"slug\":\"iguide-test\",\"status\":\"ACTIVE\",\"localDescription\":null,\"initialized\":false,\"createdAt\":\"2026-10-07T09:41:40.406170Z\",\"updatedAt\":\"2026-10-07T09:41:40.406170Z\",\"i"
+ },
+ "/iguide/api/v1/projects/:id/places?size=1&status=ACTIVE": {
+  "status": 200,
+  "body": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ "/iguide/api/v1/projects/:id/pois?size=1&status=ACTIVE": {
+  "status": 200,
+  "body": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ "/iguide/api/v1/projects/:id/routes?size=1&status=DRAFT": {
+  "status": 200,
+  "body": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ "/iguide/api/v1/projects/:id/routes?size=1&status=ACTIVE": {
+  "status": 200,
+  "body": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ "/iguide/api/v1/projects/:id/places?size=1&status=DRAFT": {
+  "status": 200,
+  "body": "{\"content\":[{\"id\":\"efade4fe-6287-4c06-834a-f27e4403ab5c\",\"projectId\":\"1d6971ce-6391-4da8-848e-8d7466d25128\",\"parentPlaceId\":null,\"slug\":\"ux-s8-dashboard-place\",\"type\":\"AREA\",\"environment\":\"OUTDOOR\",\"status\":\"DRAFT\",\"internalName\":null,\"latitude\":null,\"longitude\":null,\"featured\":false,\"sortOrder\":1,\"archivedAt\":null,\"createdAt\":\"2026-11-12T12:06:29.423426Z\",\"updatedAt\":\"2026-11-12T12:06:29.423426Z\",\"version\":0,\"hasWorkingCopy\":false,\"workingCopyUpdatedAt\":null,\"translations\":{\"en\":{\"title\":\"UX-s8-dashboard Place\",\"summary\":null,\"description\":null,\"visitorInformation\":null,\"accessibilityInformation\":null}},\"media\":[]}],\"page\":0,\"size\":1,\"totalElements\":1,\"totalPages\":1}"
+ },
+ "/iguide/api/v1/projects/:id/pois?size=1&status=DRAFT": {
+  "status": 200,
+  "body": "{\"content\":[{\"id\":\"20cc51a4-fb06-4ecb-b6db-a3d8ef63a81e\",\"projectId\":\"1d6971ce-6391-4da8-848e-8d7466d25128\",\"placeId\":null,\"slug\":\"ux-s8-dashboard-poi\",\"code\":null,\"status\":\"DRAFT\",\"internalName\":null,\"latitude\":null,\"longitude\":null,\"estimatedVisitMinutes\":null,\"featured\":false,\"sortOrder\":1,\"archivedAt\":null,\"createdAt\":\"2026-11-12T12:08:02.197407Z\",\"updatedAt\":\"2026-11-12T12:08:02.197407Z\",\"version\":0,\"hasWorkingCopy\":false,\"workingCopyUpdatedAt\":null,\"translations\":{\"en\":{\"title\":\"UX-s8-dashboard POI\",\"summary\":null,\"description\":null,\"instructions\":null,\"accessibilityInformation\":null}},\"categoryIds\":[],\"media\":[]}],\"page\":0,\"size\":1,\"totalElements\":1,\"totalPages\":1}"
+ },
+ "/iguide/api/v1/projects/:id/guides?size=1&status=DRAFT": {
+  "status": 200,
+  "body": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ "/iguide/api/v1/projects/:id/guides?size=1&status=ACTIVE": {
+  "status": 200,
+  "body": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ "/iguide/api/v1/projects/:id/events?size=1&status=DRAFT": {
+  "status": 200,
+  "body": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ "/iguide/api/v1/projects/:id/events?size=1&status=ACTIVE": {
+  "status": 200,
+  "body": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ "/iguide/api/v1/projects/:id/categories?size=1&status=ACTIVE": {
+  "status": 200,
+  "body": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ "/iguide/api/v1/projects/:id/categories?size=1&status=DRAFT": {
+  "status": 200,
+  "body": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ "/iguide/api/v1/projects/:id/assets?size=1&status=ACTIVE": {
+  "status": 200,
+  "body": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ "/iguide/api/v1/projects/:id/assets?size=1&status=DRAFT": {
+  "status": 200,
+  "body": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ "/iguide/api/v1/projects/:id/floor-plans?size=1&status=ACTIVE": {
+  "status": 200,
+  "body": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ "/iguide/api/v1/projects/:id/maps?size=1&status=ACTIVE": {
+  "status": 200,
+  "body": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ "/iguide/api/v1/projects/:id/maps?size=1&status=DRAFT": {
+  "status": 200,
+  "body": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ "/iguide/api/v1/projects/:id/floor-plans?size=1&status=DRAFT": {
+  "status": 200,
+  "body": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ "/iguide/api/v1/projects/:id/places?pending=true&size=100&page=0": {
+  "status": 200,
+  "body": "{\"content\":[],\"page\":0,\"size\":100,\"totalElements\":0,\"totalPages\":0}"
+ },
+ "/iguide/api/v1/projects/:id/pois?pending=true&size=100&page=0": {
+  "status": 200,
+  "body": "{\"content\":[],\"page\":0,\"size\":100,\"totalElements\":0,\"totalPages\":0}"
+ },
+ "/iguide/api/v1/projects/:id/guides?pending=true&size=100&page=0": {
+  "status": 200,
+  "body": "{\"content\":[],\"page\":0,\"size\":100,\"totalElements\":0,\"totalPages\":0}"
+ },
+ "/iguide/api/v1/projects/:id/events?pending=true&size=100&page=0": {
+  "status": 200,
+  "body": "{\"content\":[],\"page\":0,\"size\":100,\"totalElements\":0,\"totalPages\":0}"
+ },
+ "/iguide/api/v1/projects/:id/routes?pending=true&size=100&page=0": {
+  "status": 200,
+  "body": "{\"content\":[],\"page\":0,\"size\":100,\"totalElements\":0,\"totalPages\":0}"
+ },
+ "/iguide/api/v1/projects/:id/categories?pending=true&size=100&page=0": {
+  "status": 200,
+  "body": "{\"content\":[],\"page\":0,\"size\":100,\"totalElements\":0,\"totalPages\":0}"
+ },
+ "/iguide/api/v1/projects/:id/languages": {
+  "status": 200,
+  "body": "{\"languages\":[{\"languageCode\":\"en\",\"displayName\":\"English\",\"direction\":\"LTR\",\"isDefault\":true,\"sortOrder\":0,\"titledResourceCount\":2},{\"languageCode\":\"el\",\"displayName\":\"Ελληνικά\",\"direction\":\"LTR\",\"isDefault\":false,\"sortOrder\":1,\"titledResourceCount\":0}],\"resourceCount\":2}"
+ },
+ "/iguide/api/v1/projects/:id/navigations": {
+  "status": 200,
+  "body": "[]"
+ },
+ "/iguide/api/v1/projects/:id/readiness": {
+  "status": 200,
+  "body": "{\"activatable\":true,\"blocking\":[],\"warnings\":[{\"resourceType\":\"PROJECT\",\"resourceId\":null,\"title\":null,\"languageCode\":null,\"path\":\"surfaces\",\"code\":\"PUBLIC_BASE_URL_MISSING\"}]}"
+ }
+}

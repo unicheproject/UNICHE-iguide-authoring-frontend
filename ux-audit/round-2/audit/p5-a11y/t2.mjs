@@ -1,0 +1,53 @@
+import * as L from "./lib.mjs";
+const { page, browser } = await L.open("curator", { viewport: "1440" });
+const k = page.keyboard;
+await L.go(page, "/");
+await L.watchLive(page);
+// Home search keyboard
+await page.locator('input[type=search], [role=searchbox]').first().focus();
+await k.type("Populated");
+await page.waitForTimeout(400);
+L.log("t2", "home search typed; live:", await L.liveLog(page));
+L.log("t2", "after type focus", await L.focus(page));
+await k.press("ArrowDown"); L.log("t2", "ArrowDown ->", await L.focus(page));
+await k.press("ArrowDown"); L.log("t2", "ArrowDown2 ->", await L.focus(page));
+await k.press("ArrowUp"); L.log("t2", "ArrowUp ->", await L.focus(page));
+await L.shot(page, "home__search-arrowed__1440");
+await k.press("Enter"); await page.waitForTimeout(2500);
+L.log("t2", "after Enter: url", page.url(), "title", await page.title(), "focus", await L.focus(page));
+L.log("t2", "live after route", await L.liveLog(page));
+await L.shot(page, "dashboard__after-open__1440");
+// Switcher
+await L.go(page, L.P(""));
+await L.watchLive(page);
+L.log("t2", "dashboard load: title", await page.title(), "focus", await L.focus(page), "live", await L.liveLog(page));
+await L.tabs(page, 3);
+L.log("t2", "tabs to switcher:", await L.focus(page));
+const sw = page.getByRole("button", { name: /choose a project|UX Audit/i }).first();
+await sw.focus(); L.log("t2", "switcher btn attrs", await sw.evaluate((e) => ({ aria: [...e.attributes].map((a) => a.name + "=" + a.value).join(" ") })));
+await k.press("Enter"); await page.waitForTimeout(500);
+L.log("t2", "switcher open: focus", await L.focus(page));
+await L.shot(page, "switcher__open__1440");
+L.log("t2", "switcher snapshot", await L.snap(page, "switcher", "[role=dialog], [role=menu], [data-radix-popper-content-wrapper]"));
+L.log("t2", "tabs inside", await L.tabs(page, 4));
+await k.type("Empty C"); await page.waitForTimeout(400);
+L.log("t2", "after filter live", await L.liveLog(page));
+await k.press("ArrowDown"); L.log("t2", "arrow in list", await L.focus(page));
+await k.press("Escape"); await page.waitForTimeout(300);
+L.log("t2", "after Esc focus", await L.focus(page));
+// switch via keyboard
+await k.press("Enter"); await page.waitForTimeout(500);
+await k.type("Empty C"); await page.waitForTimeout(300);
+await k.press("ArrowDown"); await k.press("Enter"); await page.waitForTimeout(2500);
+L.log("t2", "after switch: url", page.url(), "title", await page.title(), "focus", await L.focus(page));
+L.log("t2", "live", await L.liveLog(page));
+await L.shot(page, "dashboard__after-switch__1440");
+// user menu
+await L.go(page, L.P(""));
+await page.getByRole("button", { name: /account menu/i }).focus();
+await k.press("Enter"); await page.waitForTimeout(300);
+L.log("t2", "usermenu open focus", await L.focus(page));
+await k.press("ArrowDown"); L.log("t2", "usermenu ArrowDown", await L.focus(page));
+await L.shot(page, "usermenu__open__1440");
+await k.press("Escape"); L.log("t2", "usermenu esc", await L.focus(page));
+await browser.close();

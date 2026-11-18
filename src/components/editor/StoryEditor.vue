@@ -6,7 +6,15 @@
  * unsaved changes of the Guide. Images are saved as INLINE media of the Guide by the backend. `embedded` drops the
  * card frame, for a block inside the Guide's story list.
  */
+import { Plus, TriangleAlert } from "lucide-vue-next";
 import { computed, nextTick, ref } from "vue";
+import RemovedBar from "@/components/editor/RemovedBar.vue";
+import ReorderControls from "@/components/editor/ReorderControls.vue";
+import { useUndoRemove } from "@/components/editor/undoRemove";
+import { Alert } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import Input from "@/components/ui/input/Input.vue";
+import Textarea from "@/components/ui/textarea/Textarea.vue";
 import AssetPickerDialog from "@/components/media/AssetPickerDialog.vue";
 import AssetThumb from "@/components/media/AssetThumb.vue";
 import { missingAlternativeText, type Asset } from "@/platform/assets";
@@ -57,24 +65,54 @@ async function add(type: StoryBlock["type"]) {
   document.getElementById(`block-${key}`)?.focus();
 }
 
-/** Moves a block and keeps keyboard focus on the same button, so repeated presses keep moving it. */
-function move(index: number, delta: number) {
-  const target = index + delta;
-  if (target < 0 || target >= props.blocks.length) return;
+const blockBase = (key: string) => `block-${key}`;
+
+/** Moves a block and keeps keyboard focus on the control that moved it, so repeated presses keep moving it. */
+function move(index: number, target: number, via: "up" | "down" | "handle" | "position") {
+  if (target < 0 || target >= props.blocks.length || target === index) return;
   const [block] = props.blocks.splice(index, 1);
   props.blocks.splice(target, 0, block);
   announcement.value = `Moved to position ${target + 1} of ${props.blocks.length}.`;
   // At the end of the list the same button is disabled, so its counterpart takes focus.
   void nextTick(() => {
-    const same = document.getElementById(`block-move-${block.key}-${delta < 0 ? "up" : "down"}`) as HTMLButtonElement | null;
-    const other = document.getElementById(`block-move-${block.key}-${delta < 0 ? "down" : "up"}`);
+    const id = (suffix: string) => document.getElementById(`${blockBase(block.key)}-${suffix}`) as HTMLButtonElement | null;
+    const same = via === "handle" ? id("handle") : via === "position" ? id("position") : id(via === "up" ? "move-up" : "move-down");
+    const other = via === "up" ? id("move-down") : via === "down" ? id("move-up") : null;
     (same && !same.disabled ? same : other ?? same)?.focus();
   });
 }
 
-function remove(index: number) {
-  props.blocks.splice(index, 1);
+const dragging = ref<string | null>(null);
+function dragStart(key: string, event: DragEvent) {
+  dragging.value = key;
+  event.dataTransfer?.setData("text/plain", key);
+  if (event.dataTransfer) event.dataTransfer.effectAllowed = "move";
 }
+function dropOn(key: string) {
+  const from = props.blocks.findIndex((b) => b.key === dragging.value);
+  const to = props.blocks.findIndex((b) => b.key === key);
+  dragging.value = null;
+  if (from >= 0 && to >= 0) move(from, to, "handle");
+}
+
+const undo = useUndoRemove<StoryBlockForm>({
+  list: () => props.blocks,
+  describe: (block, index) => `${block.type === "paragraph" ? "Paragraph" : block.type === "heading" ? "Heading" : "Image"} ${index + 1}`,
+  noun: "block",
+  // Focus goes to Undo, next to the list (C2-70, D-098); Ctrl+Z works from anywhere.
+  focusAt(index, remaining) {
+    const undo = rootEl.value?.querySelector<HTMLElement>("[data-removed-bar] [data-undo]");
+    if (undo) return undo.focus();
+    const rows = rootEl.value?.querySelectorAll<HTMLElement>("[data-block-row]");
+    const row = rows?.[Math.min(index, remaining - 1)];
+    (row?.querySelector<HTMLElement>("[data-focus-target]") ?? row ?? rootEl.value?.querySelector<HTMLElement>("[data-add-paragraph]"))?.focus();
+  },
+  focusRestored(block) {
+    const row = document.getElementById(`block-row-${block.key}`);
+    (row?.querySelector<HTMLElement>("[data-focus-target]") ?? row)?.focus();
+  },
+});
+const rootEl = ref<HTMLElement | null>(null);
 
 // Read out by a screen reader: the current format after a change (`14` §4, DECISIONS.md D-042).
 const announcement = ref("");
@@ -111,151 +149,140 @@ const words = computed(() =>
 </script>
 
 <template>
-  <section :class="embedded ? 'story-embedded' : 'overflow-hidden rounded-lg border bg-card'" :data-path="basePath" tabindex="-1">
-    <div v-if="!embedded" class="flex items-center gap-2.5 border-b px-5 py-3.5">
-      <h2 class="flex-1 text-[11px] font-extrabold uppercase tracking-[0.09em] text-muted-foreground">
-        {{ heading ?? `Story · ${language.displayName}` }}
-      </h2>
-      <span class="text-[11px] text-muted-foreground">{{ words === 1 ? "1 word" : `${words} words` }}</span>
+  <section ref="rootEl" :class="embedded ? 'story-embedded' : 'overflow-hidden rounded-lg border bg-card'" :data-path="basePath" tabindex="-1">
+    <div v-if="!embedded" class="flex items-center gap-3 border-b px-5 py-3.5">
+      <h2 class="flex-1 text-base font-bold">{{ heading ?? `Story · ${language.displayName}` }}</h2>
+      <span class="text-xs text-muted-foreground">{{ words === 1 ? "1 word" : `${words} words` }}</span>
     </div>
 
-    <p v-if="fieldError(basePath)" class="border-b border-gray-100 px-5 py-3 text-xs font-semibold text-destructive">
-      ⚠ {{ fieldError(basePath) }}
-    </p>
+    <Alert v-if="fieldError(basePath)" tone="danger" class="m-3">{{ fieldError(basePath) }}</Alert>
 
     <p class="sr-only" aria-live="polite">{{ announcement }}</p>
 
     <ol class="flex flex-col">
       <template v-for="(block, index) in blocks" :key="block.key">
-      <li class="group border-b border-gray-100 py-3" :class="embedded ? 'px-0' : 'px-5'">
-        <div class="mb-1.5 flex items-center gap-2">
-          <!-- The visible label of the block's field, with the heading level (`14` §4, DECISIONS.md D-042). -->
-          <label
-            v-if="block.type !== 'image'"
-            :for="`block-${block.key}`"
-            class="text-[10px] font-extrabold uppercase tracking-[0.08em] text-muted-foreground"
-          >
-            {{ block.type === "paragraph" ? `Paragraph ${index + 1}` : `Heading ${index + 1}, level ${block.level}` }}
-          </label>
-          <span v-else class="text-[10px] font-extrabold uppercase tracking-[0.08em] text-muted-foreground">Image {{ index + 1 }}</span>
-          <div v-if="block.type === 'heading'" class="flex gap-1" role="group" :aria-label="`Level of heading ${index + 1}`">
-            <button
-              v-for="level in ([2, 3] as const)"
-              :key="level"
-              type="button"
-              :disabled="readonly"
-              :aria-pressed="block.level === level"
-              :aria-label="`Level ${level}`"
-              class="rounded-full border px-2 py-px text-[10px] font-bold disabled:cursor-default"
-              :class="block.level === level ? 'border-primary bg-primary text-white' : 'bg-card text-gray-700'"
-              @click="setLevel(index, level)"
+        <li :id="`block-row-${block.key}`" data-block-row tabindex="-1" class="border-b border-border py-3" :class="embedded ? 'px-0' : 'px-5'" @dragover.prevent @drop.prevent="dropOn(block.key)">
+          <div class="mb-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
+            <!-- The visible label of the block's field, with the heading level (`14` §4, DECISIONS.md D-042). -->
+            <label v-if="block.type !== 'image'" :for="`block-${block.key}`" class="text-sm font-semibold text-ink-2">
+              {{ block.type === "paragraph" ? `Paragraph (block ${index + 1})` : `Heading (block ${index + 1})` }}
+            </label>
+            <span v-else class="text-sm font-semibold text-ink-2">Image {{ index + 1 }}</span>
+            <div v-if="block.type === 'heading'" class="flex gap-1" role="group" :aria-label="`Level of heading ${index + 1}`">
+              <Button
+                v-for="level in ([2, 3] as const)"
+                :key="level"
+                :variant="block.level === level ? 'primary' : 'secondary'"
+                size="sm"
+                :disabled="readonly"
+                :aria-pressed="block.level === level"
+                @click="setLevel(index, level)"
+              >
+                H{{ level }}<span class="sr-only"> (level {{ level }})</span>
+              </Button>
+            </div>
+            <span class="min-w-2 flex-1"></span>
+            <ReorderControls
+              v-if="!readonly"
+              :id-base="blockBase(block.key)"
+              :index="index"
+              :count="blocks.length"
+              :name="`block ${index + 1}`"
+              @move="(delta, via) => move(index, index + delta, via)"
+              @position="(n) => move(index, n - 1, 'position')"
+              @remove="undo.remove(index)"
+              @dragstart="dragStart(block.key, $event)"
+              @dragend="dragging = null"
             >
-              H{{ level }}
-            </button>
+              <Button
+                variant="ghost"
+                size="icon"
+                :label="`Insert after block ${index + 1}`"
+                title="Insert after"
+                class="size-8 [@media(pointer:coarse)]:size-11"
+                :class="{ 'bg-accent text-primary': insertAt === index + 1 }"
+                :aria-expanded="insertAt === index + 1"
+                @click="insertAt = insertAt === index + 1 ? null : index + 1"
+              >
+                <Plus aria-hidden="true" />
+              </Button>
+            </ReorderControls>
           </div>
-          <span class="flex-1"></span>
-          <template v-if="!readonly">
-            <button
-              :id="`block-move-${block.key}-up`"
-              type="button"
-              class="px-1 text-[13px] text-muted-foreground disabled:opacity-30"
-              :disabled="index === 0"
-              :aria-label="`Move block ${index + 1} up`"
-              @click="move(index, -1)"
-            >
-              ↑
-            </button>
-            <button
-              :id="`block-move-${block.key}-down`"
-              type="button"
-              class="px-1 text-[13px] text-muted-foreground disabled:opacity-30"
-              :disabled="index === blocks.length - 1"
-              :aria-label="`Move block ${index + 1} down`"
-              @click="move(index, 1)"
-            >
-              ↓
-            </button>
-            <button
-              type="button"
-              class="px-1 text-[11px] font-bold text-primary"
-              :aria-expanded="insertAt === index + 1"
-              :aria-label="`Insert after block ${index + 1}`"
-              @click="insertAt = insertAt === index + 1 ? null : index + 1"
-            >
-              + after
-            </button>
-            <button type="button" class="px-1 text-[13px] text-destructive" :aria-label="`Remove block ${index + 1}`" @click="remove(index)">✕</button>
-          </template>
-        </div>
 
-        <textarea
-          v-if="block.type === 'paragraph'"
-          :id="`block-${block.key}`"
-          v-model="block.text"
-          :readonly="readonly"
-          :data-path="`${basePath}.blocks[${index}].text`"
-          :lang="language.languageCode"
-          :dir="language.direction.toLowerCase()"
-          class="field-input min-h-[96px] resize-y leading-relaxed"
-          :aria-invalid="blockError(index) ? 'true' : undefined"
-          :aria-describedby="blockError(index) ? `block-error-${block.key}` : undefined"
-          :class="{ invalid: blockError(index) }"
-        ></textarea>
-        <input
-          v-else-if="block.type === 'heading'"
-          :id="`block-${block.key}`"
-          v-model="block.text"
-          :readonly="readonly"
-          :data-path="`${basePath}.blocks[${index}].text`"
-          :lang="language.languageCode"
-          :dir="language.direction.toLowerCase()"
-          class="field-input font-bold"
-          :aria-invalid="blockError(index) ? 'true' : undefined"
-          :aria-describedby="blockError(index) ? `block-error-${block.key}` : undefined"
-          :class="[block.level === 2 ? 'text-[17px]' : 'text-[15px]', { invalid: blockError(index) }]"
-        />
-        <div v-else class="flex items-center gap-3">
-          <AssetThumb v-if="assetById.get(block.assetId)" :asset="assetById.get(block.assetId)!" height="72px" class="w-28 flex-none" />
-          <div class="min-w-0 flex-1">
-            <div class="truncate text-xs font-bold">{{ assetById.get(block.assetId)?.internalName ?? "Unavailable asset" }}</div>
-            <div
-              v-if="assetById.get(block.assetId) && missingAlternativeText(assetById.get(block.assetId)!, language.languageCode)"
-              class="mt-1 text-[11px] font-semibold text-destructive"
-            >
-              ⚠ No alternative text in {{ language.displayName }}
-            </div>
-            <div v-else-if="assetById.get(block.assetId)?.decorative" class="mt-1 text-[11px] text-muted-foreground">Decorative: screen readers skip it.</div>
-            <div v-else-if="assetById.get(block.assetId) && altText(assetById.get(block.assetId)!)" class="mt-1 text-[11px] text-gray-700">
-              <span class="font-semibold text-muted-foreground">Alternative text ({{ language.languageCode }}):</span>
-              {{ altText(assetById.get(block.assetId)!) }}
-            </div>
-            <div class="mt-1.5 flex gap-2.5">
-              <RouterLink :to="{ name: 'asset-editor', params: { projectId, assetId: block.assetId } }" class="text-[11px] font-bold text-primary no-underline">
-                Edit asset
-              </RouterLink>
-              <button v-if="!readonly" type="button" class="text-[11px] font-bold text-primary" @click="picking = { index }">Replace</button>
+          <Textarea
+            v-if="block.type === 'paragraph'"
+            :id="`block-${block.key}`"
+            v-model="block.text"
+            data-focus-target
+            :readonly="readonly"
+            :data-path="`${basePath}.blocks[${index}].text`"
+            :lang="language.languageCode"
+            :dir="language.direction.toLowerCase()"
+            :min-rows="3"
+            autogrow
+            class="leading-relaxed"
+            :aria-describedby="blockError(index) ? `block-error-${block.key}` : undefined"
+            :invalid="!!blockError(index)"
+          />
+          <Input
+            v-else-if="block.type === 'heading'"
+            :id="`block-${block.key}`"
+            v-model="block.text"
+            data-focus-target
+            :readonly="readonly"
+            :data-path="`${basePath}.blocks[${index}].text`"
+            :lang="language.languageCode"
+            :dir="language.direction.toLowerCase()"
+            class="font-bold"
+            :class="block.level === 2 ? 'text-base' : 'text-sm'"
+            :aria-describedby="blockError(index) ? `block-error-${block.key}` : undefined"
+            :invalid="!!blockError(index)"
+          />
+          <div v-else class="flex items-center gap-3">
+            <AssetThumb v-if="assetById.get(block.assetId)" :asset="assetById.get(block.assetId)!" height="72px" class="w-28 flex-none" />
+            <div class="min-w-0 flex-1">
+              <div class="truncate text-sm font-semibold">{{ assetById.get(block.assetId)?.internalName ?? "Unavailable asset" }}</div>
+              <p
+                v-if="assetById.get(block.assetId) && missingAlternativeText(assetById.get(block.assetId)!, language.languageCode)"
+                class="mt-1 flex items-start gap-1.5 text-xs font-medium text-destructive"
+              >
+                <TriangleAlert class="mt-px size-4 shrink-0" aria-hidden="true" />No alternative text in {{ language.displayName }}
+              </p>
+              <p v-else-if="assetById.get(block.assetId)?.decorative" class="mt-1 text-xs text-muted-foreground">Decorative: screen readers skip it.</p>
+              <p v-else-if="assetById.get(block.assetId) && altText(assetById.get(block.assetId)!)" class="mt-1 text-xs text-ink-2">
+                <span class="font-semibold text-muted-foreground">Alternative text ({{ language.languageCode }}):</span>
+                <span :lang="language.languageCode" :dir="language.direction.toLowerCase()"> {{ altText(assetById.get(block.assetId)!) }}</span>
+              </p>
+              <div class="mt-1 flex flex-wrap gap-x-4">
+                <RouterLink :to="{ name: 'asset-editor', params: { projectId, assetId: block.assetId } }" data-focus-target class="inline-flex min-h-control items-center text-sm font-semibold">Edit asset</RouterLink>
+                <Button v-if="!readonly" variant="link" class="hit-44" data-focus-fallback @click="picking = { index }">Replace<span class="sr-only"> image {{ index + 1 }}</span></Button>
+              </div>
             </div>
           </div>
-        </div>
-        <p v-if="blockError(index)" :id="`block-error-${block.key}`" class="mt-1.5 text-xs font-semibold text-destructive">⚠ {{ blockError(index) }}</p>
-      </li>
-      <li v-if="!readonly && insertAt === index + 1" class="flex flex-wrap gap-2 border-b border-gray-100 py-2.5" :class="embedded ? 'px-0' : 'px-5'">
-        <span class="self-center text-[11px] text-muted-foreground">Insert here:</span>
-        <button type="button" class="add-block" @click="add('paragraph')">+ Paragraph</button>
-        <button type="button" class="add-block" @click="add('heading')">+ Heading</button>
-        <button type="button" class="add-block" @click="add('image')">+ Image</button>
-      </li>
+          <p v-if="blockError(index)" :id="`block-error-${block.key}`" class="mt-1.5 flex items-start gap-1.5 text-xs font-medium text-destructive">
+            <TriangleAlert class="mt-px size-4 shrink-0" aria-hidden="true" />{{ blockError(index) }}
+          </p>
+        </li>
+        <li v-if="!readonly && insertAt === index + 1" class="flex flex-wrap items-center gap-2 border-b border-border py-2.5" :class="embedded ? 'px-0' : 'px-5'">
+          <span class="text-sm font-semibold text-ink-2">Insert here:</span>
+          <Button variant="secondary" size="sm" @click="add('paragraph')">Paragraph</Button>
+          <Button variant="secondary" size="sm" @click="add('heading')">Heading</Button>
+          <Button variant="secondary" size="sm" @click="add('image')">Image</Button>
+        </li>
       </template>
     </ol>
 
-    <p v-if="!blocks.length" class="py-4 text-[13px] text-muted-foreground" :class="embedded ? 'px-0' : 'px-5'">
+    <p v-if="!blocks.length" class="py-4 text-sm text-muted-foreground" :class="embedded ? 'px-0' : 'px-5'">
       {{ emptyText ?? `No story in ${language.displayName} yet. Start with a paragraph; the default language needs one before the guide can be activated.` }}
     </p>
 
-    <div v-if="!readonly" class="flex flex-wrap gap-2 py-3.5" :class="embedded ? 'px-0' : 'px-5'">
-      <button type="button" class="add-block" @click="insertAt = null; add('paragraph')">+ Paragraph</button>
-      <button type="button" class="add-block" @click="insertAt = null; add('heading')">+ Heading</button>
-      <button type="button" class="add-block" @click="insertAt = null; add('image')">+ Image</button>
+    <!-- A direct child of the section, so the bar stays at the bottom of the viewport for the whole story (C2-70). -->
+    <RemovedBar v-if="undo.last.value" class="mx-2 my-2" :label="undo.last.value.label" noun="block" :count="undo.removed.value.length" @undo="undo.undo()" @dismiss="undo.clear()" />
+
+    <div v-if="!readonly" class="flex flex-wrap gap-2 py-3.5" role="group" aria-label="Add to the end" :class="embedded ? 'px-0' : 'px-5'">
+      <Button variant="secondary" size="sm" data-add-paragraph @click="insertAt = null; add('paragraph')">Add paragraph</Button>
+      <Button variant="secondary" size="sm" @click="insertAt = null; add('heading')">Add heading</Button>
+      <Button variant="secondary" size="sm" @click="insertAt = null; add('image')">Add image</Button>
     </div>
 
     <AssetPickerDialog
@@ -276,16 +303,5 @@ const words = computed(() =>
 <style scoped>
 .story-embedded:focus {
   outline: none;
-}
-.add-block {
-  border: 1px solid #e5e7eb;
-  border-radius: 9999px;
-  background: #f5f5f7;
-  padding: 7px 14px;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #374151;
 }
 </style>

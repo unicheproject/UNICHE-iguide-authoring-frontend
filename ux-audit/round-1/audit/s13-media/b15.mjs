@@ -1,0 +1,16 @@
+import { start, go, P } from "./common.mjs";
+const s = await start("1440"); const { page, context } = s;
+const f = new URL("./files/UX-s13-media square.png", import.meta.url).pathname.replace(/^\/([A-Z]:)/, "$1").replace(/%20/g," ");
+await page.route("**/assets?*", async r=>{ await new Promise(x=>setTimeout(x,6000)); r.continue(); });
+await go(page, `${P}/media`); await page.waitForTimeout(1500); await s.shot("library__loading");
+console.log("skeleton:", await page.evaluate(()=>document.querySelector("main [aria-busy]")?.getAttribute("aria-label")));
+await page.unroute("**/assets?*");
+await page.waitForSelector("main ul li a",{timeout:20000});
+await context.setOffline(true); await page.waitForTimeout(1500);
+await s.shot("library__offline");
+await page.getByRole("button",{name:"Upload"}).click(); await page.waitForTimeout(500);
+await page.locator("input[type=file]").setInputFiles(f); await page.waitForTimeout(2500);
+await s.shot("upload__offline");
+console.log("offline:", (await page.evaluate(()=>document.querySelector("[role=dialog]").innerText)).replace(/\n+/g," | ").slice(-300));
+await context.setOffline(false);
+await s.browser.close();

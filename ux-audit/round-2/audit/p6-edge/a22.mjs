@@ -1,0 +1,20 @@
+import { open, go, P, ids, shot, settle, alerts, focused, main, problem, AP } from "./lib.mjs";
+import { writeFileSync } from "node:fs";
+const PP = `/projects/${P}`;
+const { browser, page } = await open("curator", { viewport: "1440" });
+const dlg = () => page.locator("[role=dialog],[role=alertdialog]").first();
+await go(page, `${PP}/maps`); await settle(page, 1200);
+await page.getByRole("button", { name: /New map/ }).first().click(); await page.waitForTimeout(800);
+await dlg().locator("input[type=search]").fill("Plaka, Athens"); await page.keyboard.press("Enter"); await page.waitForTimeout(3500);
+console.log((await dlg().innerText()).replace(/\n+/g," | ").slice(0,600));
+await shot(page, "maps__new-map-results");
+const res = dlg().locator("[role=option], li button, [role=listbox] button, ul button").first();
+console.log("results", await dlg().locator("[role=option], li button, ul button").count());
+await res.click(); await page.waitForTimeout(1200);
+await dlg().getByRole("button", { name: /Create map/ }).click(); await page.waitForTimeout(3500);
+console.log("url", page.url());
+const id = page.url().match(/maps\/([0-9a-f-]+)/)?.[1]; console.log("map id", id);
+if (id) { const j = JSON.parse((await import("node:fs")).readFileSync(new URL("./ids.json", import.meta.url))); j.map = id; writeFileSync(new URL("./ids.json", import.meta.url), JSON.stringify(j, null, 1)); }
+await shot(page, "map-editor__new-created", "1440", true);
+console.log("FIELDS", await page.evaluate(() => [...document.querySelectorAll("input,select,textarea")].filter(e => e.offsetParent).map(e => `${e.id||e.name}:${e.type}:${(e.labels?.[0]?.textContent||"").trim().slice(0,25)}=${e.value.slice(0,25)}`).join(" ; ")));
+await browser.close();

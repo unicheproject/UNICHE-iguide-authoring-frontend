@@ -1,0 +1,16 @@
+import { open, go, P, shot, log, alerts, focused, problem } from "./lib.mjs";
+import { readFileSync } from "node:fs";
+const ids = JSON.parse(readFileSync("ux-audit/round-1/audit/p6-edge/ids.json","utf8"));
+const { browser, page } = await open("curator", { viewport: "zoom200" });
+await go(page, `/projects/${P}/pois/${ids.poiA}`); await page.waitForTimeout(1500);
+await page.route("**/iguide/api/v1/**", (route) => route.request().method()==="PUT" ? route.fulfill(problem(422,"VALIDATION_ERROR",{details:["translations.en.title: Title must be at most 200 characters."]})) : route.continue());
+await page.locator("#f-title").fill("Ελληνικός τίτλος δοκιμής");
+await page.getByRole("button",{name:"Save",exact:true}).first().click(); await page.waitForTimeout(1500);
+await shot(page, "poi-editor__err-422__zoom200");
+log("focus", await focused(page), "scrollY", await page.evaluate(()=>scrollY));
+await page.unrouteAll({behavior:"ignoreErrors"});
+await go(page, `/projects/${P}/pois`); await page.waitForTimeout(800);
+await page.getByRole("button",{name:/new point of interest/i}).first().click(); await page.waitForTimeout(500);
+await page.locator("[role=dialog]").getByRole("button",{name:/^create/i}).click(); await page.waitForTimeout(500);
+await shot(page, "poi-create__empty-submit__zoom200");
+await browser.close();

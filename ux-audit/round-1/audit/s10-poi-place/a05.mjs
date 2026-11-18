@@ -1,0 +1,12 @@
+import { start, goEd, P, tall } from "./common.mjs";
+const s = await start("1440"); const { page } = s;
+await goEd(page, "/places");
+await page.getByRole("button", { name: /new place/i }).first().click(); await page.waitForTimeout(300);
+await page.getByRole("button", { name: /top-level place/i }).click();
+await page.getByRole("button", { name: /create place/i }).click();
+await page.waitForURL(/places\/[0-9a-f-]{36}/, { timeout: 15000 }).catch(()=>{});
+await page.locator("main h1").first().waitFor().catch(()=>{}); await page.waitForTimeout(1500);
+console.log("url", page.url());
+await s.shot("place-new__draft-empty__top"); console.log(await tall(s, "place-new-draft-empty"));
+console.log((await page.locator("main").innerText()).slice(0,1500));
+await s.browser.close();

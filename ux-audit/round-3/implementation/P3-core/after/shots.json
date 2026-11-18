@@ -1,0 +1,104 @@
+{
+ "empty@1440": "No points of interest match | Search: zzzznomatch | Status: Draft | Remove a filter, or use Clear filters in the toolbar above.",
+ "error@1440": {
+  "focus": {
+   "tag": "H1",
+   "id": "",
+   "label": "Points of Interest",
+   "top": 80,
+   "bottom": 106,
+   "inViewport": true
+  },
+  "card": "The platform is busy | The platform is busy or down for maintenance. Nothing was changed. Try again in a few minutes. | Try again | Request id req-p3core | Copy request id"
+ },
+ "errorRetryFocus@1440": {
+  "tag": "H1",
+  "id": "",
+  "label": "Points of Interest",
+  "top": 80,
+  "bottom": 106,
+  "inViewport": true
+ },
+ "empty@1024": "No points of interest match | Search: zzzznomatch | Status: Draft | Remove a filter, or use Clear filters in the toolbar above.",
+ "error@1024": {
+  "focus": {
+   "tag": "H1",
+   "id": "",
+   "label": "Points of Interest",
+   "top": 80,
+   "bottom": 106,
+   "inViewport": true
+  },
+  "card": "The platform is busy | The platform is busy or down for maintenance. Nothing was changed. Try again in a few minutes. | Try again | Request id req-p3core | Copy request id"
+ },
+ "errorRetryFocus@1024": {
+  "tag": "H1",
+  "id": "",
+  "label": "Points of Interest",
+  "top": 80,
+  "bottom": 106,
+  "inViewport": true
+ },
+ "empty@768": "No points of interest match | Search: zzzznomatch | Status: Draft | Remove a filter, or use Clear filters in the toolbar above.",
+ "error@768": {
+  "focus": {
+   "tag": "H1",
+   "id": "",
+   "label": "Points of Interest",
+   "top": 80,
+   "bottom": 106,
+   "inViewport": true
+  },
+  "card": "The platform is busy | The platform is busy or down for maintenance. Nothing was changed. Try again in a few minutes. | Try again | Request id req-p3core | Copy request id"
+ },
+ "errorRetryFocus@768": {
+  "tag": "H1",
+  "id": "",
+  "label": "Points of Interest",
+  "top": 80,
+  "bottom": 106,
+  "inViewport": true
+ },
+ "empty@zoom200": "No points of interest match | Search: zzzznomatch | Status: Draft | Remove a filter, or use Clear filters in the toolbar above.",
+ "error@zoom200": {
+  "focus": {
+   "tag": "H1",
+   "id": "",
+   "label": "Points of Interest",
+   "top": 80,
+   "bottom": 106,
+   "inViewport": true
+  },
+  "card": "The platform is busy | The platform is busy or down for maintenance. Nothing was changed. Try again in a few minutes. | Try again | Request id req-p3core | Copy request id"
+ },
+ "errorRetryFocus@zoom200": {
+  "tag": "H1",
+  "id": "",
+  "label": "Points of Interest",
+  "top": 71,
+  "bottom": 97,
+  "inViewport": true
+ },
+ "flashReduced": {
+  "shadow": "rgb(76, 29, 139) 0px 2px 0px 0px inset, rgb(76, 29, 139) 0px -2px 0px 0px inset",
+  "anim": "none"
+ },
+ "keyboardUndo": [
+  {
+   "tag": "BUTTON",
+   "id": "",
+   "label": "Undo move of UX-R3-P3core Move A",
+   "top": 745,
+   "bottom": 777,
+   "inViewport": true
+  },
+  {
+   "tag": "BUTTON",
+   "id": "radix-vue-dropdown-menu-trigger-v-53",
+   "label": "Actions for UX-R3-P3core Move A",
+   "top": 630,
+   "bottom": 670,
+   "inViewport": true
+  }
+ ]
+}

@@ -1,0 +1,15 @@
+import { open, go, shot, wait, url, ids, active, txt, live, liveLog } from "./h.mjs";
+const { browser, page } = await open("admin", { viewport: "1440" });
+const problem = (status, code, extra={}) => JSON.stringify({ type:`urn:uniche:iguide:problem:${code}`, title:"SECRET-SERVER-DETAIL", status, detail:"SECRET-SERVER-DETAIL", code, requestId:"req-v3-apply-409", ...extra });
+await go(page, url("pois", ids.poiDraft)); await wait(page, 1800);
+await page.route(/:apply$/, r => r.fulfill({ status:409, contentType:"application/problem+json", body: problem(409,"VERSION_CONFLICT",{currentVersion: 99}) }));
+await page.locator("#f-summary").fill("Edit for apply 409 "+Date.now()); await wait(page,300);
+await page.getByRole("button",{name:/^Save draft/}).first().click(); await wait(page,1800);
+await page.getByRole("button",{name:/Apply changes/}).first().click(); await wait(page,800);
+console.log("APPLY CONFIRM:", await page.getByRole("dialog").innerText().then(t=>t.replace(/\n+/g," | ")));
+await page.getByRole("dialog").getByRole("button",{name:/^Apply changes/}).click(); await wait(page,2500);
+const d = page.getByRole("dialog");
+console.log("APPLY 409 DIALOG count", await d.count(), await d.count()? await d.innerText().then(t=>t.replace(/\n+/g," | ")):"");
+await shot(page,"poi-active__409-apply__1440");
+console.log("canary:", (await page.content()).includes("SECRET-SERVER-DETAIL") ? "LEAK":"none");
+await browser.close();

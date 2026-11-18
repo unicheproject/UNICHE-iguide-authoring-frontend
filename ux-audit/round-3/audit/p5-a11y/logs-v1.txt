@@ -1,0 +1,14 @@
+typed [{"t":3769,"role":"status","text":"5 of 28 projects shown","why":"add"}] input "Search projects" 336,176,768,40  solid 2px rgb(76, 29, 139) off 2px
+[home list] ArrowDown -> a "UX Audit – EmptyApp: Draftux-audit-emptyMulti-region network" 337,285,766,64  solid 2px rgb(76, 29, 139) off 2px | live=[]
+[home list] ArrowDown -> a "UX Audit – Empty BApp: Draftux-audit-empty-bMulti-region net" 337,350,766,64  solid 2px rgb(76, 29, 139) off 2px | live=[]
+[home list] ArrowUp -> a "UX Audit – EmptyApp: Draftux-audit-emptyMulti-region network" 337,285,766,64  solid 2px rgb(76, 29, 139) off 2px | live=[]
+[home list] ArrowUp -> input "Search projects" 336,176,768,40  solid 2px rgb(76, 29, 139) off 2px | live=[]
+esc value: (empty)
+no results: [{"t":5253,"role":"status","text":"No project matches this search. Try part of the name, or the organisation.","why":"add"},{"t":5817,"role":"status","text":"No projects match","why":"add"}]  or organisation
+
+Searches name, address (slug) and organisation. Use the arrow keys to move through the list.
+
+No project matches this search. Try part of the name, or the organisation.
+AXE {"label":"home-empty-search","url":"http://localhost:5173/","counts":{},"v":[]}
+[open project from home] Enter -> h1 "Dashboard" 256,83,113,26  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) | live=["1 of 28 projects shown","Dashboard loaded"]
+land {"title":"Dashboard · UX Audit – Populated · iGuide CMS","h1":"Dashboard","ae":"H1"}

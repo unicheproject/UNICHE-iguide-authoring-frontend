@@ -1,0 +1,7 @@
+dialog focus pick-search
+after Enter on ArrowDown row, added rows 1
+after Esc focus Add stops
+unplaced link boxes []
+zoom200 axe []
+1440  unplaced link boxes [{"t":"1. UX-R3-P5b Parthenon Παρθενώ","w":260,"h":40}]
+768 touch unplaced link boxes [{"t":"1. UX-R3-P5b Parthenon Παρθενώ","w":260,"h":44}]

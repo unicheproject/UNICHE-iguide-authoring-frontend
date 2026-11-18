@@ -1,0 +1,11 @@
+import * as H from "./h.mjs";
+const log = H.LOG("e26");
+const { browser, page } = await H.session();
+await H.go(page, H.P("/pois/" + H.ids.poi2)); await H.sleep(1800);
+const card = page.locator("section,div").filter({ hasText: /How visitors reach it/ }).last();
+await page.getByRole("button", { name: /Add QR code/ }).first().click(); await H.sleep(600);
+await page.getByRole("button", { name: /Add Geo-proximity/ }).first().click().catch(()=>{}); await H.sleep(600);
+log("inputs", await page.evaluate(() => [...document.querySelectorAll("input,select,textarea")].filter(e=>e.getBoundingClientRect().width>0 && e.closest("[id*=trigger],section,div")).map(e=>(e.id||e.name)+":"+(e.getAttribute("aria-label")||e.labels?.[0]?.innerText||e.placeholder||"")).slice(-14)));
+log("buttons", await page.getByRole("button").allInnerTexts().then(a=>a.filter(x=>/trigger|QR|Geo|Add|Remove|Test|Save|print|Download/i.test(x))));
+await H.shot(page, "poi-editor__triggers-added__1440");
+await browser.close();

@@ -1,0 +1,10 @@
+import { open, go, base, shot } from "./lib.mjs";
+import { readFileSync } from "node:fs";
+const R = JSON.parse(readFileSync("ux-audit/round-3/audit/p3-translator/records.json","utf8"));
+const { browser, page } = await open("admin", { viewport: "1440" });
+await go(page, R.categories+"?lang=it"); await page.waitForSelector("h1"); await page.waitForTimeout(2000);
+await page.locator("#tab-it").focus(); await page.keyboard.press("Shift+Tab"); await page.keyboard.press("Tab"); await page.waitForTimeout(250);
+console.log(await page.evaluate(()=>{const e=document.activeElement; const s=getComputedStyle(e); const a=getComputedStyle(e,"::after"); const b=getComputedStyle(e,"::before"); return `id=${e.id} fv=${e.matches(":focus-visible")} outline=${s.outline} | ring var shadow=${s.boxShadow} | after: ${a.content} ${a.outline} ${a.boxShadow} ${a.border} | before: ${b.content} ${b.outline}`}));
+const box = await page.locator("#tab-it").boundingBox();
+await page.screenshot({path:"ux-audit/round-3/audit/p3-translator/shots/category-editor__tab-focus__1440.png", clip:{x:box.x-40,y:box.y-20,width:300,height:100}});
+await browser.close();

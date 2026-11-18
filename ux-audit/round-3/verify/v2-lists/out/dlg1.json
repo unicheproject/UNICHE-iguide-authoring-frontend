@@ -1,0 +1,392 @@
+{
+ "places-create1": {
+  "dialog": 1,
+  "url": "http://localhost:5173/projects/P/places",
+  "focus": {
+   "tag": "INPUT",
+   "id": "fd-v-12-title",
+   "label": "",
+   "top": 270,
+   "inViewport": true
+  },
+  "w": 576,
+  "h": 494,
+  "top": 88,
+  "bodyPad": "8px/24px/16px/24px",
+  "closeTop": 21,
+  "closeRight": 17,
+  "h2Top": 26,
+  "heading": "New place",
+  "alerts": 0,
+  "labels": [
+   "Title · English(required)",
+   "Level",
+   "Top-level placeStands on its own, such a",
+   "Sub-placeSits inside another place, such",
+   "Slug"
+  ],
+  "radios": 2,
+  "selects": 0,
+  "btns": [
+   "Edit slug",
+   "Cancel",
+   "Create and open"
+  ]
+ },
+ "places-empty": {
+  "w": 576,
+  "h": 593,
+  "top": 88,
+  "bodyPad": "8px/24px/16px/24px",
+  "closeTop": 21,
+  "closeRight": 17,
+  "h2Top": 26,
+  "heading": "New place",
+  "alerts": 1,
+  "labels": [
+   "Title · English(required)",
+   "Level",
+   "Top-level placeStands on its own, such a",
+   "Sub-placeSits inside another place, such",
+   "Slug"
+  ],
+  "radios": 2,
+  "selects": 0,
+  "btns": [
+   "Edit slug",
+   "Cancel",
+   "Create and open"
+  ]
+ },
+ "places-emptyFocus": {
+  "tag": "DIV",
+  "id": "",
+  "label": "1 thing to fixTitle: Enter a title in th",
+  "top": 223,
+  "inViewport": true
+ },
+ "pois-create1": {
+  "dialog": 1,
+  "url": "http://localhost:5173/projects/P/pois",
+  "focus": {
+   "tag": "INPUT",
+   "id": "fd-v-11-title",
+   "label": "",
+   "top": 249,
+   "inViewport": true
+  },
+  "w": 576,
+  "h": 627,
+  "top": 88,
+  "bodyPad": "8px/24px/16px/24px",
+  "closeTop": 21,
+  "closeRight": 17,
+  "h2Top": 26,
+  "heading": "New point of interest",
+  "alerts": 0,
+  "labels": [
+   "Title · English(required)",
+   "Place",
+   "Category",
+   "Exhibit code",
+   "Slug"
+  ],
+  "radios": 0,
+  "selects": 2,
+  "btns": [
+   "Edit slug",
+   "Cancel",
+   "Create and open"
+  ]
+ },
+ "pois-empty": {
+  "w": 576,
+  "h": 726,
+  "top": 88,
+  "bodyPad": "8px/24px/16px/24px",
+  "closeTop": 21,
+  "closeRight": 17,
+  "h2Top": 26,
+  "heading": "New point of interest",
+  "alerts": 1,
+  "labels": [
+   "Title · English(required)",
+   "Place",
+   "Category",
+   "Exhibit code",
+   "Slug"
+  ],
+  "radios": 0,
+  "selects": 2,
+  "btns": [
+   "Edit slug",
+   "Cancel",
+   "Create and open"
+  ]
+ },
+ "pois-emptyFocus": {
+  "tag": "DIV",
+  "id": "",
+  "label": "1 thing to fixTitle: Enter a title in th",
+  "top": 202,
+  "inViewport": true
+ },
+ "routes-create1": {
+  "dialog": 1,
+  "url": "http://localhost:5173/projects/P/routes",
+  "focus": {
+   "tag": "INPUT",
+   "id": "fd-v-12-title",
+   "label": "",
+   "top": 249,
+   "inViewport": true
+  },
+  "w": 576,
+  "h": 473,
+  "top": 88,
+  "bodyPad": "8px/24px/16px/24px",
+  "closeTop": 21,
+  "closeRight": 17,
+  "h2Top": 26,
+  "heading": "New route",
+  "alerts": 0,
+  "labels": [
+   "Title · English(required)",
+   "Setting(required)",
+   "IndoorInside a building. Stops sit on fl",
+   "OutdoorOn a site or in a city. Drawn on ",
+   "Slug"
+  ],
+  "radios": 2,
+  "selects": 0,
+  "btns": [
+   "Edit slug",
+   "Cancel",
+   "Create and open"
+  ]
+ },
+ "routes-empty": {
+  "w": 576,
+  "h": 619,
+  "top": 88,
+  "bodyPad": "8px/24px/16px/24px",
+  "closeTop": 21,
+  "closeRight": 17,
+  "h2Top": 26,
+  "heading": "New route",
+  "alerts": 1,
+  "labels": [
+   "Title · English(required)",
+   "Setting(required)",
+   "IndoorInside a building. Stops sit on fl",
+   "OutdoorOn a site or in a city. Drawn on ",
+   "Slug"
+  ],
+  "radios": 2,
+  "selects": 0,
+  "btns": [
+   "Edit slug",
+   "Cancel",
+   "Create and open"
+  ]
+ },
+ "routes-emptyFocus": {
+  "tag": "DIV",
+  "id": "",
+  "label": "2 things to fixTitle: Enter a title in t",
+  "top": 202,
+  "inViewport": true
+ },
+ "guides-create1": {
+  "dialog": 1,
+  "url": "http://localhost:5173/projects/P/guides",
+  "focus": {
+   "tag": "INPUT",
+   "id": "fd-v-10-title",
+   "label": "",
+   "top": 249,
+   "inViewport": true
+  },
+  "w": 576,
+  "h": 343,
+  "top": 88,
+  "bodyPad": "8px/24px/16px/24px",
+  "closeTop": 21,
+  "closeRight": 17,
+  "h2Top": 26,
+  "heading": "New guide",
+  "alerts": 0,
+  "labels": [
+   "Title · English(required)",
+   "Slug"
+  ],
+  "radios": 0,
+  "selects": 0,
+  "btns": [
+   "Edit slug",
+   "Cancel",
+   "Create and open"
+  ]
+ },
+ "guides-empty": {
+  "w": 576,
+  "h": 442,
+  "top": 88,
+  "bodyPad": "8px/24px/16px/24px",
+  "closeTop": 21,
+  "closeRight": 17,
+  "h2Top": 26,
+  "heading": "New guide",
+  "alerts": 1,
+  "labels": [
+   "Title · English(required)",
+   "Slug"
+  ],
+  "radios": 0,
+  "selects": 0,
+  "btns": [
+   "Edit slug",
+   "Cancel",
+   "Create and open"
+  ]
+ },
+ "guides-emptyFocus": {
+  "tag": "DIV",
+  "id": "",
+  "label": "1 thing to fixTitle: Enter a title in th",
+  "top": 202,
+  "inViewport": true
+ },
+ "events-create1": {
+  "dialog": 1,
+  "url": "http://localhost:5173/projects/P/events",
+  "focus": {
+   "tag": "INPUT",
+   "id": "fd-v-94-title",
+   "label": "",
+   "top": 249,
+   "inViewport": true
+  },
+  "w": 576,
+  "h": 343,
+  "top": 88,
+  "bodyPad": "8px/24px/16px/24px",
+  "closeTop": 21,
+  "closeRight": 17,
+  "h2Top": 26,
+  "heading": "New event",
+  "alerts": 0,
+  "labels": [
+   "Title · English(required)",
+   "Slug"
+  ],
+  "radios": 0,
+  "selects": 0,
+  "btns": [
+   "Edit slug",
+   "Cancel",
+   "Create and open"
+  ]
+ },
+ "events-empty": {
+  "w": 576,
+  "h": 442,
+  "top": 88,
+  "bodyPad": "8px/24px/16px/24px",
+  "closeTop": 21,
+  "closeRight": 17,
+  "h2Top": 26,
+  "heading": "New event",
+  "alerts": 1,
+  "labels": [
+   "Title · English(required)",
+   "Slug"
+  ],
+  "radios": 0,
+  "selects": 0,
+  "btns": [
+   "Edit slug",
+   "Cancel",
+   "Create and open"
+  ]
+ },
+ "events-emptyFocus": {
+  "tag": "DIV",
+  "id": "",
+  "label": "1 thing to fixTitle: Enter a title in th",
+  "top": 202,
+  "inViewport": true
+ },
+ "categories-create1": {
+  "dialog": 1,
+  "url": "http://localhost:5173/projects/P/categories",
+  "focus": {
+   "tag": "INPUT",
+   "id": "fd-v-142-title",
+   "label": "",
+   "top": 270,
+   "inViewport": true
+  },
+  "w": 576,
+  "h": 646,
+  "top": 88,
+  "bodyPad": "8px/24px/16px/24px",
+  "closeTop": 21,
+  "closeRight": 17,
+  "h2Top": 26,
+  "heading": "New category",
+  "alerts": 0,
+  "labels": [
+   "Name · English(required)",
+   "Applies to(required)",
+   "Points of InterestGroups points of inter",
+   "RoutesGroups routes, such as Short tours",
+   "Level",
+   "Top-levelA main group with its own subca",
+   "SubcategorySits under a top-level catego",
+   "Code"
+  ],
+  "radios": 4,
+  "selects": 0,
+  "btns": [
+   "Edit code",
+   "Cancel",
+   "Create and open"
+  ]
+ },
+ "categories-empty": {
+  "w": 576,
+  "h": 791,
+  "top": 88,
+  "bodyPad": "8px/24px/16px/24px",
+  "closeTop": 21,
+  "closeRight": 17,
+  "h2Top": 26,
+  "heading": "New category",
+  "alerts": 1,
+  "labels": [
+   "Name · English(required)",
+   "Applies to(required)",
+   "Points of InterestGroups points of inter",
+   "RoutesGroups routes, such as Short tours",
+   "Level",
+   "Top-levelA main group with its own subca",
+   "SubcategorySits under a top-level catego",
+   "Code"
+  ],
+  "radios": 4,
+  "selects": 0,
+  "btns": [
+   "Edit code",
+   "Cancel",
+   "Create and open"
+  ]
+ },
+ "categories-emptyFocus": {
+  "tag": "DIV",
+  "id": "",
+  "label": "2 things to fixName: Enter a name in the",
+  "top": 223,
+  "inViewport": true
+ }
+}

@@ -1,0 +1,11 @@
+import { readFileSync } from "node:fs";
+import { open, go } from "../../../tools/session.mjs";
+const seed = JSON.parse(readFileSync(new URL("../../../tools/seed.json", import.meta.url), "utf8"));
+const rec = JSON.parse(readFileSync(new URL("./records.json", import.meta.url), "utf8"));
+const out = new URL("./after/", import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1");
+const { browser, page } = await open("curator", { viewport: "1440", forcedColors: "active" });
+await go(page, `/projects/${seed.projects.populated.id}/pois/${rec.draft}`);
+await page.waitForTimeout(3500);
+await page.locator("#triggers").scrollIntoViewIfNeeded();
+await page.screenshot({ path: out + "poi-triggers-forced-colors__1440.png" });
+await browser.close();

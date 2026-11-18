@@ -1,0 +1,197 @@
+[
+ [
+  "RM anims",
+  [
+   [
+    "font-size",
+    1
+   ]
+  ]
+ ],
+ [
+  "RM transitionDur",
+  "0.001s"
+ ],
+ [
+  "RM spinning",
+  0
+ ],
+ [
+  "FC selected tabs",
+  [
+   [
+    "Web",
+    "rgb(55, 0, 110)",
+    "rgb(255, 255, 255)",
+    "rgb(76, 29, 139)",
+    "2px"
+   ],
+   [
+    "English",
+    "rgb(55, 0, 110)",
+    "rgb(255, 255, 255)",
+    "rgb(76, 29, 139)",
+    "2px"
+   ],
+   [
+    "Working",
+    "rgb(55, 0, 110)",
+    "rgb(255, 255, 255)",
+    "rgb(76, 29, 139)",
+    "2px"
+   ],
+   [
+    "Fit width",
+    "rgb(55, 0, 110)",
+    "rgb(255, 255, 255)",
+    "rgb(76, 29, 139)",
+    "2px"
+   ]
+  ]
+ ],
+ [
+  "FC unselected",
+  [
+   [
+    "Mobile",
+    "rgba(255, 255, 255, 0)",
+    "rgb(0, 0, 0)"
+   ],
+   [
+    "Kiosk",
+    "rgba(255, 255, 255, 0)",
+    "rgb(0, 0, 0)"
+   ]
+  ]
+ ],
+ [
+  "FC fire disabled",
+  [
+   "rgb(0, 0, 0)",
+   "rgb(0, 0, 0)",
+   "rgb(255, 255, 255)",
+   "0.6"
+  ]
+ ],
+ [
+  "FC chip",
+  [
+   "flex flex-wrap items-center gap-2",
+   "rgb(0, 0, 0)",
+   "rgba(255, 255, 255, 0)",
+   "0px",
+   "rgb(0, 0, 0)"
+  ]
+ ],
+ [
+  "ring in stand-in",
+  {
+   "el": "BUTTON:UX Audit – Populated",
+   "outline": "rgb(76, 29, 139) solid 2px",
+   "offset": "2px",
+   "bg": "rgb(16, 36, 63)"
+  }
+ ],
+ [
+  "interact pressed",
+  {
+   "txt": "Stop interacting with the preview",
+   "pressed": "true",
+   "bg": "rgb(238, 240, 243)",
+   "h": 40
+  }
+ ],
+ [
+  "columns",
+  {
+   "tbL": 252,
+   "tbR": 1420,
+   "h1L": 256,
+   "regL": 256,
+   "regR": 1416
+  }
+ ],
+ [
+  "warning text",
+  {
+   "color": "rgb(122, 75, 0)",
+   "bg": "rgb(244, 245, 247)",
+   "fs": "14px",
+   "page": "rgba(0, 0, 0, 0)"
+  }
+ ],
+ [
+  "touch targets",
+  [
+   [
+    "UX Audit – Popul",
+    142,
+    21
+   ],
+   [
+    "Home",
+    32,
+    17
+   ],
+   [
+    "Places",
+    35,
+    17
+   ],
+   [
+    "Points of intere",
+    89,
+    17
+   ],
+   [
+    "Routes",
+    37,
+    17
+   ],
+   [
+    "Guides",
+    36,
+    17
+   ],
+   [
+    "Events",
+    35,
+    17
+   ],
+   [
+    "Search",
+    58,
+    18
+   ],
+   [
+    "See all",
+    31,
+    15
+   ],
+   [
+    "See all",
+    31,
+    15
+   ],
+   [
+    "See all",
+    31,
+    15
+   ],
+   [
+    "See all",
+    31,
+    15
+   ],
+   [
+    "See all",
+    31,
+    15
+   ]
+  ]
+ ],
+ [
+  "touch interact",
+  "Stop interacting with the prev"
+ ]
+]

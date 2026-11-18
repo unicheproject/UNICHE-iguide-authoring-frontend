@@ -1,0 +1,65 @@
+{
+ "places": {
+  "url": "http://localhost:5173/projects/P/places/a5989060-7bc2-4bb1-8aa4-c017ae1289b7",
+  "h1": "UX-R3V-v2 Place",
+  "toasts": [
+   "",
+   "",
+   "Place created\nIt is a draft. Add its texts, then activate it.",
+   "UX-R3V-v2 Place loaded",
+   ""
+  ]
+ },
+ "pois": {
+  "url": "http://localhost:5173/projects/P/pois/ee51273c-fd62-4f97-a3bc-493a2712ebab",
+  "h1": "UX-R3V-v2 POI",
+  "toasts": [
+   "",
+   "",
+   "",
+   "Point of interest created\nIt is a draft. Add its texts, then activate it.",
+   "UX-R3V-v2 POI loaded",
+   ""
+  ]
+ },
+ "routes": {
+  "url": "http://localhost:5173/projects/P/routes/9da535fc-aae3-433e-8601-5485a5d4e80b",
+  "h1": "UX-R3V-v2 Route",
+  "toasts": [
+   "",
+   "Route created\nIt is a draft. Add its stops, then activate it.",
+   "UX-R3V-v2 Route loaded",
+   ""
+  ]
+ },
+ "guides": {
+  "url": "http://localhost:5173/projects/P/guides/5b6a2c2f-e56d-4bc7-8cc6-813b72ca5366",
+  "h1": "UX-R3V-v2 Guide",
+  "toasts": [
+   "",
+   "Guide created\nIt is a draft. Write its story, then activate it.",
+   "UX-R3V-v2 Guide loaded",
+   ""
+  ]
+ },
+ "events": {
+  "url": "http://localhost:5173/projects/P/events/e849c408-d65c-42c2-8c7d-09c1fb536941",
+  "h1": "UX-R3V-v2 Event",
+  "toasts": [
+   "",
+   "Event created\nIt is a draft. Add its dates, then activate it.",
+   "UX-R3V-v2 Event loaded",
+   ""
+  ]
+ },
+ "categories": {
+  "url": "http://localhost:5173/projects/P/categories",
+  "h1": "Categories",
+  "toasts": [
+   "",
+   "",
+   "",
+   "1 thing to fix\n\nApplies to: Choose what the category applies to: points of interest or routes."
+  ]
+ }
+}

@@ -1,0 +1,12 @@
+import { open, go, rec, P, ready, SH, tall, axe } from "./h.mjs";
+const { browser, page } = await open("curator", { viewport: "1440", forcedColors: "active" });
+await go(page, `/projects/${P}/pois/${rec.poiA}`); await ready(page);
+await page.locator("#f-summary").fill("Forced colours dirty edit."); await page.waitForTimeout(600);
+await page.screenshot({path:SH+"poi-editor__forced-colors-dirty__1440.png"});
+await page.locator("#triggers").scrollIntoViewIfNeeded(); await page.waitForTimeout(500);
+await page.screenshot({path:SH+"poi-editor__forced-colors-triggers__1440.png"});
+await browser.close();
+const b2 = await open("curator", { viewport: "1440", reducedMotion:"reduce" });
+await go(b2.page, `/projects/${P}/pois/${rec.poiA}`); await ready(b2.page);
+console.log("reduced-motion toast transition", await b2.page.evaluate(()=>getComputedStyle(document.querySelector("main")).transitionDuration));
+await b2.browser.close();

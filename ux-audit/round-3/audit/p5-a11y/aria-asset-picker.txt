@@ -1,0 +1,47 @@
+- dialog "Choose an asset for primary image":
+  - heading "Choose an asset for primary image" [level=2]
+  - button "Close dialog"
+  - text: Search
+  - searchbox "Search"
+  - group: Filters and view (Active, 41 draft hidden, tiles)
+  - log "Upload activity"
+  - 'list "Choose an asset for primary image: arrow keys move between files"':
+    - listitem:
+      - button "Upload new or drop files here"
+    - listitem:
+      - button "UX-s13-media portrait.png Image · 900 × 1600 · 1.4 MB Active Not used yet"
+    - listitem:
+      - button "meander-border Image · 1200 × 120 · 163 KB Active Not used yet"
+    - listitem:
+      - button "acropolis-panorama Image · 4200 × 1000 · 68 KB Active Used in 4"
+    - listitem:
+      - button "tiny-thumbnail Image · 120 × 90 · 15 KB Active Not used yet"
+    - listitem:
+      - button "klepsydra Image · 480 × 640 · 350 KB Active Used in 6"
+    - listitem:
+      - button "ostrakon-themistocles Image · 640 × 480 · 15 KB Active Used in 2"
+    - listitem:
+      - button "slopes-excavation Image · 1920 × 1280 · 56 KB Active Used in 3"
+    - listitem:
+      - button "rampin-rider Image · 700 × 1000 · 20 KB Active Used in 3"
+    - listitem:
+      - button "nike-temple Image · 800 × 800 · 709 KB Active Used in 4"
+    - listitem:
+      - button "theatre-dionysus Image · 1280 × 720 · 30 KB Active Used in 2"
+    - listitem:
+      - button "agora-hephaestus Image · 2400 × 1600 · 68 KB Active Used in 4"
+    - listitem:
+      - button "erechtheion-caryatids Image · 1200 × 1200 · 1.5 MB Active Used in 8"
+    - listitem:
+      - button "peplos-kore Image · 900 × 1600 · 29 KB Active Used in 9"
+    - listitem:
+      - button "frieze-detail Image · 1600 × 900 · 1.5 MB Active Used in 8"
+    - listitem:
+      - button "parthenon-west-dawn Image · 1920 × 1080 · 48 KB Active Used in 2"
+  - paragraph:
+    - text: 41 draft files are hidden.
+    - button "Show any status"
+  - contentinfo:
+    - status: Nothing selected
+    - button "Cancel"
+    - button "Use this image Choose a file first" [disabled]

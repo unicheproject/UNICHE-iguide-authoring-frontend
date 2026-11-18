@@ -1,0 +1,230 @@
+{
+ "768": {
+  "btnBox": {
+   "x": 264,
+   "y": 3388.4375,
+   "width": 157.171875,
+   "height": 35.875
+  },
+  "dlg": {
+   "x": 16,
+   "y": 597.3125,
+   "width": 560,
+   "height": 410.6875
+  },
+  "viewport": {
+   "width": 768,
+   "height": 1024
+  },
+  "focus": {
+   "tag": "button",
+   "role": "tab",
+   "name": "Mobile",
+   "ring": "NONE",
+   "w": 75,
+   "h": 28,
+   "inFrame": false,
+   "dialog": true
+  },
+  "cardCoversEditorPct": 29,
+  "escFromTab": "closed",
+  "focusAfterEsc": "⧉ Preview in app",
+  "kioskDlg": {
+   "x": 16,
+   "y": 597.3125,
+   "width": 560,
+   "height": 410.6875
+  },
+  "escFromPanel": "closed",
+  "escAfterClickInside": "closed",
+  "walk": [
+   "button/ \"Close preview\" [dlg]",
+   "div/tabpanel \"←☰UX Audit – PopulatedSearchen ▾ Parthenon Frieze \" [dlg]",
+   "button/tab \"Mobile\" [dlg]",
+   "button/ \"Close preview\" [dlg]",
+   "div/tabpanel \"←☰UX Audit – PopulatedSearchen ▾ Parthenon Frieze \" [dlg]",
+   "button/tab \"Mobile\" [dlg]",
+   "button/ \"Close preview\" [dlg]",
+   "div/tabpanel \"←☰UX Audit – PopulatedSearchen ▾ Parthenon Frieze \" [dlg]"
+  ],
+  "statusBannerVisible": 1,
+  "axe": [],
+  "headingsInCard": [
+   "H1:Parthenon Frieze – North Side ",
+   "H2:When you are there",
+   "H2:Accessibility"
+  ],
+  "h1Total": 2
+ },
+ "1024": {
+  "btnBox": {
+   "x": 636,
+   "y": 381.125,
+   "width": 157.171875,
+   "height": 35.875
+  },
+  "dlg": {
+   "x": 233.171875,
+   "y": 425,
+   "width": 560,
+   "height": 327
+  },
+  "viewport": {
+   "width": 1024,
+   "height": 768
+  },
+  "focus": {
+   "tag": "button",
+   "role": "tab",
+   "name": "Mobile",
+   "ring": "NONE",
+   "w": 75,
+   "h": 28,
+   "inFrame": false,
+   "dialog": true
+  },
+  "cardCoversEditorPct": 23,
+  "escFromTab": "closed",
+  "focusAfterEsc": "⧉ Preview in app",
+  "kioskDlg": {
+   "x": 233.171875,
+   "y": 425,
+   "width": 560,
+   "height": 327
+  },
+  "escFromPanel": "closed",
+  "escAfterClickInside": "closed",
+  "walk": [
+   "button/ \"Close preview\" [dlg]",
+   "div/tabpanel \"←☰UX Audit – PopulatedSearchen ▾ Parthenon Frieze \" [dlg]",
+   "button/tab \"Mobile\" [dlg]",
+   "button/ \"Close preview\" [dlg]",
+   "div/tabpanel \"←☰UX Audit – PopulatedSearchen ▾ Parthenon Frieze \" [dlg]",
+   "button/tab \"Mobile\" [dlg]",
+   "button/ \"Close preview\" [dlg]",
+   "div/tabpanel \"←☰UX Audit – PopulatedSearchen ▾ Parthenon Frieze \" [dlg]"
+  ],
+  "statusBannerVisible": 1,
+  "axe": [],
+  "headingsInCard": [
+   "H1:Parthenon Frieze – North Side ",
+   "H2:When you are there",
+   "H2:Accessibility"
+  ],
+  "h1Total": 2
+ },
+ "1280": {
+  "btnBox": {
+   "x": 892,
+   "y": 330,
+   "width": 157.171875,
+   "height": 35.875
+  },
+  "dlg": {
+   "x": 489.171875,
+   "y": 373.875,
+   "width": 560,
+   "height": 330.125
+  },
+  "viewport": {
+   "width": 1280,
+   "height": 720
+  },
+  "focus": {
+   "tag": "button",
+   "role": "tab",
+   "name": "Mobile",
+   "ring": "NONE",
+   "w": 75,
+   "h": 28,
+   "inFrame": false,
+   "dialog": true
+  },
+  "cardCoversEditorPct": 20,
+  "escFromTab": "closed",
+  "focusAfterEsc": "⧉ Preview in app",
+  "kioskDlg": {
+   "x": 489.171875,
+   "y": 373.875,
+   "width": 560,
+   "height": 330.125
+  },
+  "escFromPanel": "closed",
+  "escAfterClickInside": "closed",
+  "walk": [
+   "button/ \"Close preview\" [dlg]",
+   "div/tabpanel \"←☰UX Audit – PopulatedSearchen ▾ Parthenon Frieze \" [dlg]",
+   "button/tab \"Mobile\" [dlg]",
+   "button/ \"Close preview\" [dlg]",
+   "div/tabpanel \"←☰UX Audit – PopulatedSearchen ▾ Parthenon Frieze \" [dlg]",
+   "button/tab \"Mobile\" [dlg]",
+   "button/ \"Close preview\" [dlg]",
+   "div/tabpanel \"←☰UX Audit – PopulatedSearchen ▾ Parthenon Frieze \" [dlg]"
+  ],
+  "statusBannerVisible": 1,
+  "axe": [],
+  "headingsInCard": [
+   "H1:Parthenon Frieze – North Side ",
+   "H2:When you are there",
+   "H2:Accessibility"
+  ],
+  "h1Total": 2
+ },
+ "1440": {
+  "btnBox": {
+   "x": 1052,
+   "y": 330,
+   "width": 157.171875,
+   "height": 35.875
+  },
+  "dlg": {
+   "x": 649.171875,
+   "y": 373.875,
+   "width": 560,
+   "height": 510.125
+  },
+  "viewport": {
+   "width": 1440,
+   "height": 900
+  },
+  "focus": {
+   "tag": "button",
+   "role": "tab",
+   "name": "Mobile",
+   "ring": "NONE",
+   "w": 75,
+   "h": 28,
+   "inFrame": false,
+   "dialog": true
+  },
+  "cardCoversEditorPct": 22,
+  "escFromTab": "closed",
+  "focusAfterEsc": "⧉ Preview in app",
+  "kioskDlg": {
+   "x": 649.171875,
+   "y": 373.875,
+   "width": 560,
+   "height": 510.125
+  },
+  "escFromPanel": "closed",
+  "escAfterClickInside": "closed",
+  "walk": [
+   "button/ \"Close preview\" [dlg]",
+   "div/tabpanel \"←☰UX Audit – PopulatedSearchen ▾ Parthenon Frieze \" [dlg]",
+   "button/tab \"Mobile\" [dlg]",
+   "button/ \"Close preview\" [dlg]",
+   "div/tabpanel \"←☰UX Audit – PopulatedSearchen ▾ Parthenon Frieze \" [dlg]",
+   "button/tab \"Mobile\" [dlg]",
+   "button/ \"Close preview\" [dlg]",
+   "div/tabpanel \"←☰UX Audit – PopulatedSearchen ▾ Parthenon Frieze \" [dlg]"
+  ],
+  "statusBannerVisible": 1,
+  "axe": [],
+  "headingsInCard": [
+   "H1:Parthenon Frieze – North Side ",
+   "H2:When you are there",
+   "H2:Accessibility"
+  ],
+  "h1Total": 2
+ }
+}

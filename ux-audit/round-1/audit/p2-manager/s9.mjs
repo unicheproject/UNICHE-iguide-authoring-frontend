@@ -1,0 +1,11 @@
+import { shot, CMS } from "./h.mjs";
+import { open, go } from "../../../tools/session.mjs";
+const { browser, page } = await open("admin", { viewport: "1440" });
+const reqs=[]; page.on("response", r=>{ if(r.url().includes("/iguide/api")&&!/\/projects\/[0-9a-f-]{36}$/.test(r.url())) reqs.push(r.status()+" "+r.url().replace(/.*api\/v1/,"")) });
+await go(page, "/projects/65f8958a-144a-46fe-851b-f1176b2a597e"); await page.waitForTimeout(2500);
+console.log(reqs.join("\n"));
+await shot(page, "dashboard-empty__1440", "1440");
+console.log(await page.locator("main").innerText());
+await page.getByText(/Warnings \(/).click().catch(()=>{});
+await page.screenshot({ path: "ux-audit/round-1/audit/p2-manager/shots/dashboard-empty__full__1440.png", fullPage: true });
+await browser.close();

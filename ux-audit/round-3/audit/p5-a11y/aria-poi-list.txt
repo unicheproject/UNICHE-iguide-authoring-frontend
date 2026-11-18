@@ -1,0 +1,405 @@
+- link "Skip to content":
+  - /url: "#main"
+- banner:
+  - link "UNICHE, all projects":
+    - /url: /
+  - text: iGuide CMS
+  - 'button "UX Audit – Populated App: Draft . Switch project"'
+  - button "P. Admin , account menu"
+- navigation "Primary":
+  - link "Dashboard":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5
+  - paragraph: Content
+  - link "Places":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/places
+  - link "Points of Interest":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois
+  - link "Routes":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/routes
+  - link "Guides":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/guides
+  - link "Events":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/events
+  - link "Categories":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/categories
+  - link "Maps & Floor Plans":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/maps
+  - separator
+  - link "Media":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/media
+  - paragraph: Visitor app
+  - link "Overview":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/overview
+  - link "App settings":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/app-settings
+  - link "Pages":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pages
+  - link "Navigation":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/navigation
+  - link "Translations":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/translations
+  - link "Preview":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/preview
+  - link "Launch":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/launch
+  - paragraph: Project
+  - link "Audit log":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/audit-log
+- main:
+  - heading "Points of Interest" [level=1]
+  - paragraph: Objects and spots visitors can open directly
+  - button "New point of interest"
+  - search "Search and filter":
+    - text: Search
+    - searchbox "Search"
+    - group "Status":
+      - text: Status
+      - radio "Not archived 12" [checked]
+      - text: Not archived 12
+      - radio "Active 12"
+      - text: Active 12
+      - radio "Draft 0"
+      - text: Draft 0
+      - radio "Archived 0"
+      - text: Archived 0
+    - button "Filters and sort, 1 on": Filters
+    - button "Clear filters"
+  - status
+  - table "Points of interest":
+    - rowgroup:
+      - row "Order Title Place and category Status Updated Translations Actions":
+        - columnheader "Order"
+        - columnheader "Title":
+          - button "Title"
+        - columnheader "Place and category"
+        - columnheader "Status":
+          - button "Status"
+        - columnheader "Updated":
+          - button "Updated"
+        - columnheader "Translations":
+          - button "Translations"
+        - columnheader "Actions"
+    - rowgroup:
+      - 'row "Parthenon Frieze – North Side parthenon-frieze-north-side QR · frieze-101 (draft) Parthenon Gallery Sculpture Active Pending changes 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : partly translated Actions for Parthenon Frieze – North Side"':
+        - cell
+        - cell "Parthenon Frieze – North Side parthenon-frieze-north-side QR · frieze-101 (draft)":
+          - link "Parthenon Frieze – North Side":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/546c5177-effd-49c8-acae-85d751f89bbe
+          - text: parthenon-frieze-north-side
+          - list:
+            - listitem: QR · frieze-101 (draft)
+        - cell "Parthenon Gallery Sculpture":
+          - paragraph: Parthenon Gallery
+          - paragraph: Sculpture
+        - cell "Active Pending changes"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : partly translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/546c5177-effd-49c8-acae-85d751f89bbe?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/546c5177-effd-49c8-acae-85d751f89bbe?lang=el
+            - 'listitem "Italiano: partly translated"':
+              - 'link "Italiano : partly translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/546c5177-effd-49c8-acae-85d751f89bbe?lang=it
+        - cell "Actions for Parthenon Frieze – North Side":
+          - button "Actions for Parthenon Frieze – North Side"
+      - 'row "South Metope XXXI: Centaur and Lapith 103 south-metope-xxxi-centaur-and-lapith No trigger Parthenon Gallery Sculpture Active Pending changes 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : not translated Actions for South Metope XXXI: Centaur and Lapith"':
+        - cell
+        - 'cell "South Metope XXXI: Centaur and Lapith 103 south-metope-xxxi-centaur-and-lapith No trigger"':
+          - 'link "South Metope XXXI: Centaur and Lapith"':
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/d7257e33-cfdb-4146-b3a3-aa4b02c5726b
+          - text: 103 south-metope-xxxi-centaur-and-lapith
+          - paragraph: No trigger
+        - cell "Parthenon Gallery Sculpture":
+          - paragraph: Parthenon Gallery
+          - paragraph: Sculpture
+        - cell "Active Pending changes"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : not translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/d7257e33-cfdb-4146-b3a3-aa4b02c5726b?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/d7257e33-cfdb-4146-b3a3-aa4b02c5726b?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/d7257e33-cfdb-4146-b3a3-aa4b02c5726b?lang=it
+        - 'cell "Actions for South Metope XXXI: Centaur and Lapith"':
+          - 'button "Actions for South Metope XXXI: Centaur and Lapith"'
+      - 'row "Rampin Rider rampin-rider No trigger First Floor – Archaic Gallery Sculpture Active Pending changes 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : not translated Actions for Rampin Rider"':
+        - cell
+        - cell "Rampin Rider rampin-rider No trigger":
+          - link "Rampin Rider":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/59e78fee-49a7-475d-9f22-7063529febe6
+          - text: rampin-rider
+          - paragraph: No trigger
+        - cell "First Floor – Archaic Gallery Sculpture":
+          - paragraph: First Floor – Archaic Gallery
+          - paragraph: Sculpture
+        - cell "Active Pending changes"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : not translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/59e78fee-49a7-475d-9f22-7063529febe6?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/59e78fee-49a7-475d-9f22-7063529febe6?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/59e78fee-49a7-475d-9f22-7063529febe6?lang=it
+        - cell "Actions for Rampin Rider":
+          - button "Actions for Rampin Rider"
+      - 'row "Peplos Kore 112 peplos-kore QR · peplos-112 (draft) Room of the Korai Sculpture Active Pending changes 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : partly translated Actions for Peplos Kore"':
+        - cell
+        - cell "Peplos Kore 112 peplos-kore QR · peplos-112 (draft)":
+          - link "Peplos Kore":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/819d7e77-e283-4133-b556-f51d771eda5e
+          - text: 112 peplos-kore
+          - list:
+            - listitem: QR · peplos-112 (draft)
+        - cell "Room of the Korai Sculpture":
+          - paragraph: Room of the Korai
+          - paragraph: Sculpture
+        - cell "Active Pending changes"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : partly translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/819d7e77-e283-4133-b556-f51d771eda5e?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/819d7e77-e283-4133-b556-f51d771eda5e?lang=el
+            - 'listitem "Italiano: partly translated"':
+              - 'link "Italiano : partly translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/819d7e77-e283-4133-b556-f51d771eda5e?lang=it
+        - cell "Actions for Peplos Kore":
+          - button "Actions for Peplos Kore"
+      - 'row "Bath Complex Floor Mosaic 118 bath-complex-floor-mosaic No trigger Excavation Hall of the Slopes Pottery and Everyday Life Active Pending changes 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : not translated Actions for Bath Complex Floor Mosaic"':
+        - cell
+        - cell "Bath Complex Floor Mosaic 118 bath-complex-floor-mosaic No trigger":
+          - link "Bath Complex Floor Mosaic":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/c4df4ce5-8b15-484b-8615-e669f413d296
+          - text: 118 bath-complex-floor-mosaic
+          - paragraph: No trigger
+        - cell "Excavation Hall of the Slopes Pottery and Everyday Life":
+          - paragraph: Excavation Hall of the Slopes
+          - paragraph: Pottery and Everyday Life
+        - cell "Active Pending changes"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : not translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/c4df4ce5-8b15-484b-8615-e669f413d296?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/c4df4ce5-8b15-484b-8615-e669f413d296?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/c4df4ce5-8b15-484b-8615-e669f413d296?lang=it
+        - cell "Actions for Bath Complex Floor Mosaic":
+          - button "Actions for Bath Complex Floor Mosaic"
+      - 'row "Parthenon (Temple of Athena Parthenos) parthenon-temple-of-athena-parthenos Geo · 100 m (draft) Acropolis of Athens Monuments and Temples Active Pending changes 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : partly translated Actions for Parthenon (Temple of Athena Parthenos)"':
+        - cell
+        - cell "Parthenon (Temple of Athena Parthenos) parthenon-temple-of-athena-parthenos Geo · 100 m (draft)":
+          - link "Parthenon (Temple of Athena Parthenos)":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/e2905a9e-2c6a-49a3-89f6-5639c94ee9fe
+          - text: parthenon-temple-of-athena-parthenos
+          - list:
+            - listitem: Geo · 100 m (draft)
+        - cell "Acropolis of Athens Monuments and Temples":
+          - paragraph: Acropolis of Athens
+          - paragraph: Monuments and Temples
+        - cell "Active Pending changes"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : partly translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/e2905a9e-2c6a-49a3-89f6-5639c94ee9fe?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/e2905a9e-2c6a-49a3-89f6-5639c94ee9fe?lang=el
+            - 'listitem "Italiano: partly translated"':
+              - 'link "Italiano : partly translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/e2905a9e-2c6a-49a3-89f6-5639c94ee9fe?lang=it
+        - cell "Actions for Parthenon (Temple of Athena Parthenos)":
+          - button "Actions for Parthenon (Temple of Athena Parthenos)"
+      - 'row "Erechtheion and the Porch of the Caryatids erechtheion-and-the-porch-of-the-caryatids QR · erechtheion-126 (draft) Acropolis of Athens Monuments and Temples Active Pending changes 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : partly translated Actions for Erechtheion and the Porch of the Caryatids"':
+        - cell
+        - cell "Erechtheion and the Porch of the Caryatids erechtheion-and-the-porch-of-the-caryatids QR · erechtheion-126 (draft)":
+          - link "Erechtheion and the Porch of the Caryatids":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/3f7ff52f-26b2-423a-9530-f8378acd07e5
+          - text: erechtheion-and-the-porch-of-the-caryatids
+          - list:
+            - listitem: QR · erechtheion-126 (draft)
+        - cell "Acropolis of Athens Monuments and Temples":
+          - paragraph: Acropolis of Athens
+          - paragraph: Monuments and Temples
+        - cell "Active Pending changes"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : partly translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/3f7ff52f-26b2-423a-9530-f8378acd07e5?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/3f7ff52f-26b2-423a-9530-f8378acd07e5?lang=el
+            - 'listitem "Italiano: partly translated"':
+              - 'link "Italiano : partly translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/3f7ff52f-26b2-423a-9530-f8378acd07e5?lang=it
+        - cell "Actions for Erechtheion and the Porch of the Caryatids":
+          - button "Actions for Erechtheion and the Porch of the Caryatids"
+      - 'row "Temple of Hephaestus 136 temple-of-hephaestus Geo · 133 m (draft) Ancient Agora of Athens Monuments and Temples Active Pending changes 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : partly translated Actions for Temple of Hephaestus"':
+        - cell
+        - cell "Temple of Hephaestus 136 temple-of-hephaestus Geo · 133 m (draft)":
+          - link "Temple of Hephaestus":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/2de087a7-f384-4eed-a2f6-25f5332c3075
+          - text: 136 temple-of-hephaestus
+          - list:
+            - listitem: Geo · 133 m (draft)
+        - cell "Ancient Agora of Athens Monuments and Temples":
+          - paragraph: Ancient Agora of Athens
+          - paragraph: Monuments and Temples
+        - cell "Active Pending changes"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : partly translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/2de087a7-f384-4eed-a2f6-25f5332c3075?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/2de087a7-f384-4eed-a2f6-25f5332c3075?lang=el
+            - 'listitem "Italiano: partly translated"':
+              - 'link "Italiano : partly translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/2de087a7-f384-4eed-a2f6-25f5332c3075?lang=it
+        - cell "Actions for Temple of Hephaestus":
+          - button "Actions for Temple of Hephaestus"
+      - 'row "UX-s10-poi-place Odeon Mosaic Floor Ψηφιδωτό ux-s10-poi-place-odeon-mosaic-floor-psifidoto No trigger Parthenon Gallery No category Active Pending changes 12 Nov 2026, 14:23 English : partly translated Ελληνικά : not translated Italiano : not translated Actions for UX-s10-poi-place Odeon Mosaic Floor Ψηφιδωτό"':
+        - cell
+        - cell "UX-s10-poi-place Odeon Mosaic Floor Ψηφιδωτό ux-s10-poi-place-odeon-mosaic-floor-psifidoto No trigger":
+          - link "UX-s10-poi-place Odeon Mosaic Floor Ψηφιδωτό":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/109e19ff-9fed-42e7-ae18-2884419f6c2e
+          - text: ux-s10-poi-place-odeon-mosaic-floor-psifidoto
+          - paragraph: No trigger
+        - cell "Parthenon Gallery No category":
+          - paragraph: Parthenon Gallery
+          - paragraph: No category
+        - cell "Active Pending changes"
+        - cell "12 Nov 2026, 14:23":
+          - time: 12 Nov 2026, 14:23
+        - 'cell "English : partly translated Ελληνικά : not translated Italiano : not translated"':
+          - list:
+            - 'listitem "English: partly translated"':
+              - 'link "English : partly translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/109e19ff-9fed-42e7-ae18-2884419f6c2e?lang=en
+            - 'listitem "Ελληνικά: not translated"':
+              - 'link "Ελληνικά : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/109e19ff-9fed-42e7-ae18-2884419f6c2e?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/109e19ff-9fed-42e7-ae18-2884419f6c2e?lang=it
+        - cell "Actions for UX-s10-poi-place Odeon Mosaic Floor Ψηφιδωτό":
+          - button "Actions for UX-s10-poi-place Odeon Mosaic Floor Ψηφιδωτό"
+      - 'row "UX-W0.2 point ux-w0-2-draft-point No trigger No place No category Active Pending changes 12 Nov 2026, 16:50 English : partly translated Ελληνικά : not translated Italiano : not translated Actions for UX-W0.2 point"':
+        - cell
+        - cell "UX-W0.2 point ux-w0-2-draft-point No trigger":
+          - link "UX-W0.2 point":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/3820d506-424a-4021-8a20-490c72946e2e
+          - text: ux-w0-2-draft-point
+          - paragraph: No trigger
+        - cell "No place No category":
+          - paragraph: No place
+          - paragraph: No category
+        - cell "Active Pending changes"
+        - cell "12 Nov 2026, 16:50":
+          - time: 12 Nov 2026, 16:50
+        - 'cell "English : partly translated Ελληνικά : not translated Italiano : not translated"':
+          - list:
+            - 'listitem "English: partly translated"':
+              - 'link "English : partly translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/3820d506-424a-4021-8a20-490c72946e2e?lang=en
+            - 'listitem "Ελληνικά: not translated"':
+              - 'link "Ελληνικά : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/3820d506-424a-4021-8a20-490c72946e2e?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/3820d506-424a-4021-8a20-490c72946e2e?lang=it
+        - cell "Actions for UX-W0.2 point":
+          - button "Actions for UX-W0.2 point"
+      - 'row "UX-P4 pending point ux-p4-pending-point No trigger No place No category Active Pending changes 13 Nov 2026, 10:10 English : partly translated Ελληνικά : partly translated Italiano : not translated Actions for UX-P4 pending point"':
+        - cell
+        - cell "UX-P4 pending point ux-p4-pending-point No trigger":
+          - link "UX-P4 pending point":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/2cb06749-1668-4de7-8220-bac295a88ff7
+          - text: ux-p4-pending-point
+          - paragraph: No trigger
+        - cell "No place No category":
+          - paragraph: No place
+          - paragraph: No category
+        - cell "Active Pending changes"
+        - cell "13 Nov 2026, 10:10":
+          - time: 13 Nov 2026, 10:10
+        - 'cell "English : partly translated Ελληνικά : partly translated Italiano : not translated"':
+          - list:
+            - 'listitem "English: partly translated"':
+              - 'link "English : partly translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/2cb06749-1668-4de7-8220-bac295a88ff7?lang=en
+            - 'listitem "Ελληνικά: partly translated"':
+              - 'link "Ελληνικά : partly translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/2cb06749-1668-4de7-8220-bac295a88ff7?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/2cb06749-1668-4de7-8220-bac295a88ff7?lang=it
+        - cell "Actions for UX-P4 pending point":
+          - button "Actions for UX-P4 pending point"
+      - 'row "UX-R2-p1-editor Amphora Room ux-r2-p1-editor-amphora-room QR · ney8rg5q Geo · 30 m Parthenon Gallery Sculpture Active Pending changes 13 Nov 2026, 15:46 English : complete Ελληνικά : complete Italiano : complete Actions for UX-R2-p1-editor Amphora Room"':
+        - cell
+        - cell "UX-R2-p1-editor Amphora Room ux-r2-p1-editor-amphora-room QR · ney8rg5q Geo · 30 m":
+          - link "UX-R2-p1-editor Amphora Room":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/061eca49-e97e-483a-b48f-3dff0d96a3cc
+          - text: ux-r2-p1-editor-amphora-room
+          - list:
+            - listitem: QR · ney8rg5q
+            - listitem: Geo · 30 m
+        - cell "Parthenon Gallery Sculpture":
+          - paragraph: Parthenon Gallery
+          - paragraph: Sculpture
+        - cell "Active Pending changes"
+        - cell "13 Nov 2026, 15:46":
+          - time: 13 Nov 2026, 15:46
+        - 'cell "English : complete Ελληνικά : complete Italiano : complete"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/061eca49-e97e-483a-b48f-3dff0d96a3cc?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/061eca49-e97e-483a-b48f-3dff0d96a3cc?lang=el
+            - 'listitem "Italiano: complete"':
+              - 'link "Italiano : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/061eca49-e97e-483a-b48f-3dff0d96a3cc?lang=it
+        - cell "Actions for UX-R2-p1-editor Amphora Room":
+          - button "Actions for UX-R2-p1-editor Amphora Room"
+  - paragraph: 81 of 93 points of interest in this status are hidden by filters
+  - paragraph: Translations Complete Partly Missing
+- status: Points of Interest loaded
+- alert

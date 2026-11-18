@@ -1,0 +1,41 @@
+import { readFileSync } from "node:fs";
+import { createRequire } from "node:module";
+import { open, go } from "../../../tools/session.mjs";
+const require = createRequire(new URL("../../../../package.json", import.meta.url));
+const { AxeBuilder } = require("@axe-core/playwright");
+const P = "6958c18f-60d2-4140-a524-5a43f8a2f6b5";
+const css = readFileSync(new URL("./built.css", import.meta.url), "utf8");
+const OUT = "ux-audit/round-2/implementation/W0-A/after/";
+const withCss = async (page) => { await page.evaluate(() => document.querySelectorAll('style[data-vite-dev-id*="style.css"]').forEach((s) => s.remove())); await page.addStyleTag({ content: css }); await page.waitForTimeout(400); };
+const axe = async (page, name) => { const r = await new AxeBuilder({ page }).withTags(["wcag2a","wcag2aa","wcag21a","wcag21aa"]).analyze(); console.log("axe", name, r.violations.map(v => `${v.id}(${v.impact}) x${v.nodes.length}`).join(", ") || "clean"); };
+const { browser, page } = await open("admin", { viewport: "1440" });
+await go(page, `/projects/${P}/pois`); await page.waitForSelector("main h1"); await page.waitForTimeout(1500); await axe(page, "POI list");
+await page.locator("header button", { hasText: /Switch project/ }).first().click(); await page.waitForTimeout(600); await axe(page, "switcher open");
+await page.keyboard.press("Escape");
+await page.getByRole("button", { name: /^New point of interest/ }).click(); await page.waitForTimeout(600); await axe(page, "create dialog"); await page.keyboard.press("Escape");
+await go(page, `/projects/${P}/pois/546c5177-effd-49c8-acae-85d751f89bbe`); await page.waitForSelector("main h1"); await page.waitForTimeout(1500); await axe(page, "POI editor");
+await go(page, `/projects/not-a-uuid`); await page.waitForSelector("main h1"); await axe(page, "404");
+
+// DateTimeFields
+await go(page, `/projects/${P}/pois`); await page.waitForSelector("main h1"); await withCss(page);
+const res = await page.evaluate(async () => {
+  const names = performance.getEntriesByType("resource").map(e => e.name);
+  const vueUrl = names.find(n => /deps\/vue\.js/.test(n)); const compUrl = names.find(n => /DateTimeFields\.vue/.test(n)) ?? "/src/components/ui/field/DateTimeFields.vue";
+  const Vue = await import(vueUrl); const Comp = (await import("/src/components/ui/field/DateTimeFields.vue")).default;
+  const host = document.createElement("div"); host.id = "dt-host"; host.style.cssText = "position:fixed;left:20px;top:80px;z-index:999;background:#fff;padding:16px;width:640px;border:1px solid #ccc"; document.body.append(host);
+  const model = Vue.ref("2026-11-16T14:05");
+  Vue.createApp({ render: () => Vue.h(Comp, { legend: "Start", id: "t1", modelValue: model.value, "onUpdate:modelValue": (v) => (model.value = v), hint: "Times are in Athens time.", error: null }) }).mount(host);
+  window.__dt = model; return model.value;
+});
+console.log("DateTimeFields initial model:", res);
+await page.fill("#t1-day", "31"); await page.selectOption("#t1-month", "4");
+console.log("31 April ->", JSON.stringify(await page.evaluate(() => window.__dt.value)));
+await page.fill("#t1-day", "30");
+console.log("30 April ->", JSON.stringify(await page.evaluate(() => window.__dt.value)));
+await page.fill("#t1-hour", "9"); await page.fill("#t1-minute", "5"); await page.locator("#t1-minute").blur();
+console.log("09:05 ->", JSON.stringify(await page.evaluate(() => window.__dt.value)), "minute field:", await page.inputValue("#t1-minute"));
+await page.fill("#t1-hour", "25");
+console.log("hour 25 ->", JSON.stringify(await page.evaluate(() => window.__dt.value)));
+await page.screenshot({ path: OUT + "datetimefields__1440.png", clip: { x: 0, y: 60, width: 700, height: 220 } });
+await axe(page, "page with DateTimeFields");
+await browser.close();

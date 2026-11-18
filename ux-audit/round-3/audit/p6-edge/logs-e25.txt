@@ -1,0 +1,3 @@
+first map /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/maps/b2ab454f-2c60-44b2-888c-979ec19e0393
+map tiles blocked {"msgs":["The map background could not be loaded. Placement still works with the coordinate fields. Try again","0 of 0 placed shown","Nothing is known to be missing. The platform checks everything when you activate."],"body":"& Floor Plans UX-R3-s12 Map UX-R3-s12 Map Draft Save No unsaved changes to save Map and bounds Name Only authors see it. Edit bounds + − Leaflet | © OpenStreetMap contributors The map background could not be loaded.","live":["The map background could not be loaded. Placement still works with the coordinate fields. Try again"]}
+floor plan image blocked {"msgs":["Signing you in…"]}

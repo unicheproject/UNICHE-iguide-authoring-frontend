@@ -1,0 +1,60 @@
+switcher-open (STEP FAILED) | Projects | ov 0 hs false viol  err 0 0
+create-project-step1  | Create Project | ov 0 hs false viol  err 0 0
+dashboard-emptyD-first-run  | Dashboard | ov 0 hs false viol  err 0 0
+pois-pristine-empty  | undefined | ov 0 hs false viol document-title:serious:1,html-has-lang:serious:1 err 0 0
+places-create-dialog  | Places | ov 0 hs false viol  err 0 0
+places-create-param  | Places | ov 0 hs false viol  err 0 0
+pois-create-dialog  | Points of Interest | ov 0 hs false viol  err 0 0
+pois-create-param  | Points of Interest | ov 0 hs false viol  err 0 0
+routes-create-dialog  | Routes | ov 0 hs false viol  err 0 0
+routes-create-param  | Routes | ov 0 hs false viol  err 0 0
+guides-create-dialog  | Guides | ov 0 hs false viol  err 0 0
+guides-create-param  | Guides | ov 0 hs false viol  err 0 0
+events-create-dialog  | Events | ov 0 hs false viol  err 0 0
+events-create-param  | Events | ov 0 hs false viol  err 0 0
+categories-create-dialog  | Categories | ov 0 hs false viol  err 0 0
+categories-create-param  | Categories | ov 0 hs false viol  err 0 0
+places-filters  | Places | ov 0 hs false viol  err 0 0
+places-row-menu  | Places | ov 0 hs false viol  err 0 0
+pois-filters  | Points of Interest | ov 0 hs false viol  err 0 0
+pois-row-menu  | Points of Interest | ov 0 hs false viol  err 0 0
+routes-filters  | Routes | ov 0 hs false viol  err 0 0
+routes-row-menu  | Routes | ov 0 hs false viol  err 0 0
+guides-filters  | Guides | ov 0 hs false viol  err 0 0
+guides-row-menu  | Guides | ov 0 hs false viol  err 0 0
+events-filters  | Events | ov 0 hs false viol  err 0 0
+events-row-menu  | Events | ov 0 hs false viol  err 0 0
+categories-filters  | Categories | ov 0 hs false viol  err 0 0
+categories-row-menu  | Categories | ov 0 hs false viol  err 0 0
+poi-draft-activate-dialog  | The Horsemen of the Panathenaic Procession | ov 0 hs false viol  err 0 0
+poi-draft-preview-in-app  | The Horsemen of the Panathenaic Procession | ov 0 hs false viol  err 0 0
+poi-draft-preview-expanded  | The Horsemen of the Panathenaic Procession | ov 0 hs false viol  err 0 0
+poi-draft-greek-tab  | The Horsemen of the Panathenaic Procession | ov 0 hs false viol  err 0 0
+poi-active-greek-tab  | East Pediment Fragments | ov 0 hs false viol  err 0 0
+poi-pending-apply-dialog  | Parthenon Frieze – North Side (revised wording) | ov 0 hs false viol  err 0 0
+route-draft-activate-dialog  | Ancient Agora Archaeological Loop | ov 0 hs false viol  err 0 0
+route-greek-tab  | Ancient Agora Archaeological Loop | ov 0 hs false viol  err 0 0
+place-draft-activate-dialog  | Ground Floor – Slopes Level | ov 0 hs false viol  err 0 0
+place-greek-tab  | Ground Floor – Slopes Level | ov 0 hs false viol  err 0 0
+guide-greek-tab  | The Story of the Parthenon: From Temple to Monument | ov 0 hs false viol  err 0 0
+event-greek-tab  | Full Moon Night at the Acropolis | ov 0 hs false viol  err 0 0
+category-greek-tab  | Monuments and Temples | ov 0 hs false viol  err 0 0
+poi-409-dialog  | The Horsemen of the Panathenaic Procession | ov 0 hs false viol  err 0 1
+409 leaks server text: false
+maps-new-dialog  | Maps & Floor Plans | ov 0 hs false viol  err 0 0
+floorplans-new-dialog  | Maps & Floor Plans | ov 0 hs false viol  err 0 0
+media-upload-dialog  | Media | ov 0 hs false viol  err 0 0
+media-filters  | Media | ov 0 hs false viol  err 0 0
+asset-picker  | East Pediment Fragments | ov 0 hs false viol  err 0 0
+preview-web  | Preview | ov 0 hs false viol  err 0 0
+preview-mobile  | Preview | ov 0 hs false viol  err 0 0
+preview-kiosk  | Preview | ov 0 hs false viol  err 0 0
+pois-503  | undefined | ov 0 hs false viol document-title:serious:1,html-has-lang:serious:1 err 0 0
+503 leaks: true
+pois-403  | undefined | ov 0 hs false viol document-title:serious:1,html-has-lang:serious:1 err 0 0
+403 leaks: true
+project-404  | This Project is not available | ov 0 hs false viol  err 0 0
+404 leaks: false
+project-403  | undefined | ov 0 hs false viol document-title:serious:1,html-has-lang:serious:1 err 0 0
+FAILS:
+switcher-open: locator.click: Timeout 30000ms exceeded.

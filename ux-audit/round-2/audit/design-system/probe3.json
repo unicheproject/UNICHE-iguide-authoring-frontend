@@ -1,0 +1,91 @@
+{
+ "1280-pois": {
+  "vh": 720,
+  "hdr": 56,
+  "mainH": 664,
+  "st": [
+   {
+    "n": "DIV.z-sticky.flex",
+    "top": 156,
+    "h": 182
+   },
+   {
+    "n": "TH.list-th.w-12",
+    "top": 338,
+    "h": 49
+   },
+   {
+    "n": "TH.list-th.w-[40%]",
+    "top": 338,
+    "h": 49
+   },
+   {
+    "n": "TH.list-th.w-40",
+    "top": 338,
+    "h": 49
+   },
+   {
+    "n": "TH.list-th.w-44",
+    "top": 338,
+    "h": 49
+   },
+   {
+    "n": "TH.list-th",
+    "top": 338,
+    "h": 49
+   },
+   {
+    "n": "TH.list-th.w-14",
+    "top": 338,
+    "h": 49
+   }
+  ]
+ },
+ "1280-poi": {
+  "vh": 720,
+  "hdr": 56,
+  "mainH": 664,
+  "st": [
+   {
+    "n": "DIV.sticky.-top-6",
+    "top": 117,
+    "h": 138
+   },
+   {
+    "n": "ASIDE.flex.min-w-0",
+    "top": 287,
+    "h": 494
+   }
+  ]
+ },
+ "1280-preview": {
+  "vh": 720,
+  "hdr": 56,
+  "mainH": 664,
+  "st": []
+ },
+ "zoom200-pois": {
+  "vh": 360,
+  "hdr": 56,
+  "mainH": 304,
+  "st": []
+ },
+ "zoom200-poi": {
+  "vh": 360,
+  "hdr": 56,
+  "mainH": 304,
+  "st": [
+   {
+    "n": "DIV.sticky.-top-6",
+    "top": 117,
+    "h": 201
+   }
+  ]
+ },
+ "zoom200-preview": {
+  "vh": 360,
+  "hdr": 56,
+  "mainH": 304,
+  "st": []
+ }
+}

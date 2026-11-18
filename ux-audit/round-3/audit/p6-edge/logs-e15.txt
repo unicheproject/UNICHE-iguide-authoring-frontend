@@ -1,0 +1,4 @@
+restore {"msgs":["3 warnings, nothing blocks.","Back to draft Visitors no longer see it. You can edit it now."],"focus":"textarea#f-title \"UX-R3-p6 POI A e2 slow reloadme\""}
+row menu ["Activate","Archive","Clear filters to reorder"]
+list archived {"msgs":["UX-R3-p6 POI A e2 slow reloadme archived. It is under Archived now.","Archived UX-R3-p6 POI A e2 slow reloadme is archived. It is hidden from the default list; choose Archived to see it.","0 of 98 points of interest"],"focus":"main#main \"Points of InterestObjects and spots visitors can o\"","undo":1}
+undo after nav {"undo":0,"msgs":["Archived UX-R3-p6 POI A e2 slow reloadme is archived. It is hidden from the default list; choose Archived to see it.","Routes loaded"]}

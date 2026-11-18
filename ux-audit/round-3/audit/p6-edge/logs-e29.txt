@@ -1,0 +1,12 @@
+768 422 {"box":[16,247,736,104],"hscroll":false,"focusVisible":true,"anims":0}
+768 409 {"box":[-1,-1,1,1],"hscroll":false,"focusVisible":true,"anims":0}
+768 503page {"box":[-1,-1,1,1],"hscroll":false,"focusVisible":true,"anims":0}
+zoom200 422 {"box":[16,120,608,104],"hscroll":false,"focusVisible":true,"anims":0}
+zoom200 409 {"box":[-1,-1,1,1],"hscroll":false,"focusVisible":true,"anims":0}
+zoom200 503page {"box":[-1,-1,1,1],"hscroll":false,"focusVisible":true,"anims":0}
+forced 422 {"box":[256,173,736,104],"hscroll":false,"focusVisible":true,"anims":0}
+forced 409 {"box":[-1,-1,2,2],"hscroll":false,"focusVisible":true,"anims":0}
+forced 503page {"box":[-1,-1,2,2],"hscroll":false,"focusVisible":true,"anims":0}
+reduced 422 {"box":[256,173,736,104],"hscroll":false,"focusVisible":true,"anims":0}
+reduced 409 {"box":[-1,-1,1,1],"hscroll":false,"focusVisible":true,"anims":2}
+reduced 503page {"box":[-1,-1,1,1],"hscroll":false,"focusVisible":true,"anims":0}

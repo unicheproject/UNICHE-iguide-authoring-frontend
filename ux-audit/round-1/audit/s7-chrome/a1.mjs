@@ -1,0 +1,22 @@
+import { open, go, shot, log, P, focused } from "./lib.mjs";
+const { browser, page } = await open("curator", { viewport: "1440" });
+await go(page, "/");
+await page.waitForTimeout(800);
+await shot(page, "home__list__1440", true);
+log("projects text count", await page.locator("main ul li").count());
+// picker
+await page.getByRole("button", { name: /Select a project|Project/ }).first().click();
+await page.waitForTimeout(400);
+await shot(page, "picker__home-open__1440");
+log("picker items", await page.locator("#project-switcher-menu li").count());
+await page.keyboard.press("Escape");
+await go(page, `/projects/${P}`);
+await page.waitForTimeout(1500);
+await shot(page, "workspace__dashboard__1440", true);
+await page.locator("header button[aria-controls=project-switcher-menu]").click();
+await page.waitForTimeout(300);
+await shot(page, "picker__open-in-project__1440");
+log("focus after open", await focused(page));
+await page.keyboard.press("Tab"); log("tab1", await focused(page));
+await page.keyboard.press("Escape"); log("after esc", await focused(page));
+await browser.close();

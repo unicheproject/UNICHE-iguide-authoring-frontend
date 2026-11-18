@@ -1,0 +1,4917 @@
+{
+ "projects": {
+  "populated": {
+   "id": "6958c18f-60d2-4140-a524-5a43f8a2f6b5",
+   "name": "UX Audit – Populated",
+   "slug": "ux-audit-populated",
+   "template": "multi-region-network",
+   "stylePreset": "aegean-network",
+   "defaultLanguage": "en"
+  },
+  "empty": {
+   "id": "65f8958a-144a-46fe-851b-f1176b2a597e",
+   "name": "UX Audit – Empty"
+  }
+ },
+ "places": [
+  {
+   "key": "athens",
+   "id": "9ce7037d-d9bd-4450-812c-3fee540bf71b",
+   "title": "Athens Historic Centre",
+   "type": "DESTINATION",
+   "environment": "OUTDOOR",
+   "parent": null,
+   "status": "ACTIVE"
+  },
+  {
+   "key": "museum",
+   "id": "e5932358-078d-4872-a903-8b726793b9d5",
+   "title": "Acropolis Museum",
+   "type": "BUILDING",
+   "environment": "INDOOR",
+   "parent": "athens",
+   "status": "ACTIVE"
+  },
+  {
+   "key": "gf",
+   "id": "6558fe35-209a-4e49-a92f-f785eb839756",
+   "title": "Ground Floor – Slopes Level",
+   "type": "FLOOR",
+   "environment": "INDOOR",
+   "parent": "museum",
+   "status": "DRAFT"
+  },
+  {
+   "key": "slopes",
+   "id": "01d4dbd4-3a16-411a-a663-0d2a164888e1",
+   "title": "Excavation Hall of the Slopes",
+   "type": "ROOM",
+   "environment": "INDOOR",
+   "parent": "gf",
+   "status": "DRAFT"
+  },
+  {
+   "key": "archaic",
+   "id": "5f6aa074-bc17-4a4d-8884-79c807294168",
+   "title": "First Floor – Archaic Gallery",
+   "type": "FLOOR",
+   "environment": "INDOOR",
+   "parent": "museum",
+   "status": "ACTIVE"
+  },
+  {
+   "key": "korai",
+   "id": "59fecf67-1dcf-426d-838d-d655ed73f870",
+   "title": "Room of the Korai",
+   "type": "ROOM",
+   "environment": "INDOOR",
+   "parent": "archaic",
+   "status": "DRAFT"
+  },
+  {
+   "key": "parthenon",
+   "id": "0551e49d-4b18-43dd-8219-edf8d219e76d",
+   "title": "Parthenon Gallery",
+   "type": "FLOOR",
+   "environment": "INDOOR",
+   "parent": "museum",
+   "status": "ACTIVE"
+  },
+  {
+   "key": "site",
+   "id": "615cf675-15a6-42cc-9ce8-24ec217f44ce",
+   "title": "Acropolis of Athens",
+   "type": "SITE",
+   "environment": "OUTDOOR",
+   "parent": "athens",
+   "status": "ACTIVE"
+  },
+  {
+   "key": "propylaea",
+   "id": "f718c534-0292-4ad1-94ea-84a65997ca2a",
+   "title": "Propylaea and Temple of Athena Nike",
+   "type": "SITE",
+   "environment": "OUTDOOR",
+   "parent": "site",
+   "status": "ACTIVE"
+  },
+  {
+   "key": "theatre",
+   "id": "38e6ac4d-9643-40ac-95e3-9fd3db7370c6",
+   "title": "Theatre of Dionysus",
+   "type": "SITE",
+   "environment": "OUTDOOR",
+   "parent": "athens",
+   "status": "ACTIVE"
+  },
+  {
+   "key": "agora",
+   "id": "b887ed0a-88ed-4bf6-8eb6-6b1516e89b7f",
+   "title": "Ancient Agora of Athens",
+   "type": "SITE",
+   "environment": "OUTDOOR",
+   "parent": "athens",
+   "status": "ACTIVE"
+  },
+  {
+   "key": "stoa",
+   "id": "765727b3-e9c4-45e0-8bd1-15becd016d35",
+   "title": "Stoa of Attalos Museum",
+   "type": "BUILDING",
+   "environment": "INDOOR",
+   "parent": "agora",
+   "status": "ACTIVE"
+  }
+ ],
+ "pois": [
+  {
+   "key": "frieze",
+   "id": "546c5177-effd-49c8-acae-85d751f89bbe",
+   "title": "Parthenon Frieze – North Side",
+   "status": "ACTIVE",
+   "hasWorkingCopy": true,
+   "hasTrigger": true,
+   "hasGeo": true,
+   "longTitle": false
+  },
+  {
+   "key": "pediment",
+   "id": "9d32bf3f-6d1b-4ab1-a129-f52f4a890403",
+   "title": "East Pediment Fragments",
+   "status": "ACTIVE",
+   "hasWorkingCopy": false,
+   "hasTrigger": true,
+   "hasGeo": true,
+   "longTitle": false
+  },
+  {
+   "key": "metope",
+   "id": "d7257e33-cfdb-4146-b3a3-aa4b02c5726b",
+   "title": "South Metope XXXI: Centaur and Lapith",
+   "status": "ACTIVE",
+   "hasWorkingCopy": true,
+   "hasTrigger": false,
+   "hasGeo": true,
+   "longTitle": false
+  },
+  {
+   "key": "dionysos",
+   "id": "65785e7e-aced-47d6-ab2e-662ca86153ae",
+   "title": "Dionysos, Hestia and Aphrodite",
+   "status": "ACTIVE",
+   "hasWorkingCopy": false,
+   "hasTrigger": false,
+   "hasGeo": true,
+   "longTitle": false
+  },
+  {
+   "key": "horsemen",
+   "id": "cb763579-1082-45a7-8038-ed6a91ecc3d4",
+   "title": "The Horsemen of the Panathenaic Procession",
+   "status": "DRAFT",
+   "hasWorkingCopy": false,
+   "hasTrigger": false,
+   "hasGeo": false,
+   "longTitle": false
+  },
+  {
+   "key": "copies",
+   "id": "f89af652-0578-4b37-8dbf-0f81e2a874fe",
+   "title": "Plaster Casts Display",
+   "status": "ARCHIVED",
+   "hasWorkingCopy": false,
+   "hasTrigger": false,
+   "hasGeo": true,
+   "longTitle": false
+  },
+  {
+   "key": "moschophoros",
+   "id": "f38d32c7-380c-412c-8ed5-bd3095e42556",
+   "title": "Moschophoros (The Calf-Bearer)",
+   "status": "ACTIVE",
+   "hasWorkingCopy": false,
+   "hasTrigger": true,
+   "hasGeo": true,
+   "longTitle": false
+  },
+  {
+   "key": "rampin",
+   "id": "59e78fee-49a7-475d-9f22-7063529febe6",
+   "title": "Rampin Rider",
+   "status": "ACTIVE",
+   "hasWorkingCopy": true,
+   "hasTrigger": false,
+   "hasGeo": true,
+   "longTitle": false
+  },
+  {
+   "key": "hydra",
+   "id": "d2b6e6a2-a517-459d-b80d-0cf63801b535",
+   "title": "Archaic Pediment: Herakles and the Hydra",
+   "status": "DRAFT",
+   "hasWorkingCopy": false,
+   "hasTrigger": false,
+   "hasGeo": true,
+   "longTitle": false
+  },
+  {
+   "key": "typhon",
+   "id": "880c1266-2b57-4cbe-945c-49677d74a349",
+   "title": "Typhon, the Three-Bodied Daemon",
+   "status": "ACTIVE",
+   "hasWorkingCopy": false,
+   "hasTrigger": false,
+   "hasGeo": true,
+   "longTitle": false
+  },
+  {
+   "key": "lions",
+   "id": "00ee3bc2-afdb-4931-a515-03b96a76b7a4",
+   "title": "Hekatompedon Pediment Lions",
+   "status": "ACTIVE",
+   "hasWorkingCopy": false,
+   "hasTrigger": true,
+   "hasGeo": true,
+   "longTitle": false
+  },
+  {
+   "key": "peplos",
+   "id": "819d7e77-e283-4133-b556-f51d771eda5e",
+   "title": "Peplos Kore",
+   "status": "ACTIVE",
+   "hasWorkingCopy": true,
+   "hasTrigger": true,
+   "hasGeo": true,
+   "longTitle": false
+  },
+  {
+   "key": "chian",
+   "id": "c3ab7f07-6778-4013-baf9-68b876a5f454",
+   "title": "Chian Kore (Kore 675)",
+   "status": "ACTIVE",
+   "hasWorkingCopy": false,
+   "hasTrigger": false,
+   "hasGeo": true,
+   "longTitle": false
+  },
+  {
+   "key": "antenor",
+   "id": "2943a788-caa9-43d0-bf64-46f36e9a37b4",
+   "title": "Antenor Kore",
+   "status": "DRAFT",
+   "hasWorkingCopy": false,
+   "hasTrigger": false,
+   "hasGeo": false,
+   "longTitle": false
+  },
+  {
+   "key": "euthydikos",
+   "id": "c7d9ef27-2d13-4695-821b-7d7f75a6cf2a",
+   "title": "Kore of Euthydikos",
+   "status": "ACTIVE",
+   "hasWorkingCopy": false,
+   "hasTrigger": false,
+   "hasGeo": true,
+   "longTitle": false
+  },
+  {
+   "key": "neighbourhood",
+   "id": "a12564e2-1d45-4441-b421-ef3497979ef6",
+   "title": "Excavated Athenian Neighbourhood",
+   "status": "ACTIVE",
+   "hasWorkingCopy": false,
+   "hasTrigger": true,
+   "hasGeo": true,
+   "longTitle": false
+  },
+  {
+   "key": "household",
+   "id": "14d7a1e1-649a-4d84-a9b8-cd29786c0955",
+   "title": "Classical Household Pottery",
+   "status": "DRAFT",
+   "hasWorkingCopy": false,
+   "hasTrigger": false,
+   "hasGeo": true,
+   "longTitle": false
+  },
+  {
+   "key": "mosaic",
+   "id": "c4df4ce5-8b15-484b-8615-e669f413d296",
+   "title": "Bath Complex Floor Mosaic",
+   "status": "ACTIVE",
+   "hasWorkingCopy": true,
+   "hasTrigger": false,
+   "hasGeo": true,
+   "longTitle": false
+  },
+  {
+   "key": "reception",
+   "id": "74756f10-a914-4fb6-9710-4a63b8e97ca7",
+   "title": "Reception and Information Desk, Ticket Collection Point, Audio Guide Rental and Accessibility Assistance Counter (Ground Floor, Main Entrance)",
+   "status": "ACTIVE",
+   "hasWorkingCopy": false,
+   "hasTrigger": true,
+   "hasGeo": false,
+   "longTitle": true
+  },
+  {
+   "key": "cloak",
+   "id": "c54542eb-8df9-47ee-8a30-45abf9cc323e",
+   "title": "Cloakroom and Lockers",
+   "status": "ARCHIVED",
+   "hasWorkingCopy": false,
+   "hasTrigger": false,
+   "hasGeo": false,
+   "longTitle": false
+  },
+  {
+   "key": "shop",
+   "id": "8579c4de-d37e-43ae-95a9-db9aeb43ffd7",
+   "title": "Museum Shop",
+   "status": "ACTIVE",
+   "hasWorkingCopy": false,
+   "hasTrigger": false,
+   "hasGeo": false,
+   "longTitle": false
+  },
+  {
+   "key": "cafe",
+   "id": "b1b30bd9-49c9-40d1-8171-95dc02f66939",
+   "title": "Museum Café – Terrace Restaurant",
+   "status": "ACTIVE",
+   "hasWorkingCopy": false,
+   "hasTrigger": false,
+   "hasGeo": true,
+   "longTitle": false
+  },
+  {
+   "key": "terrace",
+   "id": "6f12125f-c1fb-4acf-9c03-1d81ced4372e",
+   "title": "Acropolis View Terrace",
+   "status": "ACTIVE",
+   "hasWorkingCopy": false,
+   "hasTrigger": true,
+   "hasGeo": true,
+   "longTitle": false
+  },
+  {
+   "key": "tempexh",
+   "id": "883b205a-15cb-4068-b1bc-b031bf5d857b",
+   "title": "Temporary Exhibitions Hall: “The Acropolis Through the Eyes of Travellers, Antiquarians and Photographers from the Seventeenth Century to Today”",
+   "status": "DRAFT",
+   "hasWorkingCopy": false,
+   "hasTrigger": false,
+   "hasGeo": true,
+   "longTitle": true
+  },
+  {
+   "key": "parthenon_t",
+   "id": "e2905a9e-2c6a-49a3-89f6-5639c94ee9fe",
+   "title": "Parthenon (Temple of Athena Parthenos)",
+   "status": "ACTIVE",
+   "hasWorkingCopy": true,
+   "hasTrigger": true,
+   "hasGeo": true,
+   "longTitle": false
+  },
+  {
+   "key": "erechtheion",
+   "id": "3f7ff52f-26b2-423a-9530-f8378acd07e5",
+   "title": "Erechtheion and the Porch of the Caryatids",
+   "status": "ACTIVE",
+   "hasWorkingCopy": true,
+   "hasTrigger": true,
+   "hasGeo": true,
+   "longTitle": false
+  },
+  {
+   "key": "nike",
+   "id": "87628a4c-90e1-4f0c-9aa0-70231d57e464",
+   "title": "Temple of Athena Nike",
+   "status": "ACTIVE",
+   "hasWorkingCopy": false,
+   "hasTrigger": true,
+   "hasGeo": true,
+   "longTitle": false
+  },
+  {
+   "key": "propylaea_p",
+   "id": "27144d6e-4c1e-450c-abf9-e3e5829d387f",
+   "title": "Propylaea Monumental Gateway",
+   "status": "ACTIVE",
+   "hasWorkingCopy": false,
+   "hasTrigger": false,
+   "hasGeo": true,
+   "longTitle": false
+  },
+  {
+   "key": "agrippa",
+   "id": "4628d204-5607-4e98-9f4b-e6142b85dacc",
+   "title": "Statue Base of Agrippa, the Monumental Pedestal Beside the Propylaea Originally Built for a Chariot Group Honouring Eumenes II of Pergamon",
+   "status": "ARCHIVED",
+   "hasWorkingCopy": false,
+   "hasTrigger": false,
+   "hasGeo": true,
+   "longTitle": true
+  },
+  {
+   "key": "oldtemple",
+   "id": "c2570945-7727-4cac-bc9d-29717ccb0c58",
+   "title": "Foundations of the Old Temple of Athena",
+   "status": "DRAFT",
+   "hasWorkingCopy": false,
+   "hasTrigger": false,
+   "hasGeo": false,
+   "longTitle": false
+  },
+  {
+   "key": "brauronia",
+   "id": "5466dc91-fc12-468c-be4d-1f1982420d22",
+   "title": "Sanctuary of Artemis Brauronia",
+   "status": "ARCHIVED",
+   "hasWorkingCopy": false,
+   "hasTrigger": false,
+   "hasGeo": true,
+   "longTitle": false
+  },
+  {
+   "key": "chalkotheke",
+   "id": "a43db55e-6203-4415-9a65-5da9c11757a5",
+   "title": "Chalkotheke",
+   "status": "DRAFT",
+   "hasWorkingCopy": false,
+   "hasTrigger": false,
+   "hasGeo": true,
+   "longTitle": false
+  },
+  {
+   "key": "orchestra",
+   "id": "d3ea8cb2-119d-47f2-b776-80e0903b972f",
+   "title": "Theatre of Dionysus Eleuthereus – Orchestra",
+   "status": "ACTIVE",
+   "hasWorkingCopy": false,
+   "hasTrigger": true,
+   "hasGeo": true,
+   "longTitle": false
+  },
+  {
+   "key": "bema",
+   "id": "757ce945-e6a6-4e20-8e43-decc7a572970",
+   "title": "Bema of Phaedrus",
+   "status": "ACTIVE",
+   "hasWorkingCopy": false,
+   "hasTrigger": false,
+   "hasGeo": true,
+   "longTitle": false
+  },
+  {
+   "key": "thrasyllos",
+   "id": "511861d7-16e3-40fb-87fd-705d7349e31c",
+   "title": "Choragic Monument of Thrasyllos – Cave Shrine Above the Theatre with the Statue of Dionysus Later Installed Within the Arch",
+   "status": "DRAFT",
+   "hasWorkingCopy": false,
+   "hasTrigger": false,
+   "hasGeo": false,
+   "longTitle": true
+  },
+  {
+   "key": "hephaestus",
+   "id": "2de087a7-f384-4eed-a2f6-25f5332c3075",
+   "title": "Temple of Hephaestus",
+   "status": "ACTIVE",
+   "hasWorkingCopy": true,
+   "hasTrigger": true,
+   "hasGeo": true,
+   "longTitle": false
+  },
+  {
+   "key": "stoa_f",
+   "id": "63fb97a6-30d7-49c1-9013-c45242cf70fa",
+   "title": "Stoa of Attalos (Facade)",
+   "status": "ACTIVE",
+   "hasWorkingCopy": false,
+   "hasTrigger": false,
+   "hasGeo": true,
+   "longTitle": false
+  },
+  {
+   "key": "solaki",
+   "id": "6b5264b5-beba-43fd-9cac-5bb51c7c3fe9",
+   "title": "Church of the Holy Apostles of Solaki (c. 1000 AD), an Eleventh-Century Byzantine Cross-in-Square Church Restored by the American School in the 1950s",
+   "status": "ACTIVE",
+   "hasWorkingCopy": false,
+   "hasTrigger": true,
+   "hasGeo": true,
+   "longTitle": true
+  },
+  {
+   "key": "tholos",
+   "id": "e5356b6c-de87-41cd-bec5-7a70bcef67ff",
+   "title": "Tholos",
+   "status": "ACTIVE",
+   "hasWorkingCopy": false,
+   "hasTrigger": true,
+   "hasGeo": true,
+   "longTitle": false
+  },
+  {
+   "key": "altar",
+   "id": "47ec879c-3601-4092-8246-7fe8edad5df3",
+   "title": "Altar of the Twelve Gods",
+   "status": "DRAFT",
+   "hasWorkingCopy": false,
+   "hasTrigger": false,
+   "hasGeo": true,
+   "longTitle": false
+  },
+  {
+   "key": "gate",
+   "id": "52afa185-ba47-42fe-992d-b87f982692e3",
+   "title": "Ancient Agora Entrance and Ticket Office",
+   "status": "ACTIVE",
+   "hasWorkingCopy": false,
+   "hasTrigger": true,
+   "hasGeo": true,
+   "longTitle": false
+  },
+  {
+   "key": "ostraka",
+   "id": "650e942d-8f56-489c-aea1-2fd3c70f117b",
+   "title": "Ostraka and the Ostracism Vote",
+   "status": "ACTIVE",
+   "hasWorkingCopy": false,
+   "hasTrigger": false,
+   "hasGeo": true,
+   "longTitle": false
+  },
+  {
+   "key": "klepsydra",
+   "id": "d44feee5-38c2-41b1-bf98-097f078d8384",
+   "title": "Klepsydra Water Clock",
+   "status": "ACTIVE",
+   "hasWorkingCopy": false,
+   "hasTrigger": true,
+   "hasGeo": true,
+   "longTitle": false
+  },
+  {
+   "key": "kleroterion",
+   "id": "c5e9a66f-634f-4c99-9339-321e262b8485",
+   "title": "Kleroterion Allotment Machine",
+   "status": "DRAFT",
+   "hasWorkingCopy": false,
+   "hasTrigger": false,
+   "hasGeo": true,
+   "longTitle": false
+  }
+ ],
+ "routes": [
+  {
+   "key": "acro",
+   "id": "9743e460-8351-4897-8ee5-eecc13fcbf19",
+   "title": "Acropolis Highlights – Classical Walk",
+   "status": "ACTIVE",
+   "stops": 7,
+   "hasWorkingCopy": false
+  },
+  {
+   "key": "museum",
+   "id": "99ce0154-8b2b-40dc-ac08-a0cd0dea2872",
+   "title": "Museum Masterpieces – One Hour Tour",
+   "status": "ACTIVE",
+   "stops": 8,
+   "hasWorkingCopy": false
+  },
+  {
+   "key": "agora",
+   "id": "e415a909-58aa-433d-b16b-fd735896979c",
+   "title": "Ancient Agora Archaeological Loop",
+   "status": "DRAFT",
+   "stops": 5,
+   "hasWorkingCopy": false
+  },
+  {
+   "key": "family",
+   "id": "d73250f8-85ff-44ae-a758-e269d1b8e5dc",
+   "title": "Family Trail: Myths and Monsters",
+   "status": "ACTIVE",
+   "stops": 5,
+   "hasWorkingCopy": true
+  },
+  {
+   "key": "sunset",
+   "id": "5f0df572-42ae-40dc-b46b-39f3471709b4",
+   "title": "Acropolis Slopes Sunset Stroll",
+   "status": "DRAFT",
+   "stops": 1,
+   "hasWorkingCopy": false
+  },
+  {
+   "key": "old",
+   "id": "91310665-d304-4a3c-9aee-ab71984b2259",
+   "title": "Old Town Walk (retired 2025)",
+   "status": "ARCHIVED",
+   "stops": 2,
+   "hasWorkingCopy": false
+  }
+ ],
+ "guides": [
+  {
+   "key": "parthenon",
+   "id": "bcc7d2be-50ef-46cb-85e2-ced86c6559a3",
+   "title": "The Story of the Parthenon: From Temple to Monument",
+   "status": "ACTIVE",
+   "blocks": 18,
+   "hasWorkingCopy": true
+  },
+  {
+   "key": "caryatids",
+   "id": "1c85f8b3-6ecd-4580-a13a-96df5823d863",
+   "title": "The Erechtheion and the Caryatids – A Visitor’s Companion",
+   "status": "ACTIVE",
+   "blocks": 16,
+   "hasWorkingCopy": false
+  },
+  {
+   "key": "agora",
+   "id": "35bc2737-7b97-44fd-bdb4-85f3fb65846c",
+   "title": "Everyday Life in the Ancient Agora",
+   "status": "DRAFT",
+   "blocks": 14,
+   "hasWorkingCopy": false
+  },
+  {
+   "key": "korai",
+   "id": "728ac2ce-050c-4162-ae57-33c734f0cb4a",
+   "title": "Reading the Archaic Korai: Colour, Gesture and Craft",
+   "status": "ACTIVE",
+   "blocks": 20,
+   "hasWorkingCopy": false
+  },
+  {
+   "key": "museum",
+   "id": "e1a8287b-9947-4aa3-9340-7f8458f647a0",
+   "title": "A Short History of the Museum Building",
+   "status": "ARCHIVED",
+   "blocks": 8,
+   "hasWorkingCopy": false
+  }
+ ],
+ "events": [
+  {
+   "key": "fullmoon",
+   "id": "6e8462e3-a8b5-4f4b-a625-6140c1fd117e",
+   "title": "Full Moon Night at the Acropolis",
+   "status": "ACTIVE"
+  },
+  {
+   "key": "panathenaic",
+   "id": "1f98cf73-333c-4257-a43c-5026500e836d",
+   "title": "Panathenaic Procession Reenactment",
+   "status": "ACTIVE"
+  },
+  {
+   "key": "lateopening",
+   "id": "b43c1b5c-e78f-4a46-92d5-57a4afedeada",
+   "title": "Late Opening: Friday Nights at the Museum",
+   "status": "ACTIVE"
+  },
+  {
+   "key": "lamp",
+   "id": "e48b6489-181e-4a9d-9f7d-92df4e147951",
+   "title": "Family Workshop: Make Your Own Clay Lamp",
+   "status": "ACTIVE"
+  },
+  {
+   "key": "lectures",
+   "id": "baaa64b3-8ed8-4369-94bd-471c4980e289",
+   "title": "Agora Archaeology Lecture Series",
+   "status": "DRAFT"
+  },
+  {
+   "key": "concerts",
+   "id": "78403f0f-185c-430c-936d-92cbb9ecc36d",
+   "title": "Summer Evening Concerts at the Theatre of Dionysus",
+   "status": "ACTIVE"
+  },
+  {
+   "key": "closed",
+   "id": "f9b9bc43-822a-4d21-897d-c909712994ac",
+   "title": "Gallery Closed for Conservation Works (ended)",
+   "status": "ARCHIVED"
+  }
+ ],
+ "categories": [
+  {
+   "key": "monuments",
+   "id": "79aaf581-d009-4294-a11b-bf5a8fa980f3",
+   "scope": "POI",
+   "parent": null,
+   "name": "Monuments and Temples",
+   "status": "ACTIVE",
+   "icon": "monument"
+  },
+  {
+   "key": "sculpture",
+   "id": "15e8fb19-dd6d-4de2-b8e3-4d55f5fb37b9",
+   "scope": "POI",
+   "parent": null,
+   "name": "Sculpture",
+   "status": "ACTIVE",
+   "icon": "statue"
+  },
+  {
+   "key": "pottery",
+   "id": "4bed7fe0-fb5d-450b-a8ae-536418b6c2db",
+   "scope": "POI",
+   "parent": null,
+   "name": "Pottery and Everyday Life",
+   "status": "ACTIVE",
+   "icon": "vase"
+  },
+  {
+   "key": "services",
+   "id": "615d3d67-3658-4c7d-848c-dcb52c2ecb59",
+   "scope": "POI",
+   "parent": null,
+   "name": "Visitor Services",
+   "status": "ACTIVE",
+   "icon": "info"
+  },
+  {
+   "key": "food",
+   "id": "51c12bfc-c55a-40b3-8829-fcf656677449",
+   "scope": "POI",
+   "parent": "services",
+   "name": "Food and Drink",
+   "status": "ACTIVE",
+   "icon": "food"
+  },
+  {
+   "key": "shops",
+   "id": "5b33752a-0ce8-4c3c-984d-a81ee5fea7cd",
+   "scope": "POI",
+   "parent": "services",
+   "name": "Shops",
+   "status": "ACTIVE",
+   "icon": "shop"
+  },
+  {
+   "key": "views",
+   "id": "a62fbe08-3519-4900-be5e-040704c72633",
+   "scope": "POI",
+   "parent": null,
+   "name": "Viewpoints",
+   "status": "ACTIVE",
+   "icon": "view"
+  },
+  {
+   "key": "walks",
+   "id": "9a8829d4-4004-4c23-9a83-f7262675cf3e",
+   "scope": "ROUTE",
+   "parent": null,
+   "name": "Guided Walks",
+   "status": "ACTIVE",
+   "icon": "trail"
+  },
+  {
+   "key": "family",
+   "id": "66f0bb54-6d31-43b4-bd7a-0753cb43cb78",
+   "scope": "ROUTE",
+   "parent": "walks",
+   "name": "Family Trails",
+   "status": "ACTIVE",
+   "icon": "family"
+  },
+  {
+   "key": "cycling",
+   "id": "699ad286-590e-44ba-be74-aa7417675ce9",
+   "scope": "ROUTE",
+   "parent": "walks",
+   "name": "Cycling Itineraries",
+   "status": "ACTIVE",
+   "icon": "bike"
+  },
+  {
+   "key": "themes",
+   "id": "a63918a5-f062-40e2-9104-223b1b1686d2",
+   "scope": "ROUTE",
+   "parent": null,
+   "name": "Thematic Itineraries",
+   "status": "ACTIVE",
+   "icon": "building"
+  }
+ ],
+ "maps": [
+  {
+   "id": "5eef6cab-a61e-419e-adff-053edfff9939",
+   "name": "Acropolis and South Slope – visitor map",
+   "status": "ACTIVE",
+   "placeId": "615cf675-15a6-42cc-9ce8-24ec217f44ce"
+  },
+  {
+   "id": "6e8b821a-63ca-48b7-93a2-2c53090dcd82",
+   "name": "Ancient Agora – site map",
+   "status": "ACTIVE",
+   "placeId": "b887ed0a-88ed-4bf6-8eb6-6b1516e89b7f"
+  }
+ ],
+ "floorPlans": [
+  {
+   "id": "d40864d1-684a-466f-819d-68fa651b7146",
+   "name": "Acropolis Museum – Parthenon Gallery plan",
+   "status": "ACTIVE",
+   "placeId": "0551e49d-4b18-43dd-8219-edf8d219e76d"
+  },
+  {
+   "id": "753ccbd3-183c-4a59-b413-ca91e9d68aa5",
+   "name": "Acropolis Museum – Archaic Gallery plan",
+   "status": "ACTIVE",
+   "placeId": "5f6aa074-bc17-4a4d-8884-79c807294168"
+  }
+ ],
+ "assets": [
+  {
+   "key": "a_parthenon_dawn",
+   "id": "484a6bb2-d08c-41df-aa7c-d8cf2a2f1823",
+   "kind": "IMAGE",
+   "name": "parthenon-west-dawn",
+   "status": "ACTIVE",
+   "mime": "image/jpeg"
+  },
+  {
+   "key": "a_frieze",
+   "id": "5b1832c9-7931-4f25-b0dc-bce27dbfc2a6",
+   "kind": "IMAGE",
+   "name": "frieze-detail",
+   "status": "ACTIVE",
+   "mime": "image/png"
+  },
+  {
+   "key": "a_peplos",
+   "id": "d742656f-bd54-4ba8-a884-2c9d9a7702e4",
+   "kind": "IMAGE",
+   "name": "peplos-kore",
+   "status": "ACTIVE",
+   "mime": "image/jpeg"
+  },
+  {
+   "key": "a_erechtheion",
+   "id": "b5a0cee3-9950-41c7-a03b-3eaff0479f03",
+   "kind": "IMAGE",
+   "name": "erechtheion-caryatids",
+   "status": "ACTIVE",
+   "mime": "image/png"
+  },
+  {
+   "key": "a_agora",
+   "id": "cd93bfc0-c95a-41b1-bd3e-fc0f7452f29e",
+   "kind": "IMAGE",
+   "name": "agora-hephaestus",
+   "status": "ACTIVE",
+   "mime": "image/jpeg"
+  },
+  {
+   "key": "a_theatre",
+   "id": "62dc3636-77b1-4d83-98a3-6487724d192e",
+   "kind": "IMAGE",
+   "name": "theatre-dionysus",
+   "status": "ACTIVE",
+   "mime": "image/jpeg"
+  },
+  {
+   "key": "a_nike",
+   "id": "b30b6f73-6b17-4595-979a-d4fdaf84e293",
+   "kind": "IMAGE",
+   "name": "nike-temple",
+   "status": "ACTIVE",
+   "mime": "image/png"
+  },
+  {
+   "key": "a_rampin",
+   "id": "5e3be6da-6321-4b27-9e37-0b85e7096835",
+   "kind": "IMAGE",
+   "name": "rampin-rider",
+   "status": "ACTIVE",
+   "mime": "image/jpeg"
+  },
+  {
+   "key": "a_typhon",
+   "id": "d4d0f2fd-4894-49d9-a084-b5d8cf844c18",
+   "kind": "IMAGE",
+   "name": "typhon",
+   "status": "DRAFT",
+   "mime": "image/png"
+  },
+  {
+   "key": "a_slopes",
+   "id": "3bb04707-9c50-4f32-8ade-0ff72b6186a8",
+   "kind": "IMAGE",
+   "name": "slopes-excavation",
+   "status": "ACTIVE",
+   "mime": "image/jpeg"
+  },
+  {
+   "key": "a_ostrakon",
+   "id": "0c1e5477-3beb-492f-89b3-82253e95776c",
+   "kind": "IMAGE",
+   "name": "ostrakon-themistocles",
+   "status": "ACTIVE",
+   "mime": "image/jpeg"
+  },
+  {
+   "key": "a_klepsydra",
+   "id": "ef5b3867-eb1a-4ded-b8f2-89d829d9d041",
+   "kind": "IMAGE",
+   "name": "klepsydra",
+   "status": "ACTIVE",
+   "mime": "image/png"
+  },
+  {
+   "key": "a_cafe",
+   "id": "9b475814-96d5-44c1-8b7a-60e0d2e64b13",
+   "kind": "IMAGE",
+   "name": "terrace-cafe",
+   "status": "DRAFT",
+   "mime": "image/jpeg"
+  },
+  {
+   "key": "a_shop",
+   "id": "8942947b-2b65-4b86-9ff7-390db64cd4bd",
+   "kind": "IMAGE",
+   "name": "museum-shop",
+   "status": "DRAFT",
+   "mime": "image/jpeg"
+  },
+  {
+   "key": "a_map_thumb",
+   "id": "2dbf96b6-1548-4b38-a083-d2f3984870e0",
+   "kind": "IMAGE",
+   "name": "tiny-thumbnail",
+   "status": "ACTIVE",
+   "mime": "image/png"
+  },
+  {
+   "key": "a_panorama",
+   "id": "1d116576-ab6c-4df4-b104-8285b815eb54",
+   "kind": "IMAGE",
+   "name": "acropolis-panorama",
+   "status": "ACTIVE",
+   "mime": "image/jpeg"
+  },
+  {
+   "key": "a_border",
+   "id": "c47b9d97-79d7-411b-add8-5c77fc3043b7",
+   "kind": "IMAGE",
+   "name": "meander-border",
+   "status": "ACTIVE",
+   "mime": "image/png"
+  },
+  {
+   "key": "a_noalt",
+   "id": "2d37dd54-6747-4f62-b6ff-a3442634a1cc",
+   "kind": "IMAGE",
+   "name": "storeroom-shelves",
+   "status": "DRAFT",
+   "mime": "image/jpeg"
+  },
+  {
+   "key": "fp_parthenon",
+   "id": "a391eb1d-231c-4c7e-9ad8-6120aff2f06b",
+   "kind": "FLOOR_PLAN",
+   "name": "plan-parthenon-gallery",
+   "status": "ACTIVE",
+   "mime": "image/png"
+  },
+  {
+   "key": "fp_archaic",
+   "id": "e0aade9c-345b-44d0-b32d-a6fc9e52ba92",
+   "kind": "FLOOR_PLAN",
+   "name": "plan-archaic-gallery",
+   "status": "ACTIVE",
+   "mime": "image/png"
+  },
+  {
+   "key": "au_frieze",
+   "id": "cd03daa8-2684-4f8b-84b8-f674babe501b",
+   "kind": "AUDIO",
+   "name": "audio-frieze-en",
+   "status": "ACTIVE",
+   "mime": "audio/wav"
+  },
+  {
+   "key": "au_peplos",
+   "id": "f2ca8f6a-9f21-4718-9519-bcdd59cbe837",
+   "kind": "AUDIO",
+   "name": "audio-peplos-kore",
+   "status": "ACTIVE",
+   "mime": "audio/wav"
+  },
+  {
+   "key": "au_parthenon",
+   "id": "ccad609e-f945-45ad-9a5e-fad0751afd97",
+   "kind": "AUDIO",
+   "name": "audio-parthenon-overview",
+   "status": "ACTIVE",
+   "mime": "audio/wav"
+  },
+  {
+   "key": "au_erechtheion",
+   "id": "f7e15ab8-e159-4a09-8edf-5c6c60e10263",
+   "kind": "AUDIO",
+   "name": "audio-erechtheion",
+   "status": "DRAFT",
+   "mime": "audio/wav"
+  },
+  {
+   "key": "au_moschophoros",
+   "id": "156048bb-e917-4841-8172-ead5ee8c3831",
+   "kind": "AUDIO",
+   "name": "audio-moschophoros",
+   "status": "ACTIVE",
+   "mime": "audio/wav"
+  },
+  {
+   "key": "au_ambient",
+   "id": "3f753bb5-535f-48ec-a604-b1cb4d6df9c2",
+   "kind": "AUDIO",
+   "name": "ambient-agora",
+   "status": "ACTIVE",
+   "mime": "audio/wav"
+  },
+  {
+   "key": "v_dionysos",
+   "id": "c7b76a72-8313-4f1e-8d99-90651da6bafe",
+   "kind": "VIDEO",
+   "name": "video-dionysos-restoration",
+   "status": "ACTIVE",
+   "mime": "video/webm"
+  },
+  {
+   "key": "v_slopes",
+   "id": "74767334-2b12-4e95-bcb3-2f22c92a79d4",
+   "kind": "VIDEO",
+   "name": "video-slopes-tour",
+   "status": "ACTIVE",
+   "mime": "video/webm"
+  },
+  {
+   "key": "v_clip",
+   "id": "b6cc81a0-d9b7-4629-8716-0bdf0f912fdd",
+   "kind": "VIDEO",
+   "name": "video-conservation-clip",
+   "status": "DRAFT",
+   "mime": "video/webm"
+  },
+  {
+   "key": "d_map",
+   "id": "b8c67518-8f82-44ca-a62f-b56d518f04ba",
+   "kind": "DOCUMENT",
+   "name": "visitor-map-printable.pdf",
+   "status": "ACTIVE",
+   "mime": "application/pdf"
+  },
+  {
+   "key": "d_access",
+   "id": "8eff6dff-4f39-40a8-97b1-ac7a870415e8",
+   "kind": "DOCUMENT",
+   "name": "accessibility-guide.pdf",
+   "status": "ACTIVE",
+   "mime": "application/pdf"
+  },
+  {
+   "key": "d_press",
+   "id": "a8350c2f-0a06-4afe-ae77-017fc0bfb1b4",
+   "kind": "DOCUMENT",
+   "name": "press-kit-2026.pdf",
+   "status": "ARCHIVED",
+   "mime": "application/pdf"
+  },
+  {
+   "key": "d_notes",
+   "id": "5fc54fa9-fa42-4295-a661-31bb3e28496f",
+   "kind": "DOCUMENT",
+   "name": "curatorial-notes.txt",
+   "status": "DRAFT",
+   "mime": "text/plain"
+  }
+ ],
+ "triggers": [
+  {
+   "id": "0e570ab5-c25a-456f-8c1c-02e3b1a41cd7",
+   "type": "QR_CODE",
+   "target": "546c5177-effd-49c8-acae-85d751f89bbe",
+   "code": "frieze-101"
+  },
+  {
+   "id": "0524b13b-b753-464f-835b-4543a74e6f49",
+   "type": "QR_CODE",
+   "target": "9d32bf3f-6d1b-4ab1-a129-f52f4a890403",
+   "code": "pediment-102"
+  },
+  {
+   "id": "ef4c2fff-efe2-4fed-ae53-6ca32365c26a",
+   "type": "QR_CODE",
+   "target": "f38d32c7-380c-412c-8ed5-bd3095e42556",
+   "code": "moschophoros-107"
+  },
+  {
+   "id": "3f89bdda-4e20-470e-8ee0-a6602bfbd21e",
+   "type": "GEO_PROXIMITY",
+   "target": "00ee3bc2-afdb-4931-a515-03b96a76b7a4",
+   "code": null
+  },
+  {
+   "id": "3c333a40-2970-4bd6-809c-b897b4b09310",
+   "type": "QR_CODE",
+   "target": "819d7e77-e283-4133-b556-f51d771eda5e",
+   "code": "peplos-112"
+  },
+  {
+   "id": "432c66f3-86b0-4a49-836b-e575f41fa19a",
+   "type": "BEACON",
+   "target": "a12564e2-1d45-4441-b421-ef3497979ef6",
+   "code": null
+  },
+  {
+   "id": "be61918d-c62b-490c-999c-18b4cef2d054",
+   "type": "QR_CODE",
+   "target": "74756f10-a914-4fb6-9710-4a63b8e97ca7",
+   "code": "reception-119"
+  },
+  {
+   "id": "a508bc0f-3bf8-41fd-929c-e6abb4320d44",
+   "type": "GEO_PROXIMITY",
+   "target": "6f12125f-c1fb-4acf-9c03-1d81ced4372e",
+   "code": null
+  },
+  {
+   "id": "db336c8e-36f1-47cb-9b6d-46b3f4d3b0d4",
+   "type": "GEO_PROXIMITY",
+   "target": "e2905a9e-2c6a-49a3-89f6-5639c94ee9fe",
+   "code": null
+  },
+  {
+   "id": "4d6affe3-1cc8-4585-87aa-7f4f39003a27",
+   "type": "QR_CODE",
+   "target": "3f7ff52f-26b2-423a-9530-f8378acd07e5",
+   "code": "erechtheion-126"
+  },
+  {
+   "id": "85e74de9-bb05-416e-8ee9-dc2551e3bbcf",
+   "type": "QR_CODE",
+   "target": "87628a4c-90e1-4f0c-9aa0-70231d57e464",
+   "code": "nike-127"
+  },
+  {
+   "id": "9c11a29d-db10-452c-aa93-5032546838c6",
+   "type": "GEO_PROXIMITY",
+   "target": "d3ea8cb2-119d-47f2-b776-80e0903b972f",
+   "code": null
+  },
+  {
+   "id": "997049b7-aa71-4ead-896b-2944979a66c5",
+   "type": "GEO_PROXIMITY",
+   "target": "2de087a7-f384-4eed-a2f6-25f5332c3075",
+   "code": null
+  },
+  {
+   "id": "0275449d-8cdd-4fa4-84b0-ab8d7e1e8dd5",
+   "type": "QR_CODE",
+   "target": "6b5264b5-beba-43fd-9cac-5bb51c7c3fe9",
+   "code": "solaki-138"
+  },
+  {
+   "id": "c9bd8c8d-bffa-4d4f-835e-b41dc0d1bceb",
+   "type": "BEACON",
+   "target": "e5356b6c-de87-41cd-bec5-7a70bcef67ff",
+   "code": null
+  },
+  {
+   "id": "1a9c0fe9-a8ac-41bc-a2cc-a8327defbb98",
+   "type": "QR_CODE",
+   "target": "52afa185-ba47-42fe-992d-b87f982692e3",
+   "code": "gate-141"
+  },
+  {
+   "id": "db812ace-7e66-465f-a706-e4077d5df07c",
+   "type": "BEACON",
+   "target": "d44feee5-38c2-41b1-bf98-097f078d8384",
+   "code": null
+  },
+  {
+   "id": "db6975b1-1257-4512-b34b-dacedf4951b5",
+   "type": "QR_CODE",
+   "target": "40cab7b2-a7f7-4057-b56e-5605a589156f",
+   "code": "av54v8fy"
+  },
+  {
+   "id": "4860eef8-3566-49c4-964c-3a89c0943640",
+   "type": "QR_CODE",
+   "target": "1af84426-8230-46ee-8ab4-7edecaa9b20f",
+   "code": "zqk6rh3d"
+  },
+  {
+   "id": "7c92a2ac-f162-452a-81dc-633123aa9da8",
+   "type": "QR_CODE",
+   "target": "e85c94b4-f31f-4d1c-8711-dd4fe7695fc6",
+   "code": "zsn9sjfu"
+  },
+  {
+   "id": "83edca54-c5e6-412a-b4fe-36589a02e4a9",
+   "type": "QR_CODE",
+   "target": "52c284e3-db56-4f88-a860-eef712c7f58e",
+   "code": "34wmpf8r"
+  },
+  {
+   "id": "3c5a9d97-033c-43d0-b058-be063b581c5a",
+   "type": "QR_CODE",
+   "target": "061eca49-e97e-483a-b48f-3dff0d96a3cc",
+   "code": "ney8rg5q"
+  },
+  {
+   "id": "0a193096-8de7-445c-9b62-eb5cd68745d8",
+   "type": "QR_CODE",
+   "target": "6b4035d1-bacc-46d0-9772-5bcfb4a6f492",
+   "code": "6gp4qm43"
+  },
+  {
+   "id": "ba5ede05-2293-4427-8397-de25bb1c2428",
+   "type": "QR_CODE",
+   "target": "57d05371-0303-4f11-bcea-cab34522be19",
+   "code": "frynfw2g"
+  },
+  {
+   "id": "cbe9fbda-532c-49b8-92b6-d28e636ce061",
+   "type": "QR_CODE",
+   "target": "b7fa9ab8-402a-405f-bfaa-8aa0776efed2",
+   "code": "f4ebbtad"
+  },
+  {
+   "id": "5e4b8273-74af-45aa-836e-03b2b966e364",
+   "type": "QR_CODE",
+   "target": "513ac2fc-68df-47dd-b5a3-f72468513482",
+   "code": "zqdfkkk8"
+  },
+  {
+   "id": "c05f4a5c-5682-45c4-b68a-d4f65a1791f5",
+   "type": "GEO_PROXIMITY",
+   "target": "40cab7b2-a7f7-4057-b56e-5605a589156f",
+   "code": null
+  },
+  {
+   "id": "66df9f10-63bc-4820-b6da-09d2d0ce9e70",
+   "type": "GEO_PROXIMITY",
+   "target": "1af84426-8230-46ee-8ab4-7edecaa9b20f",
+   "code": null
+  },
+  {
+   "id": "c85c05d7-4913-41c0-803d-d495d7d76a77",
+   "type": "GEO_PROXIMITY",
+   "target": "e85c94b4-f31f-4d1c-8711-dd4fe7695fc6",
+   "code": null
+  },
+  {
+   "id": "ccc858e0-1d44-43cb-bf20-eab2ee4e1a19",
+   "type": "BEACON",
+   "target": "52c284e3-db56-4f88-a860-eef712c7f58e",
+   "code": null
+  },
+  {
+   "id": "bf5c6999-2fa6-4da8-8a27-58262b0b95e4",
+   "type": "GEO_PROXIMITY",
+   "target": "061eca49-e97e-483a-b48f-3dff0d96a3cc",
+   "code": null
+  },
+  {
+   "id": "81823763-077f-46c2-9309-a4dc9f83ec83",
+   "type": "GEO_PROXIMITY",
+   "target": "6b4035d1-bacc-46d0-9772-5bcfb4a6f492",
+   "code": null
+  },
+  {
+   "id": "4d7de986-a39f-46df-b42f-bb8a00e2f941",
+   "type": "GEO_PROXIMITY",
+   "target": "57d05371-0303-4f11-bcea-cab34522be19",
+   "code": null
+  },
+  {
+   "id": "e3d4e237-6174-4065-97b2-84a55074b759",
+   "type": "BEACON",
+   "target": "b7fa9ab8-402a-405f-bfaa-8aa0776efed2",
+   "code": null
+  },
+  {
+   "id": "0374bc53-2479-4c5f-8966-570b308b5b68",
+   "type": "QR_CODE",
+   "target": "513ac2fc-68df-47dd-b5a3-f72468513482",
+   "code": "sgs5yj9j"
+  },
+  {
+   "id": "ba03c062-3172-4c10-9830-b60e70f2e08d",
+   "type": "GEO_PROXIMITY",
+   "target": "52c284e3-db56-4f88-a860-eef712c7f58e",
+   "code": null
+  },
+  {
+   "id": "ac014171-7c9a-467e-8383-09da493fdb5a",
+   "type": "GEO_PROXIMITY",
+   "target": "b7fa9ab8-402a-405f-bfaa-8aa0776efed2",
+   "code": null
+  },
+  {
+   "id": "ba67a1b6-c9c1-4ada-9c0e-a9ea7276b8c8",
+   "type": "QR_CODE",
+   "target": "513ac2fc-68df-47dd-b5a3-f72468513482",
+   "code": "c53qrb9c"
+  }
+ ],
+ "languages": [
+  "en (default)",
+  "el",
+  "it (partial)"
+ ],
+ "accountUsed": {
+  "createAndInitializeProject": "admin",
+  "openPopulated_curator": 404,
+  "openPopulated_admin": 200,
+  "content": "admin",
+  "curatorCanOpen_populated": 404,
+  "curatorReadiness_populated": 404,
+  "curatorCanOpen_empty": 404,
+  "curatorReadiness_empty": 404
+ },
+ "failures": [
+  "asset museum-shop -> ACTIVE: POST /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/assets/8942947b-2b65-4b86-9ff7-390db64cd4bd/status -> 422 {\"type\":\"urn:uniche:iguide:problem:VALIDATION_ERROR\",\"title\":\"Validation error\",\"status\":422,\"detail\":\"The image needs a text alternative.\",\"code\":\"VALIDATION_ERROR\",\"requestId\":\"322de1e5-1b10-4edd-804a-b20bddb43db0\",\"errors\":[{\"path\":\"translations.en.alternativeText\",\"code\":\"MISSING_REQUIRED_FIELDS\",\"message\":\"Is required in the default language unless the i",
+  "asset storeroom-shelves -> ACTIVE: POST /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/assets/2d37dd54-6747-4f62-b6ff-a3442634a1cc/status -> 422 {\"type\":\"urn:uniche:iguide:problem:VALIDATION_ERROR\",\"title\":\"Validation error\",\"status\":422,\"detail\":\"The image needs a text alternative.\",\"code\":\"VALIDATION_ERROR\",\"requestId\":\"99072af5-885f-4e80-84ff-ad825f616a6c\",\"errors\":[{\"path\":\"translations.en.alternativeText\",\"code\":\"MISSING_REQUIRED_FIELDS\",\"message\":\"Is required in the default language unless"
+ ],
+ "notes": [
+  "Project UX Audit – Populated created by admin"
+ ],
+ "readiness": {
+  "activatable": true,
+  "blocking": [],
+  "warnings": [
+   {
+    "resourceType": "PLACE",
+    "resourceId": "e5932358-078d-4872-a903-8b726793b9d5",
+    "title": "Acropolis Museum",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "e5932358-078d-4872-a903-8b726793b9d5",
+    "title": "Acropolis Museum",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "e5932358-078d-4872-a903-8b726793b9d5",
+    "title": "Acropolis Museum",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "e5932358-078d-4872-a903-8b726793b9d5",
+    "title": "Acropolis Museum",
+    "languageCode": "it",
+    "path": "translations.it.visitorInformation",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "615cf675-15a6-42cc-9ce8-24ec217f44ce",
+    "title": "Acropolis of Athens",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "615cf675-15a6-42cc-9ce8-24ec217f44ce",
+    "title": "Acropolis of Athens",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "615cf675-15a6-42cc-9ce8-24ec217f44ce",
+    "title": "Acropolis of Athens",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "615cf675-15a6-42cc-9ce8-24ec217f44ce",
+    "title": "Acropolis of Athens",
+    "languageCode": "it",
+    "path": "translations.it.visitorInformation",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "b887ed0a-88ed-4bf6-8eb6-6b1516e89b7f",
+    "title": "Ancient Agora of Athens",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "b887ed0a-88ed-4bf6-8eb6-6b1516e89b7f",
+    "title": "Ancient Agora of Athens",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "b887ed0a-88ed-4bf6-8eb6-6b1516e89b7f",
+    "title": "Ancient Agora of Athens",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "b887ed0a-88ed-4bf6-8eb6-6b1516e89b7f",
+    "title": "Ancient Agora of Athens",
+    "languageCode": "it",
+    "path": "translations.it.visitorInformation",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "9ce7037d-d9bd-4450-812c-3fee540bf71b",
+    "title": "Athens Historic Centre",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "9ce7037d-d9bd-4450-812c-3fee540bf71b",
+    "title": "Athens Historic Centre",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "9ce7037d-d9bd-4450-812c-3fee540bf71b",
+    "title": "Athens Historic Centre",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "9ce7037d-d9bd-4450-812c-3fee540bf71b",
+    "title": "Athens Historic Centre",
+    "languageCode": "it",
+    "path": "translations.it.visitorInformation",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "5f6aa074-bc17-4a4d-8884-79c807294168",
+    "title": "First Floor – Archaic Gallery",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "5f6aa074-bc17-4a4d-8884-79c807294168",
+    "title": "First Floor – Archaic Gallery",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "5f6aa074-bc17-4a4d-8884-79c807294168",
+    "title": "First Floor – Archaic Gallery",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "5f6aa074-bc17-4a4d-8884-79c807294168",
+    "title": "First Floor – Archaic Gallery",
+    "languageCode": "it",
+    "path": "translations.it.visitorInformation",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "0551e49d-4b18-43dd-8219-edf8d219e76d",
+    "title": "Parthenon Gallery",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "0551e49d-4b18-43dd-8219-edf8d219e76d",
+    "title": "Parthenon Gallery",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "0551e49d-4b18-43dd-8219-edf8d219e76d",
+    "title": "Parthenon Gallery",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "0551e49d-4b18-43dd-8219-edf8d219e76d",
+    "title": "Parthenon Gallery",
+    "languageCode": "it",
+    "path": "translations.it.visitorInformation",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "f718c534-0292-4ad1-94ea-84a65997ca2a",
+    "title": "Propylaea and Temple of Athena Nike",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "f718c534-0292-4ad1-94ea-84a65997ca2a",
+    "title": "Propylaea and Temple of Athena Nike",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "f718c534-0292-4ad1-94ea-84a65997ca2a",
+    "title": "Propylaea and Temple of Athena Nike",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "f718c534-0292-4ad1-94ea-84a65997ca2a",
+    "title": "Propylaea and Temple of Athena Nike",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "f718c534-0292-4ad1-94ea-84a65997ca2a",
+    "title": "Propylaea and Temple of Athena Nike",
+    "languageCode": "it",
+    "path": "translations.it.visitorInformation",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "765727b3-e9c4-45e0-8bd1-15becd016d35",
+    "title": "Stoa of Attalos Museum",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "765727b3-e9c4-45e0-8bd1-15becd016d35",
+    "title": "Stoa of Attalos Museum",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "765727b3-e9c4-45e0-8bd1-15becd016d35",
+    "title": "Stoa of Attalos Museum",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "765727b3-e9c4-45e0-8bd1-15becd016d35",
+    "title": "Stoa of Attalos Museum",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "765727b3-e9c4-45e0-8bd1-15becd016d35",
+    "title": "Stoa of Attalos Museum",
+    "languageCode": "it",
+    "path": "translations.it.visitorInformation",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "38e6ac4d-9643-40ac-95e3-9fd3db7370c6",
+    "title": "Theatre of Dionysus",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "38e6ac4d-9643-40ac-95e3-9fd3db7370c6",
+    "title": "Theatre of Dionysus",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "38e6ac4d-9643-40ac-95e3-9fd3db7370c6",
+    "title": "Theatre of Dionysus",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "38e6ac4d-9643-40ac-95e3-9fd3db7370c6",
+    "title": "Theatre of Dionysus",
+    "languageCode": "it",
+    "path": "translations.it.visitorInformation",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "73a8ddfe-53bb-4f3f-a7d5-42314b3f5030",
+    "title": "UX-R2-s9 Place",
+    "languageCode": "el",
+    "path": "translations.el.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "73a8ddfe-53bb-4f3f-a7d5-42314b3f5030",
+    "title": "UX-R2-s9 Place",
+    "languageCode": "el",
+    "path": "translations.el.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "73a8ddfe-53bb-4f3f-a7d5-42314b3f5030",
+    "title": "UX-R2-s9 Place",
+    "languageCode": "en",
+    "path": "translations.en.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "73a8ddfe-53bb-4f3f-a7d5-42314b3f5030",
+    "title": "UX-R2-s9 Place",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "73a8ddfe-53bb-4f3f-a7d5-42314b3f5030",
+    "title": "UX-R2-s9 Place",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "e2429d5c-31f0-44c0-96d6-eadbacdaaca5",
+    "title": "UX-s10-poi-place Κήπος Ωδείου – Odeon Garden with a deliberately long name to test wrapping",
+    "languageCode": "el",
+    "path": "translations.el.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "e2429d5c-31f0-44c0-96d6-eadbacdaaca5",
+    "title": "UX-s10-poi-place Κήπος Ωδείου – Odeon Garden with a deliberately long name to test wrapping",
+    "languageCode": "el",
+    "path": "translations.el.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "e2429d5c-31f0-44c0-96d6-eadbacdaaca5",
+    "title": "UX-s10-poi-place Κήπος Ωδείου – Odeon Garden with a deliberately long name to test wrapping",
+    "languageCode": "en",
+    "path": "translations.en.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "e2429d5c-31f0-44c0-96d6-eadbacdaaca5",
+    "title": "UX-s10-poi-place Κήπος Ωδείου – Odeon Garden with a deliberately long name to test wrapping",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "PLACE",
+    "resourceId": "e2429d5c-31f0-44c0-96d6-eadbacdaaca5",
+    "title": "UX-s10-poi-place Κήπος Ωδείου – Odeon Garden with a deliberately long name to test wrapping",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "6f12125f-c1fb-4acf-9c03-1d81ced4372e",
+    "title": "Acropolis View Terrace",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "6f12125f-c1fb-4acf-9c03-1d81ced4372e",
+    "title": "Acropolis View Terrace",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "6f12125f-c1fb-4acf-9c03-1d81ced4372e",
+    "title": "Acropolis View Terrace",
+    "languageCode": "it",
+    "path": "translations.it.instructions",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "52afa185-ba47-42fe-992d-b87f982692e3",
+    "title": "Ancient Agora Entrance and Ticket Office",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "52afa185-ba47-42fe-992d-b87f982692e3",
+    "title": "Ancient Agora Entrance and Ticket Office",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "52afa185-ba47-42fe-992d-b87f982692e3",
+    "title": "Ancient Agora Entrance and Ticket Office",
+    "languageCode": "it",
+    "path": "translations.it.instructions",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "52afa185-ba47-42fe-992d-b87f982692e3",
+    "title": "Ancient Agora Entrance and Ticket Office",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "52afa185-ba47-42fe-992d-b87f982692e3",
+    "title": "Ancient Agora Entrance and Ticket Office",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "c4df4ce5-8b15-484b-8615-e669f413d296",
+    "title": "Bath Complex Floor Mosaic",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "c4df4ce5-8b15-484b-8615-e669f413d296",
+    "title": "Bath Complex Floor Mosaic",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "c4df4ce5-8b15-484b-8615-e669f413d296",
+    "title": "Bath Complex Floor Mosaic",
+    "languageCode": "it",
+    "path": "translations.it.instructions",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "c4df4ce5-8b15-484b-8615-e669f413d296",
+    "title": "Bath Complex Floor Mosaic",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "c4df4ce5-8b15-484b-8615-e669f413d296",
+    "title": "Bath Complex Floor Mosaic",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "c4df4ce5-8b15-484b-8615-e669f413d296",
+    "title": "Bath Complex Floor Mosaic",
+    "languageCode": null,
+    "path": "workingCopy",
+    "code": "PENDING_WORKING_COPY"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "757ce945-e6a6-4e20-8e43-decc7a572970",
+    "title": "Bema of Phaedrus",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "757ce945-e6a6-4e20-8e43-decc7a572970",
+    "title": "Bema of Phaedrus",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "757ce945-e6a6-4e20-8e43-decc7a572970",
+    "title": "Bema of Phaedrus",
+    "languageCode": "it",
+    "path": "translations.it.instructions",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "757ce945-e6a6-4e20-8e43-decc7a572970",
+    "title": "Bema of Phaedrus",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "757ce945-e6a6-4e20-8e43-decc7a572970",
+    "title": "Bema of Phaedrus",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "c3ab7f07-6778-4013-baf9-68b876a5f454",
+    "title": "Chian Kore (Kore 675)",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "c3ab7f07-6778-4013-baf9-68b876a5f454",
+    "title": "Chian Kore (Kore 675)",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "c3ab7f07-6778-4013-baf9-68b876a5f454",
+    "title": "Chian Kore (Kore 675)",
+    "languageCode": "it",
+    "path": "translations.it.instructions",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "c3ab7f07-6778-4013-baf9-68b876a5f454",
+    "title": "Chian Kore (Kore 675)",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "c3ab7f07-6778-4013-baf9-68b876a5f454",
+    "title": "Chian Kore (Kore 675)",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "6b5264b5-beba-43fd-9cac-5bb51c7c3fe9",
+    "title": "Church of the Holy Apostles of Solaki (c. 1000 AD), an Eleventh-Century Byzantine Cross-in-Square Church Restored by the American School in the 1950s",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "6b5264b5-beba-43fd-9cac-5bb51c7c3fe9",
+    "title": "Church of the Holy Apostles of Solaki (c. 1000 AD), an Eleventh-Century Byzantine Cross-in-Square Church Restored by the American School in the 1950s",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "6b5264b5-beba-43fd-9cac-5bb51c7c3fe9",
+    "title": "Church of the Holy Apostles of Solaki (c. 1000 AD), an Eleventh-Century Byzantine Cross-in-Square Church Restored by the American School in the 1950s",
+    "languageCode": "it",
+    "path": "translations.it.instructions",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "6b5264b5-beba-43fd-9cac-5bb51c7c3fe9",
+    "title": "Church of the Holy Apostles of Solaki (c. 1000 AD), an Eleventh-Century Byzantine Cross-in-Square Church Restored by the American School in the 1950s",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "6b5264b5-beba-43fd-9cac-5bb51c7c3fe9",
+    "title": "Church of the Holy Apostles of Solaki (c. 1000 AD), an Eleventh-Century Byzantine Cross-in-Square Church Restored by the American School in the 1950s",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "65785e7e-aced-47d6-ab2e-662ca86153ae",
+    "title": "Dionysos, Hestia and Aphrodite",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "65785e7e-aced-47d6-ab2e-662ca86153ae",
+    "title": "Dionysos, Hestia and Aphrodite",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "65785e7e-aced-47d6-ab2e-662ca86153ae",
+    "title": "Dionysos, Hestia and Aphrodite",
+    "languageCode": "it",
+    "path": "translations.it.instructions",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "9d32bf3f-6d1b-4ab1-a129-f52f4a890403",
+    "title": "East Pediment Fragments",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "9d32bf3f-6d1b-4ab1-a129-f52f4a890403",
+    "title": "East Pediment Fragments",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "9d32bf3f-6d1b-4ab1-a129-f52f4a890403",
+    "title": "East Pediment Fragments",
+    "languageCode": "it",
+    "path": "translations.it.instructions",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "9d32bf3f-6d1b-4ab1-a129-f52f4a890403",
+    "title": "East Pediment Fragments",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "9d32bf3f-6d1b-4ab1-a129-f52f4a890403",
+    "title": "East Pediment Fragments",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "3f7ff52f-26b2-423a-9530-f8378acd07e5",
+    "title": "Erechtheion and the Porch of the Caryatids",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "3f7ff52f-26b2-423a-9530-f8378acd07e5",
+    "title": "Erechtheion and the Porch of the Caryatids",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "3f7ff52f-26b2-423a-9530-f8378acd07e5",
+    "title": "Erechtheion and the Porch of the Caryatids",
+    "languageCode": "it",
+    "path": "translations.it.instructions",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "3f7ff52f-26b2-423a-9530-f8378acd07e5",
+    "title": "Erechtheion and the Porch of the Caryatids",
+    "languageCode": null,
+    "path": "workingCopy",
+    "code": "PENDING_WORKING_COPY"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "a12564e2-1d45-4441-b421-ef3497979ef6",
+    "title": "Excavated Athenian Neighbourhood",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "a12564e2-1d45-4441-b421-ef3497979ef6",
+    "title": "Excavated Athenian Neighbourhood",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "a12564e2-1d45-4441-b421-ef3497979ef6",
+    "title": "Excavated Athenian Neighbourhood",
+    "languageCode": "it",
+    "path": "translations.it.instructions",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "a12564e2-1d45-4441-b421-ef3497979ef6",
+    "title": "Excavated Athenian Neighbourhood",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "a12564e2-1d45-4441-b421-ef3497979ef6",
+    "title": "Excavated Athenian Neighbourhood",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "00ee3bc2-afdb-4931-a515-03b96a76b7a4",
+    "title": "Hekatompedon Pediment Lions",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "00ee3bc2-afdb-4931-a515-03b96a76b7a4",
+    "title": "Hekatompedon Pediment Lions",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "00ee3bc2-afdb-4931-a515-03b96a76b7a4",
+    "title": "Hekatompedon Pediment Lions",
+    "languageCode": "it",
+    "path": "translations.it.instructions",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "00ee3bc2-afdb-4931-a515-03b96a76b7a4",
+    "title": "Hekatompedon Pediment Lions",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "00ee3bc2-afdb-4931-a515-03b96a76b7a4",
+    "title": "Hekatompedon Pediment Lions",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "d44feee5-38c2-41b1-bf98-097f078d8384",
+    "title": "Klepsydra Water Clock",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "d44feee5-38c2-41b1-bf98-097f078d8384",
+    "title": "Klepsydra Water Clock",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "d44feee5-38c2-41b1-bf98-097f078d8384",
+    "title": "Klepsydra Water Clock",
+    "languageCode": "it",
+    "path": "translations.it.instructions",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "d44feee5-38c2-41b1-bf98-097f078d8384",
+    "title": "Klepsydra Water Clock",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "d44feee5-38c2-41b1-bf98-097f078d8384",
+    "title": "Klepsydra Water Clock",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "c7d9ef27-2d13-4695-821b-7d7f75a6cf2a",
+    "title": "Kore of Euthydikos",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "c7d9ef27-2d13-4695-821b-7d7f75a6cf2a",
+    "title": "Kore of Euthydikos",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "c7d9ef27-2d13-4695-821b-7d7f75a6cf2a",
+    "title": "Kore of Euthydikos",
+    "languageCode": "it",
+    "path": "translations.it.instructions",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "c7d9ef27-2d13-4695-821b-7d7f75a6cf2a",
+    "title": "Kore of Euthydikos",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "c7d9ef27-2d13-4695-821b-7d7f75a6cf2a",
+    "title": "Kore of Euthydikos",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "f38d32c7-380c-412c-8ed5-bd3095e42556",
+    "title": "Moschophoros (The Calf-Bearer)",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "f38d32c7-380c-412c-8ed5-bd3095e42556",
+    "title": "Moschophoros (The Calf-Bearer)",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "f38d32c7-380c-412c-8ed5-bd3095e42556",
+    "title": "Moschophoros (The Calf-Bearer)",
+    "languageCode": "it",
+    "path": "translations.it.instructions",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "b1b30bd9-49c9-40d1-8171-95dc02f66939",
+    "title": "Museum Café – Terrace Restaurant",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "b1b30bd9-49c9-40d1-8171-95dc02f66939",
+    "title": "Museum Café – Terrace Restaurant",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "b1b30bd9-49c9-40d1-8171-95dc02f66939",
+    "title": "Museum Café – Terrace Restaurant",
+    "languageCode": "it",
+    "path": "translations.it.instructions",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "b1b30bd9-49c9-40d1-8171-95dc02f66939",
+    "title": "Museum Café – Terrace Restaurant",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "b1b30bd9-49c9-40d1-8171-95dc02f66939",
+    "title": "Museum Café – Terrace Restaurant",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "8579c4de-d37e-43ae-95a9-db9aeb43ffd7",
+    "title": "Museum Shop",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "8579c4de-d37e-43ae-95a9-db9aeb43ffd7",
+    "title": "Museum Shop",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "8579c4de-d37e-43ae-95a9-db9aeb43ffd7",
+    "title": "Museum Shop",
+    "languageCode": "it",
+    "path": "translations.it.instructions",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "650e942d-8f56-489c-aea1-2fd3c70f117b",
+    "title": "Ostraka and the Ostracism Vote",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "650e942d-8f56-489c-aea1-2fd3c70f117b",
+    "title": "Ostraka and the Ostracism Vote",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "650e942d-8f56-489c-aea1-2fd3c70f117b",
+    "title": "Ostraka and the Ostracism Vote",
+    "languageCode": "it",
+    "path": "translations.it.instructions",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "e2905a9e-2c6a-49a3-89f6-5639c94ee9fe",
+    "title": "Parthenon (Temple of Athena Parthenos)",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "e2905a9e-2c6a-49a3-89f6-5639c94ee9fe",
+    "title": "Parthenon (Temple of Athena Parthenos)",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "e2905a9e-2c6a-49a3-89f6-5639c94ee9fe",
+    "title": "Parthenon (Temple of Athena Parthenos)",
+    "languageCode": "it",
+    "path": "translations.it.instructions",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "e2905a9e-2c6a-49a3-89f6-5639c94ee9fe",
+    "title": "Parthenon (Temple of Athena Parthenos)",
+    "languageCode": null,
+    "path": "workingCopy",
+    "code": "PENDING_WORKING_COPY"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "546c5177-effd-49c8-acae-85d751f89bbe",
+    "title": "Parthenon Frieze – North Side",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "546c5177-effd-49c8-acae-85d751f89bbe",
+    "title": "Parthenon Frieze – North Side",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "546c5177-effd-49c8-acae-85d751f89bbe",
+    "title": "Parthenon Frieze – North Side",
+    "languageCode": "it",
+    "path": "translations.it.instructions",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "546c5177-effd-49c8-acae-85d751f89bbe",
+    "title": "Parthenon Frieze – North Side",
+    "languageCode": null,
+    "path": "workingCopy",
+    "code": "PENDING_WORKING_COPY"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "819d7e77-e283-4133-b556-f51d771eda5e",
+    "title": "Peplos Kore",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "819d7e77-e283-4133-b556-f51d771eda5e",
+    "title": "Peplos Kore",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "819d7e77-e283-4133-b556-f51d771eda5e",
+    "title": "Peplos Kore",
+    "languageCode": "it",
+    "path": "translations.it.instructions",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "819d7e77-e283-4133-b556-f51d771eda5e",
+    "title": "Peplos Kore",
+    "languageCode": null,
+    "path": "workingCopy",
+    "code": "PENDING_WORKING_COPY"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "27144d6e-4c1e-450c-abf9-e3e5829d387f",
+    "title": "Propylaea Monumental Gateway",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "27144d6e-4c1e-450c-abf9-e3e5829d387f",
+    "title": "Propylaea Monumental Gateway",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "27144d6e-4c1e-450c-abf9-e3e5829d387f",
+    "title": "Propylaea Monumental Gateway",
+    "languageCode": "it",
+    "path": "translations.it.instructions",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "59e78fee-49a7-475d-9f22-7063529febe6",
+    "title": "Rampin Rider",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "59e78fee-49a7-475d-9f22-7063529febe6",
+    "title": "Rampin Rider",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "59e78fee-49a7-475d-9f22-7063529febe6",
+    "title": "Rampin Rider",
+    "languageCode": "it",
+    "path": "translations.it.instructions",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "59e78fee-49a7-475d-9f22-7063529febe6",
+    "title": "Rampin Rider",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "59e78fee-49a7-475d-9f22-7063529febe6",
+    "title": "Rampin Rider",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "59e78fee-49a7-475d-9f22-7063529febe6",
+    "title": "Rampin Rider",
+    "languageCode": null,
+    "path": "workingCopy",
+    "code": "PENDING_WORKING_COPY"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "74756f10-a914-4fb6-9710-4a63b8e97ca7",
+    "title": "Reception and Information Desk, Ticket Collection Point, Audio Guide Rental and Accessibility Assistance Counter (Ground Floor, Main Entrance)",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "74756f10-a914-4fb6-9710-4a63b8e97ca7",
+    "title": "Reception and Information Desk, Ticket Collection Point, Audio Guide Rental and Accessibility Assistance Counter (Ground Floor, Main Entrance)",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "74756f10-a914-4fb6-9710-4a63b8e97ca7",
+    "title": "Reception and Information Desk, Ticket Collection Point, Audio Guide Rental and Accessibility Assistance Counter (Ground Floor, Main Entrance)",
+    "languageCode": "it",
+    "path": "translations.it.instructions",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "74756f10-a914-4fb6-9710-4a63b8e97ca7",
+    "title": "Reception and Information Desk, Ticket Collection Point, Audio Guide Rental and Accessibility Assistance Counter (Ground Floor, Main Entrance)",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "74756f10-a914-4fb6-9710-4a63b8e97ca7",
+    "title": "Reception and Information Desk, Ticket Collection Point, Audio Guide Rental and Accessibility Assistance Counter (Ground Floor, Main Entrance)",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "d7257e33-cfdb-4146-b3a3-aa4b02c5726b",
+    "title": "South Metope XXXI: Centaur and Lapith",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "d7257e33-cfdb-4146-b3a3-aa4b02c5726b",
+    "title": "South Metope XXXI: Centaur and Lapith",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "d7257e33-cfdb-4146-b3a3-aa4b02c5726b",
+    "title": "South Metope XXXI: Centaur and Lapith",
+    "languageCode": "it",
+    "path": "translations.it.instructions",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "d7257e33-cfdb-4146-b3a3-aa4b02c5726b",
+    "title": "South Metope XXXI: Centaur and Lapith",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "d7257e33-cfdb-4146-b3a3-aa4b02c5726b",
+    "title": "South Metope XXXI: Centaur and Lapith",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "d7257e33-cfdb-4146-b3a3-aa4b02c5726b",
+    "title": "South Metope XXXI: Centaur and Lapith",
+    "languageCode": null,
+    "path": "workingCopy",
+    "code": "PENDING_WORKING_COPY"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "63fb97a6-30d7-49c1-9013-c45242cf70fa",
+    "title": "Stoa of Attalos (Facade)",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "63fb97a6-30d7-49c1-9013-c45242cf70fa",
+    "title": "Stoa of Attalos (Facade)",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "63fb97a6-30d7-49c1-9013-c45242cf70fa",
+    "title": "Stoa of Attalos (Facade)",
+    "languageCode": "it",
+    "path": "translations.it.instructions",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "63fb97a6-30d7-49c1-9013-c45242cf70fa",
+    "title": "Stoa of Attalos (Facade)",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "63fb97a6-30d7-49c1-9013-c45242cf70fa",
+    "title": "Stoa of Attalos (Facade)",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "87628a4c-90e1-4f0c-9aa0-70231d57e464",
+    "title": "Temple of Athena Nike",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "87628a4c-90e1-4f0c-9aa0-70231d57e464",
+    "title": "Temple of Athena Nike",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "87628a4c-90e1-4f0c-9aa0-70231d57e464",
+    "title": "Temple of Athena Nike",
+    "languageCode": "it",
+    "path": "translations.it.instructions",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "87628a4c-90e1-4f0c-9aa0-70231d57e464",
+    "title": "Temple of Athena Nike",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "87628a4c-90e1-4f0c-9aa0-70231d57e464",
+    "title": "Temple of Athena Nike",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "2de087a7-f384-4eed-a2f6-25f5332c3075",
+    "title": "Temple of Hephaestus",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "2de087a7-f384-4eed-a2f6-25f5332c3075",
+    "title": "Temple of Hephaestus",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "2de087a7-f384-4eed-a2f6-25f5332c3075",
+    "title": "Temple of Hephaestus",
+    "languageCode": "it",
+    "path": "translations.it.instructions",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "2de087a7-f384-4eed-a2f6-25f5332c3075",
+    "title": "Temple of Hephaestus",
+    "languageCode": null,
+    "path": "workingCopy",
+    "code": "PENDING_WORKING_COPY"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "d3ea8cb2-119d-47f2-b776-80e0903b972f",
+    "title": "Theatre of Dionysus Eleuthereus – Orchestra",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "d3ea8cb2-119d-47f2-b776-80e0903b972f",
+    "title": "Theatre of Dionysus Eleuthereus – Orchestra",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "d3ea8cb2-119d-47f2-b776-80e0903b972f",
+    "title": "Theatre of Dionysus Eleuthereus – Orchestra",
+    "languageCode": "it",
+    "path": "translations.it.instructions",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "e5356b6c-de87-41cd-bec5-7a70bcef67ff",
+    "title": "Tholos",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "e5356b6c-de87-41cd-bec5-7a70bcef67ff",
+    "title": "Tholos",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "e5356b6c-de87-41cd-bec5-7a70bcef67ff",
+    "title": "Tholos",
+    "languageCode": "it",
+    "path": "translations.it.instructions",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "e5356b6c-de87-41cd-bec5-7a70bcef67ff",
+    "title": "Tholos",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "e5356b6c-de87-41cd-bec5-7a70bcef67ff",
+    "title": "Tholos",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "880c1266-2b57-4cbe-945c-49677d74a349",
+    "title": "Typhon, the Three-Bodied Daemon",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "880c1266-2b57-4cbe-945c-49677d74a349",
+    "title": "Typhon, the Three-Bodied Daemon",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "880c1266-2b57-4cbe-945c-49677d74a349",
+    "title": "Typhon, the Three-Bodied Daemon",
+    "languageCode": "it",
+    "path": "translations.it.instructions",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "40cab7b2-a7f7-4057-b56e-5605a589156f",
+    "title": "UX-p1-editor Alpha Kouros",
+    "languageCode": "el",
+    "path": "translations.el.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "40cab7b2-a7f7-4057-b56e-5605a589156f",
+    "title": "UX-p1-editor Alpha Kouros",
+    "languageCode": "el",
+    "path": "translations.el.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "40cab7b2-a7f7-4057-b56e-5605a589156f",
+    "title": "UX-p1-editor Alpha Kouros",
+    "languageCode": "el",
+    "path": "translations.el.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "40cab7b2-a7f7-4057-b56e-5605a589156f",
+    "title": "UX-p1-editor Alpha Kouros",
+    "languageCode": "en",
+    "path": "translations.en.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "40cab7b2-a7f7-4057-b56e-5605a589156f",
+    "title": "UX-p1-editor Alpha Kouros",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "40cab7b2-a7f7-4057-b56e-5605a589156f",
+    "title": "UX-p1-editor Alpha Kouros",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "40cab7b2-a7f7-4057-b56e-5605a589156f",
+    "title": "UX-p1-editor Alpha Kouros",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "1af84426-8230-46ee-8ab4-7edecaa9b20f",
+    "title": "UX-p1-editor Beta",
+    "languageCode": "el",
+    "path": "translations.el.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "1af84426-8230-46ee-8ab4-7edecaa9b20f",
+    "title": "UX-p1-editor Beta",
+    "languageCode": "el",
+    "path": "translations.el.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "1af84426-8230-46ee-8ab4-7edecaa9b20f",
+    "title": "UX-p1-editor Beta",
+    "languageCode": "el",
+    "path": "translations.el.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "1af84426-8230-46ee-8ab4-7edecaa9b20f",
+    "title": "UX-p1-editor Beta",
+    "languageCode": "el",
+    "path": "translations.el.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "1af84426-8230-46ee-8ab4-7edecaa9b20f",
+    "title": "UX-p1-editor Beta",
+    "languageCode": "en",
+    "path": "translations.en.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "1af84426-8230-46ee-8ab4-7edecaa9b20f",
+    "title": "UX-p1-editor Beta",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "1af84426-8230-46ee-8ab4-7edecaa9b20f",
+    "title": "UX-p1-editor Beta",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "1af84426-8230-46ee-8ab4-7edecaa9b20f",
+    "title": "UX-p1-editor Beta",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "1af84426-8230-46ee-8ab4-7edecaa9b20f",
+    "title": "UX-p1-editor Beta",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "e85c94b4-f31f-4d1c-8711-dd4fe7695fc6",
+    "title": "UX-p1-editor Delta",
+    "languageCode": "el",
+    "path": "translations.el.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "e85c94b4-f31f-4d1c-8711-dd4fe7695fc6",
+    "title": "UX-p1-editor Delta",
+    "languageCode": "el",
+    "path": "translations.el.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "e85c94b4-f31f-4d1c-8711-dd4fe7695fc6",
+    "title": "UX-p1-editor Delta",
+    "languageCode": "el",
+    "path": "translations.el.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "e85c94b4-f31f-4d1c-8711-dd4fe7695fc6",
+    "title": "UX-p1-editor Delta",
+    "languageCode": "en",
+    "path": "translations.en.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "e85c94b4-f31f-4d1c-8711-dd4fe7695fc6",
+    "title": "UX-p1-editor Delta",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "e85c94b4-f31f-4d1c-8711-dd4fe7695fc6",
+    "title": "UX-p1-editor Delta",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "e85c94b4-f31f-4d1c-8711-dd4fe7695fc6",
+    "title": "UX-p1-editor Delta",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "2f15e961-5a0a-4931-b28a-ced0f13b9e50",
+    "title": "UX-p1-editor Gamma",
+    "languageCode": "el",
+    "path": "translations.el.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "2f15e961-5a0a-4931-b28a-ced0f13b9e50",
+    "title": "UX-p1-editor Gamma",
+    "languageCode": "el",
+    "path": "translations.el.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "2f15e961-5a0a-4931-b28a-ced0f13b9e50",
+    "title": "UX-p1-editor Gamma",
+    "languageCode": "en",
+    "path": "translations.en.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "2f15e961-5a0a-4931-b28a-ced0f13b9e50",
+    "title": "UX-p1-editor Gamma",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "2f15e961-5a0a-4931-b28a-ced0f13b9e50",
+    "title": "UX-p1-editor Gamma",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "86b624e8-f48f-429a-938c-2e29d2f65a4c",
+    "title": "UX-P4 active point",
+    "languageCode": "el",
+    "path": "translations.el.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "86b624e8-f48f-429a-938c-2e29d2f65a4c",
+    "title": "UX-P4 active point",
+    "languageCode": "en",
+    "path": "translations.en.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "86b624e8-f48f-429a-938c-2e29d2f65a4c",
+    "title": "UX-P4 active point",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "86b624e8-f48f-429a-938c-2e29d2f65a4c",
+    "title": "UX-P4 active point",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "86b624e8-f48f-429a-938c-2e29d2f65a4c",
+    "title": "UX-P4 active point",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "2cb06749-1668-4de7-8220-bac295a88ff7",
+    "title": "UX-P4 pending point",
+    "languageCode": "el",
+    "path": "translations.el.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "2cb06749-1668-4de7-8220-bac295a88ff7",
+    "title": "UX-P4 pending point",
+    "languageCode": "en",
+    "path": "translations.en.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "2cb06749-1668-4de7-8220-bac295a88ff7",
+    "title": "UX-P4 pending point",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "2cb06749-1668-4de7-8220-bac295a88ff7",
+    "title": "UX-P4 pending point",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "2cb06749-1668-4de7-8220-bac295a88ff7",
+    "title": "UX-P4 pending point",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "2cb06749-1668-4de7-8220-bac295a88ff7",
+    "title": "UX-P4 pending point",
+    "languageCode": null,
+    "path": "workingCopy",
+    "code": "PENDING_WORKING_COPY"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "c10e8454-4484-4f47-bb0c-ad9e9571f155",
+    "title": "UX-p6-edge POI C applied once",
+    "languageCode": "el",
+    "path": "translations.el.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "c10e8454-4484-4f47-bb0c-ad9e9571f155",
+    "title": "UX-p6-edge POI C applied once",
+    "languageCode": "el",
+    "path": "translations.el.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "c10e8454-4484-4f47-bb0c-ad9e9571f155",
+    "title": "UX-p6-edge POI C applied once",
+    "languageCode": "en",
+    "path": "translations.en.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "c10e8454-4484-4f47-bb0c-ad9e9571f155",
+    "title": "UX-p6-edge POI C applied once",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "c10e8454-4484-4f47-bb0c-ad9e9571f155",
+    "title": "UX-p6-edge POI C applied once",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "061eca49-e97e-483a-b48f-3dff0d96a3cc",
+    "title": "UX-R2-p1-editor Amphora Room",
+    "languageCode": null,
+    "path": "workingCopy",
+    "code": "PENDING_WORKING_COPY"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "6b4035d1-bacc-46d0-9772-5bcfb4a6f492",
+    "title": "UX-R2-p1-editor Kore Corridor",
+    "languageCode": "el",
+    "path": "translations.el.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "6b4035d1-bacc-46d0-9772-5bcfb4a6f492",
+    "title": "UX-R2-p1-editor Kore Corridor",
+    "languageCode": "el",
+    "path": "translations.el.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "6b4035d1-bacc-46d0-9772-5bcfb4a6f492",
+    "title": "UX-R2-p1-editor Kore Corridor",
+    "languageCode": "el",
+    "path": "translations.el.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "6b4035d1-bacc-46d0-9772-5bcfb4a6f492",
+    "title": "UX-R2-p1-editor Kore Corridor",
+    "languageCode": "en",
+    "path": "translations.en.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "6b4035d1-bacc-46d0-9772-5bcfb4a6f492",
+    "title": "UX-R2-p1-editor Kore Corridor",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "6b4035d1-bacc-46d0-9772-5bcfb4a6f492",
+    "title": "UX-R2-p1-editor Kore Corridor",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "6b4035d1-bacc-46d0-9772-5bcfb4a6f492",
+    "title": "UX-R2-p1-editor Kore Corridor",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "57d05371-0303-4f11-bcea-cab34522be19",
+    "title": "UX-R2-p1-editor Στοά Θέατρο Long Greek Title Αρχαίο",
+    "languageCode": "el",
+    "path": "translations.el.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "57d05371-0303-4f11-bcea-cab34522be19",
+    "title": "UX-R2-p1-editor Στοά Θέατρο Long Greek Title Αρχαίο",
+    "languageCode": "el",
+    "path": "translations.el.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "57d05371-0303-4f11-bcea-cab34522be19",
+    "title": "UX-R2-p1-editor Στοά Θέατρο Long Greek Title Αρχαίο",
+    "languageCode": "el",
+    "path": "translations.el.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "57d05371-0303-4f11-bcea-cab34522be19",
+    "title": "UX-R2-p1-editor Στοά Θέατρο Long Greek Title Αρχαίο",
+    "languageCode": "en",
+    "path": "translations.en.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "57d05371-0303-4f11-bcea-cab34522be19",
+    "title": "UX-R2-p1-editor Στοά Θέατρο Long Greek Title Αρχαίο",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "57d05371-0303-4f11-bcea-cab34522be19",
+    "title": "UX-R2-p1-editor Στοά Θέατρο Long Greek Title Αρχαίο",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "57d05371-0303-4f11-bcea-cab34522be19",
+    "title": "UX-R2-p1-editor Στοά Θέατρο Long Greek Title Αρχαίο",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "a725bd84-6a05-4cec-aa3a-f0ae974a7585",
+    "title": "UX-R2-p3 Active Kouros Hall",
+    "languageCode": "el",
+    "path": "translations.el.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "a725bd84-6a05-4cec-aa3a-f0ae974a7585",
+    "title": "UX-R2-p3 Active Kouros Hall",
+    "languageCode": "el",
+    "path": "translations.el.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "a725bd84-6a05-4cec-aa3a-f0ae974a7585",
+    "title": "UX-R2-p3 Active Kouros Hall",
+    "languageCode": "en",
+    "path": "translations.en.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "a725bd84-6a05-4cec-aa3a-f0ae974a7585",
+    "title": "UX-R2-p3 Active Kouros Hall",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "7548d0c0-736e-4b75-b658-a967999b5b58",
+    "title": "UX-R2-p6 POI Gamma (theirs)",
+    "languageCode": "el",
+    "path": "translations.el.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "7548d0c0-736e-4b75-b658-a967999b5b58",
+    "title": "UX-R2-p6 POI Gamma (theirs)",
+    "languageCode": "el",
+    "path": "translations.el.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "7548d0c0-736e-4b75-b658-a967999b5b58",
+    "title": "UX-R2-p6 POI Gamma (theirs)",
+    "languageCode": "el",
+    "path": "translations.el.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "7548d0c0-736e-4b75-b658-a967999b5b58",
+    "title": "UX-R2-p6 POI Gamma (theirs)",
+    "languageCode": "el",
+    "path": "translations.el.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "7548d0c0-736e-4b75-b658-a967999b5b58",
+    "title": "UX-R2-p6 POI Gamma (theirs)",
+    "languageCode": "en",
+    "path": "translations.en.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "7548d0c0-736e-4b75-b658-a967999b5b58",
+    "title": "UX-R2-p6 POI Gamma (theirs)",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "7548d0c0-736e-4b75-b658-a967999b5b58",
+    "title": "UX-R2-p6 POI Gamma (theirs)",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "7548d0c0-736e-4b75-b658-a967999b5b58",
+    "title": "UX-R2-p6 POI Gamma (theirs)",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "7548d0c0-736e-4b75-b658-a967999b5b58",
+    "title": "UX-R2-p6 POI Gamma (theirs)",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "513ac2fc-68df-47dd-b5a3-f72468513482",
+    "title": "UX-R2-s10 POI A",
+    "languageCode": "el",
+    "path": "translations.el.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "513ac2fc-68df-47dd-b5a3-f72468513482",
+    "title": "UX-R2-s10 POI A",
+    "languageCode": "el",
+    "path": "translations.el.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "513ac2fc-68df-47dd-b5a3-f72468513482",
+    "title": "UX-R2-s10 POI A",
+    "languageCode": "el",
+    "path": "translations.el.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "513ac2fc-68df-47dd-b5a3-f72468513482",
+    "title": "UX-R2-s10 POI A",
+    "languageCode": "el",
+    "path": "translations.el.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "513ac2fc-68df-47dd-b5a3-f72468513482",
+    "title": "UX-R2-s10 POI A",
+    "languageCode": "en",
+    "path": "translations.en.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "513ac2fc-68df-47dd-b5a3-f72468513482",
+    "title": "UX-R2-s10 POI A",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "513ac2fc-68df-47dd-b5a3-f72468513482",
+    "title": "UX-R2-s10 POI A",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "513ac2fc-68df-47dd-b5a3-f72468513482",
+    "title": "UX-R2-s10 POI A",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "513ac2fc-68df-47dd-b5a3-f72468513482",
+    "title": "UX-R2-s10 POI A",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "bbfd89ed-dc42-41b1-99ef-3eba81d25341",
+    "title": "UX-R2-s11 POI Alpha",
+    "languageCode": "el",
+    "path": "translations.el.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "bbfd89ed-dc42-41b1-99ef-3eba81d25341",
+    "title": "UX-R2-s11 POI Alpha",
+    "languageCode": "el",
+    "path": "translations.el.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "bbfd89ed-dc42-41b1-99ef-3eba81d25341",
+    "title": "UX-R2-s11 POI Alpha",
+    "languageCode": "en",
+    "path": "translations.en.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "bbfd89ed-dc42-41b1-99ef-3eba81d25341",
+    "title": "UX-R2-s11 POI Alpha",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "bbfd89ed-dc42-41b1-99ef-3eba81d25341",
+    "title": "UX-R2-s11 POI Alpha",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "27684ddc-054d-4c55-9d9f-3900f904b8d7",
+    "title": "UX-R2-s11 POI Bravo",
+    "languageCode": "el",
+    "path": "translations.el.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "27684ddc-054d-4c55-9d9f-3900f904b8d7",
+    "title": "UX-R2-s11 POI Bravo",
+    "languageCode": "el",
+    "path": "translations.el.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "27684ddc-054d-4c55-9d9f-3900f904b8d7",
+    "title": "UX-R2-s11 POI Bravo",
+    "languageCode": "en",
+    "path": "translations.en.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "27684ddc-054d-4c55-9d9f-3900f904b8d7",
+    "title": "UX-R2-s11 POI Bravo",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "27684ddc-054d-4c55-9d9f-3900f904b8d7",
+    "title": "UX-R2-s11 POI Bravo",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "7034234f-e039-4a4d-a100-463653173b28",
+    "title": "UX-R2-s11 POI Charlie",
+    "languageCode": "el",
+    "path": "translations.el.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "7034234f-e039-4a4d-a100-463653173b28",
+    "title": "UX-R2-s11 POI Charlie",
+    "languageCode": "el",
+    "path": "translations.el.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "7034234f-e039-4a4d-a100-463653173b28",
+    "title": "UX-R2-s11 POI Charlie",
+    "languageCode": "en",
+    "path": "translations.en.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "7034234f-e039-4a4d-a100-463653173b28",
+    "title": "UX-R2-s11 POI Charlie",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "7034234f-e039-4a4d-a100-463653173b28",
+    "title": "UX-R2-s11 POI Charlie",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "b0d48657-f6f3-4480-857f-6b55e12b486c",
+    "title": "UX-R2-s11 POI Delta",
+    "languageCode": "el",
+    "path": "translations.el.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "b0d48657-f6f3-4480-857f-6b55e12b486c",
+    "title": "UX-R2-s11 POI Delta",
+    "languageCode": "el",
+    "path": "translations.el.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "b0d48657-f6f3-4480-857f-6b55e12b486c",
+    "title": "UX-R2-s11 POI Delta",
+    "languageCode": "en",
+    "path": "translations.en.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "b0d48657-f6f3-4480-857f-6b55e12b486c",
+    "title": "UX-R2-s11 POI Delta",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "b0d48657-f6f3-4480-857f-6b55e12b486c",
+    "title": "UX-R2-s11 POI Delta",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "109e19ff-9fed-42e7-ae18-2884419f6c2e",
+    "title": "UX-s10-poi-place Odeon Mosaic Floor Ψηφιδωτό",
+    "languageCode": "el",
+    "path": "translations.el.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "109e19ff-9fed-42e7-ae18-2884419f6c2e",
+    "title": "UX-s10-poi-place Odeon Mosaic Floor Ψηφιδωτό",
+    "languageCode": "el",
+    "path": "translations.el.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "109e19ff-9fed-42e7-ae18-2884419f6c2e",
+    "title": "UX-s10-poi-place Odeon Mosaic Floor Ψηφιδωτό",
+    "languageCode": "en",
+    "path": "translations.en.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "109e19ff-9fed-42e7-ae18-2884419f6c2e",
+    "title": "UX-s10-poi-place Odeon Mosaic Floor Ψηφιδωτό",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "109e19ff-9fed-42e7-ae18-2884419f6c2e",
+    "title": "UX-s10-poi-place Odeon Mosaic Floor Ψηφιδωτό",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "109e19ff-9fed-42e7-ae18-2884419f6c2e",
+    "title": "UX-s10-poi-place Odeon Mosaic Floor Ψηφιδωτό",
+    "languageCode": null,
+    "path": "workingCopy",
+    "code": "PENDING_WORKING_COPY"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "0441df15-a2ed-47d3-a079-d6766c9a2344",
+    "title": "UX-s11-editors Stop Alpha",
+    "languageCode": "el",
+    "path": "translations.el.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "0441df15-a2ed-47d3-a079-d6766c9a2344",
+    "title": "UX-s11-editors Stop Alpha",
+    "languageCode": "el",
+    "path": "translations.el.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "0441df15-a2ed-47d3-a079-d6766c9a2344",
+    "title": "UX-s11-editors Stop Alpha",
+    "languageCode": "en",
+    "path": "translations.en.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "0441df15-a2ed-47d3-a079-d6766c9a2344",
+    "title": "UX-s11-editors Stop Alpha",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "0441df15-a2ed-47d3-a079-d6766c9a2344",
+    "title": "UX-s11-editors Stop Alpha",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "374543ed-5944-47db-abec-25a4473a247d",
+    "title": "UX-s11-editors Stop Bravo",
+    "languageCode": "el",
+    "path": "translations.el.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "374543ed-5944-47db-abec-25a4473a247d",
+    "title": "UX-s11-editors Stop Bravo",
+    "languageCode": "el",
+    "path": "translations.el.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "374543ed-5944-47db-abec-25a4473a247d",
+    "title": "UX-s11-editors Stop Bravo",
+    "languageCode": "en",
+    "path": "translations.en.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "374543ed-5944-47db-abec-25a4473a247d",
+    "title": "UX-s11-editors Stop Bravo",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "374543ed-5944-47db-abec-25a4473a247d",
+    "title": "UX-s11-editors Stop Bravo",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "cbdb1c84-d4ba-4652-8a96-b551050f6998",
+    "title": "UX-s11-editors Stop Charlie",
+    "languageCode": "el",
+    "path": "translations.el.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "cbdb1c84-d4ba-4652-8a96-b551050f6998",
+    "title": "UX-s11-editors Stop Charlie",
+    "languageCode": "el",
+    "path": "translations.el.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "cbdb1c84-d4ba-4652-8a96-b551050f6998",
+    "title": "UX-s11-editors Stop Charlie",
+    "languageCode": "en",
+    "path": "translations.en.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "cbdb1c84-d4ba-4652-8a96-b551050f6998",
+    "title": "UX-s11-editors Stop Charlie",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "cbdb1c84-d4ba-4652-8a96-b551050f6998",
+    "title": "UX-s11-editors Stop Charlie",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "1eaa52d4-7801-4a6b-8bf3-5a884a2a218c",
+    "title": "UX-s11-editors Stop Delta",
+    "languageCode": "el",
+    "path": "translations.el.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "1eaa52d4-7801-4a6b-8bf3-5a884a2a218c",
+    "title": "UX-s11-editors Stop Delta",
+    "languageCode": "el",
+    "path": "translations.el.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "1eaa52d4-7801-4a6b-8bf3-5a884a2a218c",
+    "title": "UX-s11-editors Stop Delta",
+    "languageCode": "en",
+    "path": "translations.en.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "1eaa52d4-7801-4a6b-8bf3-5a884a2a218c",
+    "title": "UX-s11-editors Stop Delta",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "1eaa52d4-7801-4a6b-8bf3-5a884a2a218c",
+    "title": "UX-s11-editors Stop Delta",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "3820d506-424a-4021-8a20-490c72946e2e",
+    "title": "UX-W0.2 point",
+    "languageCode": "el",
+    "path": "translations.el.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "3820d506-424a-4021-8a20-490c72946e2e",
+    "title": "UX-W0.2 point",
+    "languageCode": "el",
+    "path": "translations.el.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "3820d506-424a-4021-8a20-490c72946e2e",
+    "title": "UX-W0.2 point",
+    "languageCode": "el",
+    "path": "translations.el.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "3820d506-424a-4021-8a20-490c72946e2e",
+    "title": "UX-W0.2 point",
+    "languageCode": "en",
+    "path": "translations.en.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "3820d506-424a-4021-8a20-490c72946e2e",
+    "title": "UX-W0.2 point",
+    "languageCode": "it",
+    "path": "translations.it.accessibilityInformation",
+    "code": "MISSING_ACCESSIBILITY_INFORMATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "3820d506-424a-4021-8a20-490c72946e2e",
+    "title": "UX-W0.2 point",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "3820d506-424a-4021-8a20-490c72946e2e",
+    "title": "UX-W0.2 point",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "POI",
+    "resourceId": "3820d506-424a-4021-8a20-490c72946e2e",
+    "title": "UX-W0.2 point",
+    "languageCode": null,
+    "path": "workingCopy",
+    "code": "PENDING_WORKING_COPY"
+   },
+   {
+    "resourceType": "ROUTE",
+    "resourceId": "9743e460-8351-4897-8ee5-eecc13fcbf19",
+    "title": "Acropolis Highlights – Classical Walk",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "ROUTE",
+    "resourceId": "9743e460-8351-4897-8ee5-eecc13fcbf19",
+    "title": "Acropolis Highlights – Classical Walk",
+    "languageCode": "it",
+    "path": "translations.it.instructions",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "ROUTE",
+    "resourceId": "9743e460-8351-4897-8ee5-eecc13fcbf19",
+    "title": "Acropolis Highlights – Classical Walk",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "ROUTE",
+    "resourceId": "d73250f8-85ff-44ae-a758-e269d1b8e5dc",
+    "title": "Family Trail: Myths and Monsters",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "ROUTE",
+    "resourceId": "d73250f8-85ff-44ae-a758-e269d1b8e5dc",
+    "title": "Family Trail: Myths and Monsters",
+    "languageCode": "it",
+    "path": "translations.it.instructions",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "ROUTE",
+    "resourceId": "d73250f8-85ff-44ae-a758-e269d1b8e5dc",
+    "title": "Family Trail: Myths and Monsters",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "ROUTE",
+    "resourceId": "d73250f8-85ff-44ae-a758-e269d1b8e5dc",
+    "title": "Family Trail: Myths and Monsters",
+    "languageCode": null,
+    "path": "workingCopy",
+    "code": "PENDING_WORKING_COPY"
+   },
+   {
+    "resourceType": "ROUTE",
+    "resourceId": "99ce0154-8b2b-40dc-ac08-a0cd0dea2872",
+    "title": "Museum Masterpieces – One Hour Tour",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "ROUTE",
+    "resourceId": "99ce0154-8b2b-40dc-ac08-a0cd0dea2872",
+    "title": "Museum Masterpieces – One Hour Tour",
+    "languageCode": "it",
+    "path": "translations.it.instructions",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "ROUTE",
+    "resourceId": "99ce0154-8b2b-40dc-ac08-a0cd0dea2872",
+    "title": "Museum Masterpieces – One Hour Tour",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "ROUTE",
+    "resourceId": "99ce0154-8b2b-40dc-ac08-a0cd0dea2872",
+    "title": "Museum Masterpieces – One Hour Tour",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "ROUTE",
+    "resourceId": "a952c02b-a2d8-4300-a300-f6d4821f6c0b",
+    "title": "UX-P5a Route",
+    "languageCode": "el",
+    "path": "translations.el.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "ROUTE",
+    "resourceId": "a952c02b-a2d8-4300-a300-f6d4821f6c0b",
+    "title": "UX-P5a Route",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "ROUTE",
+    "resourceId": "9ee241ba-75a6-4948-882b-d7764d5ffb71",
+    "title": "UX-R2-p6 Route",
+    "languageCode": "el",
+    "path": "translations.el.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "ROUTE",
+    "resourceId": "9ee241ba-75a6-4948-882b-d7764d5ffb71",
+    "title": "UX-R2-p6 Route",
+    "languageCode": "el",
+    "path": "translations.el.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "ROUTE",
+    "resourceId": "9ee241ba-75a6-4948-882b-d7764d5ffb71",
+    "title": "UX-R2-p6 Route",
+    "languageCode": "el",
+    "path": "translations.el.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "ROUTE",
+    "resourceId": "9ee241ba-75a6-4948-882b-d7764d5ffb71",
+    "title": "UX-R2-p6 Route",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "ROUTE",
+    "resourceId": "9ee241ba-75a6-4948-882b-d7764d5ffb71",
+    "title": "UX-R2-p6 Route",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "ROUTE",
+    "resourceId": "9ee241ba-75a6-4948-882b-d7764d5ffb71",
+    "title": "UX-R2-p6 Route",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "ROUTE",
+    "resourceId": "1e93d7a6-b497-4e1c-b594-71e2878de379",
+    "title": "UX-R2-s11 Route",
+    "languageCode": "el",
+    "path": "translations.el.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "ROUTE",
+    "resourceId": "1e93d7a6-b497-4e1c-b594-71e2878de379",
+    "title": "UX-R2-s11 Route",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "ROUTE",
+    "resourceId": "00b39d11-892e-44fc-ad0d-05f7b4282790",
+    "title": "UX-s11-editors Route (edited)",
+    "languageCode": "el",
+    "path": "translations.el.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "ROUTE",
+    "resourceId": "00b39d11-892e-44fc-ad0d-05f7b4282790",
+    "title": "UX-s11-editors Route (edited)",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "728ac2ce-050c-4162-ae57-33c734f0cb4a",
+    "title": "Reading the Archaic Korai: Colour, Gesture and Craft",
+    "languageCode": "it",
+    "path": "blocks[10].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "728ac2ce-050c-4162-ae57-33c734f0cb4a",
+    "title": "Reading the Archaic Korai: Colour, Gesture and Craft",
+    "languageCode": "it",
+    "path": "blocks[11].translations.it.caption",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "728ac2ce-050c-4162-ae57-33c734f0cb4a",
+    "title": "Reading the Archaic Korai: Colour, Gesture and Craft",
+    "languageCode": "it",
+    "path": "blocks[12].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "728ac2ce-050c-4162-ae57-33c734f0cb4a",
+    "title": "Reading the Archaic Korai: Colour, Gesture and Craft",
+    "languageCode": "it",
+    "path": "blocks[13].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "728ac2ce-050c-4162-ae57-33c734f0cb4a",
+    "title": "Reading the Archaic Korai: Colour, Gesture and Craft",
+    "languageCode": "it",
+    "path": "blocks[14].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "728ac2ce-050c-4162-ae57-33c734f0cb4a",
+    "title": "Reading the Archaic Korai: Colour, Gesture and Craft",
+    "languageCode": "it",
+    "path": "blocks[15].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "728ac2ce-050c-4162-ae57-33c734f0cb4a",
+    "title": "Reading the Archaic Korai: Colour, Gesture and Craft",
+    "languageCode": "it",
+    "path": "blocks[16].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "728ac2ce-050c-4162-ae57-33c734f0cb4a",
+    "title": "Reading the Archaic Korai: Colour, Gesture and Craft",
+    "languageCode": "it",
+    "path": "blocks[17].translations.it.caption",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "728ac2ce-050c-4162-ae57-33c734f0cb4a",
+    "title": "Reading the Archaic Korai: Colour, Gesture and Craft",
+    "languageCode": "it",
+    "path": "blocks[18].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "728ac2ce-050c-4162-ae57-33c734f0cb4a",
+    "title": "Reading the Archaic Korai: Colour, Gesture and Craft",
+    "languageCode": "it",
+    "path": "blocks[19].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "728ac2ce-050c-4162-ae57-33c734f0cb4a",
+    "title": "Reading the Archaic Korai: Colour, Gesture and Craft",
+    "languageCode": "it",
+    "path": "blocks[3].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "728ac2ce-050c-4162-ae57-33c734f0cb4a",
+    "title": "Reading the Archaic Korai: Colour, Gesture and Craft",
+    "languageCode": "it",
+    "path": "blocks[4].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "728ac2ce-050c-4162-ae57-33c734f0cb4a",
+    "title": "Reading the Archaic Korai: Colour, Gesture and Craft",
+    "languageCode": "it",
+    "path": "blocks[5].translations.it.caption",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "728ac2ce-050c-4162-ae57-33c734f0cb4a",
+    "title": "Reading the Archaic Korai: Colour, Gesture and Craft",
+    "languageCode": "it",
+    "path": "blocks[6].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "728ac2ce-050c-4162-ae57-33c734f0cb4a",
+    "title": "Reading the Archaic Korai: Colour, Gesture and Craft",
+    "languageCode": "it",
+    "path": "blocks[7].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "728ac2ce-050c-4162-ae57-33c734f0cb4a",
+    "title": "Reading the Archaic Korai: Colour, Gesture and Craft",
+    "languageCode": "it",
+    "path": "blocks[8].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "728ac2ce-050c-4162-ae57-33c734f0cb4a",
+    "title": "Reading the Archaic Korai: Colour, Gesture and Craft",
+    "languageCode": "it",
+    "path": "blocks[9].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "728ac2ce-050c-4162-ae57-33c734f0cb4a",
+    "title": "Reading the Archaic Korai: Colour, Gesture and Craft",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "1c85f8b3-6ecd-4580-a13a-96df5823d863",
+    "title": "The Erechtheion and the Caryatids – A Visitor’s Companion",
+    "languageCode": "it",
+    "path": "blocks[0].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "1c85f8b3-6ecd-4580-a13a-96df5823d863",
+    "title": "The Erechtheion and the Caryatids – A Visitor’s Companion",
+    "languageCode": "it",
+    "path": "blocks[10].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "1c85f8b3-6ecd-4580-a13a-96df5823d863",
+    "title": "The Erechtheion and the Caryatids – A Visitor’s Companion",
+    "languageCode": "it",
+    "path": "blocks[11].translations.it.caption",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "1c85f8b3-6ecd-4580-a13a-96df5823d863",
+    "title": "The Erechtheion and the Caryatids – A Visitor’s Companion",
+    "languageCode": "it",
+    "path": "blocks[12].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "1c85f8b3-6ecd-4580-a13a-96df5823d863",
+    "title": "The Erechtheion and the Caryatids – A Visitor’s Companion",
+    "languageCode": "it",
+    "path": "blocks[13].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "1c85f8b3-6ecd-4580-a13a-96df5823d863",
+    "title": "The Erechtheion and the Caryatids – A Visitor’s Companion",
+    "languageCode": "it",
+    "path": "blocks[14].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "1c85f8b3-6ecd-4580-a13a-96df5823d863",
+    "title": "The Erechtheion and the Caryatids – A Visitor’s Companion",
+    "languageCode": "it",
+    "path": "blocks[15].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "1c85f8b3-6ecd-4580-a13a-96df5823d863",
+    "title": "The Erechtheion and the Caryatids – A Visitor’s Companion",
+    "languageCode": "it",
+    "path": "blocks[1].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "1c85f8b3-6ecd-4580-a13a-96df5823d863",
+    "title": "The Erechtheion and the Caryatids – A Visitor’s Companion",
+    "languageCode": "it",
+    "path": "blocks[2].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "1c85f8b3-6ecd-4580-a13a-96df5823d863",
+    "title": "The Erechtheion and the Caryatids – A Visitor’s Companion",
+    "languageCode": "it",
+    "path": "blocks[3].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "1c85f8b3-6ecd-4580-a13a-96df5823d863",
+    "title": "The Erechtheion and the Caryatids – A Visitor’s Companion",
+    "languageCode": "it",
+    "path": "blocks[4].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "1c85f8b3-6ecd-4580-a13a-96df5823d863",
+    "title": "The Erechtheion and the Caryatids – A Visitor’s Companion",
+    "languageCode": "it",
+    "path": "blocks[5].translations.it.caption",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "1c85f8b3-6ecd-4580-a13a-96df5823d863",
+    "title": "The Erechtheion and the Caryatids – A Visitor’s Companion",
+    "languageCode": "it",
+    "path": "blocks[6].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "1c85f8b3-6ecd-4580-a13a-96df5823d863",
+    "title": "The Erechtheion and the Caryatids – A Visitor’s Companion",
+    "languageCode": "it",
+    "path": "blocks[7].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "1c85f8b3-6ecd-4580-a13a-96df5823d863",
+    "title": "The Erechtheion and the Caryatids – A Visitor’s Companion",
+    "languageCode": "it",
+    "path": "blocks[8].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "1c85f8b3-6ecd-4580-a13a-96df5823d863",
+    "title": "The Erechtheion and the Caryatids – A Visitor’s Companion",
+    "languageCode": "it",
+    "path": "blocks[9].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "1c85f8b3-6ecd-4580-a13a-96df5823d863",
+    "title": "The Erechtheion and the Caryatids – A Visitor’s Companion",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "1c85f8b3-6ecd-4580-a13a-96df5823d863",
+    "title": "The Erechtheion and the Caryatids – A Visitor’s Companion",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "bcc7d2be-50ef-46cb-85e2-ced86c6559a3",
+    "title": "The Story of the Parthenon: From Temple to Monument",
+    "languageCode": "it",
+    "path": "blocks[10].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "bcc7d2be-50ef-46cb-85e2-ced86c6559a3",
+    "title": "The Story of the Parthenon: From Temple to Monument",
+    "languageCode": "it",
+    "path": "blocks[11].translations.it.caption",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "bcc7d2be-50ef-46cb-85e2-ced86c6559a3",
+    "title": "The Story of the Parthenon: From Temple to Monument",
+    "languageCode": "it",
+    "path": "blocks[12].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "bcc7d2be-50ef-46cb-85e2-ced86c6559a3",
+    "title": "The Story of the Parthenon: From Temple to Monument",
+    "languageCode": "it",
+    "path": "blocks[13].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "bcc7d2be-50ef-46cb-85e2-ced86c6559a3",
+    "title": "The Story of the Parthenon: From Temple to Monument",
+    "languageCode": "it",
+    "path": "blocks[14].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "bcc7d2be-50ef-46cb-85e2-ced86c6559a3",
+    "title": "The Story of the Parthenon: From Temple to Monument",
+    "languageCode": "it",
+    "path": "blocks[15].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "bcc7d2be-50ef-46cb-85e2-ced86c6559a3",
+    "title": "The Story of the Parthenon: From Temple to Monument",
+    "languageCode": "it",
+    "path": "blocks[16].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "bcc7d2be-50ef-46cb-85e2-ced86c6559a3",
+    "title": "The Story of the Parthenon: From Temple to Monument",
+    "languageCode": "it",
+    "path": "blocks[17].translations.it.caption",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "bcc7d2be-50ef-46cb-85e2-ced86c6559a3",
+    "title": "The Story of the Parthenon: From Temple to Monument",
+    "languageCode": "it",
+    "path": "blocks[3].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "bcc7d2be-50ef-46cb-85e2-ced86c6559a3",
+    "title": "The Story of the Parthenon: From Temple to Monument",
+    "languageCode": "it",
+    "path": "blocks[4].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "bcc7d2be-50ef-46cb-85e2-ced86c6559a3",
+    "title": "The Story of the Parthenon: From Temple to Monument",
+    "languageCode": "it",
+    "path": "blocks[5].translations.it.caption",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "bcc7d2be-50ef-46cb-85e2-ced86c6559a3",
+    "title": "The Story of the Parthenon: From Temple to Monument",
+    "languageCode": "it",
+    "path": "blocks[6].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "bcc7d2be-50ef-46cb-85e2-ced86c6559a3",
+    "title": "The Story of the Parthenon: From Temple to Monument",
+    "languageCode": "it",
+    "path": "blocks[7].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "bcc7d2be-50ef-46cb-85e2-ced86c6559a3",
+    "title": "The Story of the Parthenon: From Temple to Monument",
+    "languageCode": "it",
+    "path": "blocks[8].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "bcc7d2be-50ef-46cb-85e2-ced86c6559a3",
+    "title": "The Story of the Parthenon: From Temple to Monument",
+    "languageCode": "it",
+    "path": "blocks[9].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "bcc7d2be-50ef-46cb-85e2-ced86c6559a3",
+    "title": "The Story of the Parthenon: From Temple to Monument",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "bcc7d2be-50ef-46cb-85e2-ced86c6559a3",
+    "title": "The Story of the Parthenon: From Temple to Monument",
+    "languageCode": null,
+    "path": "workingCopy",
+    "code": "PENDING_WORKING_COPY"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "ceaccdfb-a99c-4481-851c-c228082e2456",
+    "title": "UX-s11-editors Guide",
+    "languageCode": "el",
+    "path": "blocks[0].translations.el.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "ceaccdfb-a99c-4481-851c-c228082e2456",
+    "title": "UX-s11-editors Guide",
+    "languageCode": "it",
+    "path": "blocks[0].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "ceaccdfb-a99c-4481-851c-c228082e2456",
+    "title": "UX-s11-editors Guide",
+    "languageCode": "el",
+    "path": "blocks[2].translations.el.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "ceaccdfb-a99c-4481-851c-c228082e2456",
+    "title": "UX-s11-editors Guide",
+    "languageCode": "it",
+    "path": "blocks[2].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "ceaccdfb-a99c-4481-851c-c228082e2456",
+    "title": "UX-s11-editors Guide",
+    "languageCode": "el",
+    "path": "blocks[6].translations.el.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "ceaccdfb-a99c-4481-851c-c228082e2456",
+    "title": "UX-s11-editors Guide",
+    "languageCode": "it",
+    "path": "blocks[6].translations.it.text",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "ceaccdfb-a99c-4481-851c-c228082e2456",
+    "title": "UX-s11-editors Guide",
+    "languageCode": "el",
+    "path": "translations.el.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "ceaccdfb-a99c-4481-851c-c228082e2456",
+    "title": "UX-s11-editors Guide",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "GUIDE",
+    "resourceId": "ceaccdfb-a99c-4481-851c-c228082e2456",
+    "title": "UX-s11-editors Guide",
+    "languageCode": null,
+    "path": "workingCopy",
+    "code": "PENDING_WORKING_COPY"
+   },
+   {
+    "resourceType": "EVENT",
+    "resourceId": "e48b6489-181e-4a9d-9f7d-92df4e147951",
+    "title": "Family Workshop: Make Your Own Clay Lamp",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "EVENT",
+    "resourceId": "e48b6489-181e-4a9d-9f7d-92df4e147951",
+    "title": "Family Workshop: Make Your Own Clay Lamp",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "EVENT",
+    "resourceId": "e48b6489-181e-4a9d-9f7d-92df4e147951",
+    "title": "Family Workshop: Make Your Own Clay Lamp",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "EVENT",
+    "resourceId": "6e8462e3-a8b5-4f4b-a625-6140c1fd117e",
+    "title": "Full Moon Night at the Acropolis",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "EVENT",
+    "resourceId": "6e8462e3-a8b5-4f4b-a625-6140c1fd117e",
+    "title": "Full Moon Night at the Acropolis",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "EVENT",
+    "resourceId": "b43c1b5c-e78f-4a46-92d5-57a4afedeada",
+    "title": "Late Opening: Friday Nights at the Museum",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "EVENT",
+    "resourceId": "b43c1b5c-e78f-4a46-92d5-57a4afedeada",
+    "title": "Late Opening: Friday Nights at the Museum",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "EVENT",
+    "resourceId": "1f98cf73-333c-4257-a43c-5026500e836d",
+    "title": "Panathenaic Procession Reenactment",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "EVENT",
+    "resourceId": "1f98cf73-333c-4257-a43c-5026500e836d",
+    "title": "Panathenaic Procession Reenactment",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "EVENT",
+    "resourceId": "1f98cf73-333c-4257-a43c-5026500e836d",
+    "title": "Panathenaic Procession Reenactment",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "EVENT",
+    "resourceId": "78403f0f-185c-430c-936d-92cbb9ecc36d",
+    "title": "Summer Evening Concerts at the Theatre of Dionysus",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "EVENT",
+    "resourceId": "78403f0f-185c-430c-936d-92cbb9ecc36d",
+    "title": "Summer Evening Concerts at the Theatre of Dionysus",
+    "languageCode": "it",
+    "path": "translations.it.summary",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "EVENT",
+    "resourceId": "78403f0f-185c-430c-936d-92cbb9ecc36d",
+    "title": "Summer Evening Concerts at the Theatre of Dionysus",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "EVENT",
+    "resourceId": "b47ea028-96cb-4649-81f4-4a5bc4d01598",
+    "title": "UX-R2-s9 Event",
+    "languageCode": "el",
+    "path": "translations.el.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "EVENT",
+    "resourceId": "b47ea028-96cb-4649-81f4-4a5bc4d01598",
+    "title": "UX-R2-s9 Event",
+    "languageCode": "it",
+    "path": "translations.it.title",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "CATEGORY",
+    "resourceId": "699ad286-590e-44ba-be74-aa7417675ce9",
+    "title": "Cycling Itineraries",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "CATEGORY",
+    "resourceId": "699ad286-590e-44ba-be74-aa7417675ce9",
+    "title": "Cycling Itineraries",
+    "languageCode": "it",
+    "path": "translations.it.name",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "CATEGORY",
+    "resourceId": "66f0bb54-6d31-43b4-bd7a-0753cb43cb78",
+    "title": "Family Trails",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "CATEGORY",
+    "resourceId": "66f0bb54-6d31-43b4-bd7a-0753cb43cb78",
+    "title": "Family Trails",
+    "languageCode": "it",
+    "path": "translations.it.name",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "CATEGORY",
+    "resourceId": "51c12bfc-c55a-40b3-8829-fcf656677449",
+    "title": "Food and Drink",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "CATEGORY",
+    "resourceId": "51c12bfc-c55a-40b3-8829-fcf656677449",
+    "title": "Food and Drink",
+    "languageCode": "it",
+    "path": "translations.it.name",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "CATEGORY",
+    "resourceId": "9a8829d4-4004-4c23-9a83-f7262675cf3e",
+    "title": "Guided Walks",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "CATEGORY",
+    "resourceId": "79aaf581-d009-4294-a11b-bf5a8fa980f3",
+    "title": "Monuments and Temples",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "CATEGORY",
+    "resourceId": "4bed7fe0-fb5d-450b-a8ae-536418b6c2db",
+    "title": "Pottery and Everyday Life",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "CATEGORY",
+    "resourceId": "4bed7fe0-fb5d-450b-a8ae-536418b6c2db",
+    "title": "Pottery and Everyday Life",
+    "languageCode": "it",
+    "path": "translations.it.name",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "CATEGORY",
+    "resourceId": "15e8fb19-dd6d-4de2-b8e3-4d55f5fb37b9",
+    "title": "Sculpture",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "CATEGORY",
+    "resourceId": "5b33752a-0ce8-4c3c-984d-a81ee5fea7cd",
+    "title": "Shops",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "CATEGORY",
+    "resourceId": "5b33752a-0ce8-4c3c-984d-a81ee5fea7cd",
+    "title": "Shops",
+    "languageCode": "it",
+    "path": "translations.it.name",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "CATEGORY",
+    "resourceId": "a63918a5-f062-40e2-9104-223b1b1686d2",
+    "title": "Thematic Itineraries",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "CATEGORY",
+    "resourceId": "a63918a5-f062-40e2-9104-223b1b1686d2",
+    "title": "Thematic Itineraries",
+    "languageCode": "it",
+    "path": "translations.it.name",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "CATEGORY",
+    "resourceId": "1b8242a5-0499-45e5-98da-f762184bd620",
+    "title": "UX-R2-s11 Category",
+    "languageCode": "el",
+    "path": "translations.el.name",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "CATEGORY",
+    "resourceId": "1b8242a5-0499-45e5-98da-f762184bd620",
+    "title": "UX-R2-s11 Category",
+    "languageCode": "it",
+    "path": "translations.it.name",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "CATEGORY",
+    "resourceId": "64189076-5e6d-42cc-8654-80a2678db9ea",
+    "title": "UX-R2-s7-chrome toast timing A",
+    "languageCode": "el",
+    "path": "translations.el.name",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "CATEGORY",
+    "resourceId": "64189076-5e6d-42cc-8654-80a2678db9ea",
+    "title": "UX-R2-s7-chrome toast timing A",
+    "languageCode": "it",
+    "path": "translations.it.name",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "CATEGORY",
+    "resourceId": "6caa45c6-7e74-46ec-8713-3b31ee4f018e",
+    "title": "UX-R2-s9 Category",
+    "languageCode": "el",
+    "path": "translations.el.name",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "CATEGORY",
+    "resourceId": "6caa45c6-7e74-46ec-8713-3b31ee4f018e",
+    "title": "UX-R2-s9 Category",
+    "languageCode": "it",
+    "path": "translations.it.name",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "CATEGORY",
+    "resourceId": "6fa0e204-d987-4761-9cd0-b79bc3bc980f",
+    "title": "UX-s11-editors Category",
+    "languageCode": "el",
+    "path": "translations.el.name",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "CATEGORY",
+    "resourceId": "6fa0e204-d987-4761-9cd0-b79bc3bc980f",
+    "title": "UX-s11-editors Category",
+    "languageCode": "it",
+    "path": "translations.it.name",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "CATEGORY",
+    "resourceId": "a62fbe08-3519-4900-be5e-040704c72633",
+    "title": "Viewpoints",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "CATEGORY",
+    "resourceId": "a62fbe08-3519-4900-be5e-040704c72633",
+    "title": "Viewpoints",
+    "languageCode": "it",
+    "path": "translations.it.name",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "CATEGORY",
+    "resourceId": "615d3d67-3658-4c7d-848c-dcb52c2ecb59",
+    "title": "Visitor Services",
+    "languageCode": "it",
+    "path": "translations.it.description",
+    "code": "MISSING_TRANSLATION"
+   },
+   {
+    "resourceType": "ASSET",
+    "resourceId": "3f753bb5-535f-48ec-a604-b1cb4d6df9c2",
+    "title": "ambient-agora",
+    "languageCode": "en",
+    "path": "translations.en.transcript",
+    "code": "MISSING_TRANSCRIPT"
+   },
+   {
+    "resourceType": "ASSET",
+    "resourceId": "156048bb-e917-4841-8172-ead5ee8c3831",
+    "title": "audio-moschophoros",
+    "languageCode": "en",
+    "path": "translations.en.transcript",
+    "code": "MISSING_TRANSCRIPT"
+   },
+   {
+    "resourceType": "ASSET",
+    "resourceId": "ccad609e-f945-45ad-9a5e-fad0751afd97",
+    "title": "audio-parthenon-overview",
+    "languageCode": "en",
+    "path": "translations.en.transcript",
+    "code": "MISSING_TRANSCRIPT"
+   },
+   {
+    "resourceType": "ASSET",
+    "resourceId": "c7b76a72-8313-4f1e-8d99-90651da6bafe",
+    "title": "video-dionysos-restoration",
+    "languageCode": "en",
+    "path": "translations.en.transcript",
+    "code": "MISSING_TRANSCRIPT"
+   }
+  ]
+ }
+}

@@ -1,0 +1,10 @@
+import { open, go, shot, P, settle } from "./lib.mjs";
+const ID="061eca49-e97e-483a-b48f-3dff0d96a3cc";
+const { browser, page } = await open("curator", { viewport: "1440" });
+await go(page, `/projects/${P}/pois/${ID}`);
+await page.getByRole("heading", { level: 1 }).first().waitFor(); await settle(page,1500);
+const t=await page.locator("aside").innerText(); console.log(t);
+const dbtn=page.getByRole("button",{name:/^Deactivate/}); console.log("deactivate disabled?", await dbtn.isDisabled(), await dbtn.getAttribute("aria-disabled"), await dbtn.getAttribute("aria-describedby"));
+await page.evaluate(()=>document.querySelector("aside").scrollTo(0,9999)); await settle(page,300);
+await shot(page,"poi-editor__active-sidecolumn-bottom__1440");
+await browser.close();

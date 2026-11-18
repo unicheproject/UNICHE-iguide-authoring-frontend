@@ -1,0 +1,80 @@
+{
+ "populated@1440": {
+  "h1": "Dashboard",
+  "rows": "Warnings (100)",
+  "status": "Ready to go live, with 100 warnings",
+  "guide": 0,
+  "hscroll": false,
+  "axe": []
+ },
+ "drafts@1440": {
+  "h1": "Dashboard",
+  "rows": "Warnings (1)",
+  "status": "Nothing is live yet",
+  "guide": 1,
+  "hscroll": false,
+  "axe": []
+ },
+ "populated@1024": {
+  "h1": "Dashboard",
+  "rows": "Warnings (100)",
+  "status": "Ready to go live, with 100 warnings",
+  "guide": 0,
+  "hscroll": false,
+  "axe": []
+ },
+ "drafts@1024": {
+  "h1": "Dashboard",
+  "rows": "Warnings (1)",
+  "status": "Nothing is live yet",
+  "guide": 1,
+  "hscroll": false,
+  "axe": []
+ },
+ "populated@768": {
+  "h1": "Dashboard",
+  "rows": "Warnings (100)",
+  "status": "Ready to go live, with 100 warnings",
+  "guide": 0,
+  "hscroll": false,
+  "axe": []
+ },
+ "drafts@768": {
+  "h1": "Dashboard",
+  "rows": "Warnings (1)",
+  "status": "Nothing is live yet",
+  "guide": 1,
+  "hscroll": false,
+  "axe": []
+ },
+ "populated@zoom200": {
+  "h1": "Dashboard",
+  "rows": "Warnings (100)",
+  "status": "Ready to go live, with 100 warnings",
+  "guide": 0,
+  "hscroll": false,
+  "axe": []
+ },
+ "drafts@zoom200": {
+  "h1": "Dashboard",
+  "rows": "Warnings (1)",
+  "status": "Nothing is live yet",
+  "guide": 1,
+  "hscroll": false,
+  "axe": []
+ },
+ "populated@forced": {
+  "h1": "Dashboard",
+  "rows": "Warnings (100)",
+  "status": "Ready to go live, with 100 warnings",
+  "guide": 0,
+  "hscroll": false
+ },
+ "drafts@forced": {
+  "h1": "Dashboard",
+  "rows": "Warnings (1)",
+  "status": "Nothing is live yet",
+  "guide": 1,
+  "hscroll": false
+ }
+}

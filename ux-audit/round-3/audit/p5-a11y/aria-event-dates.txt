@@ -1,0 +1,156 @@
+- region "Dates 2":
+  - heading "Dates 2" [level=2]
+  - paragraph: "This Project has no time zone set, so times are in this browser's: Athens time (Europe/Athens)."
+  - list "Dates of the event":
+    - listitem:
+      - group "Date 1":
+        - heading "Date 1" [level=3]
+        - text: Wed 18 Nov 2026 · 10:00–11:00
+        - group "Starts(required)":
+          - text: Starts(required)
+          - paragraph: "Format: day, month name, year, 24-hour time HH:MM."
+          - text: Day
+          - textbox "Day":
+            - /placeholder: DD
+            - text: "18"
+          - text: Month
+          - combobox "Month":
+            - option "Month" [disabled]
+            - option "January"
+            - option "February"
+            - option "March"
+            - option "April"
+            - option "May"
+            - option "June"
+            - option "July"
+            - option "August"
+            - option "September"
+            - option "October"
+            - option "November" [selected]
+            - option "December"
+          - text: Year
+          - textbox "Year":
+            - /placeholder: YYYY
+            - text: "2026"
+          - text: Hour (0 to 23)
+          - textbox "Hour (0 to 23)":
+            - /placeholder: HH
+            - text: "10"
+          - text: Minute
+          - textbox "Minute":
+            - /placeholder: MM
+            - text: "00"
+        - group "Ends(required)":
+          - text: Ends(required)
+          - paragraph: "Format: day, month name, year, 24-hour time HH:MM."
+          - text: Day
+          - textbox "Day":
+            - /placeholder: DD
+            - text: "18"
+          - text: Month
+          - combobox "Month":
+            - option "Month" [disabled]
+            - option "January"
+            - option "February"
+            - option "March"
+            - option "April"
+            - option "May"
+            - option "June"
+            - option "July"
+            - option "August"
+            - option "September"
+            - option "October"
+            - option "November" [selected]
+            - option "December"
+          - text: Year
+          - textbox "Year":
+            - /placeholder: YYYY
+            - text: "2026"
+          - text: Hour (0 to 23)
+          - textbox "Hour (0 to 23)":
+            - /placeholder: HH
+            - text: "11"
+          - text: Minute
+          - textbox "Minute":
+            - /placeholder: MM
+            - text: "00"
+        - switch "Cancelled"
+        - text: Cancelled
+        - button "Remove date 1"
+    - listitem:
+      - group "Date 2":
+        - heading "Date 2" [level=3]
+        - text: Thu 19 Nov 2026 · 10:00–11:00
+        - group "Starts(required)":
+          - text: Starts(required)
+          - paragraph: "Format: day, month name, year, 24-hour time HH:MM."
+          - text: Day
+          - textbox "Day":
+            - /placeholder: DD
+            - text: "19"
+          - text: Month
+          - combobox "Month":
+            - option "Month" [disabled]
+            - option "January"
+            - option "February"
+            - option "March"
+            - option "April"
+            - option "May"
+            - option "June"
+            - option "July"
+            - option "August"
+            - option "September"
+            - option "October"
+            - option "November" [selected]
+            - option "December"
+          - text: Year
+          - textbox "Year":
+            - /placeholder: YYYY
+            - text: "2026"
+          - text: Hour (0 to 23)
+          - textbox "Hour (0 to 23)":
+            - /placeholder: HH
+            - text: "10"
+          - text: Minute
+          - textbox "Minute":
+            - /placeholder: MM
+            - text: "00"
+        - group "Ends(required)":
+          - text: Ends(required)
+          - paragraph: "Format: day, month name, year, 24-hour time HH:MM."
+          - text: Day
+          - textbox "Day":
+            - /placeholder: DD
+            - text: "19"
+          - text: Month
+          - combobox "Month":
+            - option "Month" [disabled]
+            - option "January"
+            - option "February"
+            - option "March"
+            - option "April"
+            - option "May"
+            - option "June"
+            - option "July"
+            - option "August"
+            - option "September"
+            - option "October"
+            - option "November" [selected]
+            - option "December"
+          - text: Year
+          - textbox "Year":
+            - /placeholder: YYYY
+            - text: "2026"
+          - text: Hour (0 to 23)
+          - textbox "Hour (0 to 23)":
+            - /placeholder: HH
+            - text: "11"
+          - text: Minute
+          - textbox "Minute":
+            - /placeholder: MM
+            - text: "00"
+        - switch "Cancelled"
+        - text: Cancelled
+        - button "Remove date 2"
+  - button "Add a date"
+  - button "Repeat weekly"

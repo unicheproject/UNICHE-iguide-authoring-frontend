@@ -1,0 +1,17 @@
+import { open, go, P, shot, settle, IDS, url, txt, routeWithStops } from "./lib.mjs";
+const { browser, page } = await open("admin", { viewport: "1440" });
+await routeWithStops(page);
+await page.getByRole("button",{name:"Show as list"}).click(); await settle(page,300);
+console.log("show list ->", await page.evaluate(()=>{const b=document.querySelector("[aria-controls=route-stop-list]"); return b.textContent.trim()+" exp="+b.getAttribute("aria-expanded")+" target="+!!document.getElementById("route-stop-list")}));
+await page.getByRole("button",{name:/^More stop texts/}).first().click(); await settle(page,400);
+const row = page.locator("li[data-stop-row]").first();
+await row.scrollIntoViewIfNeeded(); await shot(page,"route__stop-more-texts__1440");
+console.log(await row.evaluate(e=>e.innerText.replace(/\n+/g," | ")));
+await page.getByRole("button",{name:"Save", exact:true}).click(); await settle(page,1800);
+console.log("saved", await page.evaluate(()=>document.querySelector("header, [role=banner]")?.innerText.slice(0,200)));
+await page.evaluate(()=>window.scrollTo(0,0));
+await page.getByRole("button",{name:/Activate/}).first().click(); await settle(page,800);
+const dlg = page.getByRole("dialog");
+console.log("ACTIVATE", await dlg.count() ? await dlg.evaluate(e=>e.innerText.replace(/\n+/g," | ")) : "no dialog; page: "+await page.evaluate(()=>[...document.querySelectorAll("[role=alert],[role=status]")].map(e=>e.textContent.trim()).join(" || ")));
+await shot(page,"route__activate-click__1440");
+await browser.close();

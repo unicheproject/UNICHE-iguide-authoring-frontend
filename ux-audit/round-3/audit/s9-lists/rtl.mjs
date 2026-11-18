@@ -1,0 +1,16 @@
+import { open, go, P, shot, settle } from "./h.mjs";
+const { browser, page } = await open("admin", { viewport: "1440" });
+let id;
+page.on("response", async r => { if (r.request().method() === "POST" && /\/guides$/.test(r.url())) { try { const j = await r.json(); id = j.id; console.log("POST", r.status(), JSON.stringify(j).slice(0,200)); } catch(e){ console.log("POST", r.status(), await r.text().catch(()=>"")); } } });
+await go(page, `/projects/${P}/guides`); await settle(page, 1500);
+await page.getByRole("button", { name: "New guide", exact: true }).click(); await settle(page, 400);
+await page.locator("[role=dialog] input[type=text]").first().fill("UX-R3-s9 מוזיאון (חדש)! – Guide RTL");
+console.log("slug preview", await page.evaluate(() => document.querySelector("[role=dialog]").innerText.match(/Slug:[\s\S]*?(?=Edit slug)/)?.[0].replace(/\n/g," ")));
+console.log("title input dir attr:", await page.locator("[role=dialog] input[type=text]").first().getAttribute("dir"));
+await page.locator("[role=dialog] button", { hasText: /^Create/ }).click(); await settle(page, 2500);
+console.log("url", await page.evaluate(() => location.pathname));
+await go(page, `/projects/${P}/guides?q=guide%20rtl`); await settle(page, 1800);
+const m = await page.evaluate(() => { const tr = document.querySelector("main table tbody tr"); const a = tr.querySelector("td:nth-child(2) a"); const box = a.closest("[dir]"); return { text: a.textContent, boxDir: box?.getAttribute("dir"), computedDir: getComputedStyle(a).direction, bdi: !!a.querySelector("bdi"), ariaLabel: tr.querySelector("button[aria-label^=Actions]").getAttribute("aria-label") }; });
+console.log(JSON.stringify(m));
+await shot(page, "guides__rtl-title__1440");
+await browser.close();

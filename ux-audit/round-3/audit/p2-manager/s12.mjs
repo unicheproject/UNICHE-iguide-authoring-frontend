@@ -1,0 +1,18 @@
+import { open, go } from "../../../tools/session.mjs";
+import { shot } from "./lib.mjs";
+const ID="600c4311-3e81-4235-91b0-5b3e336918fc";
+const { browser, page } = await open("admin", { viewport: "1440" });
+await go(page, "/projects/"+ID);
+await page.waitForTimeout(2000);
+const m = await page.evaluate(()=>{ const cards=[...document.querySelectorAll("main section, main > div > div, main article")].map(e=>{const b=e.getBoundingClientRect(); return [e.tagName, (e.getAttribute("aria-labelledby")||e.className.slice(0,30)), Math.round(b.x), Math.round(b.right), Math.round(b.width)]}); return cards.slice(0,14)});
+console.log(JSON.stringify(m));
+await page.getByRole("link",{name:/Open Pages/}).click();
+await page.waitForTimeout(1500);
+console.log("pages url", page.url());
+await shot(page,"firstrun-step3__pages__1440");
+console.log("PAGES\n", await page.evaluate(()=>document.querySelector("main")?.innerText));
+await go(page, "/projects/"+ID);
+await page.waitForTimeout(1500);
+console.log("DASH after visiting pages\n", await page.evaluate(()=>document.querySelector("main")?.innerText.slice(0,900)));
+await shot(page,"dashboard-new__after-step3__1440");
+await browser.close();

@@ -1,0 +1,13 @@
+import { start, goEd, P, tall, place, poi } from "./common.mjs";
+import { readFileSync, writeFileSync } from "node:fs";
+const s = await start("1440"); const { page } = s;
+const reqs=[]; page.on("request", r=>{ if(/\/iguide\/api/.test(r.url()) && r.method()!=="GET") reqs.push(r.method()+" "+r.url().replace(/.*api\/v1/,"")); });
+page.on("response", async r=>{ if(/\/iguide\/api/.test(r.url()) && r.request().method()!=="GET") console.log("RESP", r.status(), r.url().replace(/.*api\/v1/,"")); });
+const id = "e2429d5c-31f0-44c0-96d6-eadbacdaaca5";
+await goEd(page, "/places/"+id);
+await page.getByRole("button", { name: /^activate$/i }).click(); await page.waitForTimeout(1500);
+console.log("dialogs:", await page.getByRole("dialog").count());
+await s.shot("place-new__activate-click");
+console.log((await page.locator("main").innerText()).slice(0,200).replace(/\n+/g," | "));
+console.log(reqs);
+await s.browser.close();

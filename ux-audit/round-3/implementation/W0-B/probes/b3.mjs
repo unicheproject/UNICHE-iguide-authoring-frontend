@@ -1,0 +1,41 @@
+import { session, go, P, ids, LOG, shot, sleep, AE, names } from "./h.mjs";
+const log = LOG("b3");
+const { browser, page } = await session({ viewport: "1440" });
+await go(page, P(`/pois/${ids.wc1}`));
+await page.waitForSelector("#f-summary", { timeout: 20000 });
+await page.locator("#f-summary").fill("Edited summary for discard");
+await sleep(300);
+await page.locator("[data-banner-save]").click();
+await sleep(1500);
+log("state line after save draft:", await page.locator("[role=status]").first().innerText());
+// Discard
+await page.getByRole("button", { name: /Discard changes/ }).first().click();
+await sleep(400);
+await page.locator("[role=dialog]").getByRole("button", { name: "Discard changes" }).click();
+await sleep(1800);
+log("DISCARD activeElement:", await AE(page));
+log("toast:", await page.evaluate(() => [...document.querySelectorAll("[role=status],[class*=toast]")].map((e) => e.textContent.trim()).filter(Boolean)));
+await shot(page, "b3-after-discard-1440");
+
+// 401 persistent on PUT of working copy
+await page.locator("#f-summary").fill("401 text");
+await sleep(300);
+let hits = 0;
+await page.route(/\/working-copy/, (r) => { if (r.request().method() === "PUT") { hits++; return r.fulfill({ status: 401, contentType: "application/problem+json", body: JSON.stringify({ type: "x", title: "Unauthorized", status: 401, code: "UNAUTHORIZED", requestId: "r401" }) }); } return r.continue(); });
+await page.keyboard.press("Control+s");
+await sleep(2500);
+log("dialog shown:", await page.locator("[role=dialog]").count(), (await page.locator("[role=dialog]").innerText().catch(() => "")).replace(/\s+/g, " "));
+await shot(page, "b3-session-dialog-1440");
+await page.keyboard.press("Escape");
+await sleep(600);
+log("state line after dismiss:", await page.locator("[data-session-lost], [role=status]").first().innerText());
+const saveBtn = page.locator("[data-banner-save]");
+log("Save draft aria-disabled:", await saveBtn.getAttribute("aria-disabled"), "primary aria-disabled:", await page.locator("[data-editor-primary]").getAttribute("aria-disabled"));
+log("header texts:", await page.locator(".editor-header").innerText().then((t) => t.replace(/\s+/g, " ")));
+await shot(page, "b3-after-dismiss-1440");
+const before = hits;
+await page.keyboard.press("Control+s");
+await sleep(1500);
+log("Ctrl+S retried:", hits - before, "dialog again:", await page.locator("[role=dialog]").count());
+log("Saving... anywhere:", /Saving…/.test(await page.evaluate(() => document.body.innerText)));
+await browser.close();

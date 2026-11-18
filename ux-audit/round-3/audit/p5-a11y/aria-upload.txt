@@ -1,0 +1,44 @@
+- dialog "Upload files":
+  - heading "Upload files" [level=2]
+  - button "Close dialog"
+  - paragraph: Drop files here, or
+  - button "Choose files"
+  - button "Files to upload"
+  - checkbox "Upload images as floor plans"
+  - text: Upload images as floor plans
+  - table "Accepted formats and largest file":
+    - caption: Accepted formats and largest file
+    - rowgroup:
+      - row "Type Formats Largest file":
+        - columnheader "Type"
+        - columnheader "Formats"
+        - columnheader "Largest file"
+    - rowgroup:
+      - row "Image JPG, PNG, WebP, GIF, SVG, AVIF 20.0 MB":
+        - rowheader "Image"
+        - cell "JPG, PNG, WebP, GIF, SVG, AVIF"
+        - cell "20.0 MB"
+      - row "Audio MP3, WAV, M4A, OGG, FLAC 50.0 MB":
+        - rowheader "Audio"
+        - cell "MP3, WAV, M4A, OGG, FLAC"
+        - cell "50.0 MB"
+      - row "Video MP4, WebM, MOV 200.0 MB":
+        - rowheader "Video"
+        - cell "MP4, WebM, MOV"
+        - cell "200.0 MB"
+      - row "Document PDF 20.0 MB":
+        - rowheader "Document"
+        - cell "PDF"
+        - cell "20.0 MB"
+      - row "3D model GLB, GLTF 100.0 MB":
+        - rowheader "3D model"
+        - cell "GLB, GLTF"
+        - cell "100.0 MB"
+      - row "Any upload At most 200.0 MB":
+        - rowheader "Any upload"
+        - cell "At most"
+        - cell "200.0 MB"
+  - paragraph: You can add several files at once. Other file types are held back until you confirm them.
+  - log "Upload activity"
+  - contentinfo:
+    - button "Close"

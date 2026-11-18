@@ -1,0 +1,14 @@
+import { call, closeAll } from "../../../tools/lib.mjs";
+import { writeFileSync } from "node:fs";
+const PID="6958c18f-60d2-4140-a524-5a43f8a2f6b5"; const P=(p)=>`/projects/${PID}${p}`;
+const W=(m,p,b)=>call("admin",m,P(p),b);
+const ids={};
+ids.place=(await W("POST","/places",{title:"UX-R3-p6 Place A",type:"BUILDING",environment:"INDOOR",parentPlaceId:null}).catch(e=>W("POST","/places",{title:"UX-R3-p6 Place A",type:"BUILDING",environment:"INDOOR",parentPlaceId:null}))).id;
+ids.poi=(await W("POST","/pois",{title:"UX-R3-p6 POI A",placeId:ids.place,code:null})).id;
+ids.poi2=(await W("POST","/pois",{title:"UX-R3-p6 POI B",placeId:ids.place,code:null})).id;
+ids.route=(await W("POST","/routes",{title:"UX-R3-p6 Route A",type:"OUTDOOR"}).catch(e=>{console.log(e.message);return W("POST","/routes",{title:"UX-R3-p6 Route A"})})).id;
+ids.guide=(await W("POST","/guides",{title:"UX-R3-p6 Guide A"})).id;
+ids.event=(await W("POST","/events",{title:"UX-R3-p6 Event A"})).id;
+ids.category=(await W("POST","/categories",{name:"UX-R3-p6 Category A",scope:"POI",parentCategoryId:null}).catch(e=>{console.log(e.message);return W("POST","/categories",{name:"UX-R3-p6 Category A",scope:"POIS",parentCategoryId:null})})).id;
+console.log(ids); writeFileSync(new URL("./ids.json",import.meta.url),JSON.stringify(ids));
+await closeAll();

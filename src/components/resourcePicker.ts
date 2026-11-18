@@ -13,4 +13,9 @@ export interface Pickable {
   id: string;
   title: string;
   status: ResourceStatus;
+  /** An exhibit code a visitor types, shown labelled ("Code 103") and searched. */
+  code?: string | null;
+  /** The Place the Resource belongs to, for the Place filter and the row's second line. */
+  placeId?: string | null;
+  placeName?: string | null;
 }

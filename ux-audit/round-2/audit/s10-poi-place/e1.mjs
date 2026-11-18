@@ -1,0 +1,22 @@
+import { open, go, rec, P, ready, SH, tall, axe } from "./h.mjs";
+const log=(...a)=>console.log(...a);
+const focus=(page)=>page.evaluate(()=>{const a=document.activeElement;return a?`${a.tagName}#${a.id}.${(a.getAttribute("aria-label")||a.textContent||"").trim().slice(0,40)}`:null});
+const { browser, page } = await open("curator", { viewport: "1440" });
+await go(page, `/projects/${P}/pois/${rec.poiB}`); await ready(page);
+await page.getByRole("button",{name:/More/}).click(); await page.waitForTimeout(500);
+log("menu items", await page.getByRole("menuitem").allInnerTexts()); log("focus", await focus(page));
+await page.screenshot({path:SH+"poi-editor__more-menu__1440.png"});
+await page.getByRole("menuitem",{name:/Archive/}).click(); await page.waitForTimeout(1500);
+log("dialog", await page.getByRole("dialog").innerText().catch(()=>"none"));
+await page.screenshot({path:SH+"poi-editor__archive-confirm__1440.png"});
+await page.getByRole("dialog").getByRole("button",{name:/Archive/}).last().click(); await page.waitForTimeout(3000);
+log("focus after archive", await focus(page));
+log("toasts", await page.locator("[role=status],[role=alert]").allInnerTexts());
+await page.screenshot({path:SH+"poi-editor__archived-viewport__1440.png"});
+log(await tall(page,"poi-editor__archived-tall__1440"));
+log("hdr", await page.evaluate(()=>document.querySelector("main")?.innerText.slice(0,500).replace(/\n+/g," | ")));
+log("editable inputs", await page.locator("main input:not([disabled]):not([readonly]), main textarea:not([disabled]):not([readonly]), main select:not([disabled])").count(), "disabled", await page.locator("main [disabled]").count());
+log("side", await page.evaluate(()=>document.querySelector("aside")?.innerText.replace(/\n+/g," | ").slice(0,400)));
+await axe(page,"poi archived");
+// forced colors compare later
+await browser.close();

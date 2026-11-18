@@ -1,0 +1,207 @@
+{
+ "places@1440": {
+  "mode": "table",
+  "rows": 30,
+  "titleMin": 406,
+  "titleMax": 406,
+  "overlaps": 0,
+  "overflow": 0,
+  "theadH": [
+   48,
+   48,
+   48,
+   48,
+   48,
+   48,
+   48
+  ],
+  "orderW": 48,
+  "docOverflow": false
+ },
+ "pois@1440": {
+  "mode": "table",
+  "rows": 50,
+  "titleMin": 438,
+  "titleMax": 438,
+  "overlaps": 0,
+  "overflow": 8,
+  "theadH": [
+   48,
+   48,
+   48,
+   48,
+   48,
+   48,
+   48
+  ],
+  "orderW": 48,
+  "docOverflow": false
+ },
+ "routes@1440": {
+  "mode": "table",
+  "rows": 26,
+  "titleMin": 406,
+  "titleMax": 406,
+  "overlaps": 0,
+  "overflow": 1,
+  "theadH": [
+   48,
+   48,
+   48,
+   48,
+   48,
+   48,
+   48
+  ],
+  "orderW": 48,
+  "docOverflow": false
+ },
+ "places@1280": {
+  "mode": "table",
+  "rows": 30,
+  "titleMin": 246,
+  "titleMax": 246,
+  "overlaps": 0,
+  "overflow": 0,
+  "theadH": [
+   48,
+   48,
+   48,
+   48,
+   48,
+   48,
+   48
+  ],
+  "orderW": 48,
+  "docOverflow": false
+ },
+ "pois@1280": {
+  "mode": "table",
+  "rows": 50,
+  "titleMin": 278,
+  "titleMax": 278,
+  "overlaps": 0,
+  "overflow": 8,
+  "theadH": [
+   48,
+   48,
+   48,
+   48,
+   48,
+   48,
+   48
+  ],
+  "orderW": 48,
+  "docOverflow": false
+ },
+ "routes@1280": {
+  "mode": "table",
+  "rows": 26,
+  "titleMin": 246,
+  "titleMax": 246,
+  "overlaps": 0,
+  "overflow": 1,
+  "theadH": [
+   48,
+   48,
+   48,
+   48,
+   48,
+   48,
+   48
+  ],
+  "orderW": 48,
+  "docOverflow": false
+ },
+ "places@1024": {
+  "mode": "cards",
+  "rows": 30,
+  "titleMin": 834,
+  "titleMax": 914,
+  "overlaps": 0,
+  "overflow": 0,
+  "theadH": [],
+  "orderW": null,
+  "docOverflow": false
+ },
+ "pois@1024": {
+  "mode": "table",
+  "rows": 50,
+  "titleMin": 270,
+  "titleMax": 270,
+  "overlaps": 0,
+  "overflow": 8,
+  "theadH": [
+   48,
+   48,
+   48,
+   48,
+   48,
+   48,
+   48
+  ],
+  "orderW": 48,
+  "docOverflow": false
+ },
+ "routes@1024": {
+  "mode": "cards",
+  "rows": 26,
+  "titleMin": 914,
+  "titleMax": 914,
+  "overlaps": 0,
+  "overflow": 0,
+  "theadH": [],
+  "orderW": null,
+  "docOverflow": false
+ },
+ "places@768": {
+  "mode": "cards",
+  "rows": 30,
+  "titleMin": 578,
+  "titleMax": 658,
+  "overlaps": 0,
+  "overflow": 0,
+  "theadH": [],
+  "orderW": null,
+  "docOverflow": false
+ },
+ "pois@768": {
+  "mode": "cards",
+  "rows": 50,
+  "titleMin": 658,
+  "titleMax": 658,
+  "overlaps": 0,
+  "overflow": 0,
+  "theadH": [],
+  "orderW": null,
+  "docOverflow": false
+ },
+ "routes@768": {
+  "mode": "cards",
+  "rows": 26,
+  "titleMin": 658,
+  "titleMax": 658,
+  "overlaps": 0,
+  "overflow": 0,
+  "theadH": [],
+  "orderW": null,
+  "docOverflow": false
+ },
+ "greek-pois@1024": [
+  {
+   "text": 19,
+   "lines": 1,
+   "bad": 0
+  },
+  {
+   "text": 71,
+   "lines": 3,
+   "bad": 0
+  },
+  {
+   "text": 19,
+   "lines": 1,
+   "bad": 0
+  }
+ ]
+}

@@ -1,0 +1,42 @@
+import { session, go, P, ids, LOG, shot, ax, sleep } from "./h.mjs";
+const log = LOG(process.argv[2] ?? "an");
+const { browser, page } = await session({ viewport: "1440" });
+await page.addInitScript(() => {
+  window.__live = [];
+  const start = () => new MutationObserver((ms) => { for (const m of ms) { const t = (m.target.nodeType === 3 ? m.target.parentElement : m.target); const live = t?.closest?.("[aria-live],[role=status],[role=alert]"); const txt = live?.textContent.trim().replace(/\s+/g, " "); if (txt) window.__live.push(txt.slice(0, 160)); } }).observe(document.body, { subtree: true, childList: true, characterData: true });
+  document.addEventListener("DOMContentLoaded", start);
+});
+const msgs = async () => { await sleep(700); const l = await page.evaluate(() => { const r = [...new Set(window.__live)]; window.__live.length = 0; return r; }); return l; };
+await go(page, P(`/routes/${ids.routeEmpty}`));
+await page.getByRole("button", { name: "Add stops" }).waitFor(); await sleep(1500); await msgs();
+await page.getByRole("button", { name: "Add stops" }).click(); await sleep(500);
+const dlg = page.getByRole("dialog", { name: "Add stops" });
+await msgs();
+await dlg.getByRole("searchbox").fill("παρθενωνας"); await sleep(400);
+log("search παρθενωνας ->", await dlg.locator("ul li").count(), "rows;", (await dlg.locator("ul li").allInnerTexts()).map((t) => t.split("\n")[0]));
+log("live after search", await msgs());
+await dlg.getByRole("searchbox").fill("ΠΑΡΘΕΝΩΝΑΣ"); await sleep(300);
+log("search ΠΑΡΘΕΝΩΝΑΣ ->", await dlg.locator("ul li").count());
+await dlg.getByRole("searchbox").fill("erechtheion"); await sleep(300); await msgs();
+await dlg.locator("ul li button").first().click();
+log("ONE ADD live messages:", await msgs());
+await dlg.getByRole("searchbox").fill("");
+await dlg.locator("ul li button:not([aria-disabled=true])").nth(0).click(); await sleep(200);
+await dlg.locator("ul li button:not([aria-disabled=true])").nth(0).click();
+log("two more adds live messages:", await msgs());
+await dlg.getByRole("button", { name: /^Done/ }).click(); await sleep(500); await msgs();
+log("stops now", await page.locator("[data-stop-row]").count());
+// reorder
+await page.locator("[id$=-move-down]").first().click();
+log("REORDER live:", await msgs());
+// remove
+await page.getByRole("button", { name: /^Remove stop 1/ }).click();
+log("REMOVE live:", await msgs());
+const bar = await page.evaluate(() => { const b = document.querySelector("[data-removed-bar]"); if (!b) return null; const r = b.getBoundingClientRect(); return { text: b.querySelector("[role=status]").textContent, top: r.top, bottom: r.bottom, vh: innerHeight }; });
+log("undo bar", bar);
+await page.getByRole("button", { name: /^Remove stop 1/ }).click(); await sleep(300);
+log("2nd removal bar text", await page.evaluate(() => document.querySelector("[data-removed-bar] [role=status]").textContent));
+log("draft warnings in rows", await page.locator("[data-stop-row] p.text-warning").count(), "grouped notes", await page.locator("[data-hidden-stops]").count());
+log("chip titles", await page.evaluate(() => [...document.querySelectorAll("[data-stop-row] [title]")].map((e) => e.title)));
+log("position select h", await page.evaluate(() => document.querySelector("[id$=-position]")?.getBoundingClientRect().height));
+await browser.close();

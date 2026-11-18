@@ -1,0 +1,10 @@
+slow t~600 {"btn":"Saving…\nSaving…","disabled":true,"msgs":["Saving…","3 warnings, nothing blocks."],"puts":1}
+slow t~3000 {"btn":"Saving…\nSaving…","disabled":true,"msgs":["Still saving…","3 warnings, nothing blocks."],"puts":1}
+slow t~5500 {"btn":"Saving…\nSaving…","disabled":true,"msgs":["Still saving…","3 warnings, nothing blocks."],"puts":1}
+slow t~9500 {"btn":"Saving…\nSaving…","disabled":true,"msgs":["Still saving…","3 warnings, nothing blocks."],"puts":1}
+slow done {"puts":1,"msgs":["Saved 11:29","3 warnings, nothing blocks."],"live":["Saving…","Still saving…","Saved 11:29"]}
+offline banner ["You are offline. Changes are disabled; what is loaded stays readable, and unsaved changes stay in the form. Check again","Unsaved changes","3 warnings, nothing blocks."]
+offline banner ["You are offline. Changes are disabled; what is loaded stays readable, and unsaved changes stay in the form. Check again","Unsaved changes","3 warnings, nothing blocks."]
+offline save click {"msgs":["You are offline. Changes are disabled; what is loaded stays readable, and unsaved changes stay in the form. Check again","Unsaved changes","3 warnings, nothing blocks."],"focus":"button \"SaveYou are offline\"","live":[]}
+offline ctrl+s {"msgs":["You are offline. Changes are disabled; what is loaded stays readable, and unsaved changes stay in the form. Check again","Unsaved changes","3 warnings, nothing blocks.","You are offline. Your changes are kept in this browser until you are back online."],"live":["status: You are offline. Your changes are kept in this browser until you are back online."]}
+back online {"msgs":["Unsaved changes","3 warnings, nothing blocks.","Back online"],"live":["alert: You are offline. Changes are disabled; what is loaded stays readable, and unsaved changes stay in the form. Checking","alert: You are offline. Changes are disabled; what is loaded stays readable, and unsaved changes stay in the form. Checking","status: Back online"]}

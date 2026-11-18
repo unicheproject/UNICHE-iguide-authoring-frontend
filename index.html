@@ -4,23 +4,38 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
+    <!-- Montserrat is self-hosted (D-071); the latin file is needed by every first paint. -->
+    <link rel="preload" href="/fonts/montserrat-latin-var.woff2" as="font" type="font/woff2" crossorigin />
     <title>iGuide CMS</title>
   </head>
   <body>
     <div id="app">
-      <!-- Replaced when the CMS mounts, once the UNICHE session check has finished. -->
-      <div
-        aria-busy="true"
-        style="min-height:100vh;display:flex;flex-direction:column;background:#f3f4f6;font-family:Montserrat,sans-serif"
-      >
-        <div style="height:60px;background:#fff;border-bottom:1px solid #e5e7eb"></div>
-        <p style="margin:auto;font-size:13px;color:#4b5563">Checking your UNICHE session…</p>
+      <!-- Replaced when the CMS mounts, once the UNICHE session check has finished. Self-contained: no request of its own;
+           the values are the style.css tokens (background, card, border, primary, muted-foreground), which are not loaded yet. -->
+      <div class="splash" aria-busy="true">
+        <style>
+          .splash{--s-bg:hsl(220 15.8% 96.3%);--s-card:hsl(0 0% 100%);--s-border:hsl(220 13.4% 86.9%);--s-primary:hsl(265.6 65.5% 32.9%);--s-muted:hsl(220 15.8% 92.5%);--s-ink:hsl(216.9 13.1% 38.8%);min-height:100vh;display:flex;flex-direction:column;background:var(--s-bg);color:var(--s-ink);font-family:Montserrat,system-ui,sans-serif}
+          .splash-head{height:56px;display:flex;align-items:center;gap:12px;padding:0 16px;background:var(--s-card);border-bottom:1px solid var(--s-border);flex:none}
+          .splash-app{border-left:1px solid var(--s-border);padding-left:12px;font-size:.75rem;font-weight:600}
+          @media (min-width:1100px){.splash-head{padding:0 24px}}
+          .splash-body{margin:0 auto;width:100%;max-width:56rem;padding:48px 24px;display:flex;flex-direction:column;gap:16px}
+          .splash-bar{background:var(--s-muted);border-radius:8px}
+          .splash-msg{font-size:.875rem;margin:0 0 8px}
+          @media (prefers-reduced-motion:no-preference){.splash-bar{animation:splash-pulse 1.6s ease-in-out infinite}}
+          @keyframes splash-pulse{50%{opacity:.55}}
+        </style>
+        <div class="splash-head">
+          <img src="/src/assets/uniche-logo.png" alt="UNICHE" width="122" height="26" style="display:block;height:1.625rem;width:auto" />
+          <span class="splash-app">iGuide CMS</span>
+        </div>
+        <div class="splash-body">
+          <p class="splash-msg" role="status">Signing you in…</p>
+          <div class="splash-bar" style="height:28px;width:min(55%,20rem)"></div>
+          <div class="splash-bar" style="height:16px;width:min(78%,32rem)"></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(12rem,1fr));gap:16px;margin-top:8px">
+            <div class="splash-bar" style="height:96px"></div><div class="splash-bar" style="height:96px"></div><div class="splash-bar" style="height:96px"></div><div class="splash-bar" style="height:96px"></div>
+          </div>
+        </div>
       </div>
     </div>
     <script src="/config.js"></script>

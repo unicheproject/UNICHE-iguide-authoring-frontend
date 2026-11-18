@@ -1,0 +1,10 @@
+import { start, go, P, shotDir } from "./common.mjs";
+const s = await start(); const p=s.page;
+const t=Date.now();
+await go(p, P + "/pois/40cab7b2-a7f7-4057-b56e-5605a589156f");
+console.log("networkidle ms", Date.now()-t);
+await p.waitForTimeout(1500);
+await p.setViewportSize({width:1440,height:2600});await p.waitForTimeout(400);
+await p.screenshot({path:shotDir+"poi-editor__draft-full__1440.png"});
+console.log((await p.locator("body").innerText()).slice(0,5000));
+await s.browser.close();

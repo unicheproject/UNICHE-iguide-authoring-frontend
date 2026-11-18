@@ -1,0 +1,10 @@
+import { open, go, PID, shot, settle, log } from "./lib.mjs";
+const { browser, page } = await open("curator", { viewport: "1440" });
+const t0 = Date.now();
+await go(page, `/projects/${PID}/pois`); await settle(page);
+await shot(page, "pois-list__default");
+const bar = await page.locator("main").first().innerText();
+console.log(bar.slice(0, 1500));
+const ctrls = await page.$$eval("main button, main label, main select, main input", e => e.slice(0,40).map(x => `${x.tagName}:${(x.getAttribute("aria-label")||x.textContent||x.placeholder||"").trim().slice(0,40)}`));
+console.log(ctrls.join(" | "));
+await browser.close();

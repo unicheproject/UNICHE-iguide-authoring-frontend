@@ -1,0 +1,14 @@
+import { session, go, P, ids, LOG, sleep } from "./h.mjs";
+const log = LOG("add");
+const { browser, page } = await session({ viewport: "1440" });
+await go(page, P(`/categories/${ids.catUsed}`)); await page.waitForSelector("#status-card-heading"); await sleep(1200);
+const btn = page.getByRole("button", { name: "Deactivate" }).first();
+log("category used by DRAFT POI: Deactivate aria-disabled:", await btn.getAttribute("aria-disabled"), "| reason:", (await page.locator("[data-blocked-reason]").first().innerText().catch(() => "none")).replace(/\s+/g, " "));
+await page.locator("[data-show-used]").click(); await sleep(300);
+log("Show where used focus:", await page.evaluate(() => document.activeElement?.id));
+await go(page, P(`/events/${ids.e1}`)); await page.waitForSelector("#status-card-heading"); await sleep(800);
+const gap = () => page.locator("#editor-side-column").innerText().then((t) => (t.match(/no dates/g) || []).length);
+log("Event no-dates lines before:", await gap());
+await page.getByRole("button", { name: /Add a date|Add date/ }).first().click(); await sleep(700);
+log("Event no-dates lines after Add a date:", await gap());
+await browser.close();

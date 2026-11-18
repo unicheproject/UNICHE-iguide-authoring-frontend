@@ -1,0 +1,18 @@
+{
+ "populated@1440": {
+  "h1": "Dashboard",
+  "rows": "Warnings (101)",
+  "status": "Ready to go live, with 101 warnings",
+  "guide": 0,
+  "hscroll": false,
+  "axe": []
+ },
+ "drafts@1440": {
+  "h1": "Dashboard",
+  "rows": "Warnings (1)",
+  "status": "Nothing is live yet",
+  "guide": 1,
+  "hscroll": false,
+  "axe": []
+ }
+}

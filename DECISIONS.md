@@ -1271,3 +1271,669 @@ the backend's DECISIONS.md.
   reads its configuration.
 - Not done: the backend compose `cms` profile (backend repository, backend D-010).
 
+
+## D-069 (2026-11-12) — UX overhaul: visual authority passes to the owner's brief
+
+- Type: product
+- Decision: for the three-round UX overhaul (owner brief of 2026-11-12, `ux-audit/BRIEF.md`) the running app's look
+  is the incumbent, not the authority. This supersedes D-004's "the prototype governs visual design" and AGENTS.md §6
+  for visual language only. Behaviour, data, flows, vocabulary and every statement of the specs `12` and `14` are
+  unchanged. Every later decision of the overhaul names what it replaces.
+- Why: the audit found the incumbent fails four WCAG gates and 61 % of its text is under 12 px.
+- Not done: dark mode (no `dark:` class exists; the variable structure in `src/style.css` allows it later).
+- Supersedes: D-004 and AGENTS.md §6 (visual language only).
+
+## D-070 (2026-11-12) — Colour, status and focus tokens
+
+- Type: design
+- Decision: control border `#737b8b` (4.26:1 on white), placeholder `#5f6877`, muted ink `#566070`, link hover
+  `#a3106a`, success, warning, danger and info inks each with a tint, and one status vocabulary: Draft (dashed circle
+  on sunken grey), Archived (outline only, archive box), Active (check on success), Pending changes (pencil in the
+  primary tint instead of amber, since amber means warning), translation state as icon plus language name. One focus
+  ring for every control (2 px, 2 px offset, surface halo; fields included), plus forced-colours and reduced-motion
+  rules in the base layer of `src/style.css`. Values are HSL triplets (`--primary`, `--input`, `--success` ...) so
+  Tailwind can add an alpha; `tailwind.config.js` maps them.
+- Why: C1-06 to C1-09 (1.24:1 field borders and a 2.54:1 placeholder were P0).
+- Supersedes: the colours of D-042's chips and the `.field-input` border. D-042's rule that status is never colour
+  alone stands and is strengthened.
+
+## D-071 (2026-11-12) — Type system and fonts
+
+- Type: design
+- Decision: fixed rem scale 12 / 13 / 14 / 16 / 20 / 24 px (`text-xs`, `text-compact`, `text-sm`, `text-base`,
+  `text-lg`, `text-xl`; 28 px only for the sign-in hero), 12 px floor, sentence case, weights 400 to 700, tabular
+  numerals on counts. Montserrat is self-hosted as variable woff2 files (`wght` 400 to 700) in `public/fonts/`: latin,
+  latin-ext and cyrillic, with `OFL.txt`, `font-display: swap` and a metric-matched fallback face. Google Fonts is
+  removed from `index.html` and the shell. Template fonts for the Create Project and Appearance previews still load
+  from Google Fonts per D-045 (previews only, a recorded exception to "authoring API and identity provider only").
+  Montserrat contains no Greek glyphs, so no Greek file exists to ship; Greek text falls back to the system sans
+  (`system-ui`, Segoe UI) with the same weights.
+- Why: C1-01, C1-05, offline use.
+- Not done: a Greek-capable webfont paired with Montserrat (needs the owner's choice of face; it would be a font
+  asset, not an npm dependency).
+- Supersedes: the px sizes and uppercase labels carried from the mockup. No new npm dependency.
+
+## D-072 (2026-11-12) — One Button, one Chip, lucide icons, no gradient CTA
+
+- Type: design
+- Decision: one `Button` with variants primary, secondary, ghost, danger, danger-outline and link; 8 px radius,
+  sentence case, 40 px tall (44 on a coarse pointer); `loading` and `disabledReason` (a stated reason, the button stays
+  focusable with `aria-disabled`). One `Chip`. Unicode glyph icons are replaced by lucide icons (already a dependency).
+  The brand gradient survives only in the logo and the sign-in hero. The old variant names (`default`, `brand`,
+  `outline`, `destructive`) and classes (`.dialog-primary`, `.dialog-secondary`, `.field-input`, `.field-label`,
+  `.small-label`) stay as restyled aliases until Round 3 so screens not yet migrated keep rendering.
+- Why: C1-10 to C1-12, C1-04.
+- Supersedes: D-053 (gradient primary and its contrast e2e check, replaced by `expectSolidFillContrast` in
+  `e2e/support/a11y.ts`) and the pill buttons.
+
+## D-073 (2026-11-12) — Shell and navigation model
+
+- Type: design
+- Decision: header 56 px in a single row; the workspace menu is 232 px from 1100 px and an off-canvas drawer below
+  it (supersedes the `md:` disclosure of D-054's menu but keeps D-054's reflow guarantee and D-062's fixed shell);
+  Media is a top-level item as `12` §3 lists it (it was nested under Content); menu items have 20 px icons; a switched
+  off capability shows an "Off" chip with its reason and a notice under the page head; "Manage members" links to the
+  Portal when `portalUrl` is configured and is absent otherwise; "Help" is removed until it has a destination; the
+  UNICHE logo is a bundled asset; every route sets `document.title`, moves focus to the page `h1` and announces
+  "<page> loaded"; `PageFrame` renders the single `<main>`. The field label stays "Slug" (spec `12` §3).
+- Why: C1-58, C1-119, C1-122, C1-55, C1-76, C1-77.
+- Supersedes: D-054's menu disclosure.
+
+## D-078 (2026-11-12) — Feedback, dialogs, validation and offline rules
+
+- Type: design
+- Decision: one `Alert`, one toast stack (up to three, timers pause on hover and focus, errors persist and carry their
+  `requestId`), one `StateCard`, one `FormErrorSummary` (focusable, links to fields), a sticky dialog footer, one named
+  z-scale (`sticky`, `drawer`, `popover`, `modal`, `modal-over`, `toast`, `skip`), offline asserted only after
+  `navigator.onLine` is false or two requests in a row got no response, `SessionEndedDialog` before a single capped
+  redirect, `describeError` for plain-language failures (never the rejected value), two live regions fed by
+  `lib/announcer.ts`. `showToast(title, body?, tone?, options?)` keeps its signature.
+- Why: C1-59, C1-62 to C1-75.
+- Supersedes: D-040's banner styling and the single-string live region of D-042; their behaviour (mutations
+  disabled, announcements) stands.
+
+## D-083 (2026-11-12) — Hit areas
+
+- Type: design
+- Decision: controls are 40 px (44 px on `pointer: coarse`), row actions at least 32 px on desktop, menu items 36 px
+  (44 coarse); the drawer's items are 44 px; made with padding, not font size. WCAG 2.5.8 is not in the 2.1 gate and is
+  applied by the kiosk persona's rule. Density toggle deferred (the `--control-h` and `--row-h` tokens exist so it can
+  land later). Leaflet controls and pins reach the same floor in the map package (D-081).
+- Why: C1-123.
+
+## D-076 (2026-11-12) — Content list pattern
+
+- Type: design
+- Decision: one list scaffold (`src/components/list/*`) for the six Content kinds: sticky toolbar and table head,
+  status segments with counts (Not archived by default, Active, Draft, Archived), "Pending changes" and "Needs
+  translation" toggles, sort, filter state in the URL query (`q`, `status`, `pending`, `lang`, `missing`, `cat`,
+  `featured`, `sort`, `dir`) with scroll restored on Back and the result count announced politely, one Tab stop per
+  row plus a kebab (`RowMenu`: lifecycle actions, Move up / down, Move to position..., Move to top / bottom), whole-row
+  open, disclosure trees, ARCHIVED hidden from the default segment, empty and filtered-empty states, card rows below
+  900 px. `useReorder` gains `position`, `moveToPosition` and an optional `visible` filter (a move steps over rows the
+  default segment hides). `ReorderControls`, `TranslationDots` (icon, language, `lang`, optional link) and
+  `TriggerChips` (icons, outline for DRAFT) are rebuilt on tokens; old props stay valid so unmigrated views run.
+- Why: C1-13 to C1-21, C1-35. Additive where `12` §3 is silent.
+- Supersedes: amends D-017 (reorder stays Manual-order only, now with set position and an explained blocked state) and
+  D-035. Bulk selection is deferred (Q-016).
+
+## D-085 (2026-11-12) — Greek companion font
+
+- Type: design
+- Decision: Manrope (SIL OFL 1.1), Greek subset only (`public/fonts/manrope-greek-var.woff2`, licence in
+  `public/fonts/OFL-Manrope.txt`), is declared in `src/style.css` under the family name "Montserrat Variable" with
+  `unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF`, so Greek text uses it and
+  Latin stays Montserrat. Greek Extended (polytonic, U+1F00-1FFF) is not in Manrope and still falls to the system sans.
+- Why: D-071 left Greek on the system fallback although Greek is a first-class language here; Manrope is a geometric
+  sans of similar width and weight. No npm dependency (an asset, self-hosted, no runtime request to a font host).
+- Supersedes: the "no Greek file" note in D-071 and `src/style.css`.
+
+## D-074 (2026-11-12) — Editor frame
+
+- Type: design
+- Decision: every Resource editor gets a sticky editor header (title, status and Pending chips, a polite state line
+  "Unsaved changes" / "Saved 12:41" / "Saving…" / "Still saving…", a readiness badge, Apply changes on an ACTIVE
+  Resource or Save on a DRAFT, and a "More actions" menu with Archive) and, for an ACTIVE Resource, a sticky Working
+  Copy banner of reserved height under it holding Save draft and Discard changes (the `12` §3 split is kept; a merged
+  bar is Q-008). From 1180 px a sticky side column holds Status, "Preview in app", the readiness list ("Before you
+  activate" on a DRAFT, "What needs attention" on an ACTIVE Resource), the "On this page" rail, Translations and Used
+  in; below 1180 px a single column with a non-sticky summary row that opens the same cards inline. Sections follow one
+  order (Texts, the kind's core setup, Media, How visitors reach it, Details) through `EditorSection`, which registers
+  itself in the rail. Ctrl or Cmd+S saves (draft, or the Working Copy); the summary of a failed save takes focus; an
+  error clears when its field changes. Activate always confirms (`ActivateDialog`): it names the item, lists what the
+  editor already knows grouped by language, offers "Save and activate" for a dirty DRAFT, shows the platform's `422`
+  inside the dialog with each missing field as a link, and the toast says "Activated" or "Activated with N warnings",
+  never "complete" with warnings. Deactivate and Archive are disabled up front, with the reason, while an ACTIVE item
+  uses the Resource. Conflict choices (`ConflictDialog`) start unselected. Leaving with unsaved changes keeps them in
+  this browser as a draft (the leave dialog says so) and the restore notice is offered once, when the editor opens.
+  `EditorShell` keeps its props and slots (plan 6.2) and adds `sections`, `structuralInNonDefault`, slot `header-extra`.
+- Why: C1-22 to C1-26, C1-29 to C1-33.
+- Supersedes: D-023's column arrangement and D-060's 360 px column details; D-058 breadcrumbs stand. The editor's own
+  `<main>` is replaced by `PageFrame` (D-073). Leaving without saving no longer clears the stored draft (the amber
+  "Leave without saving" loss of D-024 becomes "stays in this browser").
+
+## D-075 (2026-11-12) — "Preview in app" is an inline panel
+
+- Type: design
+- Decision: "Preview in app" opens a panel directly below its action (the side column on wide layouts, under the
+  summary row on narrow ones) that pushes the content below it down and never covers the form. No focus trap and no
+  inert background, so the CMS chrome stays operable; Escape (when no dialog or menu claims it) and the preview's Close
+  return focus to the action; its height is capped at 70 % of the window with its own scroll. On wide layouts "Expand"
+  moves it to a full-width strip above the form. The content is `ResourcePreview`, unchanged.
+- Why: C1-86 and `12` §3 ("below the action"). The surface default, "Shown at 45 %" scale text and the real-size link
+  are P8's (`ResourcePreview`).
+- Supersedes: D-056, D-059 and D-066 (pop-up card, backdrop wheel forwarding); `AppDialog`'s `popover` mode loses its
+  only caller. A docked split pane is Q-009 and is not built.
+
+## D-079 (2026-11-12) — Translation work inside editors
+
+- Type: design
+- Decision: in a language that is not the default, every text field shows the default-language text read-only beside it
+  (stacked when the card is narrower than 34 rem) with a "Copy source" button; the language tabs are a real tab pattern
+  (roving tabindex, Left, Right, Home, End), each named in the language's own script with its `lang`, a completeness
+  icon plus text ("Complete", "3 of 5", "Missing") and an error marker with text; the Translations card lists the same
+  state and a "Next missing" button; structural controls (reorder, add, remove of blocks, stops, occurrences) show only
+  in the default language through `TranslationsPanel`'s `structural` prop and the shell's `EDITOR_STRUCTURAL` (the
+  Route, Guide and Asset editors honour it in their packages); `describePath` falls back to a readable name with the
+  language. The language-aware date and number formatter (`lib/format.ts`) is stage 0.1's.
+- Why: C1-34 to C1-40.
+
+## D-077 (2026-11-12) — Dashboard rebuilt to `12` §3
+
+- Type: design
+- Decision: the Dashboard is a first-run five-step guide while nothing is live and there is no Place or no Point of interest (steps 1 and 2 tick from list totals,
+  DRAFT included; 3 to 5 link without ticks) and otherwise a Status card with four states and one action ("Nothing is
+  live yet" -> Activate content, "N things block going live" -> Fix the first issue, "Ready with N warnings" -> Review
+  warnings, "Ready" -> Preview the app), where "Ready" needs at least one ACTIVE Resource (`status=ACTIVE` totals of the
+  six kinds). Then "Waiting for you to apply" (`pending=true` per kind, newest first, Open), warnings grouped by kind
+  and code, collapsed, one line per Resource and field with language names, one counts strip from list `totalElements`,
+  Project details collapsed. `contentRevision` and "Visitor app: Draft/Live" come from `GET /settings`. No translation
+  bars and no packages until the endpoints exist (G-023, G-024); no "who" column (G-025). `aria-live` only on the
+  Status headline; errors are a danger Alert with the request id.
+- Why: C1-41 to C1-52 (P0 C1-41, C1-42).
+- Supersedes: D-022's single readiness card as the Dashboard; its readiness data and codes stand.
+
+## D-082 (2026-11-13) — Preview pattern
+
+- Type: design
+- Decision: one `PreviewPane` (labelled `role="region"`, "Skip preview" link first, the stand-in `inert` until "Interact with
+  the preview", headings and landmarks of the stand-in demoted to plain text inside the CMS) shared by the Preview page, the
+  editors' "Preview in app" panel (`ResourcePreview`, props unchanged) and the stand-in in the new tab (real headings there).
+  `DeviceFrame` draws real surface sizes with Fit, 100 % and 50 % and states the scale; a Kiosk turns portrait or landscape and
+  has no browser dots. Working mode draws each active item's Working Copy in place of its live row (read through the Working
+  Copy endpoint, `12` §3); when none can be read the page says "Drafts shown. Pending changes of active items ... are shown in
+  each editor's preview" (G-034). The fire control is surface-aware (beacons only on Mobile), grouped by type, with a persistent
+  "Fired:" chip and Reset; notes and the chip clear on surface, language or mode change. The new tab has a slim control bar,
+  case-insensitive parameters, shown (not silent) invalid ones, a per-state title and a StateCard for not found. Stand-in chrome
+  words follow the previewed language (Greek, Italian, French, German, Spanish). No analytics event is sent.
+- Why: C1-81 to C1-90 (P0 C1-81).
+- Supersedes: nothing; D-014 and D-015 (the stand-in) stand.
+
+## D-084 (2026-11-13) — Project picker, Create Project and session states
+
+- Type: design
+- Decision: Home and the header switcher share one searchable `ProjectList` (Current and Recent first, organisations
+  grouped, "Needs setup (n)" collapsed with a "Resume initialization" button, "App: Draft" status words, roving arrow-key
+  model, search focused when the popover opens, popover closes before the unsaved-work confirmation). Browser storage
+  keeps only up to five recently opened Project ids (`workspace/lastProject.ts`, never a token or a name); Home offers
+  "Continue to <Project>" and sign-in still lands on the picker. The Project list no longer reads every Project on load:
+  only the open, Recent and first 12 listed Projects are read (4 at a time) for their initialization state; the rest
+  open their Dashboard unchecked until the Catalogue listing carries `initialized` (G-029). Create Project is a four-step
+  wizard (Name, Template and style, Languages and surfaces, Review) with a real stepper, radio-group choices instead of
+  "Style confirmed", one error pattern (field errors plus a focused `FormErrorSummary` with links, 422 mapped per field
+  without echoing the rejected value), a sticky footer with one primary per step, and Initialize disabled with its
+  reason when no language, default language or surface is chosen. Session end shows the session-ended dialog instead of
+  a silent redirect; a second `401` within 30 s of a sign-in redirect ends on a "Your session keeps ending" page
+  (time kept in sessionStorage). Full-page states (sign-in errors, Project 403, 404, platform unreachable) use one
+  `StateCard` in author wording with technical details collapsed; each holds its own document title.
+- Why: C1-53, C1-54, C1-56, C1-57, C1-59 (P0), C1-60, C1-62, C1-63, C1-64, C1-65 (messages), C1-66 (strings).
+- Supersedes: D-045's step presentation (its flow and API use stand); the all-Projects read in `stores/projects.ts`.
+- Not done: reading setup state for every Project (needs G-029), automatic return to the last Project after sign-in.
+
+## D-080 (2026-11-13) — Media pattern
+
+- Type: design
+- Decision: the library is a Content-style list (sticky toolbar from the list scaffold, URL-stored state) with sort (Updated,
+  Name, Type, Size, Used in), the status segments, a Type select and "Needs attention" filters (No alt text in the default
+  language, Needs translation in a chosen language, Unused, Decorative), an always-visible "Showing N of M files", grid or
+  list with one Tab stop per file, never-cropped thumbnails (`object-contain` in a fixed-ratio box) and drawn icons plus the
+  type in words for audio, video, documents and 3D, and "Show more" (focus to the first new file, range announced) in place
+  of paging. Upload states the accepted formats and the largest size per type up front (client allow-list: images, audio,
+  video, PDF, 3D; anything else, and any file that looks like a copy by name and size, is held with "Upload anyway" and
+  Skip, G-032, Q-015), shows one row per file with progress, Cancel, Retry only where a second try can help, and the request
+  id of a failure, keeps every message in a `role="log"` (start, each result, "3 uploaded, 1 failed"), and offers
+  "Describe now": a stepper over new images without alt text. The Asset editor leads its form with Decorative (effect
+  stated) and Translations, keeps the image visible beside the form (the lead of the sticky side column from 1180 px, a
+  sticky strip above the form below it), and keeps file facts, Replace (DRAFT only, D-032) and Download in the side column;
+  Used in comes from the references list and says when the library's count differs (G-030). The picker opens with focus in
+  Search, defaults to Active (hidden drafts counted and one click away), has tiles or a list with Play for audio, a "No alt
+  text" cue before selection, folds its filters into a disclosure at small sizes, selects a single uploaded file, and
+  announces the selection and the attach.
+- Why: C1-107 to C1-118. D-032 stands (Replace only for DRAFT).
+
+## D-081 (2026-11-13) — Maps and Floor plans pattern, and the map engine
+
+- Type: design
+- Decision: the Map editor leads with Name and the map, with the Bounds and Visitor start view fields directly under the
+  map (never a screen below it), then Placed and Not placed, Visibility, Visitor filter (collapsed) and Linked Place; one
+  set of zoom controls (Leaflet's, 44 px on a coarse pointer, `showZoomControls`); the map is at least 360 px high and
+  full width at 1024 and 768. `GeoMapCanvas` gained, additively (contract in `implementation/system.md`): a base-map
+  state (`tileState`: loading, ready, error) with an in-canvas "The map background could not be loaded. Try again" card
+  (the editor stays usable by coordinates), focusable bounds handles (four corners and the centre) and focusable
+  draggable pins that move with the arrow keys (about 2 px, Shift ten times) and announce every move, context markers
+  without a Tab stop unless `contextMarkersFocusable`, a dashed warning rim and badge for placed items outside the bounds
+  (with a warning above the map), 44 px hit areas on coarse pointers, and design tokens instead of hex. Markers are kept
+  between redraws so a focused pin keeps focus while its coordinates change. Coordinates are parsed once
+  (`components/map/coordinates.ts`): a decimal comma is accepted, words and out-of-range values give a field error and never
+  reach Leaflet (no `Invalid LatLng`); typed bounds apply only when all four are valid and in order. New items fan out on a
+  spiral instead of stacking. The floor plan editor shows numbered pins at one size (44 px on touch), "Place" arms a visible
+  "Click/Tap the plan to place <name>" state (sticky, Cancel or Escape ends it, "Place near the centre" is the keyboard
+  route), x and y are labelled "Across" and "Down" with a 0 to 1 range check, rotation is explained as the pin's facing, nudges
+  are announced, and the Working Copy banner no longer moves the plan (its height is reserved by the shell). The New map
+  dialog states the geocoder failure by cause (429 busy, 403 refused, 5xx service problem, unreachable), names result types in
+  words, offers typed bounds and "Reset to search result"; the New floor plan dialog keeps Places that already have a plan,
+  marked "(has a plan)", since a Place has one plan per floor. Both lists use the shared list scaffold; the tab strip shows
+  counts and the floor plan list shows each plan's position among its Place's plans.
+- Correction: D-064 names the OpenMapTiles "OSM Bright" vector style served by OpenFreeMap (MapLibre in Leaflet), not raw
+  OpenStreetMap raster tiles; the raster tiles remain only as the no-WebGL fallback. The style and OpenFreeMap stay.
+  The Nominatim geocoder and the tile host are recorded exceptions to "authoring API and IdP only" (Q-003 stays open for
+  production hosting).
+- Why: C1-93 to C1-100, C1-72 (map side), C1-80 (engine side), C1-123 (map controls).
+- Supersedes: nothing; D-064 (style, OpenFreeMap) stands, with the correction above.
+
+## D-086 (2026-11-16) — Hit areas and forced colours completed
+
+- Type: design
+- Decision: `size-control` is a real token (`spacing.control` in `tailwind.config.js`), so `Button size="icon"` and every
+  icon-only control built on it is 40 px square (44 px on a coarse pointer through `--control-h`). A `.hit-44` utility
+  (`src/style.css`) gives a text link or small control a 44 px target through a transparent `::after`, without moving
+  layout. A build-time check (`scripts/check-css-tokens.mjs`, `make check-css`, `pnpm check:css`) builds the Tailwind
+  CSS and fails when a `size-*`, `h-*`, `w-*`, `min-h-*`, `z-*`, `shadow-*` or `rounded-*` class used in
+  `src/components/ui/**` (or `--all` of `src/`) has no rule. The forced-colours block gives dialogs, alert dialogs,
+  menus, listboxes, tooltips, alerts, status banners and popover content a 1 px `CanvasText` border, filled buttons a 2 px
+  frame, `[aria-selected=true]` and `aria-current` items `Highlight`/`HighlightText`, and disclosure and sort-header
+  buttons padding inside their new border. Reduced motion keeps a 120 ms opacity fade for appearing surfaces and drops
+  transform, slide, pulse and spin. New tokens: `z-raised` (5), `shadow-drop-before` and `shadow-drop-after`.
+- Why: C2-01 left every icon button at 18 px because the class existed in no stylesheet; C2-02 left dialogs and menus
+  borderless in forced colours; C2-04. Spec `14` §4 (44 x 44, state not by colour alone).
+- Supersedes: the per-call `size-8` and coarse patches on icon buttons.
+
+## D-087 (2026-11-16) — Errors are sentences chosen by code, never server text
+
+- Type: design
+- Decision: `describeError` (`src/lib/errors.ts`) and `ApiError.message` take their text from one table
+  (`src/lib/problemText.ts`) keyed by `code` and status (403, 404, 409, 422, 429, 500, 502, 503, 504, network and
+  offline) with the request id beside it. A problem's `detail`, `title` and `message` stay in `ApiError.body` for code
+  that reads specific fields and are never rendered; the only server wording shown is the `message` of a 422 field error,
+  at its field. For other statuses a field error's text is a fixed sentence chosen by its code. 503 reads "The platform is
+  busy or down for maintenance"; "cannot reach the server" is said only for a network failure. One `ProblemAlert`
+  (`ui/alert`) renders heading, sentence, request id with copy and an optional Try again in cards, dialogs and page
+  states; toasts take the same text through `showErrorToast`.
+- Why: C2-09 showed stack traces and a user name in the UI; the BRIEF hard constraint, `07` §15, AGENTS §4.5.
+- Supersedes: the use of the server's `detail` as the error text in `toApiError` and `describeError`.
+
+## D-088 (2026-11-16) — One date and time formatter
+
+- Type: design
+- Decision: `formatDate`, `formatTime`, `formatDateTime` and `formatDateTimeRange` in `src/lib/format.ts` are the only
+  formatters: 24-hour clock, day, month name, year ("16 Nov 2026, 14:05"), in the interface language, in the Project's or
+  Event's time zone where one is given (`{ timeZone }`), the author's otherwise. Native date and time inputs are
+  replaced by `DateTimeFields` (`ui/field`): typed day, month by name, year, hour and minute with a visible legend, a
+  format hint linked by `aria-describedby`, one label per part and an error linked to the group; its model is the
+  `datetime-local`, `date` or `time` string, empty until the parts are a real value.
+- Why: C2-52 and C1-39 (12-hour and 24-hour times and three formats on one page; the browser's region decided the
+  order and clock of native inputs).
+- Supersedes: `toLocaleString`/`toLocaleTimeString` calls with the browser's locale in shared files.
+
+## D-089 (2026-11-16) — Sticky stacks are measured and short
+
+- Type: design
+- Decision: the editor header is one 56 px line (the title truncates inside it; status chip, state line and readiness
+  count drop out below 640, 768 and 1024 px). The Working Copy banner is one 40 px line with fixed-length text and is
+  sticky only when the viewport is at least 800 px tall; below that (and at zoom of 150 % and more, which shrinks the CSS
+  height) it scrolls with the page, so at 640 x 360 only the 56 px header is stuck. `useStickyStack` publishes the height of
+  what is really stuck as `--sticky-stack-h` on `<html>` (ResizeObserver plus resize; an element counts only while its
+  computed `position` is `sticky`) and sets `scroll-padding-top` of `<main>` from it, so a focused field or an anchor lands
+  under the bars. The editor's side column `top`/`max-height` and the rail's scroll-spy read it. On lists only the one-row
+  toolbar (search, status segments from 1180 px, a "Filters" popover for the rest) and the table head stick (106 px at
+  1280); the head's `top` is the toolbar height minus the 1.5 rem the page frame pads, so no sliver of rows shows above or
+  between the bars; below 900 px only the head sticks. `--editor-sticky-h` stays on the shell root as an alias.
+- Why: C2-05, C2-06; WCAG 1.4.10 and 2.4.7. Measured: banner + header 98 px (11 % of 900) at 1440 x 900; 56 px at
+  1280 x 720, 1024 x 768 and 640 x 360; POI list 106 px at 1280 x 720 (was 255 px, 35 %).
+- Supersedes: the fixed `--editor-sticky-h: 7rem` of D-074 and the always-sticky two-line banner; the list toolbar of
+  D-076 as a two-row sticky block.
+
+## D-090 (2026-11-16) — One readiness and completeness model
+
+- Type: design
+- Decision: `src/platform/completeness.ts` is the only place that counts things to fix. `completenessOf` takes the
+  languages, the editor's counted texts (`base`), individual text slots (Route stop texts, image alternative text) and
+  gaps (a Guide without TEXT blocks) and returns blockers, warnings, per-language marks and the counts; `issueSentence`
+  is the one sentence ("3 to fix before activating, 4 warnings", "4 warnings, nothing blocks", "Nothing to fix"; an
+  ACTIVE Resource reads "3 to fix"). The header count, the readiness card, the Activate confirm, the toast after
+  activation, the language tab marks and the Translations card all read it (`EditorShell` provides it to
+  `TranslationsPanel`); the platform's readiness adds only what the browser cannot know and its text items are dropped
+  so nothing is counted twice. Without an editor-supplied `completeness`, the shell builds it from `translations` and the
+  saved Resource. A Resource's own triggers are never "used by" blockers: the sentence names the other users ("Used by 1
+  route. Choose another category in that route first."), and a DRAFT image without alt text cannot be activated ("Add alt
+  text in English first").
+- Why: C2-33, C2-34, C2-59. The platform still refuses Deactivate while a non-archived trigger points at the item (verified
+  on a POI with a QR code): the dialog then says to deactivate the codes first and links to them; the backend should
+  deactivate a Resource's own triggers with it (G-037).
+- Supersedes: per-screen counts in `EditorShell` (`clientLines`, `progress`), `TranslationsPanel`'s own tab count and the
+  "Activated with N warnings" toast built from the platform's list alone.
+
+## D-092 (2026-11-16) — The Dashboard says how the visitor app goes live
+
+- Type: design
+- Decision: The Status card is the one next step. With no blockers, at least one ACTIVE Resource and the visitor app
+  still a Draft, the primary action is "Go to Launch" and the sentence says visitors cannot open the app until you go live
+  in Launch; "Preview the app" is the secondary action. ACTIVE = 0 reads "N items are drafts, so visitors see nothing" with
+  "Show drafts" (first list that has drafts, filtered to DRAFT). Blockers list at most three rows with field names and "and N
+  more" expands in place. The Project status chip leaves the h1; the one status line below it is "Visitor app: Draft/Live"
+  with a HelpHint and "Content revision N" (the Project's own lifecycle is not shown on the Dashboard). The first-run guide
+  stays until step 5 (Preview) is opened or this viewer dismisses it (browser storage per Project, wrapped in try/catch)
+  while nothing is live or a Place or Point of interest is missing; with live content the Status card already says what to
+  do. Steps 1 and 2 tick from list totals, step 4 from the main menu having an item, steps 3 and 5 once this viewer opened
+  them from the guide (the API has no data). Its buttons open the create dialog with `?create=1` on the list.
+  Pending changes: every page of every kind is read, newest saved first, the title is the link, "Showing 10 of 15" and
+  per-kind "See all" links to the `pending=1` lists. Warnings: one row per Resource with field names ("Italian: Description,
+  Summary"), kind prefix dropped, `PENDING_WORKING_COPY` and duplicates removed, counted in those rows everywhere on the
+  page (`issueSentence`). Counts read "10 active · 8 draft" with zeros muted. Requests run in one round; errors use
+  `ProblemAlert`; the skeleton mirrors the layout and announces "Loading dashboard".
+- Why: C2-24, C2-25, C2-26, C2-27, C2-28, C2-29, C2-30, C2-31, C2-32, C2-21, C2-73. `12` §3 stays: five steps, one action,
+  at most three items, pending only when present.
+- Supersedes: "Activate content", the Active chip in the Dashboard head, the guide that vanished after two drafts.
+
+## D-094 (2026-11-16) — The Media worklist names what is missing
+
+- Type: design
+- Decision: Every Media row, grid and list, says what is missing in the language in force ("Italiano: alt text, title
+  missing"). The language is Needs translation, else Search in, else the Project default; the "No alt text in <language>"
+  filter uses the same one. `missingTextNames` (`platform/assets.ts`) uses the same two checks as `missingTextIn` and
+  the completeness model (title, plus alternative text of an image that is not decorative). The list view has five columns
+  (Name, Type and size, Status, Used in, Updated); Status holds the Decorative chip, so no cell overprints another at 1024
+  px. `view=grid|list` is in the URL. There is one count line ("Showing 48 of 87 files (1 archived)") and one "Clear
+  filters": the toolbar's, which also resets Type and Needs attention and moves focus to the search field. The toolbar is
+  hidden while the library is empty. In the upload dialog the formats table folds into a disclosure once files are added,
+  the log is visually hidden (read by screen readers), "Done" is "Close", a skipped file offers "Undo skip", button names
+  begin with their visible text ("Upload anyway, tool.exe"), focus moves to the next held file after a decision, and a
+  server failure shows `ProblemAlert` instead of server text.
+- Why: C2-51, C2-75, C2-77, C2-79, C2-82, C2-83.
+
+## D-097 (2026-11-16) — Session, picker and loading states
+
+- Type: design
+- Decision: Create Project has no silent defaults: with one Template it is the only choice and says so; with several the
+  author chooses (Continue says "Choose a Template first"); the preselected style reads "Recommended" (not "Suggested")
+  and the Surfaces step says all are on as recommended; surfaces use the same words (Web, Mobile, Kiosk) everywhere;
+  step 1 says it creates a real Catalogue record; "style" has a HelpHint; placeholders start with "e.g.". Loading
+  states mirror the page and announce "Loading <page>" (Dashboard, list, editor skeletons); the workspace menu is
+  `inert` until the Project is confirmed; the header chip's skeleton shows only while the Project read is pending (3 s
+  at most) and never on an error page. The authorization code leaves the address bar (`history.replaceState`, one
+  entry). The session-ended dialog is dismissible (Escape, close, "Stay on this page"). The offline notice floats under
+  the header (no row, no layout shift, one `role="alert"`) and Create Project controls are `aria-disabled` with the
+  reason while offline. The picker lists "Needs setup" before the organisations, marks rows not yet read "Setup not
+  checked" and counts "n+" while some are unread (G-029); the switcher list uses the height of the window. "Off" menu
+  items are one line with the reason read through `aria-describedby`. One logo: the sign-in card no longer repeats the
+  header's, and the start-up splash uses the same asset and says "Signing you in...".
+- Why: C2-08, C2-11, C2-14, C2-15, C2-19, C2-21, C2-22, C2-23, C2-25.
+
+## D-096 (2026-11-16) — Maps: keyboard and touch model
+
+- Type: design
+- Decision: On a coarse pointer a map starts at rest: one finger scrolls the page (Leaflet's panning and pinch are off,
+  so the container no longer declares `touch-action: none`), pins and handles still drag (they declare it themselves)
+  and the zoom buttons zoom. A "Move map" toggle (`aria-pressed`, 44 px, top-right of the map) turns one-finger pan and
+  two-finger zoom on, and a line under the map says which mode is on (`mapGestures.ts`, `MapMoveButton.vue`; used by the
+  canvas and the GeoPicker). Non-draggable layers stay out of the Tab order (W0-B). The map editor's "Try the visitor
+  filter" is one disclosure with a Type and a Category radio group (two Tab stops, arrow keys inside), not about 40 chip
+  buttons. Coordinate fields check on leaving the field with the New map dialog's sentences, `aria-invalid` and a polite
+  announcement; Save still checks all. Floor plan "Place" buttons are named by their item ("Place Acropolis"); the
+  armed bar sits under the plan (sticky at the bottom of the viewport), never over its top. Placed numbers keep their
+  order across a save. The tile-failure card is drawn under the map, not over its pins. The New floor plan dialog shows
+  the shared "N things to fix" summary. Routes drawn on the map editor have a legend line.
+- Why: C2-58, C2-69, C2-84, C2-85, C2-86, C2-87; `14` §4 (coordinate fields remain the accessible alternative to dragging).
+- Supersedes: `touch-action: none` on the whole map; the visitor-filter chip row.
+
+## D-095 (2026-11-16) — Editor save, conflict and restore model
+
+- Type: design
+- Decision: In an ACTIVE item with a Working Copy, a dirty form makes "Save draft" the header's primary action and "Save
+  and apply" the secondary one (in the More menu below 768 px); "Apply changes" is primary only when the form is clean,
+  and is truly disabled ("Nothing to apply: there are no pending changes") when no copy exists. Apply and Activate
+  confirm by naming what changes ("Changes: Summary (English), Title (Greek). ... Still open: 6 warnings, nothing blocks.").
+  A refused Save with 409 is a three-way merge against the snapshot taken at load or last save: only fields the author
+  changed and the other person changed too are a choice (nothing preselected; lists show "Mine: 1 added. Current: 2
+  removed."); fields only they changed keep their value, fields only the author changed keep theirs. The primary action
+  is "Keep my changes"; the other is "Reload their version (discards your N changes)"; the request id is shown. Save errors
+  are a floating card under the sticky bars (`data-summary-slot`, `z-raised`, no layout shift) that takes focus for
+  5xx, offline, 403 and 404 (403/404: "You no longer have access" / "was removed", with one action "Back to <list>");
+  the header state line ("Saved 14:52") is the one Save announcement, so a successful Save has no toast (an ACTIVE item
+  without a Working Copy still says visitors see the change). The Restore-draft notice is one compact row ("Restore
+  (2 fields)", "Discard"), gone after Restore, Discard or any successful save, and focus goes to the first restored
+  field. An Activate refusal other than missing fields (503, 403, offline) stays inside the dialog as "Not activated"
+  with Try again; focus after Activate, Apply and Archive is the Status card heading, after Restore the first field.
+  The Status card shows "Revision N" (only for a live or archived item) or "Not saved yet", never "Version 0". Undo of a
+  removed row is a bar that stays at the bottom of the viewport while its list is on screen (`RemovedBar anchor`) and
+  Ctrl or Cmd+Z undoes the last removal until the author types. `TranslationsPanel` draws a "Texts" heading, the Title
+  grows to its text, and "Next missing: Italiano" sits beside the tabs below 1180 px. `?lang=it` opens the editor on that
+  language. "Preview in app" is as wide as the editor content area, with Expand at every width. Independent trigger and
+  media writes of a save run together (`runIndependentWrites`) and a failure is one sentence (`partialSentence`,
+  `reportPartial`).
+- Why: C2-10, C2-11, C2-12, C2-50, C2-54, C2-56, C2-57, C2-62, C2-63, C2-64, C2-65, C2-67, C2-68, C2-70, C2-73; `12` §3 (Save
+  draft and Discard in the banner, header Apply), `12` §5 (409), `14` §4.
+- Supersedes: "Apply changes" always primary; the two-way list of every differing field in the 409 dialog; the large
+  Restore-draft alert; "Version N"; the Undo bar below the list outside the viewport.
+
+## D-091 (2026-11-16) — List paging, sort direction and honest counts
+
+- Type: design
+- Decision: The list loaders keep reading every page of the API (`size=200`, loop to `totalPages`), so search across
+  languages, segment counts, the translation worklist, trees and manual order see every row; the table renders 50 rows
+  per page (`ListTable`, `pageSize`) with a pager ("Showing 51–100 of 184", Previous / Next that stay focusable) and
+  `page` in the URL, which falls back to the last page when it is too high and returns to 1 whenever the search, a
+  filter or the sort changes. Server-side paging and filters are recorded as G-041. A sort carries a direction that
+  starts as the sort's own (`defaultDirFor`: Updated newest first, the others ascending); `dir` is in the URL only when
+  it differs, the control says it in words ("Newest first", "A to Z"). Denominators are the active status segment
+  (`segmentTotal`), segment counts respect the search and the other filters, and a count that is not known yet is left
+  out instead of showing 0. The live region names the noun and announces sorts and pages. The toolbar carries the one
+  "Clear filters"; the footer and the empty state have none. Back from an editor restores the scroll (read in a
+  route-leave guard) and focuses the row's link, on its page. Each translation dot is a link with `?lang=<code>`
+  and a language never breaks inside a word. A hit that came through another language says "Matches Ελληνικά: …".
+  "Needs translation" starts on the Search-in language, else the first non-default one. `FormDialog` validates every
+  field in one pass (`validate`), lists problems in form order, never shows an unmapped key, caps the slug at 100,
+  asks "Discard what you typed?" before Esc, the backdrop or the close button lose text, and gives its height to the body
+  in a short window. `?create=1` opens the create dialog once the languages are known and removes itself
+  (`useCreateParam`). "/" focuses the list search.
+- Why: C2-35, C2-36, C2-37, C2-39, C2-40, C2-41, C2-42, C2-44, C2-45, C2-47, C2-48, C2-49, C2-74, C2-94.
+- Supersedes: "Updated" sorting oldest first; the footer's "Showing N of M" over all statuses; a second and third "Clear
+  filters".
+
+## D-093 (2026-11-16) — Preview in app is a full-width panel with fit-width
+
+- Type: design
+- Decision: the editor's "Preview in app" panel opens below the action across the editor content area (P4s owns the
+  container; the pane inside it is the Preview pane). "Fit width" is the default size for every surface and never
+  scales above real size, so a Kiosk is no longer shrunk to 33 % by the window's height; a Kiosk screen, 1920 px tall,
+  scrolls inside an area as high as the window leaves room for (a labelled "Preview screen, scrolls" group). Size choices
+  that give the same picture are not offered: no "100 %" when the room is as wide as the screen, and a phone says "Fits at
+  real size". Where 100 % does scroll sideways the caption says so. The Preview page has one compact toolbar (Surface,
+  Language, Content; then the trigger choice with a filter field above eight choices, sticky in windows 760 px or higher)
+  and the picture starts above y 480 at 1440 x 900; the Size choice sits beside the picture's caption, and the content and
+  missing-title lines sit under it, each kind of missing title linking to its list filtered by "Needs translation".
+  `/preview?trigger=<id>` shows the surface the trigger reaches (a beacon: Mobile), chooses it, fires it and shows the
+  "Fired:" chip, or says why it is not offered. The stand-in is `inert` and `aria-hidden` until "Interact"; Esc inside the
+  frame stops interacting and returns focus to "Interact", the next Esc is the host's (the editor panel closes). Reset
+  returns focus to the trigger choice. Stand-in glyphs (arrow, menu, chevrons, play) are lucide icons and the missing-text
+  outline and note colours are tokens.
+- Why: C2-61, C2-88 to C2-92; `12` §3 ("below the action"), `14` §4.
+- Supersedes: D-082's Fit/100 %/50 % with Kiosk fitted by window height; the five-group control card.
+
+## D-098 (2026-11-16) — Removing a stop or block is undoable where you are
+
+- Type: design
+- Decision: Removing a Route stop or a Guide/story block moves focus to "Undo" in the bar under the list (one Tab from
+  the removed row; the bar stays at the viewport bottom while its list is on screen), and Ctrl or Cmd+Z undoes while
+  nothing has been typed since. After Undo, focus returns to the restored row. The Route map card states what the stops
+  say: guidance only at no stops; with stops but none placed, a card says the map cannot draw the route and links each
+  stop's point of interest; with some placed, "Stops 1-3 and 5 have no position, so they are not on the map" with links.
+  Pins at the same position are fanned out on a small circle (about 25 m) and say so; "Show as list" opens the stops
+  with their positions as text. A stop card shows its description; walking instructions, title and narrative are behind
+  "More stop texts". The Route and Guide editors pass the live form to the completeness model (stop texts, empty story
+  as a warning until G-039). The picker's search moves into the results with ArrowDown, and Enter picks the first
+  choosable row.
+- Why: C2-70, C2-71, C2-72, C2-34; `12` §3 Route and Guide, `14` §4.
+
+## D-099 (2026-11-16) — Place and POI editors: one Media card, folded other settings, partial trigger saves
+
+- Type: design
+- Decision: The audio narration is one visible group inside the Media card ("Audio narration": a row per language that
+  has a file with Replace and Clear, one dashed chip per language without one, "All languages" last), no longer under
+  each language tab (supersedes the per-language-tab placement in D-079 for media only). Empty single and gallery
+  slots are one "Add" row of short buttons; the recommended slot is named in the card's count, not in the button. While a
+  language other than the default is open, the language-independent cards (Placement or Place setup, Media, How visitors
+  reach it, Details) fold into one collapsed "Other settings (all languages)" disclosure; they stay mounted and the rail,
+  error links and trigger links open it. The POI Placement card shows Place, Category, Latitude and Longitude and opens
+  the map on "Set position on the map"; coordinates are checked when the field is left (and announced), and the trigger
+  rows are checked before any request: an empty beacon (UUID, Major, Minor) or area (latitude, longitude, radius) row is
+  named in the summary as "Beacon 1, UUID". Place and Category choices with 25 or more options get a filter field above
+  the native select (no `ui/` combobox exists). Placeholders are "e.g." examples. After a file is chosen focus lands on
+  its Replace button. Trigger rows save in parallel (removals, then creations and updates); on a DRAFT POI or Place the
+  item is saved even when a row is refused, the form keeps the rows, and one sentence names what failed; working-copy
+  saves stay all-or-nothing (the shell cannot take a partial result there) but write in parallel too.
+- Why: C2-60, C2-66, C2-67, C2-69, C2-23, C2-55, C2-57, C2-73, C2-93; `12` §3 POI, `14` §4. Spec check: `12` §3 lists the
+  media slots and the Placement card without fixing where audio is chosen or whether the map is always open.
+
+## D-100 (2026-11-17) — One focus ring, no clipping
+
+- Type: design
+- Decision: Focus is `outline: 2px solid hsl(var(--ring)); outline-offset: 2px` on every focusable control, including
+  `[data-variant=primary|danger]`. The white ring, the `#fff` and the 4 px coloured halo are gone; the 2 px gap between
+  control and ring shows the surface, so the ring reads on the canvas and on a filled button alike. Tab strips
+  (`TabsList`, `LinkTabs`; both scroll sideways) get a 4 px inset (`p-1 -m-1`) so the ring is never clipped. A
+  programmatic focus on a heading, `<main>` or a dialog panel (`tabindex="-1"`) draws no ring: it is not a control and
+  the route announcer names it. Inside the dark preview stand-in the ring uses `--ring-inverse` (class `.on-dark` on the
+  stand-in root; P8 applies it). Forced colours: `Highlight`.
+- Why: C3-01, C3-02, C3-04, C3-06; `14` §4 "focus is visible at all times".
+
+## D-101 (2026-11-17) — State ladder and menu highlight
+
+- Type: design
+- Decision: Pressed is its own step: `--primary-active` for primary, `--destructive-active` for danger and a
+  `destructive/20` tint for danger-outline, `--surface-active` (one grey step under hover) for ghost, secondary, tab,
+  nav (`.nav-item:active`, adopted by P1), kebab and row controls. Menu items (row menu, user menu, More actions):
+  highlighted = `bg-accent-strong` plus a 2 px inset `--ring` outline (the fill alone is 1.14:1). In forced colours only
+  the highlighted item is outlined (`Highlight`); other rows lose the per-item border. Popovers, menus and tooltips use
+  `z-popover-over` (`calc(var(--z-modal) + 1)`), so a HelpHint opened in a dialog is above it. The `Select` is the native
+  `<select>`, so its list highlight belongs to the platform.
+- Why: C3-03, C3-05, C3-100.
+
+## D-102 (2026-11-17) — Toasts dock beside the form, success is a check
+
+- Type: design
+- Decision: In a wide editor (from `edit`, 1180 px) the stack is anchored bottom-right, as wide as the side column and
+  with its right edge (measured from `#editor-side-column` by `useToastDock`), so it never covers the form column.
+  Below 1180 px an editor gets a full-width stack with the 16 px gutter; outside editors the stack is unchanged
+  (bottom-right, `--toast-inset-right` if a page sets it). "Link copied" is one line. Neutral confirmations (Changes
+  discarded, Archived, Restored, Link copied) use a check and ink colour (`neutral` tone), never the warning triangle; a
+  toast that carries an instruction ("copy it by hand") stays until dismissed; a route change clears toasts older than
+  1.5 s; the request id is the shared `RequestIdRow`. Callers that still pass `warning` for a neutral confirmation are
+  mapped by title in the store until they change (listed in `requests.md`).
+- Why: C3-26, C3-27 (R2-V-04).
+
+## D-103 (2026-11-17) — Focus has a successor; route announcements follow the committed route
+
+- Type: design
+- Decision: `lib/focus.ts` gains `focusSuccessor(removed, candidates)`: when focus is inside the element about to go it
+  moves to the next sibling action, else the previous, else the listed candidates, else the nearest labelled region,
+  else the page `h1`, else `<main>`; never `<body>`. Toast dismiss uses it; `StateCard` hands focus on after "Try again"
+  replaces it; the confirm store remembers the opener at the time of the question and `AppDialog` returns to it, so Esc on
+  the leave guard lands on the control that was used. The announcer, `document.title` and focus all run in
+  `router.afterEach` (committed routes only), and in an editor the title follows the heading, so a saved rename updates it.
+  The sign-in response is removed from the address bar by one `router.replace` before the app mounts (no extra history
+  entry); `/app-preview` receives `orientation`, `real`, `surface`, `lang`, `mode` and `t` through a whitelist parser.
+- Why: C3-09, C3-11, C3-84, C3-64.
+
+## D-104 (2026-11-17) — Date and time fields validate field by field
+
+- Type: design
+- Decision: `DateTimeFields` checks each part when it is left: hour 0 to 23, minute 0 to 59, year four digits, day against
+  the chosen month and year (31 February is wrong). Each wrong part has its own sentence under the group with an error
+  icon, linked to its input by `aria-describedby`, `aria-invalid` on the input, and one polite announcement. A blank part
+  is "not entered", not wrong. While a part is wrong the model is "" and never another value, so a parent cannot derive an
+  End from it; a `validity` event reports it. The optional `ended` prop mutes the legend and adds "(ended)" without opacity.
+- Why: C3-38 (WCAG 3.3.1, 3.3.3), `14` §4 errors linked and announced.
+
+## D-105 (2026-11-17) — One sentence per failure, one request-id row
+
+- Type: design
+- Decision: `problemText.ts` stays the only table (503 reads "busy or down for maintenance"; "cannot reach the server" only
+  for network failures). `RequestIdRow` (label, id, Copy request id) is the one request-id row; `Alert` (and so
+  `ProblemAlert`), `FormErrorSummary`, `StateCard` and toasts all use it. A failure that belongs to no field never has an
+  "N things to fix" title: `FormErrorSummary` says "This could not be completed" and `FormDialog` "The <noun> was not
+  created". In a dialog with an error summary the field messages are not alerts (`QUIET_FIELD_ERRORS`), so one error is one
+  announcement. Surfaces that still print "not reachable" for a 503 are listed in `requests.md`.
+- Why: C3-85, C3-93; extends D-087.
+
+## D-106 (2026-11-17) — Hit areas, dialog frame and HelpHint
+
+- Type: design
+- Decision: `HelpHint` is a 40 px hit area with a 16 px icon (44 coarse); checkbox rows are 44 px high under
+  `pointer: coarse`; `.hit-44` stays the rule for text links. `formatBytes`, `formatDistance` and `formatPercent` in
+  `lib/format.ts` join number and unit with a no-break space. `Input` and `Textarea` are `dir="auto"` unless the caller
+  passes `dir`. `Select` has `size="sm"` (32 px, 44 coarse). `AppDialog`: Close is the first Tab stop (placed last on
+  the line by `order`), the panel's top edge is anchored so an error summary does not move it, and in a short window the
+  footer is sticky at the foot of the body so the primary action is on screen at 200 % zoom.
+- Why: C3-49 (R2-V-02), C3-48, C3-44, C3-92, C3-93, C3-94; `14` §4 44x44.
+
+## D-107 (2026-11-17) — One readiness list before and after activation
+
+- Type: design
+- Decision: The platform's readiness items are merged into the completeness model by code and path (`coveredByModel`): a missing translation, accessibility information or an image's alternative text that the model already counts is dropped, so one problem is one line before and after activation and the header badge, card, Activate confirm and toast say the same number. The sentence is said once in the confirm; a DRAFT adds "plus checks run on activation" while the platform cannot return readiness for a DRAFT (G-044). Structural gaps (Route without stops, Event without dates, Guide with an empty story) stay warnings (`12` §3), are listed first in their own "Structure" group and named in the confirm ("This Route has no stops. Visitors will see an empty route."); whether they block is Q-021. Every line of the confirm is a link that closes it, opens the section and focuses the field. An Asset is no longer blocked by a missing title: the backend's asset readiness has only `MISSING_ALTERNATIVE_TEXT` and `MISSING_TRANSCRIPT` (`completenessOf` `baseBlocks`, default off when alt slots exist). `issueRowText` (Dashboard) gives "Title is missing in English".
+- Why: C3-14, C3-15, C3-16, C3-58.
+
+## D-108 (2026-11-17) — One Save draft at a time
+
+- Type: design
+- Decision: While the Working Copy banner is in sight it holds Save draft and Discard (`12` §3) and the header carries Apply only ("Apply changes", or "Save and apply" once dirty, whose confirm names the changed fields). The banner is sticky only from 960 px of viewport height and the header only from 700 px; below that the header shows one compact Save draft once the banner is out of sight, and the banner's Save steps aside. Measured chrome (app header included): 11.7 % at 1440x900, 14.6 % at 1280x720, 56 px at 200 % zoom. The error summary floats only from 900 px of height (30 dvh cap, form column width) and is in the flow below. A session that ends mid-save releases the busy flags: "Not saved: session ended. Sign in again", a Sign in again button, Save and Ctrl+S live again.
+- Why: C3-21, C3-23, C3-24, C3-25, C3-83.
+
+## D-109 (2026-11-17) — Side cards are one component
+
+- Type: design
+- Decision: `SideCard` (one `h2` `text-sm font-bold`, `p-4`, `rounded-lg border bg-card shadow-1`) is the only side-column card (Status, readiness, On this page, Translations, Used in). The column's height is the viewport less the app header and the sticky stack, with a fade on each edge that has more.
+- Why: C3-31.
+
+## D-112 (2026-11-17) — The Dashboard headline tells the truth and the guide ticks from data
+
+- Type: design
+- Decision: The Status card says "Live" only when `applicationStatus` is `LIVE`. SUSPENDED ("The visitor app is suspended", visitors cannot open it, the platform controls this) and an unreadable or unknown status ("The visitor app status is unknown", reload) have their own headlines and sentences, take precedence over blockers (which stay listed beneath), and the status line never prints the server's word for an unknown status. While Launch is a placeholder the headline is "Content is ready; going live is not available yet", and "About Launch" and "Review warnings" are text links beside the one primary action. Blocked rows give the cause from `issueRowParts` ("Title is missing in Greek"), no kind prefix, names in `<bdi>`. The first-run guide ticks only what data proves (a Place, a point of interest, a menu item); a visit ticks nothing. Step 3 reads "Not available yet", has no link and is not counted, so progress is "n of 4" (Q-022); step 5 (Preview) has no data and stays open, so it is the last step and never ticks. Once a Place and a point of interest exist the guide ends with "Next: activate the drafts that are ready" and a secondary "Show drafts"; the Status card's "Show drafts" is secondary while the guide is open (one primary). A dismissed guide returns through "Show the guide again" in Project details. Layout: from 1100 px two columns, below it one column with the counts second and the blocks in DOM order, so Tab follows what is seen; counts are compact tiles (one line each from 1024 px). A failed Working Copies read keeps the Status card and shows its own alert with Try again; 403, 404 and 422 offer "Choose another Project" and no Try again.
+- Why: C3-54, C3-55, C3-56, C3-57, C3-58, C3-59, C3-60, C3-61, C3-62, C3-63, C3-91. Supersedes the "opened counts as done" rule of D-092.
+
+## D-110 (2026-11-18) — List row anatomy and the Filters popover
+
+- Type: design
+- Decision: One row rule for the six lists. The Title column takes what the others leave (its own width class is ignored) and is never narrower than 15 rem: when the table would squeeze it below that, the rows become the two-line cards of the narrow layout until the table fits again (measured, with the width it needs as hysteresis). Title text wraps anywhere inside its cell and sits in `<bdi>` (`ListRowTitle`, which also carries `hit-44`, `back` and the worklist `lang`). One header height (48 px), one Order width (48 px), one tree step (24 px, the guide drawn inside it). Trigger chips are on their own line, at most two plus "+N". The Filters popover is a named dialog ("Filters and sort"), has a visible Done, the button reads "Filters 1" (visible text first), the popover is at most the available height with its own scroll, every field is a label above a full-width control (`FilterField`), and there is one Language control for the search language and the worklist. Below 1180 px the status in force is a chip beside the button. A third click on a sorted header returns to the list's own order. The filter chip is one component (`FilterChip`); an empty filtered list says what the other statuses hold ("1 match in Archived"); a list whose header carries New passes `header-action` so the empty state does not repeat it.
+- Why: C3-40 to C3-47, C3-51, C3-99, C3-101. `14` §4: reflow, label in name.
+
+## D-111 (2026-11-18) — A move is visible and undoable
+
+- Type: design
+- Decision: After a saved move (menu, Move to position, drop) the list shows a bar "Moved X to position N of M" with Undo (Ctrl or Cmd+Z) and, when the row left the page, "Show it"; the row flashes for 1.5 s (a static outline under reduced motion); focus goes to the row's kebab, or to the kebab of the row now standing where it stood. The live string uses at most 40 characters of the title. Changing page moves focus to the table and scrolls its head under the toolbar. The bar is a sticky group in `ListTable` because the toast store has no action button; the single announcement is the table's live region, the bar text is not live. The Undo bar of Archive, Restore and dismissals hand focus on (`focusSuccessor`, the neighbour's kebab).
+- Why: C3-08, C3-09, C3-10. `14` §4 keyboard alternatives and feedback.
+
+## D-113 — Preview controls live in the panel header; the new tab honours the options
+"Preview in app" shows the Surface tabs (with a hint), Expand and Close in one sticky header row of `PreviewPanel`, at most 70 px above the picture. Expand lines the panel up under the sticky bars (the picture stays in view), caps its height to the window from there, and is hidden when the panel already fits or would grow by less than 48 px. `/app-preview` reads `orientation` and `real` from route props (verified: Kiosk landscape is 1920 px wide, `real=1` scale 1.000) and states the scale in its bar. Invalid or malformed parameters get fixed sentences that never echo the value; `<html lang>` follows the content language (the CMS bar says `lang="en"`). The empty-Project state sits outside the frame with links to Places and points of interest and the Working/Live explanation. The Preview page keeps its picture still when the surface changes (both Size and Orientation groups are always laid out, the caption row is reserved, the trigger chip has its own reserved row). Why: C3-64, C3-65, C3-66, C3-68, C3-70; `12` §3 "below the action".
+
+## D-114 (2026-11-18) — The armed floor-plan prompt docks
+The "Placing X" prompt sits directly above the plan image, in the flow and not sticky, so it never covers the plan at any height (it covered 116 px of the plan at 1024x768 before). Arming scrolls the prompt and the plan into view together under the sticky bars. A tap or click on a spot that is already taken is not a silent no-op: the prompt shows, and the live region announces, "That spot is taken by <pin>. Click (Tap) an empty spot." (a drag that ends in a click does not count). The prompt is not a live region of its own, so the sentence is announced once. Also in this package: the bounds handles keep 16 px (40 px below, clear of the attribution strip) round the area when editing starts, the tile-failure card is drawn over the top of the map and "Try again" moves focus to the map region, and the basemap now attaches its MapLibre listeners on the layer's `add` event (it read the MapLibre map before it existed, threw, and fell back to raster tiles every time). Why: C3-71, C3-72, C3-73, C3-09, C3-76.
+
+## D-116 (2026-11-18) — Dead code removed; gates wired
+The dead files, rules, exports and config of the round-3 cleanup list are deleted, each after a zero-hit grep (recorded in `ux-audit/round-3/implementation/CLN/changes.md`): five unused filter components, `useStatusActions`, `list/ListSelect` (its six callers use `ui/select` at `size="sm"`), `dropLineClass` (the Route and Guide drop lines get a `Highlight` counterpart in forced colours), `statusGlyph`, `.small-label`, `.table-head`, `.table-row`, `.nums`, the dead `.th`/`.td` rules, five unused barrels, and in `tailwind.config.js` `darkMode`, `container`, the `tailwindcss-animate` plugin line (nothing uses it; the package stays in `package.json` for the owner to remove), the `line` colour, `card.foreground`, `text-2xl`, `rounded-xl` and `z-base`. The six local accent-folding copies are replaced by `fold` from `lib/utils`; `StatusChip` has a `wrap` prop for "Pending changes" in a narrow column. `scripts/check-css-tokens.mjs` covers every Tailwind family and the custom screens and never splits inside `[...]`; `scripts/check-literals.mjs` is the literal gate over CMS chrome. Make targets `check-css` (`--all`), `check-literals` and `check`, and `package.json` scripts `check:css`, `check:literals`, `check`, exist; they are not part of `make build` or the Dockerfile (the owner decides whether they gate the build). The legacy visitor-app screens (Overview, Languages, Surfaces, Translations, Navigation, a section page) keep `.field-input`, `.field-label`, `.dialog-primary`/`.dialog-secondary`, the Button aliases and `statusChipStyle`; DESIGN.md lists them as legacy. Why: C3-97, C3-98, C3-99.
+
+## D-115 (2026-11-18) — DESIGN.md is the system of record
+
+- Type: design
+- Decision: `DESIGN.md` at the repo root (with `.impeccable/design.json`) describes the shipped CMS design system: tokens with roles and measured contrast, type scale (one line-height per size), spacing (4 px base with half steps), radii, elevation, z layers, motion, the focus ring and state ladder (D-100, D-101), the components as used, the layout patterns, content and accessibility rules, the gates (`check-css --all`, `check-literals`), the legacy section for the out-of-scope visitor-app screens, and the deviations still open. `PRODUCT.md` stays the product source; `DESIGN.md` does not repeat it. Every token and class it names exists: the "Token verification" appendix gives name, file and line, each found by grep. A change to a token, a type size or a component variant updates `DESIGN.md` in the same slice.
+- Why: C3-101, `ux-audit/BRIEF.md` §2 item 4.

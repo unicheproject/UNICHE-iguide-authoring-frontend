@@ -1,0 +1,14 @@
+import { open, go, PID, shot, fs } from "./lib.mjs";
+const ids = JSON.parse(fs.readFileSync(new URL("./ids.json", import.meta.url)));
+const { browser, page } = await open("curator", { viewport: "1024" });
+await go(page, `/projects/${PID}/pois/${ids.poi}`);
+await page.waitForFunction(() => document.querySelector("h1")?.innerText.includes("UX-R2"), null, { timeout: 40000 }).catch(()=>{}); await page.waitForTimeout(2000);
+await page.getByRole("tab", { name: /Italiano/ }).click(); await page.waitForTimeout(600);
+const nm = page.getByRole("button", { name: "Next missing" });
+console.log("next missing count", await nm.count(), "visible", await nm.first().isVisible().catch(()=>false));
+const pos = await nm.first().evaluate(e => Math.round(e.getBoundingClientRect().top + scrollY)).catch(()=>null);
+console.log("y pos", pos, "doc height", await page.evaluate(() => document.documentElement.scrollHeight));
+await page.getByRole("button", { name: /Draft · \d+ warning/ }).click().catch(e=>console.log("bar click", e.message.slice(0,60))); await page.waitForTimeout(600);
+await shot(page, "poi-editor__1024-bar-open", "1024", false);
+console.log((await page.locator("main").innerText()).replace(/\n+/g," | ").slice(0,700));
+await browser.close();

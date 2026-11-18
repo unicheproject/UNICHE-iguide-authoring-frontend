@@ -1,0 +1,188 @@
+- main:
+  - navigation "Breadcrumb":
+    - list:
+      - listitem:
+        - link "Points of Interest":
+          - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois
+      - listitem: UX-R3-p5 POI A – Parthenon test
+  - heading "UX-R3-p5 POI A – Parthenon test" [level=1]
+  - text: Draft
+  - status: Unsaved changes
+  - 'button "3 warnings, nothing blocks in this point of interest: show what needs attention"'
+  - button "Save"
+  - button "More actions"
+  - heading "Texts" [level=2]
+  - tablist "Language":
+    - tab "English default 1 of 5" [selected]
+    - tab "Ελληνικά Missing"
+    - tab "Italiano Missing"
+  - tabpanel "English default 1 of 5":
+    - text: Title
+    - paragraph: Required in the default language before it can be activated.
+    - textbox "Title": UX-R3-p5 POI A – Parthenon test
+    - text: Summary
+    - textbox "Summary"
+    - paragraph: Short text shown in lists; aim for a reading level a twelve-year-old follows.
+    - text: Description
+    - textbox "Description"
+    - button "Practical details 0 of 2 filled Show"
+  - region "Placement":
+    - heading "Placement" [level=2]
+    - text: Place
+    - combobox "Place":
+      - option "Not inside a Place" [selected]
+      - option "Athens Historic Centre"
+      - option "Acropolis Museum"
+      - option "Ground Floor – Slopes Level"
+      - option "Excavation Hall of the Slopes"
+      - option "First Floor – Archaic Gallery"
+      - option "Room of the Korai"
+      - option "Parthenon Gallery"
+      - option "Acropolis of Athens"
+      - option "Propylaea and Temple of Athena Nike"
+      - option "Theatre of Dionysus"
+      - option "Ancient Agora of Athens"
+      - option "Stoa of Attalos Museum"
+      - option "UX-R2-s9 temp"
+      - option "UX-R2-s9 temp2"
+      - option "UX-p6-edge Place"
+      - option "UX-s10-poi-place Κήπος Ωδείου – Odeon Garden with a deliberately long name to test wrapping"
+      - option "UX-P4 outdoor place"
+      - option "UX-P4 indoor place"
+      - option "UX-P4 sub place"
+      - option "UX-R2-p6 Place"
+      - option "UX-R2-s10 Place"
+      - option "UX-R2-s9 Place"
+      - option "UX-R2-P4 Empty place"
+    - text: Category
+    - combobox "Category":
+      - option "Uncategorised" [selected]
+      - option "Monuments and Temples"
+      - option "Monuments and Temples › UX-R2-s9 Subcat"
+      - option "Sculpture"
+      - option "Pottery and Everyday Life"
+      - option "Visitor Services"
+      - option "Visitor Services › Food and Drink"
+      - option "Visitor Services › Shops"
+      - option "Viewpoints"
+      - option "UX-p3-translator categorie"
+      - option "UX-p6-edge Category"
+      - option "UX-p6-edge dup categories"
+      - option "UX-P5b category"
+      - option "UX-R2-p3 Marketplace Life"
+      - option "UX-R2-p5 Category"
+      - option "UX-R2-p6 Category"
+      - option "UX-R2-s7-chrome category"
+      - option "UX-R2-s9 Category"
+      - option "UX-R2-P5b Category"
+      - option "UX-R3-p3 Category"
+    - text: Latitude
+    - textbox "Latitude":
+      - /placeholder: e.g. 37.9715
+      - text: "37.9715"
+    - text: Longitude
+    - textbox "Longitude":
+      - /placeholder: e.g. 23.7257
+      - text: "23.7257"
+    - button "Hide the map" [expanded]
+    - text: Degrees, with a point or a comma. The pin and these fields stay in sync. Site map
+    - link "Skip map":
+      - /url: "#v-202"
+    - 'group "Site map: pin position. Arrow keys move the pin, Plus and Minus zoom; the latitude and longitude fields set it exactly."':
+      - region "Map"
+      - img
+      - button "Zoom in"
+      - button "Zoom out"
+      - link "Leaflet":
+        - /url: https://leafletjs.com
+      - text: ©
+      - link "OpenStreetMap":
+        - /url: https://www.openstreetmap.org/copyright
+      - text: contributors
+    - text: Click the map or drag the pin to move it. With the map focused, the arrow keys nudge it (Shift for larger steps) and Plus and Minus zoom.
+    - button "Nearby points of interest (60)"
+  - region "Media 0 of 6 filled · primary image recommended":
+    - heading "Media 0 of 6 filled · primary image recommended" [level=2]
+    - group "Add media":
+      - button "Add Primary image (recommended)"
+      - button "Add Video"
+      - button "Add Gallery"
+      - button "Add 3D model"
+    - group "Audio narration":
+      - text: Audio narration One file per language
+      - 'button "English : choose audio narration"'
+      - 'button "Ελληνικά : choose audio narration"'
+      - 'button "Italiano : choose audio narration"'
+      - 'button "All languages : choose audio narration"'
+      - paragraph: “All languages” plays when a language has no file of its own.
+  - region "How visitors reach it Browsing only":
+    - heading "How visitors reach it Browsing only" [level=2]
+    - paragraph: "Visitors browse to it. Add a way to open it in place:"
+    - group "Add a way to reach it":
+      - button "Add Beacon (Bluetooth)"
+      - button "Add Geo-proximity"
+      - button "Add QR code"
+      - button "AR scan target Camera recognition is not part of the first release" [disabled]
+      - button "Why is AR scan target not available?"
+  - region "Details 0 of 4 set":
+    - heading "Details 0 of 4 set" [level=2]:
+      - button "Details 0 of 4 set"
+  - complementary "About this item":
+    - region "Status":
+      - heading "Status" [level=2]
+      - text: Draft
+      - paragraph: Only authors see it. Activate it once the default-language title is set.
+      - button "Save and activate"
+      - term: Kind
+      - definition: Point of interest
+      - term: Slug
+      - definition: ux-r3-p5-poi-a
+      - term: Updated
+      - definition: 17 Nov 2026, 11:12
+      - term: Created
+      - definition: 17 Nov 2026, 11:11
+      - paragraph: The slug is part of the item's web address.
+    - button "Preview in app"
+    - region "Before you activate":
+      - heading "Before you activate" [level=2]
+      - paragraph: 3 warnings, nothing blocks.
+      - paragraph: 3 warnings, nothing blocks
+      - heading "Texts (3)" [level=3]
+      - list:
+        - listitem:
+          - 'button "Warning: English: 4 texts missing"'
+        - listitem:
+          - 'button "Warning: Ελληνικά: 5 texts missing"'
+        - listitem:
+          - 'button "Warning: Italiano: 5 texts missing"'
+    - navigation "On this page":
+      - heading "On this page" [level=2]
+      - list:
+        - listitem:
+          - link "Texts 3 languages incomplete":
+            - /url: "#texts"
+        - listitem:
+          - link "Placement":
+            - /url: "#placement"
+        - listitem:
+          - link "Media Primary image missing":
+            - /url: "#media"
+        - listitem:
+          - link "How visitors reach it Browsing only":
+            - /url: "#triggers"
+        - listitem:
+          - link "Details 0 of 4 set":
+            - /url: "#details"
+    - region "Translations":
+      - heading "Translations" [level=2]
+      - 'button "Next missing: English"'
+      - list:
+        - listitem:
+          - button "English default editing 1 of 5"
+        - listitem:
+          - button "Ελληνικά Missing"
+        - listitem:
+          - button "Italiano Missing"
+    - region "Used in (0)":
+      - heading "Used in (0)" [level=2]
+      - paragraph: Not used anywhere yet.

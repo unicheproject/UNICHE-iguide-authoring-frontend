@@ -1,0 +1,237 @@
+{
+ "info": {
+  "dashboard": {
+   "title": "iGuide CMS",
+   "landmarks": [
+    "HEADER",
+    "NAV:Primary",
+    "MAIN"
+   ],
+   "headings": [
+    "H1:Dashboard",
+    "H2:Ready for visitors"
+   ],
+   "live": [
+    "/polite:Ready for visitorsNothing blocks the application from going ",
+    "/polite:"
+   ],
+   "skip": [
+    " Skip to content #"
+   ],
+   "activeEl": "BODY."
+  },
+  "/places": {
+   "title": "iGuide CMS",
+   "landmarks": [
+    "HEADER",
+    "NAV:Primary",
+    "MAIN"
+   ],
+   "headings": [
+    "H1:Places"
+   ],
+   "live": [
+    "/polite:",
+    "/polite:"
+   ],
+   "skip": [
+    " Skip to content #"
+   ],
+   "activeEl": "BODY."
+  },
+  "/pois": {
+   "title": "iGuide CMS",
+   "landmarks": [
+    "HEADER",
+    "NAV:Primary",
+    "MAIN"
+   ],
+   "headings": [
+    "H1:Points of Interest"
+   ],
+   "live": [
+    "/polite:",
+    "/polite:"
+   ],
+   "skip": [
+    " Skip to content #"
+   ],
+   "activeEl": "BODY."
+  },
+  "/routes": {
+   "title": "iGuide CMS",
+   "landmarks": [
+    "HEADER",
+    "NAV:Primary",
+    "MAIN"
+   ],
+   "headings": [
+    "H1:Routes"
+   ],
+   "live": [
+    "/polite:",
+    "/polite:"
+   ],
+   "skip": [
+    " Skip to content #"
+   ],
+   "activeEl": "BODY."
+  },
+  "/guides": {
+   "title": "iGuide CMS",
+   "landmarks": [
+    "HEADER",
+    "NAV:Primary",
+    "MAIN"
+   ],
+   "headings": [
+    "H1:Guides"
+   ],
+   "live": [
+    "/polite:",
+    "/polite:"
+   ],
+   "skip": [
+    " Skip to content #"
+   ],
+   "activeEl": "BODY."
+  },
+  "/events": {
+   "title": "iGuide CMS",
+   "landmarks": [
+    "HEADER",
+    "NAV:Primary",
+    "MAIN"
+   ],
+   "headings": [
+    "H1:Events"
+   ],
+   "live": [
+    "/polite:",
+    "/polite:"
+   ],
+   "skip": [
+    " Skip to content #"
+   ],
+   "activeEl": "BODY."
+  },
+  "/categories": {
+   "title": "iGuide CMS",
+   "landmarks": [
+    "HEADER",
+    "NAV:Primary",
+    "MAIN"
+   ],
+   "headings": [
+    "H1:Categories"
+   ],
+   "live": [
+    "/polite:",
+    "/polite:"
+   ],
+   "skip": [
+    " Skip to content #"
+   ],
+   "activeEl": "BODY."
+  },
+  "/media": {
+   "title": "iGuide CMS",
+   "landmarks": [
+    "HEADER",
+    "NAV:Primary",
+    "MAIN",
+    "NAV:Pages"
+   ],
+   "headings": [
+    "H1:Media"
+   ],
+   "live": [
+    "/polite:"
+   ],
+   "skip": [
+    " Skip to content #"
+   ],
+   "activeEl": "BODY."
+  },
+  "/maps": {
+   "title": "iGuide CMS",
+   "landmarks": [
+    "HEADER",
+    "NAV:Primary",
+    "MAIN",
+    "NAV:Sections"
+   ],
+   "headings": [
+    "H1:Maps & Floor Plans"
+   ],
+   "live": [
+    "/polite:"
+   ],
+   "skip": [
+    " Skip to content #"
+   ],
+   "activeEl": "BODY."
+  },
+  "/floor-plans": {
+   "title": "iGuide CMS",
+   "landmarks": [
+    "HEADER",
+    "NAV:Primary",
+    "MAIN",
+    "NAV:Sections"
+   ],
+   "headings": [
+    "H1:Maps & Floor Plans"
+   ],
+   "live": [
+    "/polite:",
+    "/polite:"
+   ],
+   "skip": [
+    " Skip to content #"
+   ],
+   "activeEl": "BODY."
+  },
+  "/preview": {
+   "title": "iGuide CMS",
+   "landmarks": [
+    "HEADER",
+    "NAV:Primary",
+    "MAIN",
+    "HEADER",
+    "NAV"
+   ],
+   "headings": [
+    "H1:Preview",
+    "H1:UX Audit – Populated",
+    "H2:Highlights",
+    "H2:Places",
+    "H2:Points of interest",
+    "H2:Routes",
+    "H2:Guides",
+    "H2:Events"
+   ],
+   "live": [
+    "/polite:Showing drafts and active content. No missing titles in Engl",
+    "/polite:"
+   ],
+   "skip": [
+    " Skip to content #"
+   ],
+   "activeEl": "BODY."
+  }
+ },
+ "all": [
+  {
+   "label": "/pois",
+   "id": "color-contrast",
+   "impact": "serious",
+   "help": "Elements must meet minimum color contrast ratio thresholds",
+   "nodes": 2,
+   "sample": [
+    "tr:nth-child(1) > .px-\\[18px\\]:nth-child(2) > .mt-1\\.5.gap-1.flex-wrap > .bg-\\[\\#ececef\\].text-\\[\\#374151\\][title=\"QR code (draft)\"] ::   Element has insufficient color contrast of 3.03 (foreground color: #878d97, background color: #f4f4f5, font size: 6.8pt (9px), font weight: bold). Expected co",
+    "tr:nth-child(2) > .px-\\[18px\\]:nth-child(2) > .mt-1\\.5.gap-1.flex-wrap > .bg-\\[\\#ececef\\].text-\\[\\#374151\\][title=\"QR code (draft)\"] ::   Element has insufficient color contrast of 3.03 (foreground color: #878d97, background color: #f4f4f5, font size: 6.8pt (9px), font weight: bold). Expected co"
+   ]
+  }
+ ]
+}

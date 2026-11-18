@@ -1,0 +1,13 @@
+search παρθενωνας -> 3 rows; ["UX-R3-p3 Poi Παρθενώνας test","UX-R3-P5a Παρθενώνας 1","UX-R3-P5b Parthenon Παρθενώνας"]
+live after search ["3 items match"]
+search ΠΑΡΘΕΝΩΝΑΣ -> 3
+ONE ADD live messages: ["Unsaved changes","3 warnings, nothing blocks.","Erechtheion and the Porch of the Caryatids added. 1 added in total."]
+two more adds live messages: ["127 items","Acropolis View Terrace added. 2 added in total.","Altar of the Twelve Gods added. 3 added in total."]
+stops now 3
+REORDER live: ["Moved Erechtheion and the Porch of the Caryatids to position 2 of 3."]
+REMOVE live: ["Stop 1, Acropolis View Terrace removed. Press Ctrl+Z or use Undo next to the list to bring it back."]
+undo bar {"text":"Stop 1, Acropolis View Terrace removed.","top":742,"bottom":796,"vh":900}
+2nd removal bar text Stop 1, Erechtheion and the Porch of the Caryatids removed.1 more can be undone.
+draft warnings in rows 0 grouped notes 1
+chip titles ["Remove"]
+position select h 

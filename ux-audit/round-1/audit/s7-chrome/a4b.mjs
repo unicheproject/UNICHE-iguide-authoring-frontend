@@ -1,0 +1,11 @@
+import { open, go, shot, log, P } from "./lib.mjs";
+const { browser, page } = await open("curator", { viewport: "1440" });
+page.on("requestfailed", r => log("FAIL", r.url().slice(0,100), r.failure()?.errorText));
+page.on("response", r => { if (r.status()>=400) log(r.status(), r.url().slice(0,100)); });
+page.on("console", m => { if (m.type()==="error") log("console", m.text().slice(0,150)); });
+const t=Date.now();
+await page.goto("http://localhost:5173/projects/"+P+"/pois");
+await page.waitForSelector("nav#workspace-nav", {timeout:30000}).then(()=>log("nav ms", Date.now()-t)).catch(()=>log("no nav"));
+await page.waitForTimeout(2000);
+await shot(page, "tmp");
+await browser.close();

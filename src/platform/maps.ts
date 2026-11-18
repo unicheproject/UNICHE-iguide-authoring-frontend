@@ -129,6 +129,11 @@ export async function listMaps(projectId: string, signal?: AbortSignal): Promise
   return Promise.all(maps.map((map) => toGeoMap(projectId, map, signal)));
 }
 
+/** How many maps the Project has that are not archived, for the section tab; one cheap read, no placements. */
+export async function countMaps(projectId: string, signal?: AbortSignal): Promise<number> {
+  return (await allPages<{ status: ResourceStatus }>(base(projectId), signal)).filter((m) => m.status !== "ARCHIVED").length;
+}
+
 export async function fetchMap(projectId: string, mapId: string): Promise<GeoMap> {
   return toGeoMap(projectId, await apiRequest<MapResponse>(`${base(projectId)}/${encodeURIComponent(mapId)}`));
 }
@@ -226,17 +231,109 @@ export interface AreaResult {
   bounds: [number, number, number, number];
 }
 
+/** The area search failed; `status` is the HTTP status, or 0 when the service could not be reached at all. */
+export class AreaSearchError extends Error {
+  readonly status: number;
+
+  constructor(status: number) {
+    super(`Nominatim answered ${status}`);
+    this.name = "AreaSearchError";
+    this.status = status;
+  }
+
+  /** What to tell the author, by cause (C1-100): never "check the connection" when the service did answer. */
+  get userMessage(): string {
+    if (this.status === 0) return "The search service could not be reached. Check the connection and try again.";
+    if (this.status === 429) return "The search service is busy, as it allows about one search a second. Wait a few seconds and try again.";
+    if (this.status === 403) return "The search service refused the request. Try again later, or ask your administrator.";
+    if (this.status >= 500) return "The search service has a problem on its side. Try again in a minute.";
+    return `The search service answered with an error (${this.status}). Try a different search.`;
+  }
+}
+
+const KIND_NAMES: Record<string, string> = {
+  administrative: "Administrative area",
+  city: "City",
+  town: "Town",
+  village: "Village",
+  hamlet: "Hamlet",
+  suburb: "Suburb",
+  neighbourhood: "Neighbourhood",
+  quarter: "Quarter",
+  island: "Island",
+  archipelago: "Island group",
+  peninsula: "Peninsula",
+  municipality: "Municipality",
+  county: "County",
+  state: "Region",
+  region: "Region",
+  country: "Country",
+  heath: "Heath, open land",
+  park: "Park",
+  nature_reserve: "Nature reserve",
+  forest: "Forest",
+  wood: "Woodland",
+  beach: "Beach",
+  bay: "Bay",
+  cape: "Cape",
+  mountain: "Mountain",
+  peak: "Peak",
+  valley: "Valley",
+  museum: "Museum",
+  attraction: "Attraction",
+  archaeological_site: "Archaeological site",
+  monument: "Monument",
+  castle: "Castle",
+  ruins: "Ruins",
+  hill: "Hill",
+  residential: "Residential area",
+  industrial: "Industrial area",
+  commercial: "Commercial area",
+  farmland: "Farmland",
+  water: "Water",
+  river: "River",
+  lake: "Lake",
+  aerodrome: "Airport",
+  airport: "Airport",
+  aeroway: "Airport",
+};
+
+/**
+ * The kind to show for a search result: the specific OpenStreetMap `type` ("archaeological_site", "aerodrome") wins
+ * over `addresstype`, which is only the address role ("suburb", "aeroway"). A generic type ("administrative", "yes")
+ * says nothing, so the address role is used then (C3-74).
+ */
+export function resultKind(type: string | undefined, addresstype: string | undefined): string {
+  const generic = !type || type === "administrative" || type === "yes";
+  return areaKindLabel(generic ? addresstype || type || "" : type);
+}
+
+/** An OpenStreetMap type such as `heath` or `archaeological_site` as words an author reads. */
+export function areaKindLabel(kind: string): string {
+  const key = kind.trim().replace(/ /g, "_").toLowerCase();
+  if (!key) return "";
+  if (KIND_NAMES[key]) return KIND_NAMES[key];
+  const words = key.replace(/_/g, " ");
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
 /**
  * Searches an area by name on OpenStreetMap Nominatim, as the mockup's "New map" does. The service allows
  * about one request a second and asks for attribution; it is called only when the author presses Search.
+ * A tile and geocoder host is a recorded exception to "authoring API and IdP only" (D-081, Q-003).
  */
 export async function searchArea(query: string, language: string | null): Promise<AreaResult[]> {
   const url =
     "https://nominatim.openstreetmap.org/search?format=jsonv2&limit=6&addressdetails=0" +
     (language ? `&accept-language=${encodeURIComponent(language)}` : "") +
     `&q=${encodeURIComponent(query)}`;
-  const response = await fetch(url, { headers: { Accept: "application/json" } });
-  if (!response.ok) throw new Error(`Nominatim answered ${response.status}`);
+  let response: Response;
+  try {
+    response = await fetch(url, { headers: { Accept: "application/json" } });
+  } catch {
+    throw new AreaSearchError(0);
+  }
+  if (!response.ok) throw new AreaSearchError(response.status);
   const rows = (await response.json()) as {
     place_id: number;
     display_name: string;
@@ -252,7 +349,7 @@ export async function searchArea(query: string, language: string | null): Promis
       placeId: r.place_id,
       name: parts[0],
       rest: parts.slice(1).join(", "),
-      kind: (r.addresstype || r.type || "").replace(/_/g, " "),
+      kind: resultKind(r.type, r.addresstype),
       displayName: r.display_name,
       osmId: `${r.osm_type}/${r.osm_id}`,
       bounds: r.boundingbox.map(Number) as [number, number, number, number],

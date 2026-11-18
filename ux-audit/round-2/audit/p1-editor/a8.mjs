@@ -1,0 +1,10 @@
+import { open, go, shot, P, settle } from "./lib.mjs";
+const ID="061eca49-e97e-483a-b48f-3dff0d96a3cc";
+const { browser, page } = await open("curator", { viewport: "1440" });
+const log=[]; page.on("response", r=>{ if(r.url().includes("/api/v1") && r.request().method()!=="GET") log.push(r.request().method()+" "+r.url().split("/api/v1")[1].replace(/[0-9a-f-]{36}/g,"ID")+" "+r.status()) });
+await go(page, `/projects/${P}/pois/${ID}`);
+await page.getByRole("heading", { level: 1 }).first().waitFor(); await settle(page,1500);
+console.log((await page.locator("body").innerText()).split("\n").slice(28,75).join(" | "));
+console.log("Chips:", await page.locator("header, main").first().innerText().then(t=>t.slice(0,200)));
+await shot(page,"poi-editor__after-first-save__1440");
+await browser.close();

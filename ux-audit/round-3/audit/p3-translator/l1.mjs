@@ -1,0 +1,13 @@
+import { open, go, base, shot } from "./lib.mjs";
+import { readFileSync } from "node:fs";
+const R = JSON.parse(readFileSync("ux-audit/round-3/audit/p3-translator/records.json","utf8"));
+const { browser, page } = await open("admin", { viewport: "1440" });
+await go(page, R.routes);
+await page.waitForSelector("h1"); await page.waitForTimeout(1800);
+await page.locator("#f-title").fill("UX-R3-p3 Route Περίπατος στην Ακρόπολη και στα μνημεία της: Παρθενώνας, Ερέχθειο, Προπύλαια, Ναός Αθηνάς Νίκης και Αποκαταστατικοσυντηρητικοεπιστημονικότατος περίπατος της Πλάκας");
+await page.getByRole("tab",{name:/Ελληνικά/}).click();
+await page.locator("#f-title").fill("Ένας εξαιρετικά μακρύς ελληνικός τίτλος διαδρομής για έλεγχο αναδίπλωσης: Ανασκαφικοαρχαιολογικοεπιστημονικοσυντηρητικότατος περίπατος");
+await page.getByRole("button",{name:"Save", exact:true}).first().click();
+await page.waitForTimeout(2500);
+console.log(await page.evaluate(()=>document.title+" | "+document.querySelector("h1").innerText));
+await browser.close();

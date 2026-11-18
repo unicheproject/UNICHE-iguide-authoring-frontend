@@ -1,0 +1,34 @@
+import {open,go,P,shot,btns,hdr,D} from "./lib.mjs";
+const { browser, page } = await open("admin",{viewport:"1440"});
+await go(page,P+"/media"); await page.waitForSelector("main h1"); await page.waitForTimeout(1200);
+await page.getByRole("button",{name:/Filters and sort/}).click();
+await page.locator("#media-type").selectOption({label:"Audio"}); await page.waitForTimeout(900);
+console.log("url audio:",page.url().split("?")[1]);
+await page.getByLabel("No alt text in English").check(); await page.waitForTimeout(900);
+console.log("url noalt:",page.url().split("?")[1],"|",await page.evaluate(()=>document.querySelector("main").innerText.match(/Showing[^\n]*|No [^\n]*|Nothing[^\n]*/g)));
+await page.keyboard.press("Escape");
+await shot(page,"media__audio-noalt-empty__1440");
+await page.getByLabel("No alt text in English").check().catch(()=>{});
+await page.getByRole("button",{name:/Filters and sort|Filters/}).first().click().catch(()=>{});
+await page.getByLabel("No alt text in English").uncheck().catch(()=>{});
+await page.waitForTimeout(700);
+await page.keyboard.press("Escape");
+console.log("audio only:",await page.evaluate(()=>document.querySelector("main").innerText.match(/Showing[^\n]*/g)));
+await shot(page,"media__audio-only__1440");
+console.log((await page.evaluate(()=>document.querySelector("main").innerText)).replace(/\n+/g," | ").slice(300,1100));
+// list view
+await go(page,P+"/media?view=list&type=AUDIO"); await page.waitForTimeout(1500);
+await shot(page,"media__list-audio__1440");
+// upload
+await go(page,P+"/media"); await page.waitForSelector("main h1");
+await page.getByRole("button",{name:/Upload files/}).click(); await page.waitForTimeout(600);
+await shot(page,"media__upload-dialog-empty__1440");
+console.log((await page.evaluate(()=>document.querySelector("[role=dialog]").innerText)).replace(/\n+/g," | "));
+console.log("focus:",await page.evaluate(()=>document.activeElement.tagName+":"+(document.activeElement.innerText||document.activeElement.getAttribute("aria-label")||"").slice(0,40)));
+await page.locator("input[type=file]").setInputFiles(D.replace("C:/","C:\\").replace(/\//g,"\\")+"UX-R3-p1-editor-tone.wav");
+const t=Date.now();
+await page.waitForTimeout(400);
+await shot(page,"media__upload-dialog-held__1440");
+console.log((await page.evaluate(()=>document.querySelector("[role=dialog]").innerText)).replace(/\n+/g," | "));
+console.log(await btns(page,"[role=dialog]"));
+await browser.close();

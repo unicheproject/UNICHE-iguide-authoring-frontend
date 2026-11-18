@@ -1,0 +1,5 @@
+wc1-dirty-1440 violations: []
+activate-dialog-1440 violations: []
+wc1-dirty-1024 violations: []
+wc1-dirty-768 violations: []
+wc1-dirty-zoom200 violations: []

@@ -1,0 +1,31 @@
+import { start, go, P, shotDir } from "./common.mjs";
+const s = await start(); const p=s.page;
+await go(p, P + "/pois"); await p.waitForTimeout(1500);
+const count = async()=> (await p.getByText(/\d+ (of \d+ )?points? of interest/).first().innerText().catch(()=>"?"));
+// language select
+await p.getByRole("button",{name:/Filters/}).click();
+const dlg = p.getByRole("dialog",{name:"Filters"});
+const sels = dlg.locator("select"); console.log("selects", await sels.count());
+console.log("lang opts:", await sels.nth(1).locator("option").allInnerTexts());
+await sels.nth(1).selectOption({label:"Ελληνικά"}).catch(async()=>{ await sels.nth(1).selectOption({index:2}); });
+await p.keyboard.press("Escape").catch(()=>{});
+await p.waitForTimeout(300);
+console.log("menu closed by esc:", !(await dlg.isVisible()));
+if (await dlg.isVisible()) await dlg.getByRole("button",{name:/done/i}).click();
+await p.getByPlaceholder(/Search/).fill("Κόρη"); await p.waitForTimeout(800);
+console.log("greek:", await count());
+await s.shot("pois-list__search-greek-el");
+console.log("placeholder now:", await p.getByPlaceholder(/Search/).getAttribute("placeholder"));
+console.log("rows:", (await p.locator("main a[href*='/pois/']").allInnerTexts()).join(" | "));
+await p.getByPlaceholder(/Search/).fill("xyzzy"); await p.waitForTimeout(500);
+await s.shot("pois-list__filtered-empty");
+console.log("empty:", (await p.locator("main").innerText()).replace(/\n+/g," | ").slice(0,500));
+// pending + status filter row listing (find seeded WC)
+await p.getByPlaceholder(/Search/).fill("");
+await p.getByRole("button",{name:/Filters/}).click();
+await dlg.getByRole("button",{name:/clear filters/i}).click();
+await dlg.getByText("Pending changes",{exact:true}).click(); await dlg.getByRole("button",{name:/done/i}).click(); await p.waitForTimeout(500);
+console.log("pending titles:", (await p.locator("main a[href*='/pois/']").allInnerTexts()).join(" | "));
+await p.keyboard.press("Tab");
+console.log("chips:", await p.locator("main button[aria-label^='Remove filter']").allInnerTexts());
+await s.browser.close();

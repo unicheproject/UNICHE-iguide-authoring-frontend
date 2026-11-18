@@ -1,0 +1,1 @@
+reduced anims [{"name":"ui-fade-in","target":"DIV.fixed inset-0 flex items-center justify-center bg-scrim p-4 ","dur":120,"iter":1},{"name":"ui-fade-in","target":"DIV.flex max-h-[calc(100dvh-2rem)] w-full flex-col rounded-lg bo","dur":120,"iter":1}]

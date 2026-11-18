@@ -1,0 +1,12 @@
+import { open, go, rec, P, shot, ready, tall, SH, axe } from "./h.mjs";
+const { browser, page } = await open("curator", { viewport: "1440" });
+const errs=[]; page.on("pageerror",e=>errs.push(e.message)); page.on("console",m=>{if(m.type()==="error")errs.push(m.text().slice(0,150))});
+const log=(...a)=>console.log(...a);
+const focus=()=>page.evaluate(()=>{const a=document.activeElement;return a?`${a.tagName}#${a.id}.${(a.getAttribute("aria-label")||a.textContent||"").trim().slice(0,40)}`:null});
+await go(page, `/projects/${P}/pois/${rec.poiA}`); await ready(page);
+log("restore", await page.locator("body").innerText().then(t=>/restore|Restore/.test(t)));
+await page.screenshot({path:SH+"poi-editor__reload-after-failed-save__1440.png"});
+log("hdr", await page.evaluate(()=>document.querySelector("[data-editor-primary]")?.closest("div[class*=sticky]")?.innerText.replace(/\n+/g," | ")));
+await page.locator("#triggers").scrollIntoViewIfNeeded();
+log("triggers", await page.locator("#triggers").getByLabel("UUID").count(), await page.locator("#triggers").innerText().then(t=>t.slice(0,300)));
+await browser.close(); log(errs);

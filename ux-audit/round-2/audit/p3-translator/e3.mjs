@@ -1,0 +1,44 @@
+import { open, go, PID, shot, fs } from "./lib.mjs";
+const ids = JSON.parse(fs.readFileSync(new URL("./ids.json", import.meta.url)));
+const { browser, page } = await open("curator", { viewport: "1440" });
+await go(page, `/projects/${PID}/pois/${ids.poi}`);
+await page.waitForFunction(() => document.querySelector("h1")?.innerText.includes("UX-R2"), null, { timeout: 40000 }).catch(()=>{});
+await page.waitForTimeout(1200);
+const tabs = async () => (await page.locator("[role=tab]").evaluateAll(e => e.map(x => x.innerText.replace(/\n/g," ")))).join(" / ");
+const active = () => page.evaluate(() => { const a = document.activeElement; return `${a?.tagName}|${a?.getAttribute("data-path")}|${a?.labels?.[0]?.innerText ?? a?.innerText?.slice(0,30)}`; });
+// keyboard tab pattern
+await page.getByRole("tab", { name: /English/ }).focus();
+await page.keyboard.press("ArrowRight");
+console.log("after ArrowRight on tab:", await active(), "| selected:", await page.locator("[role=tab][aria-selected=true]").innerText());
+await page.keyboard.press("End"); console.log("End:", await page.locator("[role=tab][aria-selected=true]").innerText().then(t=>t.replace(/\n/g," ")));
+await page.keyboard.press("Home"); console.log("Home:", await page.locator("[role=tab][aria-selected=true]").innerText().then(t=>t.replace(/\n/g," ")));
+await page.getByRole("tab", { name: /Ελληνικά/ }).click();
+await page.getByLabel("Title in Ελληνικά").fill("UX-R2-p3 Στοά του Αττάλου – Πινακοθήκη");
+await page.getByLabel("Summary in Ελληνικά").fill("Αναστηλωμένη διώροφη στοά με κιονοστοιχία που στέγαζε καταστήματα.");
+await page.getByLabel("Description in Ελληνικά").fill("Η Στοά ανοικοδομήθηκε τη δεκαετία του 1950. Περπατήστε σε όλο το μήκος του ισογείου.\n\nΟ όροφος παρουσιάζει ευρήματα από τις ανασκαφές της Αγοράς.");
+console.log("tabs:", await tabs());
+// next missing from Greek with only Practical details missing
+await page.getByRole("button", { name: "Next missing" }).click(); await page.waitForTimeout(500);
+console.log("next missing ->", await active(), "| tab:", await page.locator("[role=tab][aria-selected=true]").innerText().then(t=>t.replace(/\n/g," ")));
+await page.getByRole("tab", { name: /Ελληνικά/ }).click();
+const pd = page.locator("button", { hasText: /^\s*(Show|Practical details)/ });
+console.log("pd buttons", await pd.count());
+await page.getByText("Practical details").first().scrollIntoViewIfNeeded();
+await shot(page, "poi-editor__el-practical-collapsed", "1440", false);
+const show = page.getByRole("button", { name: /Show/ });
+console.log("show btns", await show.count(), await show.first().getAttribute("aria-expanded"), await show.first().getAttribute("aria-label"));
+await show.first().click(); await page.waitForTimeout(400);
+await shot(page, "poi-editor__el-practical-open", "1440", false);
+console.log("labels:", await page.locator("label").evaluateAll(e => e.map(x => x.innerText.replace(/\n/g," ")).filter(t=>/Ελληνικά/.test(t)).join(" ;; ")));
+await page.getByLabel(/Instructions in Ελληνικά/).fill("Μπείτε από την ανατολική πόρτα και κρατήστε τους κίονες στα αριστερά σας.");
+await page.getByLabel(/Accessibility information in Ελληνικά/).fill("Είσοδος χωρίς σκαλιά στην ανατολική πλευρά· ασανσέρ εξυπηρετεί τον όροφο.");
+console.log("tabs:", await tabs());
+// Italian
+await page.getByRole("tab", { name: /Italiano/ }).click();
+await page.getByLabel("Title in Italiano").fill("UX-R2-p3 Galleria della Stoà di Attalo");
+await page.getByLabel("Summary in Italiano").fill("Un portico a due piani ricostruito che un tempo ospitava negozi.");
+console.log("tabs:", await tabs());
+await page.keyboard.press("Control+s"); await page.waitForTimeout(2500);
+console.log("after ctrl+s tabs:", await tabs(), "| header:", (await page.locator("main").innerText()).split("\n").slice(0,14).join(" / "));
+await shot(page, "poi-editor__after-save-it-partial");
+await browser.close();

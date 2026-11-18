@@ -1,0 +1,14 @@
+import { start, go, P, focusInfo, tabWalk, tabTo, live, axe, seed } from "./common.mjs";
+const s = await start("1440"); const { page } = s;
+await go(page, P + "/pois"); await page.waitForTimeout(1500);
+await page.keyboard.press("Tab"); await page.keyboard.press("Tab"); await page.keyboard.press("Enter"); await page.waitForTimeout(800);
+const links = await page.locator("a").filter({hasText:"UX Audit"}).allTextContents(); console.log(links);
+const lk = page.locator("a").filter({hasText:"Empty"}).first();
+console.log("n", await lk.count());
+await lk.focus(); await page.keyboard.press("Enter"); await page.waitForTimeout(2500);
+console.log("after switch", page.url().slice(-50), "focus", JSON.stringify(await focusInfo(page)), "live", JSON.stringify(await live(page)), "title", await page.title());
+await s.shot("switcher__after-switch");
+console.log("h1", await page.locator("h1").allTextContents());
+console.log("axe", JSON.stringify((await axe(page,"empty-dashboard")).map(v=>v.id+":"+v.impact+":"+v.nodes+":"+v.sample[0])));
+console.log(await page.locator("main").ariaSnapshot().then(t=>t.split("\n").slice(0,40).join("\n")));
+await s.browser.close();

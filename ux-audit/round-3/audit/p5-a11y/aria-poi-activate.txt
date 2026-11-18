@@ -1,0 +1,18 @@
+- dialog "Activate UX-R3-p5 POI A – Parthenon test?":
+  - heading "Activate UX-R3-p5 POI A – Parthenon test?" [level=2]
+  - button "Close dialog"
+  - paragraph:
+    - strong: UX-R3-p5 POI A – Parthenon test
+    - text: goes from draft to active. Visitors will see this point of interest on their next refresh of the app (3 warnings, nothing blocks). You can deactivate it again at any time; it then returns to draft.
+  - region "Before you activate":
+    - paragraph: 3 warnings, nothing blocks.
+    - paragraph: 3 warnings, nothing blocks
+    - heading "Texts (3)" [level=3]
+    - list:
+      - listitem: "Warning: English: 4 texts missing"
+      - listitem: "Warning: Ελληνικά: 5 texts missing"
+      - listitem: "Warning: Italiano: 5 texts missing"
+  - button "Review in editor"
+  - contentinfo:
+    - button "Cancel"
+    - button "Activate"

@@ -1,0 +1,37 @@
+import {open,go,P,shot,btns,hdr} from "./lib.mjs";
+const { browser, page } = await open("admin",{viewport:"1440"});
+await go(page,P+"/pois?q=UX-R3-p1"); await page.waitForSelector("tbody tr");
+console.log("search-filtered manual order: drag handles",await page.locator("[aria-label*='rag'],[aria-label*='Reorder']").count());
+await page.getByRole("button",{name:/Actions for UX-R3-p1-editor Beta/}).click(); await page.waitForTimeout(400);
+await shot(page,"pois-list__row-menu__1440");
+console.log("menu:",await page.evaluate(()=>[...document.querySelectorAll("[role=menuitem]")].map(m=>m.innerText.trim()+(m.getAttribute("aria-disabled")?"(disabled)":""))));
+console.log("focus:",await page.evaluate(()=>document.activeElement.innerText));
+await page.keyboard.press("Escape");
+// full list manual order, go to page 2 where my records live (end)
+await go(page,P+"/pois"); await page.waitForSelector("tbody tr");
+await page.getByRole("button",{name:/^Next/}).click(); await page.waitForTimeout(800);
+const names=await page.evaluate(()=>[...document.querySelectorAll("tbody tr")].map(r=>r.innerText.split("\n").filter(Boolean).slice(0,2).join(" ")).slice(-6));
+console.log(names);
+await shot(page,"pois-list__page2-manual__1440");
+await page.getByRole("button",{name:/Actions for UX-R3-p1-editor Beta/}).click();
+await page.waitForTimeout(300);
+console.log("menu pg2:",await page.evaluate(()=>[...document.querySelectorAll("[role=menuitem]")].map(m=>m.innerText.trim()+(m.getAttribute("aria-disabled")?"(disabled)":""))));
+await page.getByRole("menuitem",{name:/Move to position/}).click(); await page.waitForTimeout(500);
+await shot(page,"pois-list__move-to-position-dialog__1440");
+console.log((await page.evaluate(()=>document.querySelector("[role=dialog]").innerText)).replace(/\n+/g," | "));
+console.log("focus:",await page.evaluate(()=>document.activeElement.tagName+":"+document.activeElement.type+":"+(document.activeElement.getAttribute("aria-label")||"")));
+// invalid
+const inp=page.getByRole("dialog").locator("input");
+await inp.fill("0"); await page.getByRole("dialog").getByRole("button",{name:/^Move/}).click(); await page.waitForTimeout(400);
+console.log("invalid:",(await page.evaluate(()=>document.querySelector("[role=dialog]").innerText)).replace(/\n+/g," | "));
+await shot(page,"pois-list__move-to-position-invalid__1440");
+await inp.fill("1");
+const t=Date.now();
+await page.getByRole("dialog").getByRole("button",{name:/^Move/}).click();
+await page.waitForFunction(()=>!document.querySelector("[role=dialog]"),null,{timeout:15000});
+console.log("move ms",Date.now()-t);
+await page.waitForTimeout(800);
+console.log("toasts:",await page.evaluate(()=>[...document.querySelectorAll("[role=status],[aria-live]")].map(e=>e.innerText.trim().slice(0,160)).filter(Boolean)));
+console.log("url",page.url().split("?")[1],"focus:",await page.evaluate(()=>document.activeElement.tagName+":"+(document.activeElement.getAttribute("aria-label")||document.activeElement.innerText||"").slice(0,60)));
+await shot(page,"pois-list__after-move-to-1__1440");
+await browser.close();

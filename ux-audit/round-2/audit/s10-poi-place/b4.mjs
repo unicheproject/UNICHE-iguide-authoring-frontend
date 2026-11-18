@@ -1,0 +1,20 @@
+import { open, go, rec, P, ready, SH } from "./h.mjs";
+import { call, closeAll } from "../../../tools/lib.mjs";
+const { browser, page } = await open("curator", { viewport: "1440" });
+const log=(...a)=>console.log(...a);
+const focus=()=>page.evaluate(()=>{const a=document.activeElement;return a?`${a.tagName}#${a.id}.${(a.getAttribute("aria-label")||a.textContent||"").trim().slice(0,40)}`:null});
+await go(page, `/projects/${P}/pois/${rec.poiB}`); await ready(page);
+await page.locator("#f-summary").fill("My summary, written in the CMS.");
+// colleague saves via API
+const r = await call("curator","GET",`/projects/${P}/pois/${rec.poiB}`);
+const keys=["slug","placeId","code","internalName","latitude","longitude","estimatedVisitMinutes","featured"];
+await call("curator","PUT",`/projects/${P}/pois/${rec.poiB}`,{...Object.fromEntries(keys.map(k=>[k,r[k]??null])),version:r.version,translations:{...r.translations,en:{...r.translations.en,summary:"Colleague summary, written elsewhere.",description:"Colleague description."}}});
+await page.keyboard.press("Control+s"); await page.waitForTimeout(2500);
+log("dialog:", await page.getByRole("dialog").innerText().catch(()=>"none")); log("focus", await focus());
+await page.screenshot({path:SH+"poi-editor__409-save__1440.png"});
+log("buttons", await page.getByRole("dialog").getByRole("button").allInnerTexts());
+log("hdr", await page.evaluate(()=>document.querySelector("[data-editor-primary]")?.closest("div[class*=sticky]")?.innerText.replace(/\n+/g," | ")));
+await page.keyboard.press("Escape"); await page.waitForTimeout(600);
+log("after esc focus", await focus(), "dialog open?", await page.getByRole("dialog").count());
+log("alerts", await page.locator("[role=alert]").allInnerTexts());
+await browser.close(); await closeAll();

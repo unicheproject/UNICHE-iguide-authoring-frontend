@@ -1,0 +1,190 @@
+[
+ [
+  "zoom200 btn",
+  1
+ ],
+ [
+  "zoom200 btnBox",
+  {
+   "x": 450.09375,
+   "y": 224,
+   "width": 164.90625,
+   "height": 40
+  }
+ ],
+ [
+  "zoom200 opened",
+  {
+   "scrollY": 0,
+   "docH": 360,
+   "vh": 360,
+   "region": {
+    "x": 33,
+    "y": 172,
+    "w": 574,
+    "h": 440
+   },
+   "frame": {
+    "x": 33,
+    "y": 220,
+    "w": 574,
+    "h": 392
+   },
+   "scale": "0.448",
+   "btns": [
+    [
+     "Close preview",
+     {
+      "x": 332,
+      "y": 34,
+      "w": 158,
+      "h": 40
+     }
+    ],
+    [
+     "Expand",
+     {
+      "x": 503,
+      "y": 34,
+      "w": 113,
+      "h": 40
+     }
+    ],
+    [
+     "Open at real size",
+     {
+      "x": 307,
+      "y": 176,
+      "w": 170,
+      "h": 32
+     }
+    ],
+    [
+     "Interact with the preview",
+     {
+      "x": 493,
+      "y": 172,
+      "w": 114,
+      "h": 40
+     }
+    ]
+   ],
+   "active": "In the appWebMobileKiosk Skip ",
+   "cap": "Desktop browser, 1280 × 800. Shown at 45 %.",
+   "sw": 0
+  }
+ ],
+ [
+  "zoom200 expandBox(viewport)",
+  {
+   "x": 502.5,
+   "y": 34,
+   "width": 112.5,
+   "height": 40
+  }
+ ],
+ [
+  "zoom200 expandScrollDelta",
+  0
+ ],
+ [
+  "zoom200 expanded",
+  {
+   "scrollY": 0,
+   "docH": 360,
+   "vh": 360,
+   "region": {
+    "x": 33,
+    "y": 308,
+    "w": 574,
+    "h": 440
+   },
+   "frame": {
+    "x": 33,
+    "y": 356,
+    "w": 574,
+    "h": 392
+   },
+   "scale": "0.448",
+   "btns": [
+    [
+     "Close preview",
+     {
+      "x": 326,
+      "y": 170,
+      "w": 158,
+      "h": 40
+     }
+    ],
+    [
+     "Collapse",
+     {
+      "x": 496,
+      "y": 170,
+      "w": 119,
+      "h": 40
+     }
+    ],
+    [
+     "Open at real size",
+     {
+      "x": 307,
+      "y": 312,
+      "w": 170,
+      "h": 32
+     }
+    ],
+    [
+     "Interact with the preview",
+     {
+      "x": 493,
+      "y": 308,
+      "w": 114,
+      "h": 40
+     }
+    ]
+   ],
+   "active": "Collapse",
+   "cap": "Desktop browser, 1280 × 800. Shown at 45 %.",
+   "sw": 0
+  }
+ ],
+ [
+  "zoom200 focusAfterExpand",
+  "Collapse"
+ ],
+ [
+  "zoom200 afterEsc1",
+  {
+   "scrollY": 0,
+   "docH": 360,
+   "vh": 360,
+   "region": null,
+   "frame": null,
+   "btns": [],
+   "active": "Preview in app",
+   "sw": 0
+  }
+ ],
+ [
+  "zoom200 panelStillThere",
+  0
+ ],
+ [
+  "zoom200 afterEsc2",
+  {
+   "scrollY": 0,
+   "docH": 360,
+   "vh": 360,
+   "region": null,
+   "frame": null,
+   "btns": [],
+   "active": "Preview in app",
+   "sw": 0
+  }
+ ],
+ [
+  "zoom200 focusAfterClose",
+  "Preview in app"
+ ]
+]

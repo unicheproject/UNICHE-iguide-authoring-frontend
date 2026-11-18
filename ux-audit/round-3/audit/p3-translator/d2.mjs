@@ -1,0 +1,30 @@
+import { open, go, base, shot } from "./lib.mjs";
+import { readFileSync } from "node:fs";
+const R = JSON.parse(readFileSync("ux-audit/round-3/audit/p3-translator/records.json","utf8"));
+const { browser, page } = await open("admin", { viewport: "1440" });
+const tabs = async (l) => console.log(l, await page.evaluate(()=>[...document.querySelectorAll("[role=tab]")].map(t=>t.innerText.replace(/\s+/g," ")).join(" / ")+" || "+[...document.querySelectorAll("button")].filter(b=>/^(Warning|Blocking)/.test(b.innerText)).map(e=>e.innerText.trim()).join(" | ")+" || HEAD "+[...document.querySelectorAll("button")].filter(b=>b.getBoundingClientRect().y<120 && /fix|warning|Nothing/i.test(b.innerText)).map(e=>e.innerText.trim().replace(/\s+/g," ")).join(" | ")));
+await go(page, R.guides);
+console.log("start");
+await page.waitForSelector("h1"); await page.waitForTimeout(1500);
+await page.locator("#add-element-end").click();
+await page.waitForTimeout(400);
+await page.locator("textarea[id^=ge-field]").first().fill("The first English paragraph of the story.");
+await page.getByRole("button",{name:/Add heading/}).click();
+await page.waitForTimeout(400);
+console.log(await page.evaluate(()=>[...document.querySelectorAll("main textarea,main input")].filter(e=>e.offsetParent).map(e=>e.id+"|"+(e.labels?.[0]?.innerText||e.getAttribute("aria-label")||"")).join("\n")));
+await page.waitForTimeout(1500);
+await tabs("after add, 1.5s later");
+await page.locator("[id^=ge-field]").nth(1).fill("A first heading");
+await page.waitForTimeout(800);
+await tabs("heading filled");
+await shot(page,"guide-editor__en-story__1440",true);
+await page.getByRole("button",{name:/^Save/}).first().click();
+await page.waitForTimeout(2500);
+await tabs("saved");
+for (const l of ["el","it"]) {
+  await page.getByRole("tab",{name: l==="el"?/Ελληνικά/:/Italiano/}).click();
+  await page.waitForTimeout(700);
+  await shot(page,`guide-editor__${l}-tab-story__1440`,true);
+  console.log(l, "fields:", await page.evaluate(()=>[...document.querySelectorAll("main textarea,main input,main button")].filter(e=>e.offsetParent).map(e=>e.tagName+" "+e.id+"|"+(e.labels?.[0]?.innerText||e.getAttribute("aria-label")||e.innerText||"").trim().replace(/\s+/g," ").slice(0,50)).join("\n")));
+}
+await browser.close();

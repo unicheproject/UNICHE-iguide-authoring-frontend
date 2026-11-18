@@ -1,0 +1,10 @@
+import * as H from "./h.mjs";
+const log = H.LOG("e30");
+const { browser, page } = await H.session({viewport:"1280", reducedMotion:"reduce"});
+const api = (u) => u.pathname.includes("/iguide/api/");
+await H.go(page, H.P("/pois/" + H.ids.poi)); await H.sleep(1500);
+await page.route(api, (r) => r.request().method()==="PUT" && new RegExp(`/pois/${H.ids.poi}$`).test(new URL(r.request().url()).pathname) ? r.fulfill(H.problem(409,"VERSION_CONFLICT",{currentVersion:9})) : r.continue());
+await page.locator("#f-title").click(); await page.keyboard.press("End"); await page.keyboard.type(" z");
+await page.getByRole("button", { name: /^Save/ }).first().click(); await H.sleep(600);
+log("reduced anims", await page.evaluate(() => document.getAnimations().map(a => ({ name: a.animationName || a.transitionProperty, target: a.effect?.target?.tagName + "." + String(a.effect?.target?.className).slice(0,60), dur: a.effect?.getTiming().duration, iter: a.effect?.getTiming().iterations }))));
+await browser.close();

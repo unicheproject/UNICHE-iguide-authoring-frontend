@@ -1,0 +1,17 @@
+import { call, closeAll } from "../../../tools/lib.mjs";
+import fs from "node:fs";
+const P = "6958c18f-60d2-4140-a524-5a43f8a2f6b5";
+const p = (x) => `/projects/${P}${x}`;
+const ids = {};
+const N = (s) => `UX-R3V-v3 ${s}`;
+const mk = async (k, path, body) => { const r = await call("admin", "POST", p(path), body); ids[k] = r.id; console.log(k, r.id, r.status, r.version); return r; };
+await mk("place", "/places", { title: N("Place outdoor"), type: "SITE", environment: "OUTDOOR", parentPlaceId: null });
+await mk("poiDraft", "/pois", { title: N("POI draft"), placeId: null, code: null });
+await mk("poiActive", "/pois", { title: N("POI active"), placeId: null, code: null });
+await mk("route", "/routes", { title: N("Route"), type: "WALKING" }).catch(e=>console.log("route err", e.message));
+await mk("guide", "/guides", { title: N("Guide") });
+await mk("event", "/events", { title: N("Event") }).catch(e=>console.log("event err", e.message));
+await mk("cat", "/categories", { name: N("Category"), scope: "POI", parentCategoryId: null }).catch(e=>console.log("cat err", e.message));
+await mk("catUsed", "/categories", { name: N("Category used"), scope: "POI", parentCategoryId: null }).catch(e=>console.log("cat err", e.message));
+fs.writeFileSync("ids.json", JSON.stringify(ids, null, 1));
+await closeAll();

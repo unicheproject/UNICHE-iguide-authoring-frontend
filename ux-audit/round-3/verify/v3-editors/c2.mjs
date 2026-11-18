@@ -1,0 +1,20 @@
+import { open, go, shot, wait, url, ids, active, txt, live, liveLog } from "./h.mjs";
+const { browser, page } = await open("admin", { viewport: "1440" });
+await go(page, url("pois", ids.poiDraft)); await wait(page, 1800);
+await live(page);
+await page.getByRole("button",{name:"Activate"}).first().click(); await wait(page,800);
+let d = page.getByRole("dialog");
+await d.getByRole("button",{name:/Ελληνικά: 5 texts/}).click(); await wait(page,800);
+console.log("dialog open after link?", await page.getByRole("dialog").count(), "active:", await active(page), "url", page.url().slice(-60));
+await shot(page,"poi-draft__after-readiness-link__1440");
+// Activate for real
+await page.getByRole("button",{name:"Activate"}).first().click(); await wait(page,800);
+await page.getByRole("dialog").getByRole("button",{name:"Activate",exact:true}).click(); await wait(page,2500);
+console.log("live:", JSON.stringify(await liveLog(page)));
+const toast = await page.locator("[role=status],[role=alert],[data-toast],.toast").allInnerTexts();
+console.log("toasts:", JSON.stringify(toast));
+console.log("HEADER:", await page.locator(".editor-header").innerText().then(t=>t.replace(/\n+/g," | ")));
+console.log("SIDE:", await page.locator("aside").innerText().then(t=>t.replace(/\n+/g," | ")));
+await shot(page,"poi-active__after-activate__1440");
+console.log("active el:", await active(page));
+await browser.close();

@@ -1,0 +1,9 @@
+- menu "Actions for East Pediment Fragments":
+  - menuitem "Deactivate"
+  - menuitem "Archive"
+  - separator
+  - menuitem "Move up"
+  - menuitem "Move down"
+  - menuitem "Move to position..."
+  - menuitem "Move to top"
+  - menuitem "Move to bottom"

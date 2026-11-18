@@ -1,0 +1,5 @@
+# R2-fixup changes
+Files: ui/field/FormField, editor/ActivateDialog, editor/EditorShell, editor/RemovedBar, editor/TranslationsPanel, AppDialog, AppToast, PageHead, GeoPicker, ui/checkbox/Checkbox, list/ListToolbar, styles/list-table.css, lib/toastOffset.ts (new), workspace/useResourceEditor, views/workspace/{DashboardView,LifecycleDialogs}, pois/PoiEditorView, places/PlaceEditorView.
+Done/not done: see "R2-fixup status" in ../requests.md.
+Checks: vue-tsc and check-css-tokens pass; axe (serious/critical) none on POI editor and Dashboard at 1440; screenshots in after/ (POI 1440/1024/768/zoom200, Dashboard, Places/POIs 1024, Activate dialog, picker zoom200). POI editor main height 2300 px at 1440 for the populated test POI (the empty-POI figure was not re-measured); layout verified: Summary and Description side by side. Not run: e2e (cannot run here), forced-colors shots, impeccable detect.
+Caveat: toasts in a wide editor now stand left of the side column and can cover the right part of the form column.

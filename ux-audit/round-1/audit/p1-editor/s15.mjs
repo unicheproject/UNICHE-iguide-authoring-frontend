@@ -1,0 +1,20 @@
+import { start, go, P, shotDir } from "./common.mjs";
+const s = await start(); const p=s.page;
+const A="40cab7b2-a7f7-4057-b56e-5605a589156f", B="1af84426-8230-46ee-8ab4-7edecaa9b20f", D="e85c94b4-f31f-4d1c-8711-dd4fe7695fc6";
+await go(p, `${P}/pois/${A}`); await p.waitForTimeout(1500);
+await p.getByRole("button",{name:/^activate$/i}).first().click(); await p.waitForTimeout(2000);
+console.log("Alpha toasts/status:", await p.getByText(/Status\s*ACTIVE|ACTIVE/).first().innerText());
+// Beta working copy
+await go(p, `${P}/pois/${B}`); await p.waitForTimeout(1500);
+await p.getByLabel("Summary").fill("EDITED summary via working copy for Beta.");
+await p.getByLabel("Description").fill("A longer description typed by the curator, edit 1.");
+await s.shot("wc__beta-edited-unsaved");
+console.log("header buttons:", await p.locator("header, main").first().getByRole("button").allInnerTexts().then(a=>a.slice(0,12)));
+let t=Date.now();
+await p.getByRole("button",{name:/apply changes/i}).click().catch(()=>{});
+await p.waitForTimeout(1500);
+await s.shot("wc__beta-apply-with-unsaved");
+console.log("DLG apply:", await p.locator("[role=dialog],[role=alertdialog]").first().innerText().catch(()=>"(none)"));
+await p.keyboard.press("Escape"); await p.waitForTimeout(300);
+console.log("buttons:", await p.getByRole("button").allInnerTexts().then(a=>a.filter(x=>/save|draft|apply|discard/i.test(x))));
+await s.browser.close();

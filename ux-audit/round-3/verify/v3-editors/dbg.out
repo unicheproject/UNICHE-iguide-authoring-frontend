@@ -1,0 +1,66 @@
+REQ GET http://localhost:5173/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/0de4063f-c264-4eb7-be0a-ecf822439521 false
+REQ GET http://localhost:5173/@vite/client false
+REQ GET http://localhost:5173/node_modules/.pnpm/vite@8.3.1_@types+node@24.19.0_jiti@1.21.7/node_modules/vite/dist/cli false
+REQ GET http://localhost:5173/@id/__x00__plugin-vue:export-helper false
+REQ GET https://idp.uniche-eccch.eu/realms/uniche/protocol/openid-connect/3p-cookies/step1.html false
+REQ GET https://idp.uniche-eccch.eu/realms/uniche/protocol/openid-connect/3p-cookies/step2.html false
+REQ GET https://idp.uniche-eccch.eu/realms/uniche/protocol/openid-connect/auth?client_id=iguide-web&redirect_uri=http% false
+REQ GET http://localhost:5173/silent-check-sso.html false
+REQ POST https://idp.uniche-eccch.eu/realms/uniche/protocol/openid-connect/token false
+REQ GET http://localhost:5173/node_modules/.pnpm/maplibre-gl@6.17.0/node_modules/maplibre-gl/dist/maplibre-gl-worker.m false
+REQ GET http://localhost:8080/iguide/api/v1/me/authorization true
+REQ GET http://localhost:8080/iguide/api/v1/organizations true
+REQ GET http://localhost:8080/iguide/api/v1/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5 true
+REQ GET http://localhost:8080/iguide/api/v1/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/settings true
+REQ GET http://localhost:8080/iguide/api/v1/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/languages true
+REQ GET http://localhost:8080/iguide/api/v1/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/0de4063f-c264-4eb7-be0a true
+REQ GET http://localhost:8080/iguide/api/v1/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/places?size=200&page=0 true
+REQ GET http://localhost:8080/iguide/api/v1/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois?size=200&page=0 true
+REQ GET http://localhost:8080/iguide/api/v1/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/assets?size=200&page=0 true
+REQ GET http://localhost:8080/iguide/api/v1/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/categories?size=200&page=0 true
+REQ GET http://localhost:8080/iguide/api/v1/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/triggers?targetResourceType= true
+REQ GET http://localhost:8080/iguide/api/v1/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/maps?size=200&page=0 true
+REQ GET http://localhost:8080/iguide/api/v1/organizations/09e95c2c-5985-42f5-a9dd-6d06a8eb4a13/projects true
+REQ GET http://localhost:8080/iguide/api/v1/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/maps/9fda753d-4d8e-4fba-9760 true
+REQ GET http://localhost:8080/iguide/api/v1/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/maps/4b9a45cf-3bff-4dca-acad true
+REQ GET http://localhost:8080/iguide/api/v1/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/maps/b2ab454f-2c60-44b2-888c true
+REQ GET http://localhost:8080/iguide/api/v1/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/maps/f8daa876-f2af-4552-95ae true
+REQ GET http://localhost:8080/iguide/api/v1/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/maps/2e02824d-49da-43fd-80b0 true
+REQ GET http://localhost:8080/iguide/api/v1/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/maps/83d673e3-6736-49bc-b938 true
+REQ GET http://localhost:8080/iguide/api/v1/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/maps/3cab9ac1-d9e7-4cdb-aa1b true
+REQ GET http://localhost:8080/iguide/api/v1/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/maps/4bbe38bb-3ba7-4c74-9caf true
+REQ GET http://localhost:8080/iguide/api/v1/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/maps/6e8b821a-63ca-48b7-93a2 true
+REQ GET http://localhost:8080/iguide/api/v1/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/maps/5eef6cab-a61e-419e-adff true
+http://localhost:5173/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/0de4063f-c264-4eb7-be0a-ecf822439521 Skip to content
+iGuide CMS
+UX Audit – Populated
+Visitor app: Draft
+. Switch project
+PA
+P. Admin
+, account menu
+Dashboard
+
+Content
+
+Places
+Points of Interest
+Routes
+Guides
+Events
+Categories
+Maps & Floor Plans
+Media
+
+Visitor app
+
+Overview
+App settings
+Pages
+Navigation
+Translations
+Preview
+Launch
+
+Proj
+done

@@ -1,0 +1,15 @@
+import { start, go, P, focusInfo, tabWalk, tabTo, live, axe, outDir } from "./common.mjs";
+const s = await start("1440"); const { page } = s;
+await go(page, P + "/floor-plans"); await page.waitForTimeout(2000);
+await s.shot("floorplans__list");
+console.log(await page.locator("main").ariaSnapshot().then(t=>t.split("\n").slice(0,45).join("\n")));
+console.log("axe", JSON.stringify((await axe(page,"fp-list")).map(v=>v.id+":"+v.impact+":"+v.nodes)));
+await page.evaluate(()=>{document.activeElement.blur()});
+await page.keyboard.press("Tab"); await page.keyboard.press("Enter");
+await tabTo(page, /^New floor plan/);
+await page.keyboard.press("Enter"); await page.waitForTimeout(1200);
+console.log("dialog focus", JSON.stringify(await focusInfo(page)));
+console.log(await page.locator("[role=dialog]").first().ariaSnapshot().then(t=>t.split("\n").slice(0,40).join("\n")));
+await s.shot("floorplans__new-dialog");
+console.log("axe", JSON.stringify((await axe(page,"fp-dialog")).map(v=>v.id+":"+v.impact+":"+v.nodes+":"+v.sample[0])));
+await s.browser.close();

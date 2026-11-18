@@ -1,0 +1,14 @@
+import { start, goEd, P, tall, place, poi } from "./common.mjs";
+const s = await start("1440"); const { page } = s;
+await goEd(page, "/pois");
+await page.getByRole("button", { name: /new point/i }).first().click(); await page.waitForTimeout(500);
+await s.shot("create-poi__open");
+const d = page.getByRole("dialog"); console.log((await d.innerText()).replace(/\n+/g," | "));
+await d.getByRole("button", { name: /^create/i }).click(); await page.waitForTimeout(700);
+await s.shot("create-poi__empty-submit");
+console.log((await d.innerText()).replace(/\n+/g," | "));
+await d.getByRole("textbox").first().fill("UX-s10-poi-place Poi One");
+const sel = d.locator("select"); console.log("selects", await sel.count());
+for (let i=0;i<await sel.count();i++) console.log(await sel.nth(i).locator("option").allInnerTexts());
+await s.shot("create-poi__typed");
+await s.browser.close();

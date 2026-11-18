@@ -1,8 +1,18 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from "vue";
+import { ChevronDown, LocateFixed, Pencil, Trash2 } from "lucide-vue-next";
+import { computed, reactive, ref, useId } from "vue";
 import CategoryIcon from "@/components/CategoryIcon.vue";
+import EditorSection from "@/components/editor/EditorSection.vue";
 import EditorShell from "@/components/editor/EditorShell.vue";
+import { coordinateError, fanOut, formatCoordinate, isInside, parseDecimal, tidyCoordinate } from "@/components/map/coordinates";
 import GeoMapCanvas, { type Bounds, type CanvasMarker, type LatLng } from "@/components/map/GeoMapCanvas.vue";
+import { Alert } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { HelpHint } from "@/components/ui/help-hint";
+import { FormField } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
 import { categoryTree, listCategories, type Category, type CategoryScope } from "@/platform/categories";
 import {
   changeMapStatus,
@@ -19,7 +29,8 @@ import { listPlaces, placeTitle, type Place } from "@/platform/places";
 import { listPois, poiTitle, type Poi } from "@/platform/pois";
 import type { ResourceReference } from "@/platform/references";
 import { listRoutes, type Route } from "@/platform/routes";
-import { showToast } from "@/stores/toast";
+import { say } from "@/lib/announcer";
+import { glossary, hints } from "@/lib/glossary";
 import { useCurrentProject } from "@/workspace/currentProject";
 import { referenceLink } from "@/workspace/referenceLinks";
 import { useProjectLanguages } from "@/workspace/useProjectLanguages";
@@ -61,15 +72,16 @@ const form = reactive({
   placements: [] as PlacementForm[],
 });
 
-const num = (v: string) => (v.trim() === "" ? null : Number(v));
-const str = (v: number | null) => (v === null || v === undefined ? "" : String(v));
+/** A coordinate field as a number; `null` when empty, `NaN` when it is not a number (validation reports it first). */
+const num = (v: string) => (v.trim() === "" ? null : (parseDecimal(v) ?? Number.NaN));
+const str = (v: number | null) => (v === null || v === undefined ? "" : formatCoordinate(v));
 const FIELD_NAMES: Record<string, string> = {
   internalName: "Name",
   placeId: "Linked Place",
   initialLatitude: "Initial latitude",
   initialLongitude: "Initial longitude",
   initialZoom: "Initial zoom",
-  minLatitude: "Bounds",
+  minLatitude: "Min latitude",
   maxLatitude: "Max latitude",
   minLongitude: "Min longitude",
   maxLongitude: "Max longitude",
@@ -81,9 +93,9 @@ function input(): Omit<UpdateMapInput, "version"> {
   return {
     internalName: form.internalName.trim(),
     placeId: form.placeId || null,
-    initialLatitude: Number(form.lat),
-    initialLongitude: Number(form.lng),
-    initialZoom: Number(form.zoom),
+    initialLatitude: num(form.lat) ?? Number.NaN,
+    initialLongitude: num(form.lng) ?? Number.NaN,
+    initialZoom: num(form.zoom) ?? Number.NaN,
     minLatitude: num(form.minLat),
     minLongitude: num(form.minLng),
     maxLatitude: num(form.maxLat),
@@ -92,9 +104,49 @@ function input(): Omit<UpdateMapInput, "version"> {
     showRoutes: form.showRoutes,
     hiddenCategoryIds: [...form.hiddenCategoryIds],
     visitorFilter: form.visitorFilter,
-    placements: form.placements.map((p) => ({ resourceType: p.resourceType, resourceId: p.resourceId, latitude: Number(p.lat), longitude: Number(p.lng) })),
+    placements: form.placements.map((p) => ({ resourceType: p.resourceType, resourceId: p.resourceId, latitude: num(p.lat) ?? Number.NaN, longitude: num(p.lng) ?? Number.NaN })),
   };
 }
+
+/**
+ * Coordinate checks while typing: a field is checked when it loses focus, with the same rules and sentences as the New
+ * map dialog, shown under the field, marked invalid and announced politely (C2-69). Save still checks everything.
+ */
+const blurErrors = reactive<Record<string, string>>({});
+
+/** Checks one coordinate field (`axis` "zoom" for the zoom field); an empty optional field is left to Save. */
+function check(path: string, text: string, axis: "latitude" | "longitude" | "zoom", label: string, optional = false) {
+  if (optional && !text.trim()) {
+    delete blurErrors[path];
+    return;
+  }
+  let error: string | null;
+  if (axis === "zoom") {
+    const zoom = parseDecimal(text);
+    error = zoom === null || zoom < 0 || zoom > 22 ? "A zoom between 0 and 22, such as 14.5." : null;
+  } else {
+    error = coordinateError(text, axis);
+  }
+  if (error) {
+    blurErrors[path] = error;
+    say(`${label}: ${error}`);
+  } else {
+    delete blurErrors[path];
+  }
+}
+
+/** A coordinate field as it should read once left (C3-75); a read-only field is never rewritten. */
+const tidy = (text: string, digits?: number) => (readonly.value ? text : tidyCoordinate(text, digits));
+
+/** Clears a shown error as soon as the text becomes valid, so the message does not outlive the fix. */
+function recheck(path: string, text: string, axis: "latitude" | "longitude" | "zoom") {
+  if (!blurErrors[path]) return;
+  const ok = axis === "zoom" ? (() => { const z = parseDecimal(text); return z !== null && z >= 0 && z <= 22; })() : !coordinateError(text, axis);
+  if (ok) delete blurErrors[path];
+}
+
+/** The message under a field: the one from Save, else the one from leaving the field. */
+const fe = (path: string): string | undefined => editor.fieldError(path) ?? blurErrors[path];
 
 const editor = useResourceEditor<GeoMap>({
   kind: "map",
@@ -138,34 +190,66 @@ const editor = useResourceEditor<GeoMap>({
     form.showRoutes = map.showRoutes;
     form.hiddenCategoryIds = [...map.hiddenCategoryIds];
     form.visitorFilter = map.visitorFilter;
-    form.placements = map.placements.map((p) => ({
-      key: `${p.resourceType}:${p.resourceId}`,
-      resourceType: p.resourceType,
-      resourceId: p.resourceId,
-      lat: str(p.latitude),
-      lng: str(p.longitude),
-    }));
+    for (const key of Object.keys(blurErrors)) delete blurErrors[key];
+    // The numbers on the pins follow the order the author placed them in. The platform returns placements in its own
+    // order after a save, which renumbered the pins and the list, so items already shown keep their position and new
+    // ones follow (C2-87).
+    const before = new Map(form.placements.map((p, i) => [p.key, i]));
+    const keyOf = (p: { resourceType: string; resourceId: string }) => `${p.resourceType}:${p.resourceId}`;
+    const rank = (p: { resourceType: string; resourceId: string }) => before.get(keyOf(p)) ?? Number.MAX_SAFE_INTEGER;
+    form.placements = map.placements
+      .map((p, i) => ({ p, i }))
+      .sort((a, b) => rank(a.p) - rank(b.p) || a.i - b.i)
+      .map(({ p }) => ({
+        key: keyOf(p),
+        resourceType: p.resourceType,
+        resourceId: p.resourceId,
+        lat: str(p.latitude),
+        lng: str(p.longitude),
+      }));
   },
   ensureLanguageRows: () => {},
   formState: () => form,
   validate() {
     const found: Record<string, string> = {};
     if (!form.internalName.trim()) found.internalName = "Enter a name.";
-    const lat = Number(form.lat);
-    const lng = Number(form.lng);
-    const zoom = Number(form.zoom);
-    if (!form.lat.trim() || Number.isNaN(lat) || Math.abs(lat) > 90) found.initialLatitude = "A number between -90 and 90.";
-    if (!form.lng.trim() || Number.isNaN(lng) || Math.abs(lng) > 180) found.initialLongitude = "A number between -180 and 180.";
-    if (!form.zoom.trim() || Number.isNaN(zoom) || zoom < 0 || zoom > 22) found.initialZoom = "A zoom between 0 and 22.";
-    const bounds = [form.minLat, form.minLng, form.maxLat, form.maxLng];
-    const set = bounds.filter((b) => b.trim()).length;
-    if (set !== 0 && set !== 4) found.minLatitude = "Set all four bounds, or none.";
-    if (set === 4 && bounds.some((b) => Number.isNaN(Number(b)))) found.minLatitude = "The bounds must be numbers.";
+    const latError = coordinateError(form.lat, "latitude");
+    const lngError = coordinateError(form.lng, "longitude");
+    if (latError) found.initialLatitude = latError;
+    if (lngError) found.initialLongitude = lngError;
+    const zoom = parseDecimal(form.zoom);
+    if (zoom === null || zoom < 0 || zoom > 22) found.initialZoom = "A zoom between 0 and 22, such as 14.5.";
+    const fields: [keyof typeof form & string, string, "latitude" | "longitude"][] = [
+      ["minLat", "minLatitude", "latitude"],
+      ["minLng", "minLongitude", "longitude"],
+      ["maxLat", "maxLatitude", "latitude"],
+      ["maxLng", "maxLongitude", "longitude"],
+    ];
+    const set = fields.filter(([key]) => String(form[key]).trim()).length;
+    if (set !== 0 && set !== 4) {
+      for (const [key, path] of fields) if (!String(form[key]).trim()) found[path] = "Set all four bounds, or leave all four empty.";
+    }
+    if (set > 0) {
+      for (const [key, path, axis] of fields) {
+        const error = String(form[key]).trim() ? coordinateError(String(form[key]), axis) : null;
+        if (error) found[path] = error;
+      }
+    }
+    if (set === 4 && !fields.some(([, path]) => found[path])) {
+      const [s, w, n, e] = [form.minLat, form.minLng, form.maxLat, form.maxLng].map((v) => parseDecimal(v) as number);
+      if (s >= n) found.maxLatitude = "Max latitude must be greater than min latitude.";
+      if (w >= e) found.maxLongitude = "Max longitude must be greater than min longitude.";
+      const la = parseDecimal(form.lat);
+      const lo = parseDecimal(form.lng);
+      if (!found.maxLatitude && !found.maxLongitude && !found.initialLatitude && !found.initialLongitude && la !== null && lo !== null && !isInside(la, lo, [[s, w], [n, e]])) {
+        found.initialLatitude = "The start view must lie inside the bounds. Use “Set as visitor start view”, or change the bounds.";
+      }
+    }
     form.placements.forEach((p, i) => {
-      const plat = Number(p.lat);
-      const plng = Number(p.lng);
-      if (!p.lat.trim() || Number.isNaN(plat) || Math.abs(plat) > 90) found[`placements[${i}].latitude`] = "Latitude between -90 and 90.";
-      if (!p.lng.trim() || Number.isNaN(plng) || Math.abs(plng) > 180) found[`placements[${i}].longitude`] = "Longitude between -180 and 180.";
+      const plat = coordinateError(p.lat, "latitude");
+      const plng = coordinateError(p.lng, "longitude");
+      if (plat) found[`placements[${i}].latitude`] = plat;
+      if (plng) found[`placements[${i}].longitude`] = plng;
     });
     return found;
   },
@@ -206,26 +290,25 @@ const unplaced = computed(() => {
   ].filter((r) => !placed.has(`${r.type}:${r.id}`));
 });
 
-/** Puts the item at its own coordinates, or at the centre of the initial view. */
+/**
+ * Puts the item at its own coordinates, or, when it has none, on a spiral round the start view so several newly placed
+ * items do not stack on one spot (C1-98); the author drags or types the exact position.
+ */
 function place(type: PlaceableType, id: string, lat: number | null, lng: number | null) {
-  form.placements.push({
-    key: `${type}:${id}`,
-    resourceType: type,
-    resourceId: id,
-    lat: lat !== null ? String(lat) : form.lat,
-    lng: lng !== null ? String(lng) : form.lng,
-  });
-  showToast(
-    "Placed on the map",
-    lat !== null ? `${title(type, id)} sits at its own coordinates.` : `${title(type, id)} sits at the initial view; drag it or type exact coordinates.`,
-  );
+  const own = lat !== null && lng !== null;
+  const spot = own ? { lat, lng } : fanOut({ lat: view.value.lat, lng: view.value.lng }, view.value.zoom, placedWithoutOwn.value);
+  if (!own) placedWithoutOwn.value += 1;
+  form.placements.push({ key: `${type}:${id}`, resourceType: type, resourceId: id, lat: formatCoordinate(spot.lat), lng: formatCoordinate(spot.lng) });
+  say(own ? `${title(type, id)} placed at its own coordinates.` : `${title(type, id)} placed near the start view. Drag it or type exact coordinates.`);
 }
+/** How many items without coordinates were placed in this visit, so each gets its own spot on the spiral. */
+const placedWithoutOwn = ref(0);
 
 function onMarkerMove(key: string, lat: number, lng: number) {
   const p = form.placements.find((x) => x.key === key);
   if (!p || readonly.value) return;
-  p.lat = String(lat);
-  p.lng = String(lng);
+  p.lat = formatCoordinate(lat);
+  p.lng = formatCoordinate(lng);
 }
 
 // Visibility (mockup "Visibility" and "Visitors can filter") ---------------------------------------------
@@ -248,6 +331,8 @@ function shownBySettings(type: PlaceableType | "ROUTE", id: string): boolean {
 
 // The visitor filter bar, previewed above the map.
 const filter = reactive({ type: "" as "" | "POI" | "ROUTE", category: "" });
+const filterOpen = ref(false);
+const filterPanelId = useId();
 
 function shownByFilter(type: PlaceableType | "ROUTE", id: string): boolean {
   if (!form.visitorFilter || editingBounds.value || type === "PLACE") return true;
@@ -274,6 +359,8 @@ const groups = computed(() =>
       name: scope === "POI" ? "Points of Interest" : "Routes",
       on,
       stateLabel: on ? `${items.length} shown` : "hidden",
+      unit: scope === "POI" ? ["POI", "POIs"] : ["Route", "Routes"],
+      listId: `visibility-${scope}`,
       cats: tree.map(({ category, depth }) => {
         const ids = [category.id, ...tree.filter((t) => t.category.parentCategoryId === category.id).map((t) => t.category.id)];
         return {
@@ -287,6 +374,10 @@ const groups = computed(() =>
     };
   }),
 );
+
+/** Category lists longer than this are collapsed behind "By category (N)" (C3-76). */
+const LONG_LIST = 6;
+const openLists = reactive<Record<string, boolean>>({});
 
 function toggleGroup(scope: CategoryScope) {
   if (readonly.value) return;
@@ -311,34 +402,62 @@ const filterCategories = computed(() =>
 
 const editingBounds = ref(false);
 
-const view = computed(() => ({ lat: Number(form.lat) || 0, lng: Number(form.lng) || 0, zoom: Number(form.zoom) || 2 }));
+const view = computed(() => {
+  const lat = parseDecimal(form.lat);
+  const lng = parseDecimal(form.lng);
+  const zoom = parseDecimal(form.zoom);
+  return {
+    lat: lat !== null && Math.abs(lat) <= 90 ? lat : 0,
+    lng: lng !== null && Math.abs(lng) <= 180 ? lng : 0,
+    zoom: zoom !== null && zoom >= 0 && zoom <= 22 ? zoom : 2,
+  };
+});
+/** The bounds, once all four fields hold valid numbers in order; typing a half-finished value never reaches the map. */
 const bounds = computed<Bounds | null>(() => {
-  const values = [form.minLat, form.minLng, form.maxLat, form.maxLng].map(Number);
-  if ([form.minLat, form.minLng, form.maxLat, form.maxLng].some((v) => !v.trim()) || values.some(Number.isNaN)) return null;
+  const values = [form.minLat, form.minLng, form.maxLat, form.maxLng].map(parseDecimal);
+  if (values.some((v) => v === null)) return null;
+  const [s, w, n, e] = values as number[];
+  if (Math.abs(s) > 90 || Math.abs(n) > 90 || Math.abs(w) > 180 || Math.abs(e) > 180 || s >= n || w >= e) return null;
   return [
-    [values[0], values[1]],
-    [values[2], values[3]],
+    [s, w],
+    [n, e],
   ];
 });
 
+/** A placement's position as numbers, or null while its fields do not hold valid coordinates. */
+function positionOf(p: PlacementForm): LatLng | null {
+  const lat = parseDecimal(p.lat);
+  const lng = parseDecimal(p.lng);
+  return lat === null || lng === null || Math.abs(lat) > 90 || Math.abs(lng) > 180 ? null : [lat, lng];
+}
+
+function outside(p: PlacementForm): boolean {
+  const at = positionOf(p);
+  return !!at && !!bounds.value && !isInside(at[0], at[1], bounds.value);
+}
+
+/** Placed items that lie outside the bounds: visitors cannot see them (C1-95). */
+const outsideItems = computed(() => form.placements.filter(outside));
+
 const markers = computed<CanvasMarker[]>(() =>
   form.placements
-    .map((p, i) => ({ p, i }))
-    .filter(({ p }) => shownByFilter(p.resourceType, p.resourceId))
-    .map(({ p, i }) => ({
+    .map((p, i) => ({ p, i, at: positionOf(p) }))
+    .filter(({ p, at }) => at && shownByFilter(p.resourceType, p.resourceId))
+    .map(({ p, i, at }) => ({
       key: p.key,
-      lat: Number(p.lat),
-      lng: Number(p.lng),
+      lat: (at as LatLng)[0],
+      lng: (at as LatLng)[1],
       label: String(i + 1),
       title: title(p.resourceType, p.resourceId),
       draggable: !readonly.value,
       muted: !shownBySettings(p.resourceType, p.resourceId),
+      warn: outside(p),
     })),
 );
 
 /** Route lines through the stops' positions on this map, or their own coordinates. */
 const lines = computed<LatLng[][]>(() => {
-  const onMap = new Map(form.placements.filter((p) => p.resourceType === "POI").map((p) => [p.resourceId, [Number(p.lat), Number(p.lng)] as LatLng]));
+  const onMap = new Map(form.placements.filter((p) => p.resourceType === "POI" && positionOf(p)).map((p) => [p.resourceId, positionOf(p) as LatLng]));
   return routes.value
     .filter((r) => r.status !== "ARCHIVED" && shownBySettings("ROUTE", r.id) && shownByFilter("ROUTE", r.id))
     .map((r) =>
@@ -352,14 +471,19 @@ const lines = computed<LatLng[][]>(() => {
     .filter((l) => l.length > 1);
 });
 
+/** What the filter is set to, shown on the disclosure button. */
+const filterSummary = computed(() => {
+  const type = filterTypes.value.find((t) => t.key === filter.type)?.label ?? "All";
+  const category = filter.category ? filterCategories.value.find((c) => c.id === filter.category) : undefined;
+  return category ? `${type}, ${category.translations[defaultLanguage.value ?? ""]?.name || category.code}` : type;
+});
+
 const shownSummary = computed(() => `${markers.value.length} of ${form.placements.length} placed shown`);
 
 function onBoundsChange(b: Bounds) {
   if (readonly.value) return;
-  form.minLat = String(b[0][0]);
-  form.minLng = String(b[0][1]);
-  form.maxLat = String(b[1][0]);
-  form.maxLng = String(b[1][1]);
+  [form.minLat, form.minLng] = [formatCoordinate(b[0][0]), formatCoordinate(b[0][1])];
+  [form.maxLat, form.maxLng] = [formatCoordinate(b[1][0]), formatCoordinate(b[1][1])];
 }
 
 function toggleBounds() {
@@ -368,15 +492,15 @@ function toggleBounds() {
     // them (the backend rejects it otherwise), and visitors cannot zoom out past the bounds anyway.
     // Re-framing every time zoomed the editor out after each adjustment.
     const [[s, w], [n, e]] = bounds.value;
-    const lat = Number(form.lat);
-    const lng = Number(form.lng);
-    if (Number.isNaN(lat) || Number.isNaN(lng) || lat < s || lat > n || lng < w || lng > e) {
-      form.lat = ((s + n) / 2).toFixed(6);
-      form.lng = ((w + e) / 2).toFixed(6);
+    const lat = parseDecimal(form.lat);
+    const lng = parseDecimal(form.lng);
+    if (lat === null || lng === null || lat < s || lat > n || lng < w || lng > e) {
+      form.lat = formatCoordinate((s + n) / 2);
+      form.lng = formatCoordinate((w + e) / 2);
     }
     const fit = canvas.value?.zoomFor(bounds.value);
-    const zoom = Number(form.zoom);
-    if (fit !== undefined && (Number.isNaN(zoom) || zoom < fit)) form.zoom = String(fit);
+    const zoom = parseDecimal(form.zoom);
+    if (fit !== undefined && (zoom === null || zoom < fit)) form.zoom = formatCoordinate(fit, 2);
   }
   editingBounds.value = !editingBounds.value;
 }
@@ -392,14 +516,19 @@ const gesture = () => (lastGesture = Date.now());
 
 function onViewChange(current: { lat: number; lng: number; zoom: number }) {
   if (readonly.value || editingBounds.value || Date.now() - lastGesture > 1500) return;
-  form.lat = String(current.lat);
-  form.lng = String(current.lng);
-  form.zoom = String(current.zoom);
+  form.lat = formatCoordinate(current.lat);
+  form.lng = formatCoordinate(current.lng);
+  form.zoom = formatCoordinate(current.zoom, 2);
 }
 
-function zoom(delta: number) {
-  gesture();
-  canvas.value?.zoomBy(delta);
+/** Makes the map as it is now the view visitors open at (the same as leaving it there after panning). */
+function setStartView() {
+  const current = canvas.value?.currentView();
+  if (!current || readonly.value) return;
+  form.lat = formatCoordinate(current.lat);
+  form.lng = formatCoordinate(current.lng);
+  form.zoom = formatCoordinate(current.zoom, 2);
+  say(`Start view set to ${formatCoordinate(current.lat, 5)}, ${formatCoordinate(current.lng, 5)}, zoom ${formatCoordinate(current.zoom, 2)}.`);
 }
 
 // Linked Place ---------------------------------------------------------------------------------------------
@@ -419,15 +548,22 @@ const subtitle = computed(() => {
   return `Geographic map · ${n === 1 ? "1 placed Resource" : `${n} placed Resources`} · zoom ${form.zoom}`;
 });
 
-function errorAt(index: number): string | undefined {
-  const prefix = `placements[${index}]`;
-  const messages = Object.entries(editor.errors).filter(([p]) => p.startsWith(prefix)).map(([, m]) => m);
-  return messages.length ? messages.join(" ") : undefined;
-}
+const unplacedQuery = ref("");
+const unplacedShown = computed(() => {
+  const q = unplacedQuery.value.trim().toLowerCase();
+  return q ? unplaced.value.filter((u) => title(u.type, u.id).toLowerCase().includes(q)) : unplaced.value;
+});
 
-function box(on: boolean) {
-  return on ? "border-primary bg-primary text-white" : "border-gray-300 bg-white text-transparent";
-}
+const coarsePointer = typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches;
+const modeText = computed(() =>
+  editingBounds.value
+    ? coarsePointer
+      ? "Editing the area: drag a corner or the centre handle."
+      : "Editing the area: drag a corner or the centre handle, or focus one and use the arrow keys."
+    : readonly.value
+      ? "Visitor view: the map is limited to the bounds."
+      : "Visitor view: visitors open the map where you leave it.",
+);
 </script>
 
 <template>
@@ -441,322 +577,254 @@ function box(on: boolean) {
     :reference-link="toReference"
     :pending="languagesLoading"
   >
-    <section class="overflow-hidden rounded-lg border bg-card">
-      <div class="flex flex-wrap items-center gap-2 border-b px-4 py-2.5">
-        <button type="button" class="map-tool" aria-label="Zoom out" @click="zoom(-0.5)">−</button>
-        <button type="button" class="map-tool" aria-label="Zoom in" @click="zoom(0.5)">+</button>
-        <span class="text-[11px] text-muted-foreground">zoom {{ form.zoom }}</span>
-        <span class="flex-1 text-[11px] text-muted-foreground">
-          {{
-            editingBounds
-              ? "Editing bounds · drag the corners or the centre handle"
-              : readonly
-                ? "Visitor view · the map is limited to the bounds"
-                : "Visitor view · visitors open the map where you pan and zoom it"
-          }}
-        </span>
-        <button type="button" class="map-tool px-3" :class="{ 'border-primary text-primary': editingBounds }" :disabled="readonly" @click="toggleBounds">
-          {{ editingBounds ? "Done" : "Edit bounds" }}
-        </button>
+    <EditorSection id="map" title="Map and bounds">
+      <div class="flex flex-wrap items-end gap-3">
+        <FormField id="f-internalName" label="Name" hint="Only authors see it." :error="editor.fieldError('internalName')" class="min-w-[min(100%,16rem)] flex-1" v-slot="f">
+          <Input :id="f.id" v-model="form.internalName" :readonly="readonly" :aria-describedby="f.describedBy" :invalid="f.invalid" />
+        </FormField>
+        <Button :variant="editingBounds ? 'primary' : 'secondary'" :disabled="readonly" :aria-pressed="editingBounds" class="mb-5" @click="toggleBounds">
+          <Pencil aria-hidden="true" />{{ editingBounds ? "Done editing bounds" : "Edit bounds" }}
+        </Button>
       </div>
-      <div v-if="form.visitorFilter && !editingBounds" class="flex flex-wrap items-center gap-1.5 border-b border-gray-100 px-4 py-2" aria-label="Visitor filter preview">
-        <span class="mr-1 text-[10px] font-extrabold uppercase tracking-[0.08em] text-muted-foreground">Visitor filter</span>
-        <button
-          v-for="t in filterTypes"
-          :key="t.key"
-          type="button"
-          class="rounded-full border px-2.5 py-1 text-[10px] font-bold"
-          :class="filter.type === t.key ? 'border-primary bg-primary text-white' : 'bg-white text-gray-700'"
-          @click="filter.type = t.key; filter.category = ''"
-        >
-          {{ t.label }}
-        </button>
-        <span v-if="filterCategories.length" class="mx-1 h-4 w-px bg-gray-200" aria-hidden="true"></span>
-        <button
-          v-for="c in filterCategories"
-          :key="c.id"
-          type="button"
-          class="inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[10px] font-bold"
-          :class="filter.category === c.id ? 'border-primary bg-primary text-white' : 'bg-white text-gray-700'"
-          @click="filter.category = filter.category === c.id ? '' : c.id"
-        >
-          <CategoryIcon :category="c" :size="12" />{{ c.translations[defaultLanguage ?? '']?.name || c.code }}
-        </button>
-        <span class="ml-auto text-[10px] text-muted-foreground">{{ shownSummary }}</span>
-      </div>
-      <div class="p-3" @pointerdown.capture="gesture" @pointerup.capture="gesture" @wheel.capture="gesture" @keydown.capture="gesture">
-        <GeoMapCanvas
-          v-if="editor.resource"
-          ref="canvas"
-          :view="view"
-          :bounds="bounds"
-          :edit-bounds="editingBounds"
-          limit-to-bounds
-          :markers="markers"
-          :lines="lines"
-          label="Map"
-          @bounds-change="onBoundsChange"
-          @marker-move="onMarkerMove"
-          @view-change="onViewChange"
-        />
-      </div>
-    </section>
 
-    <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,300px),1fr))] gap-[18px]">
-      <section class="overflow-hidden rounded-lg border bg-card">
-        <div class="border-b px-4 py-3">
-          <h2 class="text-[11px] font-extrabold uppercase tracking-[0.09em] text-muted-foreground">Placed ({{ form.placements.length }})</h2>
+      <div class="flex min-w-0 flex-col gap-3">
+        <div @pointerdown.capture="gesture" @pointerup.capture="gesture" @wheel.capture="gesture" @keydown.capture="gesture">
+          <GeoMapCanvas
+            v-if="editor.resource"
+            ref="canvas"
+            :view="view"
+            :bounds="bounds"
+            :edit-bounds="editingBounds"
+            limit-to-bounds
+            :markers="markers"
+            :lines="lines"
+            height="clamp(360px, 56dvh, 600px)"
+            label="Map"
+            @bounds-change="onBoundsChange"
+            @marker-move="onMarkerMove"
+            @view-change="onViewChange"
+          />
         </div>
-        <ol>
-          <li v-for="(p, index) in form.placements" :key="p.key" class="border-b border-gray-100 px-4 py-2.5 last:border-b-0">
-            <div class="flex items-center gap-2">
-              <span class="flex h-5 w-5 flex-none items-center justify-center rounded-full bg-primary text-[10px] font-extrabold text-white">{{ index + 1 }}</span>
-              <span class="min-w-0 flex-1">
-                <span class="block truncate text-xs font-bold">{{ title(p.resourceType, p.resourceId) }}</span>
-                <span class="block text-[10px] text-muted-foreground">
-                  {{ kindLabel(p.resourceType) }}<template v-if="!shownBySettings(p.resourceType, p.resourceId)"> · ⊘ hidden from visitors</template>
-                </span>
-              </span>
-              <button v-if="!readonly" type="button" class="text-[10px] font-bold text-destructive" @click="form.placements.splice(index, 1)">Remove from map</button>
-            </div>
-            <div class="mt-1.5 flex gap-2 pl-7">
-              <label class="flex flex-1 flex-col gap-1 text-[10px] font-bold text-muted-foreground">
-                Latitude
-                <input v-model="p.lat" :readonly="readonly" :aria-label="`Latitude of ${title(p.resourceType, p.resourceId)}`" inputmode="decimal" class="field-input compact" />
-              </label>
-              <label class="flex flex-1 flex-col gap-1 text-[10px] font-bold text-muted-foreground">
-                Longitude
-                <input v-model="p.lng" :readonly="readonly" :aria-label="`Longitude of ${title(p.resourceType, p.resourceId)}`" inputmode="decimal" class="field-input compact" />
-              </label>
-            </div>
-            <p v-if="errorAt(index)" class="mt-1 pl-7 text-[11px] font-semibold text-destructive">⚠ {{ errorAt(index) }}</p>
-          </li>
-        </ol>
-        <p v-if="!form.placements.length" class="px-4 py-3 text-xs text-muted-foreground">Nothing placed yet. Place items from the Unplaced list.</p>
-      </section>
-
-      <section class="overflow-hidden rounded-lg border bg-card">
-        <div class="border-b px-4 py-3">
-          <h2 class="text-[11px] font-extrabold uppercase tracking-[0.09em] text-muted-foreground">Unplaced ({{ unplaced.length }})</h2>
-        </div>
-        <ul class="max-h-[420px] overflow-y-auto">
-          <li v-for="u in unplaced" :key="`${u.type}:${u.id}`" class="flex items-center gap-2 border-b border-gray-100 px-4 py-2.5 last:border-b-0">
-            <span class="min-w-0 flex-1">
-              <span class="block truncate text-xs font-bold">{{ title(u.type, u.id) }}</span>
-              <span class="block text-[10px] text-muted-foreground">{{ kindLabel(u.type) }}{{ u.lat !== null ? " · has coordinates" : "" }}</span>
-            </span>
-            <button v-if="!readonly" type="button" class="text-[10px] font-bold uppercase tracking-[0.06em] text-primary" @click="place(u.type, u.id, u.lat, u.lng)">Place</button>
-          </li>
-        </ul>
-        <p v-if="!unplaced.length" class="px-4 py-3 text-xs text-muted-foreground">Every point of interest and place is on the map.</p>
-      </section>
-    </div>
-
-    <section class="overflow-hidden rounded-lg border bg-card">
-      <div class="border-b px-5 py-3.5">
-        <h2 class="text-[11px] font-extrabold uppercase tracking-[0.09em] text-muted-foreground">Details</h2>
-      </div>
-      <div class="flex flex-col gap-1.5 px-5 py-[18px]">
-        <label for="m-name" class="small-label">Name</label>
-        <input
-          id="m-name"
-          v-model="form.internalName"
-          :readonly="readonly"
-          class="field-input"
-          :aria-invalid="editor.fieldError('internalName') ? 'true' : undefined"
-          :aria-describedby="editor.fieldError('internalName') ? 'err-m-name' : undefined"
-          :class="{ invalid: editor.fieldError('internalName') }"
-        />
-        <span v-if="editor.fieldError('internalName')" id="err-m-name" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("internalName") }}</span>
-        <span class="text-xs text-muted-foreground">
-          Only authors see it; visitors see the places and points of interest on it.
-          <template v-if="editor.resource?.area"> Area: {{ editor.resource.area }}.</template>
-        </span>
-      </div>
-    </section>
-
-    <template #aside>
-      <section class="overflow-hidden rounded-lg border bg-card">
-        <div class="border-b px-3.5 py-[11px]">
-          <span class="text-[10px] font-extrabold uppercase tracking-[0.1em] text-muted-foreground">Visibility</span>
-        </div>
-        <div class="flex flex-col gap-3 px-3.5 py-3">
-          <div v-for="g in groups" :key="g.scope">
-            <button type="button" class="flex w-full items-center gap-2 text-left" :disabled="readonly" :aria-pressed="g.on" @click="toggleGroup(g.scope)">
-              <span class="flex h-[18px] w-[18px] items-center justify-center rounded border-[1.5px] text-[10px]" :class="box(g.on)">✓</span>
-              <span class="flex-1 text-xs font-bold">{{ g.name }}</span>
-              <span class="text-[10px] text-muted-foreground">{{ g.stateLabel }}</span>
+        <p class="text-sm text-muted-foreground">
+          {{ modeText }}<template v-if="editor.resource?.area"> Area: {{ editor.resource.area }}.</template>
+        </p>
+        <Alert v-if="outsideItems.length" tone="warning" :title="`${outsideItems.length} placed ${outsideItems.length === 1 ? 'item lies' : 'items lie'} outside the bounds`">
+          {{ outsideItems.slice(0, 4).map((p) => title(p.resourceType, p.resourceId)).join(", ") }}{{ outsideItems.length > 4 ? ` and ${outsideItems.length - 4} more` : "" }}.
+          Visitors cannot see items outside the bounds. Move them inside, or widen the bounds. They are drawn with a dashed rim and a warning badge.
+        </Alert>
+        <div v-if="form.visitorFilter && !editingBounds" class="flex flex-col gap-2">
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <button
+              type="button"
+              class="inline-flex min-h-control items-center gap-1.5 rounded-md px-1 text-sm font-semibold text-primary hover:bg-surface-hover"
+              :aria-expanded="filterOpen"
+              :aria-controls="filterPanelId"
+              @click="filterOpen = !filterOpen"
+            >
+              <ChevronDown class="size-4 transition-transform" :class="filterOpen ? 'rotate-180' : ''" aria-hidden="true" />
+              <span>Try the visitor filter<span class="font-normal text-muted-foreground">: {{ filterSummary }}</span></span>
             </button>
-            <div class="mt-1.5 flex flex-col gap-1 pl-6" :style="{ opacity: g.on ? 1 : 0.45 }">
-              <span class="text-[9px] font-extrabold uppercase tracking-[0.08em] text-muted-foreground">By category</span>
-              <button
-                v-for="c in g.cats"
-                :key="c.category.id"
-                type="button"
-                class="flex items-center gap-1.5 text-left text-[11px]"
-                :style="{ paddingLeft: `${c.depth * 18}px`, opacity: c.muted ? 0.45 : 1 }"
-                :disabled="readonly"
-                :aria-pressed="c.on"
-                @click="toggleCategory(c.category.id)"
-              >
-                <span class="flex h-4 w-4 flex-none items-center justify-center rounded border-[1.5px] text-[9px]" :class="box(c.on)">✓</span>
-                <CategoryIcon :category="c.category" :size="13" />
-                <span class="flex-1 truncate">{{ c.category.translations[defaultLanguage ?? '']?.name || c.category.code }}</span>
-                <span class="text-[10px] text-muted-foreground">{{ c.count }}</span>
-              </button>
-              <span v-if="!g.cats.length" class="text-[11px] text-muted-foreground">No categories yet</span>
+            <span class="text-xs text-muted-foreground" aria-live="polite">{{ shownSummary }}</span>
+          </div>
+          <!-- One disclosure with two radio groups: one Tab stop each, arrow keys inside (C2-85). -->
+          <div v-show="filterOpen" :id="filterPanelId" class="grid gap-4 rounded-md border border-border p-3 sm:grid-cols-2">
+            <fieldset class="min-w-0">
+              <legend class="mb-1 text-sm font-bold">Type</legend>
+              <label v-for="t in filterTypes" :key="t.key" class="flex min-h-control cursor-pointer items-center gap-2 text-sm [@media(pointer:coarse)]:min-h-11">
+                <input v-model="filter.type" type="radio" name="visitor-filter-type" :value="t.key" class="size-4 accent-primary" @change="filter.category = ''" />
+                {{ t.label }}
+              </label>
+            </fieldset>
+            <fieldset class="min-w-0">
+              <legend class="mb-1 text-sm font-bold">Category</legend>
+              <div class="max-h-56 overflow-y-auto">
+                <label class="flex min-h-control cursor-pointer items-center gap-2 text-sm [@media(pointer:coarse)]:min-h-11">
+                  <input v-model="filter.category" type="radio" name="visitor-filter-category" value="" class="size-4 accent-primary" />
+                  All categories
+                </label>
+                <label v-for="c in filterCategories" :key="c.id" class="flex min-h-control cursor-pointer items-center gap-2 text-sm [@media(pointer:coarse)]:min-h-11">
+                  <input v-model="filter.category" type="radio" name="visitor-filter-category" :value="c.id" class="size-4 accent-primary" />
+                  <CategoryIcon :category="c" :size="14" />{{ c.translations[defaultLanguage ?? '']?.name || c.code }}
+                </label>
+              </div>
+            </fieldset>
+          </div>
+        </div>
+        <!-- The legend names only what is drawn (C3-76). -->
+        <p v-if="lines.length || markers.length" class="flex items-center gap-2 text-xs text-muted-foreground" data-route-legend>
+          <svg v-if="lines.length" width="28" height="8" viewBox="0 0 28 8" aria-hidden="true" class="shrink-0 text-primary"><line x1="0" y1="4" x2="28" y2="4" stroke="currentColor" stroke-width="4" stroke-linecap="round" /></svg>
+          <span>
+            <template v-if="lines.length">The purple lines are Routes, joining their stops in order.</template>
+            <template v-if="markers.length"> Numbered pins are the placed items.</template>
+          </span>
+        </p>
+      </div>
+
+      <div class="grid gap-6 md:grid-cols-2">
+        <fieldset class="flex min-w-0 flex-col gap-3">
+          <legend class="mb-1 flex items-center gap-1 text-sm font-bold">{{ glossary.bounds }}<HelpHint label="What are map bounds?">{{ hints.bounds }}</HelpHint></legend>
+          <p class="text-xs text-muted-foreground">Visitors see only this area. Drag the handles on the map or type values; a comma or a point works as the decimal mark.</p>
+          <div class="grid grid-cols-2 gap-3">
+            <FormField id="f-minLatitude" label="Min latitude" :error="fe('minLatitude')" v-slot="f">
+              <Input :id="f.id" v-model="form.minLat" :readonly="readonly" inputmode="decimal" autocomplete="off" :aria-describedby="f.describedBy" :invalid="f.invalid" :data-path="'minLatitude'" @blur="form.minLat = tidy(form.minLat); check('minLatitude', form.minLat, 'latitude', 'Min latitude', true)" @input="recheck('minLatitude', form.minLat, 'latitude')" />
+            </FormField>
+            <FormField id="f-maxLatitude" label="Max latitude" :error="fe('maxLatitude')" v-slot="f">
+              <Input :id="f.id" v-model="form.maxLat" :readonly="readonly" inputmode="decimal" autocomplete="off" :aria-describedby="f.describedBy" :invalid="f.invalid" :data-path="'maxLatitude'" @blur="form.maxLat = tidy(form.maxLat); check('maxLatitude', form.maxLat, 'latitude', 'Max latitude', true)" @input="recheck('maxLatitude', form.maxLat, 'latitude')" />
+            </FormField>
+            <FormField id="f-minLongitude" label="Min longitude" :error="fe('minLongitude')" v-slot="f">
+              <Input :id="f.id" v-model="form.minLng" :readonly="readonly" inputmode="decimal" autocomplete="off" :aria-describedby="f.describedBy" :invalid="f.invalid" :data-path="'minLongitude'" @blur="form.minLng = tidy(form.minLng); check('minLongitude', form.minLng, 'longitude', 'Min longitude', true)" @input="recheck('minLongitude', form.minLng, 'longitude')" />
+            </FormField>
+            <FormField id="f-maxLongitude" label="Max longitude" :error="fe('maxLongitude')" v-slot="f">
+              <Input :id="f.id" v-model="form.maxLng" :readonly="readonly" inputmode="decimal" autocomplete="off" :aria-describedby="f.describedBy" :invalid="f.invalid" :data-path="'maxLongitude'" @blur="form.maxLng = tidy(form.maxLng); check('maxLongitude', form.maxLng, 'longitude', 'Max longitude', true)" @input="recheck('maxLongitude', form.maxLng, 'longitude')" />
+            </FormField>
+          </div>
+        </fieldset>
+        <fieldset class="flex min-w-0 flex-col gap-3">
+          <legend class="mb-1 text-sm font-bold">Visitor start view</legend>
+          <p class="text-xs text-muted-foreground">Where the map opens for visitors. Panning or zooming the map sets it too.</p>
+          <div class="grid grid-cols-2 gap-3">
+            <FormField id="f-initialLatitude" label="Latitude" :error="fe('initialLatitude')" v-slot="f">
+              <Input :id="f.id" v-model="form.lat" :readonly="readonly" inputmode="decimal" autocomplete="off" :aria-describedby="f.describedBy" :invalid="f.invalid" :data-path="'initialLatitude'" @blur="form.lat = tidy(form.lat); check('initialLatitude', form.lat, 'latitude', 'Latitude')" @input="recheck('initialLatitude', form.lat, 'latitude')" />
+            </FormField>
+            <FormField id="f-initialLongitude" label="Longitude" :error="fe('initialLongitude')" v-slot="f">
+              <Input :id="f.id" v-model="form.lng" :readonly="readonly" inputmode="decimal" autocomplete="off" :aria-describedby="f.describedBy" :invalid="f.invalid" :data-path="'initialLongitude'" @blur="form.lng = tidy(form.lng); check('initialLongitude', form.lng, 'longitude', 'Longitude')" @input="recheck('initialLongitude', form.lng, 'longitude')" />
+            </FormField>
+            <FormField id="f-initialZoom" label="Zoom" :error="fe('initialZoom')" v-slot="f">
+              <Input :id="f.id" v-model="form.zoom" :readonly="readonly" inputmode="decimal" autocomplete="off" :aria-describedby="f.describedBy" :invalid="f.invalid" :data-path="'initialZoom'" @blur="form.zoom = tidy(form.zoom, 2); check('initialZoom', form.zoom, 'zoom', 'Zoom')" @input="recheck('initialZoom', form.zoom, 'zoom')" />
+            </FormField>
+            <div v-if="!readonly" class="flex items-end pb-px">
+              <Button variant="secondary" class="w-full" @click="setStartView"><LocateFixed aria-hidden="true" />Set as start view</Button>
             </div>
           </div>
-          <span class="text-[11px] text-muted-foreground">Visitors see what is switched on here. Places always show.</span>
-        </div>
-      </section>
+        </fieldset>
+      </div>
+    </EditorSection>
 
-      <section class="overflow-hidden rounded-lg border bg-card">
-        <div class="border-b px-3.5 py-[11px]">
-          <span class="text-[10px] font-extrabold uppercase tracking-[0.1em] text-muted-foreground">Visitor filter</span>
+    <EditorSection id="placed" title="Placed on this map" :count="`${form.placements.length} placed, ${unplaced.length} not placed`">
+      <div class="grid gap-5 md:grid-cols-2">
+        <div class="min-w-0">
+          <h3 class="mb-2 text-sm font-bold">Placed ({{ form.placements.length }})</h3>
+          <ol v-if="form.placements.length" class="divide-y divide-border rounded-md border border-border">
+            <li v-for="(p, index) in form.placements" :key="p.key" class="flex flex-col gap-2 p-3">
+              <div class="flex items-center gap-2">
+                <span class="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground" aria-hidden="true">{{ index + 1 }}</span>
+                <span class="min-w-0 flex-1">
+                  <span class="block break-words text-sm font-semibold">{{ title(p.resourceType, p.resourceId) }}</span>
+                  <span class="block text-xs text-muted-foreground">
+                    {{ kindLabel(p.resourceType) }}<template v-if="!shownBySettings(p.resourceType, p.resourceId)"> · Hidden from visitors by Visibility</template
+                    ><template v-if="outside(p)"> · Outside the bounds</template>
+                  </span>
+                </span>
+                <Button v-if="!readonly" variant="ghost" size="sm" :label="`Remove ${title(p.resourceType, p.resourceId)} from the map`" @click="form.placements.splice(index, 1)">
+                  <Trash2 aria-hidden="true" />Remove
+                </Button>
+              </div>
+              <div class="grid grid-cols-2 gap-3 sm:pl-8">
+                <FormField :id="`pl-${index}-lat`" label="Latitude" :error="fe(`placements[${index}].latitude`)" v-slot="f">
+                  <Input
+                    :id="f.id"
+                    v-model="p.lat"
+                    :data-path="`placements[${index}].latitude`"
+                    @blur="p.lat = tidy(p.lat); check(`placements[${index}].latitude`, p.lat, 'latitude', `Latitude of ${title(p.resourceType, p.resourceId)}`)"
+                    @input="recheck(`placements[${index}].latitude`, p.lat, 'latitude')"
+                    :readonly="readonly"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    :aria-label="`Latitude of ${title(p.resourceType, p.resourceId)}`"
+                    :aria-describedby="f.describedBy"
+                    :invalid="f.invalid"
+                  />
+                </FormField>
+                <FormField :id="`pl-${index}-lng`" label="Longitude" :error="fe(`placements[${index}].longitude`)" v-slot="f">
+                  <Input
+                    :id="f.id"
+                    v-model="p.lng"
+                    :data-path="`placements[${index}].longitude`"
+                    @blur="p.lng = tidy(p.lng); check(`placements[${index}].longitude`, p.lng, 'longitude', `Longitude of ${title(p.resourceType, p.resourceId)}`)"
+                    @input="recheck(`placements[${index}].longitude`, p.lng, 'longitude')"
+                    :readonly="readonly"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    :aria-label="`Longitude of ${title(p.resourceType, p.resourceId)}`"
+                    :aria-describedby="f.describedBy"
+                    :invalid="f.invalid"
+                  />
+                </FormField>
+              </div>
+            </li>
+          </ol>
+          <p v-else class="text-sm text-muted-foreground">Nothing placed yet. Place items from the list beside this one, then drag them on the map or type coordinates.</p>
         </div>
-        <div class="flex flex-col gap-2 px-3.5 py-3">
-          <button type="button" class="flex items-center gap-2 text-left" :disabled="readonly" :aria-pressed="form.visitorFilter" @click="form.visitorFilter = !form.visitorFilter">
-            <span class="flex h-[18px] w-[18px] items-center justify-center rounded border-[1.5px] text-[10px]" :class="box(form.visitorFilter)">✓</span>
-            <span class="text-xs font-bold">Visitors can filter</span>
-          </button>
-          <span class="text-[11px] text-muted-foreground">A filter bar on the map lets visitors narrow what is switched on here, by type and category.</span>
-        </div>
-      </section>
 
-      <section class="overflow-hidden rounded-lg border bg-card">
-        <div class="border-b px-3.5 py-[11px]">
-          <label for="m-place" class="text-[10px] font-extrabold uppercase tracking-[0.1em] text-muted-foreground">Linked Place</label>
+        <div class="min-w-0">
+          <h3 class="mb-2 text-sm font-bold">Not placed ({{ unplaced.length }})</h3>
+          <FormField v-if="unplaced.length > 6" id="unplaced-search" label="Search not placed" v-slot="f">
+            <Input :id="f.id" v-model="unplacedQuery" type="search" autocomplete="off" />
+          </FormField>
+          <ul v-if="unplacedShown.length" class="mt-2 max-h-[26rem] divide-y divide-border overflow-y-auto rounded-md border border-border">
+            <li v-for="u in unplacedShown" :key="`${u.type}:${u.id}`" class="flex items-center gap-2 px-3 py-2">
+              <span class="min-w-0 flex-1">
+                <span class="block break-words text-sm font-semibold">{{ title(u.type, u.id) }}</span>
+                <span class="block text-xs text-muted-foreground">{{ kindLabel(u.type) }}{{ u.lat !== null ? " · has coordinates" : " · no coordinates yet" }}</span>
+              </span>
+              <Button v-if="!readonly" variant="secondary" size="sm" @click="place(u.type, u.id, u.lat, u.lng)">Place<span class="sr-only"> {{ title(u.type, u.id) }}</span></Button>
+            </li>
+          </ul>
+          <p v-else-if="unplaced.length" class="mt-2 text-sm text-muted-foreground">Nothing matches “{{ unplacedQuery }}”.</p>
+          <p v-else class="text-sm text-muted-foreground">Every point of interest and place is on the map.</p>
         </div>
-        <div class="flex flex-col gap-1.5 px-3.5 py-3">
-          <select id="m-place" v-model="form.placeId" :disabled="readonly" class="field-input compact" :aria-invalid="editor.fieldError('placeId') ? 'true' : undefined" :aria-describedby="editor.fieldError('placeId') ? 'err-MapEditorView-2' : undefined" :class="{ invalid: editor.fieldError('placeId') }">
-            <option value="">No place</option>
-            <option v-for="p in outdoorPlaces" :key="p.id" :value="p.id">{{ p.label }}</option>
-          </select>
-          <span v-if="editor.fieldError('placeId')" id="err-MapEditorView-2" class="text-[11px] font-semibold text-destructive">⚠ {{ editor.fieldError("placeId") }}</span>
-          <span v-else class="text-[11px] text-muted-foreground">{{ placeNote }}</span>
-        </div>
-      </section>
+      </div>
+    </EditorSection>
 
-      <section class="overflow-hidden rounded-lg border bg-card">
-        <div class="border-b px-3.5 py-[11px]">
-          <span class="text-[10px] font-extrabold uppercase tracking-[0.1em] text-muted-foreground">Initial view</span>
+    <EditorSection id="visibility" title="Visibility" description="Visitors see what is switched on here. Places always show.">
+      <div class="grid gap-5 md:grid-cols-2">
+        <div v-for="g in groups" :key="g.scope" class="min-w-0">
+          <Checkbox :model-value="g.on" :disabled="readonly" :description="g.stateLabel" @update:model-value="toggleGroup(g.scope)">{{ g.name }}</Checkbox>
+          <div class="ml-8 mt-1 flex flex-col" :class="g.on ? '' : 'opacity-70'">
+            <button
+              v-if="g.cats.length > LONG_LIST"
+              type="button"
+              class="-ml-1 inline-flex min-h-control items-center gap-1.5 self-start rounded-md px-1 text-xs font-semibold text-ink-2 hover:bg-surface-hover active:bg-surface-active"
+              :aria-expanded="!!openLists[g.scope]"
+              :aria-controls="g.listId"
+              @click="openLists[g.scope] = !openLists[g.scope]"
+            >
+              <ChevronDown class="size-4 transition-transform" :class="openLists[g.scope] ? 'rotate-180' : ''" aria-hidden="true" />
+              By category ({{ g.cats.length }})<template v-if="g.cats.some((c) => !c.on)">, {{ g.cats.filter((c) => !c.on).length }} hidden</template>
+            </button>
+            <p v-else-if="g.cats.length" class="text-xs font-semibold text-muted-foreground">By category ({{ g.cats.length }})</p>
+            <div v-show="g.cats.length <= LONG_LIST || openLists[g.scope]" :id="g.listId" class="flex flex-col">
+              <Checkbox
+                v-for="c in g.cats"
+                :key="c.category.id"
+                :model-value="c.on"
+                :disabled="readonly"
+                :style="{ paddingLeft: `${c.depth * 1.25}rem` }"
+                @update:model-value="toggleCategory(c.category.id)"
+              >
+                <span class="inline-flex flex-wrap items-center gap-x-1.5"
+                  ><CategoryIcon :category="c.category" :size="14" />{{ c.category.translations[defaultLanguage ?? '']?.name || c.category.code }}
+                  <span class="text-xs font-normal text-muted-foreground">· {{ c.count }} {{ c.count === 1 ? g.unit[0] : g.unit[1] }}<template v-if="c.muted"> · parent hidden</template></span></span
+                >
+              </Checkbox>
+            </div>
+            <p v-if="!g.cats.length" class="text-sm text-muted-foreground">No categories yet</p>
+          </div>
         </div>
-        <div class="grid grid-cols-3 gap-2 px-3.5 py-3">
-          <label class="flex flex-col gap-1 text-[10px] font-bold text-muted-foreground">
-            Latitude
-            <input
-              v-model="form.lat"
-              :readonly="readonly"
-              class="field-input compact"
-              :aria-invalid="editor.fieldError('initialLatitude') ? 'true' : undefined"
-              :aria-describedby="editor.fieldError('initialLatitude') ? 'err-m-lat' : undefined"
-              :class="{ invalid: editor.fieldError('initialLatitude') }"
-            />
-            <span v-if="editor.fieldError('initialLatitude')" id="err-m-lat" class="font-semibold text-destructive">⚠ {{ editor.fieldError("initialLatitude") }}</span>
-          </label>
-          <label class="flex flex-col gap-1 text-[10px] font-bold text-muted-foreground">
-            Longitude
-            <input
-              v-model="form.lng"
-              :readonly="readonly"
-              class="field-input compact"
-              :aria-invalid="editor.fieldError('initialLongitude') ? 'true' : undefined"
-              :aria-describedby="editor.fieldError('initialLongitude') ? 'err-m-lng' : undefined"
-              :class="{ invalid: editor.fieldError('initialLongitude') }"
-            />
-            <span v-if="editor.fieldError('initialLongitude')" id="err-m-lng" class="font-semibold text-destructive">⚠ {{ editor.fieldError("initialLongitude") }}</span>
-          </label>
-          <label class="flex flex-col gap-1 text-[10px] font-bold text-muted-foreground">
-            Zoom
-            <input
-              v-model="form.zoom"
-              :readonly="readonly"
-              class="field-input compact"
-              :aria-invalid="editor.fieldError('initialZoom') ? 'true' : undefined"
-              :aria-describedby="editor.fieldError('initialZoom') ? 'err-m-zoom' : undefined"
-              :class="{ invalid: editor.fieldError('initialZoom') }"
-            />
-            <span v-if="editor.fieldError('initialZoom')" id="err-m-zoom" class="font-semibold text-destructive">⚠ {{ editor.fieldError("initialZoom") }}</span>
-          </label>
-        </div>
-      </section>
+      </div>
+    </EditorSection>
 
-      <section class="overflow-hidden rounded-lg border bg-card">
-        <div class="border-b px-3.5 py-[11px]">
-          <span class="text-[10px] font-extrabold uppercase tracking-[0.1em] text-muted-foreground">Bounds</span>
-        </div>
-        <div class="grid grid-cols-2 gap-2 px-3.5 py-3">
-          <label class="flex flex-col gap-1 text-[10px] font-bold text-muted-foreground">
-            Min latitude
-            <input
-              v-model="form.minLat"
-              :readonly="readonly"
-              class="field-input compact"
-              :aria-invalid="editor.fieldError('minLatitude') ? 'true' : undefined"
-              :aria-describedby="editor.fieldError('minLatitude') ? 'err-m-minLatitude' : undefined"
-              :class="{ invalid: editor.fieldError('minLatitude') }"
-            />
-            <span v-if="editor.fieldError('minLatitude')" id="err-m-minLatitude" class="font-semibold text-destructive">⚠ {{ editor.fieldError("minLatitude") }}</span>
-          </label>
-          <label class="flex flex-col gap-1 text-[10px] font-bold text-muted-foreground">
-            Max latitude
-            <input
-              v-model="form.maxLat"
-              :readonly="readonly"
-              class="field-input compact"
-              :aria-invalid="editor.fieldError('maxLatitude') ? 'true' : undefined"
-              :aria-describedby="editor.fieldError('maxLatitude') ? 'err-m-maxLatitude' : undefined"
-              :class="{ invalid: editor.fieldError('maxLatitude') }"
-            />
-            <span v-if="editor.fieldError('maxLatitude')" id="err-m-maxLatitude" class="font-semibold text-destructive">⚠ {{ editor.fieldError("maxLatitude") }}</span>
-          </label>
-          <label class="flex flex-col gap-1 text-[10px] font-bold text-muted-foreground">
-            Min longitude
-            <input
-              v-model="form.minLng"
-              :readonly="readonly"
-              class="field-input compact"
-              :aria-invalid="editor.fieldError('minLongitude') ? 'true' : undefined"
-              :aria-describedby="editor.fieldError('minLongitude') ? 'err-m-minLongitude' : undefined"
-              :class="{ invalid: editor.fieldError('minLongitude') }"
-            />
-            <span v-if="editor.fieldError('minLongitude')" id="err-m-minLongitude" class="font-semibold text-destructive">⚠ {{ editor.fieldError("minLongitude") }}</span>
-          </label>
-          <label class="flex flex-col gap-1 text-[10px] font-bold text-muted-foreground">
-            Max longitude
-            <input
-              v-model="form.maxLng"
-              :readonly="readonly"
-              class="field-input compact"
-              :aria-invalid="editor.fieldError('maxLongitude') ? 'true' : undefined"
-              :aria-describedby="editor.fieldError('maxLongitude') ? 'err-m-maxLongitude' : undefined"
-              :class="{ invalid: editor.fieldError('maxLongitude') }"
-            />
-            <span v-if="editor.fieldError('maxLongitude')" id="err-m-maxLongitude" class="font-semibold text-destructive">⚠ {{ editor.fieldError("maxLongitude") }}</span>
-          </label>
-          <span class="col-span-2 text-[11px] text-muted-foreground">Use “Edit bounds” on the map, or type values. Visitors see only this area.</span>
-        </div>
-      </section>
-    </template>
+    <EditorSection id="filter" title="Visitor filter" collapsible :default-open="false" :count="form.visitorFilter ? 'On' : 'Off'">
+      <Checkbox v-model="form.visitorFilter" :disabled="readonly" description="A filter bar on the map lets visitors narrow what is switched on in Visibility, by type and category. Try it under the map.">Visitors can filter</Checkbox>
+    </EditorSection>
+
+    <EditorSection id="place" title="Linked Place">
+      <FormField id="f-placeId" label="Place" :hint="placeNote" :error="editor.fieldError('placeId')" v-slot="f">
+        <Select :id="f.id" v-model="form.placeId" :disabled="readonly" :aria-describedby="f.describedBy" :invalid="f.invalid" class="max-w-xl">
+          <option value="">No place</option>
+          <option v-for="p in outdoorPlaces" :key="p.id" :value="p.id">{{ p.label }}</option>
+        </Select>
+      </FormField>
+    </EditorSection>
   </EditorShell>
 </template>
-
-<style scoped>
-.compact {
-  padding: 6px 8px;
-  font-size: 12px;
-}
-.map-tool {
-  border: 1px solid #e5e7eb;
-  border-radius: 999px;
-  background: #fff;
-  padding: 4px 10px;
-  font-size: 11px;
-  font-weight: 700;
-  color: #374151;
-}
-.map-tool:disabled {
-  opacity: 0.5;
-}
-</style>

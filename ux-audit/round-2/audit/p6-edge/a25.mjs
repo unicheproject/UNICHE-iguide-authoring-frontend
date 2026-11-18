@@ -1,0 +1,13 @@
+import { open, go, P, ids, shot, settle, alerts, focused } from "./lib.mjs";
+const I = ids(); const PP = `/projects/${P}`;
+const { browser, page } = await open("curator", { viewport: "1440" });
+await go(page, `${PP}/maps/${I.map}`); await settle(page, 1500);
+await page.evaluate(() => localStorage.clear());
+await go(page, `${PP}/maps/${I.map}`); await settle(page, 1500);
+await page.locator("#f-internalName").fill("UX-R2-p6 Map");
+await page.locator("#f-minLatitude").fill("37,96");
+await page.getByRole("button", { name: /^Save/ }).first().click(); await page.waitForTimeout(2500);
+console.log("alerts", JSON.stringify(await alerts(page)).slice(0, 400));
+await go(page, `${PP}/maps/${I.map}`); await settle(page, 1500);
+console.log("persisted minLat", await page.locator("#f-minLatitude").inputValue(), "name", await page.locator("#f-internalName").inputValue());
+await browser.close();

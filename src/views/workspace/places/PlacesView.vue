@@ -1,39 +1,59 @@
 <script setup lang="ts">
+/**
+ * Places list (plan 2.2, D-076): the shared list scaffold with this kind's columns (title with slug and trigger chips,
+ * indoor or outdoor with its type, linked map or floor plan, status, translations). Places form a tree: rows indent by
+ * level with a disclosure button, and the order is the author's own (Manual only), among siblings. Activation goes
+ * through the shared confirm. Filters and search live in the URL.
+ */
+import { Building2, Layers, Map as MapIcon, Mountain, Plus, Star } from "lucide-vue-next";
 import { computed, onBeforeUnmount, ref, watch } from "vue";
-import ReorderControls from "@/components/ReorderControls.vue";
-import TriggerChips from "@/components/TriggerChips.vue";
-import { groupTriggersByTarget, listProjectTriggers, type Trigger } from "@/platform/triggers";
-import { saveOrder } from "@/platform/ordering";
-import { dropLineClass, useReorder } from "@/workspace/useReorder";
 import { useRouter } from "vue-router";
+import ListEmpty from "@/components/list/ListEmpty.vue";
+import ListFooter from "@/components/list/ListFooter.vue";
+import ListRowTitle from "@/components/list/ListRowTitle.vue";
+import ListSourceNotice from "@/components/list/ListSourceNotice.vue";
+import ListTable, { type ListColumn } from "@/components/list/ListTable.vue";
+import ListToolbar from "@/components/list/ListToolbar.vue";
+import RowMenu from "@/components/list/RowMenu.vue";
+import ListLoadError from "@/components/list/ListLoadError.vue";
+import MatchHint from "@/components/list/MatchHint.vue";
+import type { RowAction } from "@/components/list/RowMenu.vue";
+import { matchesStatus, segmentTotal, statusCounts, useListQuery, useResultAnnouncer, useScrollRestore } from "@/components/list/useListQuery";
+import { useCreateParam } from "@/components/list/useCreateParam";
+import PageFrame from "@/components/PageFrame.vue";
 import PageHead from "@/components/PageHead.vue";
 import StatusChip from "@/components/StatusChip.vue";
 import TranslationDots from "@/components/TranslationDots.vue";
-import StatusChangeDialog from "@/components/StatusChangeDialog.vue";
+import TriggerChips from "@/components/TriggerChips.vue";
+import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { formatDate } from "@/lib/format";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Chip } from "@/components/ui/chip";
+import { focusHeading } from "@/lib/focus";
+import { formatDateTime, NBSP } from "@/lib/format";
 import { ApiError } from "@/platform/api";
+import { listFloorPlans } from "@/platform/floorPlans";
+import { listMaps } from "@/platform/maps";
+import { saveOrder } from "@/platform/ordering";
 import {
   changePlaceStatus,
   fetchPlaceReferences,
   listPlaces,
+  PLACE_SETTING_LABELS,
   placeTitle,
   translationCompleteness,
   type Place,
-  type ResourceStatus,
 } from "@/platform/places";
+import { groupTriggersByTarget, listProjectTriggers, triggerLabel, type Trigger } from "@/platform/triggers";
 import { showToast } from "@/stores/toast";
-import { handOffActivationErrors, isMissingFieldsError } from "@/workspace/activationHandoff";
 import { useCurrentProject } from "@/workspace/currentProject";
-import type { ResourceReference } from "@/platform/references";
-import { referenceLink } from "@/workspace/referenceLinks";
 import { findSection } from "@/workspace/sections";
-import { STATUS_FILTER_OPTIONS, choiceFilter, useListFilters } from "@/workspace/listFilters";
-import ListFilterMenu from "@/components/ListFilterMenu.vue";
-import FilterChoiceGroup from "@/components/FilterChoiceGroup.vue";
-import SearchLanguageSelect from "@/components/SearchLanguageSelect.vue";
-import FeaturedFilterChip from "@/components/FeaturedFilterChip.vue";
 import { useProjectLanguages } from "@/workspace/useProjectLanguages";
+import { useReorder } from "@/workspace/useReorder";
+import LifecycleDialogs from "../LifecycleDialogs.vue";
+import { matchedInOtherLanguage, searchTitles } from "../listRows";
+import { fold } from "@/lib/utils";
+import { useListLifecycle } from "../useListLifecycle";
 import CreatePlaceDialog from "./CreatePlaceDialog.vue";
 import { flattenPlaceTree, parentOptions, placeTypeLabel } from "./placeTree";
 
@@ -41,26 +61,51 @@ const section = findSection("places")!;
 const project = useCurrentProject();
 const router = useRouter();
 const projectId = computed(() => project.value.id);
-const { languages, defaultLanguage, error: languagesError, loading: languagesLoading } = useProjectLanguages(projectId);
+const { languages, defaultLanguage, error: languagesError, loading: languagesLoading, reload: reloadLanguages } = useProjectLanguages(projectId);
 
+// Places sort Manual only: the tree order is the point (plan 2.2).
+const query = useListQuery();
 const places = ref<Place[]>([]);
 const loading = ref(true);
 const loadError = ref<ApiError | null>(null);
-/** Non-archived triggers by Resource; null when they could not be read, so no chips show. */
-const triggersByTarget = ref<Map<string, Trigger[]> | null>(null);
+/** Non-archived triggers by Place; null when they could not be read (each row then says "Triggers not loaded"). */
+const triggersByPlace = ref<Map<string, Trigger[]> | null>(null);
+/** Ids of Places that have a map, and of Places that have a floor plan; null until known (or when unreadable). */
+const linked = ref<{ maps: Set<string>; plans: Set<string> } | null>(null);
 let controller: AbortController | null = null;
 
 async function load() {
   controller?.abort();
   controller = new AbortController();
+  const signal = controller.signal;
   loading.value = true;
   loadError.value = null;
   try {
-    const signal = controller.signal;
-    // The chips are a hint: a failure to read them must not hide the list.
-    const triggers = listProjectTriggers(projectId.value, signal).catch(() => null);
-    places.value = await listPlaces(projectId.value, signal);
-    triggersByTarget.value = groupTriggersByTarget(await triggers, "PLACE");
+    // The chips and the link state are hints: a failure to read them must not hide the list (the chips' failure is a notice).
+    const triggers = listProjectTriggers(projectId.value, signal).then(
+      (found) => {
+        query.reportError("triggers", null);
+        return found;
+      },
+      (e: unknown) => {
+        if (e instanceof DOMException && e.name === "AbortError") throw e;
+        query.reportError("triggers", e);
+        return null;
+      },
+    );
+    void Promise.all([listMaps(projectId.value, signal), listFloorPlans(projectId.value, signal)])
+      .then(([maps, plans]) => {
+        if (signal.aborted) return;
+        linked.value = {
+          maps: new Set(maps.flatMap((m) => (m.placeId ? [m.placeId] : []))),
+          plans: new Set(plans.flatMap((p) => (p.placeId ? [p.placeId] : []))),
+        };
+      })
+      .catch(() => (linked.value = null));
+    // The rows are set once the triggers read has settled, so the chips never grow rows already on screen (C3-91).
+    const [found, triggerRows] = await Promise.all([listPlaces(projectId.value, signal), triggers]);
+    places.value = found;
+    triggersByPlace.value = triggerRows ? groupTriggersByTarget(triggerRows, "PLACE") : null;
   } catch (e) {
     if (e instanceof DOMException && e.name === "AbortError") return;
     if (!(e instanceof ApiError)) throw e;
@@ -72,345 +117,249 @@ async function load() {
 watch(projectId, load, { immediate: true });
 onBeforeUnmount(() => controller?.abort());
 
-type StatusFilter = "ALL" | ResourceStatus | "PENDING";
-const statusFilter = ref<StatusFilter>("ALL");
-const query = ref("");
-const filters = useListFilters();
-const { featuredOnly, searchLanguage } = filters;
-/** The filters in force, shown as chips beside the Filters button. */
-const activeFilters = computed(() => [
-  ...choiceFilter("status", "Status", statusFilter, STATUS_FILTER_OPTIONS, "ALL"),
-  ...filters.active(languages.value),
-]);
+const title = (place: Place) => placeTitle(place, null, defaultLanguage.value);
 
-function normalize(text: string): string {
-  return text.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
-}
-
-const rows = computed(() => {
-  const q = normalize(query.value.trim());
-  return flattenPlaceTree(places.value).filter(({ place }) => {
-    if (statusFilter.value === "PENDING" ? !place.hasWorkingCopy : statusFilter.value !== "ALL" && place.status !== statusFilter.value) return false;
-    if (featuredOnly.value && !place.featured) return false;
+/** Rows that pass every filter except the status segment: the segment counts come from these (no false zeros). */
+const filteredAnyStatus = computed(() => {
+  const q = fold(query.q.value.trim());
+  return places.value.filter((place) => {
+    if (query.pending.value && !place.hasWorkingCopy) return false;
+    if (query.missing.value && translationCompleteness(place, query.missing.value) === "complete") return false;
+    if (query.featured.value && !place.featured) return false;
     if (!q) return true;
-    const haystack = [place.slug, ...filters.texts(place.translations, "title")];
-    return haystack.some((text) => normalize(text).includes(q));
+    const triggerTexts = (triggersByPlace.value?.get(place.id) ?? []).map(triggerLabel);
+    return [place.slug, ...searchTitles(place.translations, query.lang.value), ...triggerTexts].some((t) => fold(t).includes(q));
   });
 });
+const counts = computed(() => statusCounts(filteredAnyStatus.value));
+const filtered = computed(() => filteredAnyStatus.value.filter((place) => matchesStatus(place, query.status.value)));
+const total = computed(() => segmentTotal(places.value, query.status.value));
+
+/** "Matches Ελληνικά: Ακρόπολη" under a row whose title only matches the search in another language (C2-48). */
+function matchOf(place: Place) {
+  return matchedInOtherLanguage(place.translations, query.q.value, defaultLanguage.value ?? "", [title(place), place.slug]);
+}
+const languageName = (code: string) => languages.value.find((l) => l.languageCode === code)?.displayName ?? code;
+/** Rows in tree order with their level; a Place whose parent is filtered out stands at the top level. */
+const tree = computed(() => flattenPlaceTree(filtered.value));
+const rows = computed(() => tree.value.map((node) => node.place));
+const depths = computed(() => new Map(tree.value.map((node) => [node.place.id, node.depth])));
+const parents = computed(() => new Set(tree.value.flatMap((node) => (node.place.parentPlaceId && depths.value.has(node.place.parentPlaceId) ? [node.place.parentPlaceId] : []))));
 
 const defaultLanguageInfo = computed(() => languages.value.find((l) => l.isDefault) ?? null);
 const createOptions = computed(() => parentOptions(places.value, defaultLanguage.value));
 const noLanguages = computed(() => !languagesLoading.value && !languagesError.value && !languages.value.length);
 
-const countText = computed(() => {
-  const total = places.value.length;
-  const noun = total === 1 ? "place" : "places";
-  return rows.value.length === total ? `${total} ${noun}` : `${rows.value.length} of ${total} ${noun}`;
+/** Whether the Place has the map (outdoor) or floor plan (indoor) its setting uses; null while unknown. */
+function link(place: Place): { linked: boolean; noun: string } | null {
+  if (!linked.value) return null;
+  return place.setting === "INDOOR"
+    ? { linked: linked.value.plans.has(place.id), noun: "Floor plan" }
+    : { linked: linked.value.maps.has(place.id), noun: "Map" };
+}
+
+const editorRoute = (place: Place) => ({ name: "place-editor", params: { projectId: projectId.value, placeId: place.id } });
+
+const lifecycle = useListLifecycle<Place>({
+  items: places,
+  projectId,
+  noun: "place",
+  referenceType: "PLACE",
+  title,
+  changeStatus: changePlaceStatus,
+  fetchReferences: fetchPlaceReferences,
+  editorRoute,
+  reload: load,
+  completeness: translationCompleteness,
+  languages,
 });
 
-// Lifecycle actions -----------------------------------------------------------------------------------
+// Manual order (spec 12 section 3) among siblings as the tree shows them; off while a search or filter hides rows (D-017).
+const reorder = useReorder<Place>({
+  items: places,
+  siblingKey: (place) => (place.parentPlaceId && places.value.some((p) => p.id === place.parentPlaceId) ? place.parentPlaceId : null),
+  title,
+  canReorder: query.canReorder,
+  visible: (place) => matchesStatus(place, query.status.value),
+  save: (ids) => saveOrder(projectId.value, "places", ids),
+  reload: load,
+});
 
+const ready = computed(() => !loading.value);
+const { rowKeyFocus } = useScrollRestore(ready);
+
+// Status 128, Updated 152, Translations 192 and one domain column of 176 leave the Title at least 15 rem at 1280 (a tree
+// step takes 24 px of it per level), so the list stays a table there (plan section 9, item 7).
+const columns: ListColumn[] = [
+  { key: "title", label: "Title", tree: true },
+  { key: "setting", label: "Setting and map", class: "w-44" },
+  { key: "status", label: "Status", class: "w-32" },
+  { key: "updated", label: "Updated", class: "w-[9.5rem]" },
+  { key: "translations", label: "Translations" },
+];
+/** The optional read to run again from the notice's "Try again". */
+function retrySource() {
+  focusHeading();
+  void load();
+}
+const SORTS = [{ value: "manual", label: "Manual order (tree)" }];
+useResultAnnouncer(computed(() => rows.value.length), total, ready, "places", { query, options: SORTS });
 const creating = ref(false);
-const pendingId = ref<string | null>(null);
-const confirm = ref<{ place: Place; target: ResourceStatus; blockedBy?: ResourceReference[] } | null>(null);
+/** The Place a sub-place is being added to ("Add sub-place" in a row's menu); empty for the toolbar's "New place". */
+const subPlaceOf = ref("");
+useCreateParam(creating, computed(() => !!defaultLanguageInfo.value));
+const createDisabledReason = computed(() => (defaultLanguageInfo.value ? undefined : languagesError.value ? "The languages could not be loaded" : "Add a language first"));
 
-function title(place: Place): string {
-  return placeTitle(place, null, defaultLanguage.value);
+function actionsFor(place: Place): RowAction[] {
+  const own = lifecycle.actionsFor(place);
+  if (place.status === "ARCHIVED" || !defaultLanguageInfo.value) return own;
+  return [{ key: "add-sub", label: "Add sub-place", icon: Plus }, ...own];
 }
-
-function toggleLabel(place: Place): string {
-  return place.status === "DRAFT" ? "Activate" : place.status === "ACTIVE" ? "Deactivate" : "Restore";
+function openCreate(parentId = "") {
+  subPlaceOf.value = parentId;
+  creating.value = true;
 }
+watch(creating, (open) => {
+  if (!open) subPlaceOf.value = "";
+});
 
-function onToggle(place: Place) {
-  if (place.status === "DRAFT") void transition(place, "ACTIVE");
-  else if (place.status === "ACTIVE") confirm.value = { place, target: "DRAFT" };
-  else void transition(place, "DRAFT");
-}
-
-async function transition(place: Place, target: ResourceStatus) {
-  pendingId.value = place.id;
-  try {
-    const updated = await changePlaceStatus(projectId.value, place.id, target, place.version);
-    places.value = places.value.map((p) => (p.id === updated.id ? updated : p));
-    confirm.value = null;
-    const messages: Record<ResourceStatus, [string, string]> = {
-      ACTIVE: ["Activated", `${title(updated)} is complete and visible to visitors.`],
-      DRAFT: place.status === "ARCHIVED"
-        ? ["Restored", `${title(updated)} is a draft again.`]
-        : ["Deactivated", `${title(updated)} is a draft again and no longer visible to visitors.`],
-      ARCHIVED: ["Archived", `${title(updated)} is archived.`],
-    };
-    const [heading, body] = messages[target];
-    showToast(heading, body, target === "ACTIVE" ? "success" : "warning");
-  } catch (e) {
-    if (!(e instanceof ApiError)) throw e;
-    if (e.code === "RESOURCE_IN_USE" && confirm.value) {
-      confirm.value = { ...confirm.value, blockedBy: (e.body.references as ResourceReference[]) ?? [] };
-      return;
-    }
-    confirm.value = null;
-    if (isMissingFieldsError(e)) {
-      // The editor shows every missing field and focuses the first (`12` §3, DECISIONS.md D-036).
-      handOffActivationErrors(place.id, e);
-      showToast("Cannot activate yet", `${title(place)} opens at the first missing field.`, "error");
-      openEditor(place);
-    } else if (e.code === "VERSION_CONFLICT") {
-      showToast("The place changed meanwhile", "The list was reloaded; check it and try again.", "warning");
-      void load();
-    } else {
-      showToast("The change was not saved", e.platformUnavailable ? "The UNICHE platform is not reachable." : e.message, "error");
-    }
-  } finally {
-    pendingId.value = null;
-  }
-}
-
-// A trigger that opens the place being changed links to its editor's "How visitors reach it" card.
-const toReference = (r: ResourceReference) =>
-  referenceLink(projectId.value, r, confirm.value && { resourceType: "PLACE", resourceId: confirm.value.place.id });
-
-function openEditor(place: Place) {
-  void router.push({ name: "place-editor", params: { projectId: projectId.value, placeId: place.id } });
+function onSelect(place: Place, key: string) {
+  if (key === "restore-order") query.restoreManualOrder();
+  else if (key === "add-sub") openCreate(place.id);
+  else lifecycle.onSelect(place, key);
 }
 
 function onCreated(place: Place) {
   creating.value = false;
   showToast("Place created", "It is a draft. Add its texts, then activate it.");
-  openEditor(place);
+  void router.push(editorRoute(place));
 }
-
-const confirmCopy = computed(() => {
-  const c = confirm.value;
-  if (!c) return null;
-  return c.target === "ARCHIVED"
-    ? {
-        heading: `Archive ${title(c.place)}?`,
-        body: "An archived place leaves the visitor app and the default lists. Restoring it makes it a draft again.",
-        action: "Archive",
-      }
-    : {
-        heading: `Deactivate ${title(c.place)}?`,
-        body: "Visitors stop seeing it on their next refresh. It becomes a draft you can edit.",
-        action: "Deactivate",
-      };
-});
-// Manual order (spec 12 section 3); off while a search or filter hides rows (DECISIONS.md D-017).
-const reorder = useReorder<Place>({
-  items: places,
-  // Siblings as the tree shows them: a Place whose parent is not in the list sits at the top level.
-  siblingKey: (place) => (place.parentPlaceId && places.value.some((p) => p.id === place.parentPlaceId) ? place.parentPlaceId : null),
-  save: (ids) => saveOrder(projectId.value, "places", ids),
-  title: (place) => title(place),
-  canReorder: computed(() => !query.value.trim() && !featuredOnly.value && statusFilter.value === "ALL"),
-  reload: load,
-});
 </script>
 
 <template>
-  <main class="relative min-w-0 flex-1 overflow-y-auto px-4 pb-16 pt-6 md:px-7">
-    <PageHead :title="section.title" :subtitle="section.subtitle">
+  <PageFrame>
+    <PageHead :title="section.title" :subtitle="section.subtitle" section="places">
       <template #actions>
-        <Button variant="brand" :disabled="!defaultLanguageInfo" @click="creating = true">New place</Button>
+        <Button :disabled-reason="createDisabledReason" @click="openCreate()">New place</Button>
       </template>
     </PageHead>
 
-    <div
-      v-if="noLanguages"
-      class="mb-5 flex flex-wrap items-center gap-3.5 rounded-lg border-l-[3px] border-l-[#855400] bg-[rgba(154,98,0,0.07)] px-[18px] py-3.5 text-[13px]"
-    >
-      <div class="min-w-[min(100%,260px)] flex-1">
-        <strong class="mb-0.5 block text-[13px] font-bold">Add a language first</strong>
-        <span class="text-gray-700">Every place has its title and texts per language, starting with the default language.</span>
-      </div>
-      <RouterLink
-        :to="{ name: 'project-languages', params: { projectId } }"
-        class="whitespace-nowrap text-[11px] font-bold uppercase tracking-[0.06em] text-primary"
-      >
-        Set up languages
-      </RouterLink>
-    </div>
-
-    <div
-      v-if="loadError"
-      role="alert"
-      class="max-w-[640px] rounded-lg border border-l-[3px] border-l-destructive bg-card px-[18px] py-4"
-    >
-      <strong class="block text-[13px] font-bold text-destructive">
-        {{ loadError.platformUnavailable ? "The UNICHE platform is not reachable" : "The places could not be loaded" }}
-      </strong>
-      <p v-if="loadError.requestId" class="mt-1 font-mono text-[11px] text-muted-foreground">Request id {{ loadError.requestId }}</p>
-      <Button variant="outline" size="sm" class="mt-3" @click="load">Try again</Button>
-    </div>
-
-    <div v-else class="overflow-hidden rounded-lg border bg-card shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-      <div class="flex flex-wrap items-center gap-2.5 border-b px-[18px] py-3.5">
-        <label for="places-search" class="text-[11px] font-bold uppercase tracking-[0.06em] text-muted-foreground">Search</label>
-        <input
-          id="places-search"
-          v-model="query"
-          type="search"
-          placeholder="Search titles"
-          class="min-w-[min(100%,200px)] flex-1 rounded-lg border-[1.5px] px-3 py-[9px] text-[13px] focus:border-primary focus:outline-none"
-        />
-        <ListFilterMenu :active="activeFilters">
-          <FilterChoiceGroup v-model="statusFilter" legend="Status" :options="STATUS_FILTER_OPTIONS" />
-          <FeaturedFilterChip v-model="featuredOnly" />
-          <SearchLanguageSelect v-model="searchLanguage" :languages="languages" />
-        </ListFilterMenu>
-        <span class="ml-auto text-[11px] text-muted-foreground">
-          {{ reorder.enabled || reorder.saving ? "Sorted by order · drag or use the arrows to reorder" : "Clear the search and filters to reorder" }}
-        </span>
-        <p class="sr-only" aria-live="polite">{{ reorder.announcement }}</p>
-      </div>
-
-      <div v-if="loading" class="animate-skeleton" role="status" aria-busy="true" aria-label="Loading places">
-        <div v-for="n in 4" :key="n" class="flex items-center gap-3.5 border-b border-gray-100 px-[18px] py-4">
-          <div class="h-[13px] w-1/3 rounded bg-[#e2e3e7]"></div>
-          <div class="flex-1"></div>
-          <div class="h-2.5 w-[90px] rounded bg-[#eceef1]"></div>
-        </div>
-      </div>
-
-      <div v-else-if="rows.length" class="overflow-x-auto">
-        <table class="w-full min-w-[560px] table-fixed border-collapse">
-          <thead>
-            <tr>
-              <th class="th w-[56px] px-2"><span class="sr-only">Order</span></th>
-              <th class="th w-[41%] px-[18px]">Title</th>
-              <th class="th w-[15%] px-3">Status</th>
-              <th class="th w-[14%] px-3">Translations</th>
-              <th class="th w-[30%] px-[18px] text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="{ place, depth } in rows" :key="place.id"
-              class="hover:bg-muted"
-              :class="dropLineClass(reorder.dropLine(place))"
-              @dragover="reorder.dragOver(place, $event)"
-              @drop="reorder.drop(place, $event)"
-            >
-              <td class="td px-2"><ReorderControls :reorder="reorder" :item="place" :title="title(place)" /></td>
-              <td class="td px-[18px]">
-                <div class="flex flex-wrap items-center gap-2" :style="{ paddingLeft: `${depth * 18}px` }">
-                  <span v-if="depth" class="text-gray-300" aria-hidden="true">↳</span>
-                  <RouterLink
-                    :to="{ name: 'place-editor', params: { projectId, placeId: place.id } }"
-                    class="text-left text-[13px] font-semibold no-underline hover:underline"
-                    :class="place.status === 'ARCHIVED' ? 'text-muted-foreground' : 'text-foreground'"
-                  >
-                    {{ title(place) }}
-                  </RouterLink>
-                  <span class="rounded-full border bg-muted px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-[0.08em] text-muted-foreground">
-                    {{ placeTypeLabel(place.type) }}
-                  </span>
-                </div>
-                <div class="mt-[3px] break-words text-[11px] text-gray-500" :style="{ paddingLeft: `${depth * 18}px` }">
-                  <span class="font-mono">{{ place.slug }}</span> · {{ formatDate(place.updatedAt) }}
-                </div>
-                <div v-if="triggersByTarget" :style="{ paddingLeft: `${depth * 18}px` }">
-                  <TriggerChips :triggers="triggersByTarget.get(place.id) ?? []" />
-                </div>
-              </td>
-              <td class="td px-3">
-                <StatusChip :status="place.status" />
-                <StatusChip
-                  v-if="place.hasWorkingCopy"
-                  status="PENDING"
-                  label="Pending changes"
-                  class="ml-1"
-                  title="Has pending changes that visitors do not see yet"
-                />
-              </td>
-              <td class="td px-3">
-                <TranslationDots :languages="languages" :completeness="(code) => translationCompleteness(place, code)" />
-              </td>
-              <td class="td px-[18px]">
-                <div class="flex flex-wrap items-center justify-end gap-2.5">
-                  <button
-                    type="button"
-                    class="whitespace-nowrap rounded-full border bg-muted px-[13px] py-1.5 text-[10px] font-bold uppercase tracking-[0.06em] text-gray-700 disabled:opacity-50"
-                    :disabled="pendingId === place.id"
-                    @click="onToggle(place)"
-                  >
-                    {{ toggleLabel(place) }}
-                  </button>
-                  <button
-                    v-if="place.status !== 'ARCHIVED'"
-                    type="button"
-                    class="whitespace-nowrap text-[10px] font-bold uppercase tracking-[0.06em] text-destructive disabled:opacity-50"
-                    :disabled="pendingId === place.id"
-                    @click="confirm = { place, target: 'ARCHIVED' }"
-                  >
-                    Archive
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div v-else class="px-6 py-12 text-center">
-        <p class="mx-auto mb-[18px] max-w-[420px] text-[13px] text-muted-foreground">
-          {{
-            places.length
-              ? "No place matches the search or the filters."
-              : "Places are physical or conceptual locations, from a whole region down to a single room. Points of Interest and Routes are organized under them."
-          }}
-        </p>
-        <Button v-if="!places.length" variant="brand" :disabled="!defaultLanguageInfo" @click="creating = true">
-          New place
+    <Alert v-if="noLanguages" tone="warning" title="Add a language first" class="mb-5">
+      Every place has its title and texts per language, starting with the default language.
+      <template #actions>
+        <Button as-child variant="secondary" size="sm">
+          <RouterLink :to="{ name: 'project-languages', params: { projectId } }">Set up languages</RouterLink>
         </Button>
-      </div>
+      </template>
+    </Alert>
 
-      <div class="border-t border-gray-100 px-[18px] py-3 text-[11px] text-muted-foreground">{{ countText }}</div>
+    <ListLoadError v-if="languagesError" :error="languagesError" what="the project languages" class="!mx-0 mb-4" @retry="reloadLanguages" />
+    <ListLoadError v-if="loadError" :error="loadError" what="the places" @retry="load" />
+
+    <template v-else>
+    <ListSourceNotice :errors="query.errors" @retry="retrySource" />
+    <div class="rounded-lg border border-border bg-card shadow-1">
+      <template v-if="loading || places.length">
+        <ListToolbar
+          :query="query"
+          :counts="counts"
+          :loading="loading"
+          :languages="languages"
+          search-placeholder="Search title, slug or trigger"
+          :sort-options="SORTS"
+        >
+          <template #filters-extra>
+            <Checkbox v-model="query.featured.value">
+              <span class="inline-flex items-center gap-1.5">
+                <Star class="size-4" :class="query.featured.value ? 'fill-current text-primary' : 'text-muted-foreground'" aria-hidden="true" />
+                Featured only
+              </span>
+            </Checkbox>
+          </template>
+        </ListToolbar>
+        <p class="border-b border-border px-4 py-2 text-compact text-muted-foreground">Ordered by hierarchy and manual order. Sub-places sit under their parent.</p>
+        <ListTable
+          :columns="columns"
+          :rows="rows"
+          :loading="loading"
+          :query="query"
+          :reorder="reorder"
+          :depth="(place) => depths.get(place.id) ?? 0"
+          :has-children="(place) => parents.has(place.id)"
+          :row-label="title"
+          :row-key-focus="rowKeyFocus"
+          label="Places"
+          openable
+          @open="(place) => router.push(editorRoute(place))"
+        >
+          <template #cell-title="{ row }">
+            <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+              <ListRowTitle :to="editorRoute(row)" :muted="row.status === 'ARCHIVED'" :missing="query.missing.value">{{ title(row) }}</ListRowTitle>
+              <Chip v-if="row.featured" tone="brand" :icon="Star">Featured</Chip>
+            </div>
+            <p class="mono truncate text-compact text-muted-foreground" :title="row.slug">{{ row.slug }}</p>
+            <TriggerChips :triggers="triggersByPlace?.get(row.id) ?? []" :unavailable="triggersByPlace === null" />
+            <MatchHint v-if="matchOf(row)" :match="matchOf(row)!" :language-name="languageName(matchOf(row)!.languageCode)" />
+          </template>
+          <template #cell-setting="{ row }">
+            <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+              <Chip tone="outline" :icon="row.setting === 'INDOOR' ? Building2 : Mountain">{{ PLACE_SETTING_LABELS[row.setting].label }}</Chip>
+              <span class="text-compact text-muted-foreground">{{ placeTypeLabel(row.type) }}</span>
+            </div>
+            <p v-if="link(row)" class="mt-0.5 flex items-center gap-1 text-compact" :class="link(row)!.linked ? 'text-success' : 'text-muted-foreground'">
+              <component :is="row.setting === 'INDOOR' ? Layers : MapIcon" v-if="link(row)!.linked" class="size-4 shrink-0" aria-hidden="true" />
+              {{ link(row)!.linked ? `${link(row)!.noun} linked` : `No ${link(row)!.noun.toLowerCase()} linked` }}
+            </p>
+          </template>
+          <template #cell-updated="{ row }">
+            <time :datetime="row.updatedAt" class="tabular whitespace-nowrap text-compact text-muted-foreground">{{ formatDateTime(row.updatedAt).replaceAll(" ", NBSP) }}</time>
+          </template>
+          <template #cell-status="{ row }">
+            <div class="flex flex-wrap gap-1">
+              <StatusChip :status="row.status" />
+              <StatusChip v-if="row.hasWorkingCopy" status="PENDING" label="Pending changes" title="Has pending changes that visitors do not see yet" wrap />
+            </div>
+          </template>
+          <template #cell-translations="{ row }">
+            <TranslationDots names :languages="languages" :route="editorRoute(row)" :completeness="(code) => translationCompleteness(row, code)" />
+          </template>
+          <template #menu="{ row }">
+            <RowMenu
+              :title="title(row)"
+              :actions="actionsFor(row)"
+              :reorder="reorder"
+              :item="row"
+              :reorder-reason="query.reorderReason.value"
+              @select="(key) => onSelect(row, key)"
+            />
+          </template>
+        </ListTable>
+      </template>
+      <ListEmpty
+        v-if="!loading && !rows.length"
+        noun="places"
+        empty-title="No places yet"
+        :filtered="places.length > 0"
+        :filters="query.chips([], languages)"
+        :counts="counts"
+        :status="query.status.value"
+        header-action
+      >
+        Places are physical or conceptual locations, from a whole region down to a single room. Points of Interest and Routes are organized under them.
+      </ListEmpty>
+      <ListFooter v-if="loading || places.length" :loading="loading" :shown="rows.length" :total="total" noun="places" :filtered="query.isFiltered.value" legend paged />
     </div>
+    </template>
 
     <CreatePlaceDialog
       v-if="creating && defaultLanguageInfo"
       :project-id="projectId"
       :default-language="defaultLanguageInfo"
       :parent-options="createOptions"
+      :initial-parent-id="subPlaceOf"
       @close="creating = false"
       @created="onCreated"
     />
-
-    <StatusChangeDialog
-      v-if="confirm && confirmCopy"
-      :heading="confirmCopy.heading"
-      :body="confirmCopy.body"
-      :action-label="confirmCopy.action"
-      :danger="confirm.target === 'ARCHIVED'"
-      :busy="pendingId === confirm.place.id"
-      :load-references="() => fetchPlaceReferences(projectId, confirm!.place.id)"
-      :blocked-by="confirm.blockedBy ?? null"
-      :link-for="toReference"
-      @close="confirm = null"
-      @confirm="transition(confirm.place, confirm.target)"
-    />
-  </main>
+    <LifecycleDialogs :lifecycle="lifecycle" />
+  </PageFrame>
 </template>
-
-<style scoped>
-.th {
-  border-bottom: 1px solid #e5e7eb;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  text-align: left;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: #6b7280;
-}
-.th.text-right {
-  text-align: right;
-}
-.td {
-  border-bottom: 1px solid #f3f4f6;
-  padding-top: 11px;
-  padding-bottom: 11px;
-  vertical-align: top;
-}
-</style>

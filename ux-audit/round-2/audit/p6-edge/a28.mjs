@@ -1,0 +1,13 @@
+import { open, go, P, shot, settle, alerts, focused, problem, AP } from "./lib.mjs";
+const PP = `/projects/${P}`;
+const { browser, page } = await open("curator", { viewport: "1440" });
+const sent = [];
+await page.route(AP, (r) => { if (r.request().method() !== "GET") { sent.push(r.request().method() + " " + r.request().url().replace(/.*v1/, "").slice(0, 80)); return r.fulfill(problem(500, "INTERNAL_ERROR")); } return r.continue(); });
+await go(page, `${PP}/floor-plans/d40864d1-684a-466f-819d-68fa651b7146`); await settle(page, 2500);
+await page.locator("#pos-0-x").fill("abc");
+await page.getByRole("button", { name: /Apply changes/ }).first().click(); await page.waitForTimeout(1000);
+console.log("dialog:", (await page.locator("[role=dialog]").first().innerText()).replace(/\n+/g, " | ").slice(0, 300));
+await page.locator("[role=dialog]").getByRole("button", { name: /apply/i }).last().click(); await page.waitForTimeout(2000);
+console.log("sent", sent, "| alerts", JSON.stringify(await alerts(page)).slice(0, 500), "| dialog open", await page.locator("[role=dialog]").count(), "| focus", await focused(page));
+await shot(page, "floorplan-editor__apply-invalid-coordinates");
+await browser.close();

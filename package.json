@@ -7,6 +7,9 @@
     "dev": "vp dev",
     "build": "vue-tsc -b && vp build",
     "preview": "vp preview",
+    "check:css": "node scripts/check-css-tokens.mjs --all",
+    "check:literals": "node scripts/check-literals.mjs",
+    "check": "node scripts/check-css-tokens.mjs --all && node scripts/check-literals.mjs",
     "test:e2e": "playwright test"
   },
   "dependencies": {

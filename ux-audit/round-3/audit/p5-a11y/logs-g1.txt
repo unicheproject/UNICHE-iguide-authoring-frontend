@@ -1,0 +1,10 @@
+CC dashboard violations nodes: 0
+CC poi-list violations nodes: 0
+CC event-editor violations nodes: 0
+CC poi-editor violations nodes: 0
+CC route-editor violations nodes: 0
+CC guide-editor violations nodes: 0
+CC category-editor violations nodes: 0
+CC media violations nodes: 0
+CC maps violations nodes: 0
+CC preview violations nodes: 0

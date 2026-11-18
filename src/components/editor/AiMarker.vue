@@ -3,7 +3,9 @@
  * The AI marker of one machine-translated part in one language (`12` §3, DECISIONS.md D-026, D-027): who generated
  * it and when, its review, the gateway's citations, and "Mark reviewed" while it is unreviewed.
  */
+import { Check, TriangleAlert } from "lucide-vue-next";
 import { Button } from "@/components/ui/button";
+import { Chip } from "@/components/ui/chip";
 import type { AiProvenanceEntry } from "@/platform/ai";
 
 const props = defineProps<{
@@ -34,17 +36,11 @@ function citationOf(citation: unknown): { text: string; href: string | null } {
 </script>
 
 <template>
-  <div
-    class="rounded-lg border-l-[3px] px-3.5 py-2.5 text-[12px] text-gray-700"
-    :class="unreviewed() ? 'border-l-[#855400] bg-[rgba(154,98,0,0.07)]' : 'border-l-gray-300 bg-gray-50'"
-  >
+  <div class="rounded-lg border px-4 py-3 text-xs text-ink-2" :class="unreviewed() ? 'border-warning/30 bg-warning-tint' : 'border-border bg-muted'">
     <div class="flex flex-wrap items-center gap-2">
-      <span
-        class="rounded-full px-[7px] py-[1px] text-[10px] font-bold uppercase tracking-[0.07em]"
-        :class="unreviewed() ? 'bg-[rgba(154,98,0,0.1)] text-[#855400]' : 'bg-gray-100 text-gray-500'"
-      >
-        {{ unreviewed() ? "AI · unreviewed" : "AI · reviewed" }}{{ entry.pending ? " · pending" : "" }}
-      </span>
+      <Chip :tone="unreviewed() ? 'warning' : 'neutral'" :icon="unreviewed() ? TriangleAlert : Check">
+        {{ unreviewed() ? "AI, unreviewed" : "AI, reviewed" }}{{ entry.pending ? ", pending" : "" }}
+      </Chip>
       <span>
         <strong v-if="label" class="font-semibold">{{ label }}: </strong>
         Machine-translated by {{ entry.provenance.serviceId ?? "the AI gateway" }}
@@ -52,19 +48,27 @@ function citationOf(citation: unknown): { text: string; href: string | null } {
         on {{ formatDateTime(entry.provenance.generatedAt) }}<template v-if="entry.provenance.reviewedAt">;
         reviewed on {{ formatDateTime(entry.provenance.reviewedAt) }}</template>.
       </span>
-      <Button v-if="unreviewed()" variant="outline" size="sm" class="ml-auto" :disabled="reviewing || disabled" @click="$emit('review')">
+      <Button
+        v-if="unreviewed()"
+        variant="secondary"
+        size="sm"
+        class="ml-auto"
+        :loading="reviewing"
+        :disabled-reason="disabled ? 'This item cannot be edited' : undefined"
+        @click="$emit('review')"
+      >
         {{ reviewing ? "Marking…" : "Mark reviewed" }}
       </Button>
     </div>
-    <p v-if="unreviewed()" class="mt-1.5 text-[11px] text-muted-foreground">
+    <p v-if="unreviewed()" class="mt-1.5 text-muted-foreground">
       Check the text, then mark it reviewed; saving a change to it counts as a review too.
     </p>
-    <div class="mt-1.5 text-[11px]">
+    <div class="mt-1.5">
       <span class="font-semibold">Citations:</span>
       <span v-if="!entry.provenance.citations?.length" class="text-muted-foreground"> No citations returned.</span>
       <ul v-else class="mt-0.5 list-disc pl-5">
         <li v-for="(citation, i) in entry.provenance.citations" :key="i" class="break-words">
-          <a v-if="citationOf(citation).href" :href="citationOf(citation).href!" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">
+          <a v-if="citationOf(citation).href" :href="citationOf(citation).href!" target="_blank" rel="noopener noreferrer">
             {{ citationOf(citation).text }}
           </a>
           <template v-else>{{ citationOf(citation).text }}</template>

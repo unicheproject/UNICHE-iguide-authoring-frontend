@@ -1,0 +1,13 @@
+import { start, go, P, focusInfo, tabWalk, tabTo, live, axe } from "./common.mjs";
+const s = await start("1440"); const { page } = s;
+await go(page, P + "/floor-plans/fef09ea8-f347-4742-8a34-cffc3ee87328"); await page.getByRole("heading",{level:1}).first().waitFor(); await page.waitForTimeout(2000);
+await s.shot("floorplan-editor__empty");
+const item = page.locator("li",{hasText:"UX-p5-a11y Beta"}).getByRole("button",{name:/^Place/});
+console.log("place btn", await item.count());
+await item.focus(); await page.keyboard.press("Enter"); await page.waitForTimeout(1000);
+console.log("after Place: focus", JSON.stringify(await focusInfo(page)), "live", JSON.stringify(await live(page)));
+await s.shot("floorplan-editor__placed");
+console.log(await page.locator("main").ariaSnapshot().then(t=>t.split("\n").slice(0,40).join("\n")));
+const w = await tabWalk(page, 12); w.forEach((x,i)=>console.log(i+1,x.tag,x.type,x.name,"|",(x.ring||"").slice(0,26),x.w+"x"+x.h));
+console.log("axe", JSON.stringify((await axe(page,"fp-placed")).map(v=>v.id+":"+v.impact+":"+v.nodes+":"+v.sample[0])));
+await s.browser.close();

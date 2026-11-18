@@ -1,0 +1,20 @@
+import * as L from "./lib.mjs";
+const { page, browser } = await L.open("curator", { viewport: "1440" });
+const k = page.keyboard;
+const R = "11d2dfe4-09fa-48b1-8b5b-494964cf3d52";
+await L.nav(page, L.P("/routes/" + R), 1500);
+await L.watchLive(page);
+await page.getByRole("button", { name: /add stops/i }).first().focus(); await k.press("Enter"); await page.waitForTimeout(1000);
+await k.type("Kore"); await page.waitForTimeout(500);
+const items = page.locator("[role=dialog] li button");
+L.log("t19", "filtered", await items.allTextContents(), "live", (await L.liveLog(page)).slice(-2));
+const n = await items.count();
+for (let i = 0; i < Math.min(n, 4); i++) { await items.nth(i).focus(); await k.press("Space"); await page.waitForTimeout(200); }
+L.log("t19", "after selecting: focus", await L.focus(page), "footer", await page.locator("[role=dialog] [role=status]").allTextContents(), "live", (await L.liveLog(page)).slice(-2));
+await L.shot(page, "route__stop-picker-multi__1440");
+L.log("t19","dlg footer btns", await page.locator("[role=dialog] footer button, [role=dialog] [role=contentinfo] button, [role=dialog] button").allTextContents());
+await k.press("Escape"); await page.waitForTimeout(1500);
+L.log("t19", "after close: focus", await L.focus(page), "live", (await L.liveLog(page)).slice(-3));
+await L.shot(page, "route__stops-added__1440");
+L.log("t19", "stops aria", (await L.snap(page, "route-stops", "#stops, section:has(h2:has-text('Stops'))")).split("\n").slice(0, 80).join("\n"));
+await browser.close();

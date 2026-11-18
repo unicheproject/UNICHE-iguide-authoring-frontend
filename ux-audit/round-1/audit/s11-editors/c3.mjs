@@ -1,0 +1,16 @@
+import { start, goP, log, dump, state, focused } from "./lib.mjs";
+const s = await start("1440"); const { page } = s;
+await page.goto("http://localhost:5173" + state().catUrl); await page.waitForTimeout(3000);
+const grid = await page.evaluate(()=>{ const b=[...document.querySelectorAll("button")].find(x=>x.innerText.trim()==="Monument"); return b? { role:b.getAttribute("role"), pressed:b.getAttribute("aria-pressed"), checked:b.getAttribute("aria-checked"), parent: b.parentElement.getAttribute("role")+"|"+b.parentElement.getAttribute("aria-label")+"|"+b.parentElement.getAttribute("aria-labelledby"), w:b.getBoundingClientRect().width, h:b.getBoundingClientRect().height, tabindex:b.getAttribute("tabindex")}:null});
+log("icon btn:", JSON.stringify(grid));
+await page.getByRole("button", { name: /^none$/i }).focus().catch(()=>{});
+log("focus", await focused(page));
+await page.keyboard.press("ArrowRight"); log("after ArrowRight", await focused(page));
+await page.keyboard.press("Tab"); log("after Tab", await focused(page));
+await page.getByText("Trail", {exact:true}).click(); await page.waitForTimeout(300);
+await s.shot("category-icon-selected");
+await page.getByRole("button", { name: /^save/i }).first().click(); await page.waitForTimeout(1800);
+await page.getByRole("button", { name: /^activate$/i }).click(); await page.waitForTimeout(2200);
+log("alerts:", await page.evaluate(()=>[...document.querySelectorAll("[role=alert],[role=status]")].map(e=>e.innerText.slice(0,200))));
+await s.shot("category-activated");
+await s.browser.close();

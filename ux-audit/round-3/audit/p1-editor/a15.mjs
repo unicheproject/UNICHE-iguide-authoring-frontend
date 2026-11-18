@@ -1,0 +1,34 @@
+import {open,go,P,shot,btns,hdr} from "./lib.mjs";
+const { browser, page } = await open("admin",{viewport:"1440"});
+await go(page,P+"/pois"); await page.waitForTimeout(800);
+await page.getByRole("button",{name:/Filters and sort/}).click();
+await page.getByLabel("Pending changes").check();
+await page.waitForTimeout(1200);
+console.log("url:",page.url());
+await page.keyboard.press("Escape"); await page.waitForTimeout(300);
+await shot(page,"pois-list__pending-filter__1440");
+console.log("rows",await page.locator("tbody tr").count(),"| filterbtn:",await page.getByRole("button",{name:/Filters/}).innerText(), "| footer:",await page.evaluate(()=>[...document.querySelectorAll("*")].find(e=>/Showing \d/.test(e.innerText||"")&&e.children.length<4)?.innerText));
+// open Alpha
+await page.getByText("UX-R3-p1-editor Alpha POI").first().click();
+await page.waitForURL(/pois\/[0-9a-f-]{36}/); await page.waitForSelector("#f-title"); await page.waitForTimeout(500);
+await page.goBack(); await page.waitForTimeout(1200);
+console.log("after back url:",page.url(),"rows",await page.locator("tbody tr").count(),"focus:",await page.evaluate(()=>document.activeElement.tagName+":"+(document.activeElement.getAttribute("aria-label")||document.activeElement.innerText||"").slice(0,50)));
+await shot(page,"pois-list__after-back-pending__1440");
+await page.reload(); await page.waitForTimeout(1500);
+console.log("reload url:",page.url(),"rows",await page.locator("tbody tr").count());
+// Apply on Alpha
+await go(page,P+"/pois/d2e48820-a468-4539-9f62-545eed5b06a6"); await page.waitForTimeout(1000);
+await page.getByRole("button",{name:/^Apply changes/}).first().click();
+await page.waitForSelector("[role=dialog]"); await page.waitForTimeout(400);
+await shot(page,"poi-apply-confirm__alpha__1440");
+console.log((await page.evaluate(()=>document.querySelector("[role=dialog]").innerText)));
+const t=Date.now();
+await page.getByRole("dialog").getByRole("button",{name:/^Apply/}).last().click();
+await page.waitForFunction(()=>!document.querySelector("[role=dialog]"),null,{timeout:20000});
+console.log("apply ms",Date.now()-t);
+await page.waitForTimeout(800);
+console.log("toasts:",await page.evaluate(()=>[...document.querySelectorAll("li[role=status],[role=status],[role=alert]")].map(e=>e.innerText.trim().slice(0,120))));
+console.log("focus:",await page.evaluate(()=>document.activeElement.tagName+":"+(document.activeElement.innerText||"").slice(0,40)));
+await shot(page,"poi-editor__alpha-applied__1440");
+console.log(await hdr(page));
+await browser.close();

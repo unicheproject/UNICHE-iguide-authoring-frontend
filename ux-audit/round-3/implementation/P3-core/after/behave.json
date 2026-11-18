@@ -1,0 +1,103 @@
+{
+ "buttonName": "Filters 1",
+ "popover": {
+  "name": "Filters and sort",
+  "top": 8,
+  "bottom": 158,
+  "innerHeight": 360,
+  "scrollable": true,
+  "done": true
+ },
+ "axe": [],
+ "axeOpen": [],
+ "afterDone": {
+  "tag": "BUTTON",
+  "id": "",
+  "label": "Filters 1",
+  "top": 164,
+  "bottom": 204,
+  "inViewport": true
+ },
+ "radioEnd": {
+  "scrollDelta": 0,
+  "checked": "Archived 8"
+ },
+ "radioHome": "Not archived 1",
+ "chips@1024": [
+  "Remove filter Status: Draft",
+  "Remove filter Needs translation in Italiano"
+ ],
+ "chips@768": [
+  "Remove filter Status: Draft",
+  "Remove filter Needs translation in Italiano"
+ ],
+ "page2": {
+  "focus": {
+   "tag": "TABLE",
+   "id": "",
+   "label": "Points of interest",
+   "top": 113,
+   "bottom": 4299,
+   "inViewport": false
+  },
+  "headTop": 113,
+  "toolbarBottom": 113,
+  "firstRowTop": 161
+ },
+ "sortCycle": [
+  "?sort=title",
+  "?sort=title&dir=desc",
+  ""
+ ],
+ "move60": {
+  "bar": "Moved UX-R3-P3core Move A to position 60 of 127. It is on page 2.\nShow it\nUndo\nmove of UX-R3-P3core Move A",
+  "focus": {
+   "tag": "BUTTON",
+   "id": "radix-vue-dropdown-menu-trigger-v-51",
+   "label": "Actions for UX-R3-W0B POI uses cat",
+   "top": 381,
+   "bottom": 421,
+   "inViewport": true
+  }
+ },
+ "move3": {
+  "bar": "Moved UX-R3-P3core Move A to position 3 of 127. It is on page 1.\nShow it\nUndo\nmove of UX-R3-P3core Move A",
+  "focus": {
+   "tag": "BUTTON",
+   "id": "radix-vue-dropdown-menu-trigger-v-27",
+   "label": "Actions for UX-s10-poi-place Odeon Mosai",
+   "top": 382,
+   "bottom": 422,
+   "inViewport": true
+  },
+  "live": "Moved UX-R3-P3core Move A to position 3 of 127."
+ },
+ "undoCtrlZ": {
+  "barGone": true,
+  "focus": {
+   "tag": "BUTTON",
+   "id": "radix-vue-dropdown-menu-trigger-v-173",
+   "label": "Actions for UX-R3-P3core Move A",
+   "top": 463,
+   "bottom": 503,
+   "inViewport": true
+  },
+  "rowOnPage2": 1
+ },
+ "moveBottom": {
+  "bar": "Moved UX-R3-P3core Move A to position 127 of 127. It is on page 3.\nShow it\nUndo\nmove of UX-R3-P3core Move A",
+  "focus": {
+   "tag": "BUTTON",
+   "id": "radix-vue-dropdown-menu-trigger-v-31",
+   "label": "Actions for UX-s10-poi-place Garden Benc",
+   "top": 463,
+   "bottom": 503,
+   "inViewport": true
+  }
+ },
+ "cls": [
+  0.0173,
+  0.0622,
+  0.0167
+ ]
+}

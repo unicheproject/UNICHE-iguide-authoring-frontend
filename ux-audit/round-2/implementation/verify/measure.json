@@ -1,0 +1,245 @@
+{
+ "sticky 1440 poi-list y=0": {
+  "cssVar": "106px",
+  "bottom": 0,
+  "vh": 900,
+  "pct": 0,
+  "items": []
+ },
+ "sticky 1440 poi-list y=400": {
+  "cssVar": "106px",
+  "bottom": 162,
+  "vh": 900,
+  "pct": 18,
+  "items": [
+   "div.z-sticky 56-113",
+   "th.list-th 113-162",
+   "th.list-th 113-162"
+  ]
+ },
+ "sticky 1440 poi-list y=1200": {
+  "cssVar": "106px",
+  "bottom": 162,
+  "vh": 900,
+  "pct": 18,
+  "items": [
+   "div.z-sticky 56-113",
+   "th.list-th 113-162",
+   "th.list-th 113-162"
+  ]
+ },
+ "iconbtns poi-list fine": {
+  "n": 50,
+  "small": []
+ },
+ "sticky 1440 poi-editor y=0": {
+  "cssVar": "103px",
+  "bottom": 178,
+  "vh": 900,
+  "pct": 20,
+  "items": [
+   "div.editor-header 117-178"
+  ]
+ },
+ "sticky 1440 poi-editor y=400": {
+  "cssVar": "103px",
+  "bottom": 154,
+  "vh": 900,
+  "pct": 17,
+  "items": [
+   "div.editor-header 56-117",
+   "div.editor-banner 112-154"
+  ]
+ },
+ "sticky 1440 poi-editor y=1200": {
+  "cssVar": "103px",
+  "bottom": 804,
+  "vh": 900,
+  "pct": 89,
+  "items": [
+   "div.editor-header 56-117",
+   "div.editor-banner 112-154",
+   "aside.flex 95-804"
+  ]
+ },
+ "iconbtns poi-editor fine": {
+  "n": 3,
+  "small": [
+   {
+    "n": "What is a Working Copy?",
+    "w": 32,
+    "h": 32
+   },
+   {
+    "n": "Why is AR scan target not available?",
+    "w": 32,
+    "h": 32
+   }
+  ]
+ },
+ "sticky 1280 poi-list y=0": {
+  "cssVar": "110px",
+  "bottom": 0,
+  "vh": 720,
+  "pct": 0,
+  "items": []
+ },
+ "sticky 1280 poi-list y=400": {
+  "cssVar": "110px",
+  "bottom": 166,
+  "vh": 720,
+  "pct": 23,
+  "items": [
+   "div.z-sticky 56-113",
+   "th.list-th 113-166"
+  ]
+ },
+ "sticky 1280 poi-list y=1200": {
+  "cssVar": "110px",
+  "bottom": 166,
+  "vh": 720,
+  "pct": 23,
+  "items": [
+   "div.z-sticky 56-113",
+   "th.list-th 113-166"
+  ]
+ },
+ "sticky 1280 poi-editor y=0": {
+  "cssVar": "61px",
+  "bottom": 178,
+  "vh": 720,
+  "pct": 25,
+  "items": [
+   "div.editor-header 117-178"
+  ]
+ },
+ "sticky 1280 poi-editor y=400": {
+  "cssVar": "61px",
+  "bottom": 704,
+  "vh": 720,
+  "pct": 98,
+  "items": [
+   "div.editor-header 56-117",
+   "aside.flex 133-704"
+  ]
+ },
+ "sticky 1280 poi-editor y=1200": {
+  "cssVar": "61px",
+  "bottom": 704,
+  "vh": 720,
+  "pct": 98,
+  "items": [
+   "div.editor-header 56-117",
+   "aside.flex 133-704"
+  ]
+ },
+ "sticky zoom200 poi-list y=0": {
+  "cssVar": "0px",
+  "bottom": 0,
+  "vh": 360,
+  "pct": 0,
+  "items": []
+ },
+ "sticky zoom200 poi-list y=400": {
+  "cssVar": "0px",
+  "bottom": 0,
+  "vh": 360,
+  "pct": 0,
+  "items": []
+ },
+ "sticky zoom200 poi-list y=1200": {
+  "cssVar": "0px",
+  "bottom": 0,
+  "vh": 360,
+  "pct": 0,
+  "items": []
+ },
+ "sticky zoom200 poi-editor y=0": {
+  "cssVar": "61px",
+  "bottom": 178,
+  "vh": 360,
+  "pct": 49,
+  "items": [
+   "div.editor-header 117-178"
+  ]
+ },
+ "sticky zoom200 poi-editor y=400": {
+  "cssVar": "61px",
+  "bottom": 117,
+  "vh": 360,
+  "pct": 33,
+  "items": [
+   "div.editor-header 56-117"
+  ]
+ },
+ "sticky zoom200 poi-editor y=1200": {
+  "cssVar": "61px",
+  "bottom": 117,
+  "vh": 360,
+  "pct": 33,
+  "items": [
+   "div.editor-header 56-117"
+  ]
+ },
+ "iconbtns poi-list coarse(true)": {
+  "n": 50,
+  "small": []
+ },
+ "iconbtns poi-editor coarse(true)": {
+  "n": 3,
+  "small": []
+ },
+ "deeplink reloads": [
+  {
+   "i": 0,
+   "titleEarly": "Parthenon Frieze – North Side (revised wording) · UX Audit – Populated · iGuide CMS",
+   "headerEarly": "iGuide CMS UX Audit – Populated App: Draft . Switch project PA P. Admin , account menu",
+   "titleLate": "Parthenon Frieze – North Side (revised wording) · UX Audit – Populated · iGuide CMS",
+   "headerLate": "iGuide CMS UX Audit – Populated App: Draft . Switch project PA P. Admin , account menu"
+  },
+  {
+   "i": 1,
+   "titleEarly": "Parthenon Frieze – North Side (revised wording) · UX Audit – Populated · iGuide CMS",
+   "headerEarly": "iGuide CMS UX Audit – Populated App: Draft . Switch project PA P. Admin , account menu",
+   "titleLate": "Parthenon Frieze – North Side (revised wording) · UX Audit – Populated · iGuide CMS",
+   "headerLate": "iGuide CMS UX Audit – Populated App: Draft . Switch project PA P. Admin , account menu"
+  },
+  {
+   "i": 2,
+   "titleEarly": "Parthenon Frieze – North Side (revised wording) · UX Audit – Populated · iGuide CMS",
+   "headerEarly": "iGuide CMS UX Audit – Populated App: Draft . Switch project PA P. Admin , account menu",
+   "titleLate": "Parthenon Frieze – North Side (revised wording) · UX Audit – Populated · iGuide CMS",
+   "headerLate": "iGuide CMS UX Audit – Populated App: Draft . Switch project PA P. Admin , account menu"
+  }
+ ],
+ "placement heading": "Placement",
+ "tab placement": {
+  "total": 12,
+  "insidePlacementCard": 5,
+  "trail": [
+   " / Discard changes",
+   " / EnglishdefaultComplete",
+   " / TEXTAREA",
+   " / TEXTAREA",
+   " / TEXTAREA",
+   " / Practical detailsAll filledSho",
+   "Placement / Not inside a PlaceAthens Histo",
+   "Placement / UncategorisedMonuments and Tem",
+   "Placement / INPUT",
+   "Placement / INPUT",
+   "Placement / Edit position on the map",
+   "Media 0 of 6 filled · primary  / Add Primary image (recommended"
+  ]
+ },
+ "preview beacon": {
+  "tabs": [
+   "Mobile",
+   "English",
+   "Working"
+  ],
+  "chip": [
+   "Fired: Bluetooth beacon, Excavated Athenian Neighbourhood"
+  ],
+  "select": "432c66f3-86b0-4a49-836b-e575f41fa19a"
+ }
+}

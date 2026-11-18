@@ -1,7 +1,16 @@
 <script setup lang="ts">
+import { Check, Lock } from "lucide-vue-next";
 import { computed, reactive, ref } from "vue";
 import CategoryIcon from "@/components/CategoryIcon.vue";
+import EditorSection from "@/components/editor/EditorSection.vue";
+import OtherSettings from "@/components/editor/OtherSettings.vue";
 import EditorShell from "@/components/editor/EditorShell.vue";
+import { Button } from "@/components/ui/button";
+import { FormField } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
+import { say } from "@/lib/announcer";
+import RadioChips, { type RadioChipOption } from "./RadioChips.vue";
 import TranslationsPanel, { type TextFieldGroup, type TextFieldMeta } from "@/components/editor/TranslationsPanel.vue";
 import { SLUG_PATTERN } from "@/lib/format";
 import {
@@ -24,7 +33,6 @@ import {
   type UpdateCategoryInput,
 } from "@/platform/categories";
 import type { ResourceReference } from "@/platform/references";
-import { showToast } from "@/stores/toast";
 import { useCurrentProject } from "@/workspace/currentProject";
 import { describeTranslationPath, ensureTextRows, textsForApi, textsFrom, type Texts } from "@/workspace/formFields";
 import { referenceLink } from "@/workspace/referenceLinks";
@@ -49,6 +57,8 @@ const FIELD_NAMES: Record<string, string> = { code: "Code", scope: "Applies to",
 const ICON_KEYS = Object.keys(CATEGORY_ICONS);
 
 const all = ref<Category[]>([]);
+/** What uses this Category: the where-used list, for the side card and the lock reasons. */
+const usedBy = ref<ResourceReference[]>([]);
 
 const form = reactive({
   code: "",
@@ -75,8 +85,14 @@ const editor = useResourceEditor<Category>({
   languages,
   defaultLanguage,
   async load() {
-    const [category, categories] = await Promise.all([fetchCategory(projectId.value, props.categoryId), listCategories(projectId.value)]);
+    const [category, categories, references] = await Promise.all([
+      fetchCategory(projectId.value, props.categoryId),
+      listCategories(projectId.value),
+      // A failed where-used lookup only hides the list; the counts and the deactivate dialog still work.
+      fetchCategoryReferences(projectId.value, props.categoryId).catch(() => [] as ResourceReference[]),
+    ]);
     all.value = categories;
+    usedBy.value = references;
     return category;
   },
   save: (category, version) => updateCategory(projectId.value, category.id, { version, ...input() }),
@@ -112,66 +128,107 @@ const subtitle = computed(() =>
   editor.resource ? `${scopeLabel(editor.resource.scope)} · ${categoryLabel(editor.resource, all.value, defaultLanguage.value)}` : "",
 );
 
-// Category setup (mockup "Category setup": Applies to, Level, icon) ------------------------------------
+// Category setup ------------------------------------------------------------------------------------------
+
+/**
+ * Applies to, Level, Icon and Code are the same in every language: under another language's tab they fold into one
+ * collapsed "Other settings (all languages)" disclosure, as in the POI and Place editors (D-079, C3-52).
+ */
+const otherFolded = computed(() => !!editor.activeLanguage && editor.activeLanguage !== defaultLanguage.value);
 
 const children = computed(() => all.value.filter((c) => c.parentCategoryId === props.categoryId && c.status !== "ARCHIVED"));
 const parents = computed(() => parentChoices(all.value, form.scope, defaultLanguage.value, props.categoryId));
-const used = computed(() => editor.resource?.resourceCount ?? 0);
+/** How many items use it: the where-used list when it loaded (what the Deactivate dialog shows), else the Category's own count. */
+const used = computed(() => usedBy.value.length || (editor.resource?.resourceCount ?? 0));
+const usedNoun = computed(() => {
+  const poi = editor.resource?.scope === "POI";
+  return used.value === 1 ? (poi ? "point of interest" : "route") : poi ? "points of interest" : "routes";
+});
 /** A Category in use keeps what it applies to (`12` §3 Category): the other choice is disabled with the reason. */
 const scopeLocked = computed(() => used.value > 0 && !!editor.resource);
-const scopeLockReason = computed(() => {
-  const poi = editor.resource?.scope === "POI";
-  const noun = used.value === 1 ? (poi ? "point of interest" : "route") : poi ? "points of interest" : "routes";
-  return `Used by ${used.value} ${noun}. Remove it from them before changing what it applies to.`;
+const scopeLockReason = computed(
+  () => `It cannot change while ${used.value} ${usedNoun.value} ${used.value === 1 ? "uses" : "use"} this category. Choose another category in ${used.value === 1 ? "that one" : "each of them"} first (see “Used in”).`,
+);
+
+const scopeOptions = computed<RadioChipOption[]>(() =>
+  CATEGORY_SCOPES.map((s) => ({ value: s, label: scopeLabel(s), disabled: scopeLocked.value && s !== editor.resource?.scope })),
+);
+const scope = computed({
+  get: () => form.scope,
+  set(value: string) {
+    if (value === form.scope) return;
+    form.scope = value as CategoryScope;
+    // Parents belong to one scope: a new scope starts at the top level.
+    const hadParent = !!form.parentCategoryId;
+    form.parentCategoryId = "";
+    say(`Applies to ${scopeLabel(form.scope)}.${hadParent ? " Level reset to top-level." : ""}`);
+  },
 });
 
-function chooseScope(scope: CategoryScope) {
-  if (scope === form.scope || readonly.value) return;
-  if (used.value && editor.resource?.scope !== scope) {
-    showToast(
-      "Category in use",
-      `Remove it from its ${scopeLabel(editor.resource!.scope)} before changing what it applies to.`,
-      "warning",
-    );
-    return;
-  }
-  form.scope = scope;
-  form.parentCategoryId = "";
-}
-
-function chooseLevel(subcategory: boolean) {
-  if (readonly.value || subcategory === !!form.parentCategoryId) return;
-  if (!subcategory) {
-    form.parentCategoryId = "";
-    return;
-  }
-  if (children.value.length) {
-    showToast("Two levels only", "This category has subcategories, so it stays top-level.", "warning");
-    return;
-  }
-  if (!parents.value.length) {
-    showToast("No parent available", `Create a top-level category for ${scopeLabel(form.scope)} first.`, "warning");
-    return;
-  }
-  form.parentCategoryId = parents.value[0].id;
-}
-
+const noParentAvailable = computed(() => !parents.value.length);
+const levelBlock = computed(() => {
+  if (children.value.length) return "This category has subcategories, so it stays top-level. Categories have two levels at most.";
+  return "";
+});
+const levelOptions = computed<RadioChipOption[]>(() => [
+  { value: "top", label: "Top-level" },
+  { value: "sub", label: "Subcategory", disabled: !!levelBlock.value || (noParentAvailable.value && !form.parentCategoryId) },
+]);
+const level = computed({
+  get: () => (form.parentCategoryId ? "sub" : "top"),
+  set(value: string) {
+    if (value === "top") form.parentCategoryId = "";
+    else if (parents.value.length) form.parentCategoryId = parents.value[0].id;
+  },
+});
 const levelNote = computed(() => {
   if (children.value.length) {
-    return `Subcategories: ${children.value.map((c) => categoryName(c, defaultLanguage.value)).join(", ")}. Categories have two levels at most.`;
+    return `Subcategories: ${children.value.map((c) => categoryName(c, defaultLanguage.value)).join(", ")}. ${levelBlock.value}`;
   }
   const parent = all.value.find((c) => c.id === form.parentCategoryId);
-  return parent
-    ? `Sits under ${categoryName(parent, defaultLanguage.value)}. A subcategory cannot have subcategories of its own.`
-    : "Categories have two levels at most: a category and its subcategories.";
+  if (parent) return `Sits under ${categoryName(parent, defaultLanguage.value)}. A subcategory cannot have subcategories of its own.`;
+  if (noParentAvailable.value) return `Subcategory is off: there is no top-level category for ${scopeLabel(form.scope)} yet. Create one first.`;
+  return "Categories have two levels at most: a category and its subcategories.";
 });
+
+const iconOptions = computed(() => [{ key: "", label: "None" }, ...ICON_KEYS.map((key) => ({ key, label: CATEGORY_ICONS[key][0] }))]);
+const iconName = computed(() => (form.icon && CATEGORY_ICONS[form.icon] ? CATEGORY_ICONS[form.icon][0] : "None"));
+const iconGroup = "cat-icon";
 
 const activationHint = computed(() =>
   form.parentCategoryId ? "Activate it once it has a default-language name and its parent is active." : "Activate it once the default-language name is set.",
 );
 
-function chip(selected: boolean) {
-  return selected ? "border-primary bg-primary text-white" : "border-gray-200 bg-white text-gray-700 hover:border-primary";
+/** Moves the author to the shell's "Used in" card, which lists what blocks a change (one card, no second "Used by"). */
+function showUsedBy() {
+  const heading = document.getElementById("used-in-heading");
+  if (!heading) return;
+  heading.tabIndex = -1;
+  heading.scrollIntoView({ block: "center" });
+  heading.focus();
+  say("Where this category is used.");
+}
+
+// Icon grid -----------------------------------------------------------------------------------------------
+
+/** How many icons sit in one row of the grid as laid out now (it wraps with the width): the icons sharing the first one's top. */
+function iconColumns(radios: HTMLInputElement[]): number {
+  const top = radios[0]?.closest("label")?.offsetTop;
+  return Math.max(1, radios.filter((r) => r.closest("label")?.offsetTop === top).length);
+}
+
+/** Arrow keys move through the grid as it looks: Up and Down by a row, Left and Right by one (the radio group's default). */
+function onIconKey(event: KeyboardEvent) {
+  if (readonly.value || (event.key !== "ArrowDown" && event.key !== "ArrowUp")) return;
+  const target = event.target as HTMLInputElement;
+  if (target.type !== "radio") return;
+  const radios = [...(event.currentTarget as HTMLElement).querySelectorAll<HTMLInputElement>('input[type="radio"]')];
+  const at = radios.indexOf(target);
+  const next = radios[at + (event.key === "ArrowDown" ? 1 : -1) * iconColumns(radios)];
+  event.preventDefault();
+  if (!next) return;
+  form.icon = next.value;
+  next.focus();
 }
 
 // The Translations panel counts the fields the content list counts for its completion dots.
@@ -205,112 +262,71 @@ const translationRows = computed(() => translationStatus(languages.value, 2, (co
       required-field="name"
     />
 
-    <section class="overflow-hidden rounded-lg border bg-card">
-      <div class="border-b px-5 py-3.5">
-        <h2 class="text-[11px] font-extrabold uppercase tracking-[0.09em] text-muted-foreground">Category setup</h2>
-      </div>
-      <div class="flex flex-col gap-[18px] px-5 py-[18px]">
-        <div class="flex flex-col gap-2" role="group" aria-labelledby="cat-scope-label">
-          <span id="cat-scope-label" class="small-label">Applies to</span>
-          <div class="flex flex-wrap gap-[7px]">
-            <button
-              v-for="s in CATEGORY_SCOPES"
-              :key="s"
-              type="button"
-              :disabled="readonly || (scopeLocked && s !== editor.resource?.scope)"
-              :aria-pressed="form.scope === s"
-              aria-describedby="cat-scope-help"
-              class="rounded-full border-[1.5px] px-3.5 py-[7px] text-[11px] font-bold disabled:cursor-default"
-              :class="[chip(form.scope === s), { 'opacity-50': scopeLocked && s !== editor.resource?.scope }]"
-              @click="chooseScope(s)"
-            >
-              {{ scopeLabel(s) }}
-            </button>
-          </div>
-          <span v-if="editor.fieldError('scope')" id="cat-scope-help" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("scope") }}</span>
-          <span v-else-if="scopeLocked" id="cat-scope-help" class="text-xs text-muted-foreground">{{ scopeLockReason }}</span>
-        </div>
-
-        <div class="flex flex-col gap-2" role="group" aria-labelledby="cat-level-label">
-          <span id="cat-level-label" class="small-label">Level</span>
-          <div class="flex flex-wrap gap-[7px]">
-            <button
-              v-for="level in ([[false, 'Top-level'], [true, 'Subcategory']] as const)"
-              :key="String(level[0])"
-              type="button"
-              :disabled="readonly"
-              :aria-pressed="!!form.parentCategoryId === level[0]"
-              class="rounded-full border-[1.5px] px-3.5 py-[7px] text-[11px] font-bold disabled:cursor-default"
-              :class="chip(!!form.parentCategoryId === level[0])"
-              @click="chooseLevel(level[0])"
-            >
-              {{ level[1] }}
-            </button>
-          </div>
-          <label v-if="form.parentCategoryId" for="f-parent-category" class="small-label">Parent category</label>
-          <select
-            v-if="form.parentCategoryId"
-            id="f-parent-category"
-            v-model="form.parentCategoryId"
+    <OtherSettings :folded="otherFolded" :section-ids="['setup', 'details']" summary="Category setup, Details">
+      <EditorSection id="setup" title="Category setup">
+        <div class="flex flex-col gap-2">
+          <RadioChips
+            id="f-scope"
+            v-model="scope"
+            legend="Applies to"
+            :options="scopeOptions"
             :disabled="readonly"
-            class="field-input max-w-[360px]"
-            :aria-invalid="editor.fieldError('parentCategoryId') ? 'true' : undefined"
-            :aria-describedby="editor.fieldError('parentCategoryId') ? 'err-CategoryEditorView-1' : undefined"
-            :class="{ invalid: editor.fieldError('parentCategoryId') }"
-          >
-            <option v-for="o in parents" :key="o.id" :value="o.id">{{ o.label }}</option>
-            <option v-if="!parents.some((o) => o.id === form.parentCategoryId)" :value="form.parentCategoryId">Unavailable category</option>
-          </select>
-          <span v-if="editor.fieldError('parentCategoryId')" id="err-CategoryEditorView-1" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("parentCategoryId") }}</span>
-          <span v-else class="text-[11px] text-muted-foreground">{{ levelNote }}</span>
+            :invalid="!!editor.fieldError('scope')"
+            describedBy="cat-scope-help"
+          />
+          <p v-if="editor.fieldError('scope')" id="cat-scope-help" class="text-xs font-medium text-destructive">{{ editor.fieldError("scope") }}</p>
+          <p v-else id="cat-scope-help" class="text-xs text-muted-foreground">
+            <template v-if="scopeLocked">
+              <Lock class="mr-1 inline size-3.5 align-text-bottom" aria-hidden="true" />{{ scopeLockReason }}
+              <Button variant="link" class="ml-1 min-h-0 p-0 text-xs" @click="showUsedBy">Show where it is used</Button>
+            </template>
+            <template v-else>Which kind of content can be put in this category. It is fixed once something uses it.</template>
+          </p>
         </div>
 
-        <div class="flex flex-col gap-2" role="group" aria-labelledby="cat-icon-label">
-          <span id="cat-icon-label" class="small-label">Icon</span>
-          <div class="flex flex-wrap gap-1.5">
-            <button
-              v-for="key in ['', ...ICON_KEYS]"
-              :key="key || 'none'"
-              type="button"
-              :disabled="readonly"
-              :aria-pressed="form.icon === key"
-              :title="key ? CATEGORY_ICONS[key][0] : 'None'"
-              class="flex w-[72px] flex-col items-center gap-1 rounded-lg border-[1.5px] px-1.5 py-2 text-[10px] font-semibold disabled:cursor-default"
-              :class="form.icon === key ? 'border-primary bg-[#f5f0fb] text-primary' : 'border-gray-200 bg-white text-gray-700 hover:border-primary'"
-              @click="form.icon = key"
+        <div class="flex flex-col gap-2">
+          <RadioChips v-model="level" legend="Level" :options="levelOptions" :disabled="readonly" describedBy="cat-level-help" />
+          <FormField v-if="form.parentCategoryId" label="Parent category" :error="editor.fieldError('parentCategoryId')" id="f-parentCategoryId" v-slot="f" class="max-w-sm">
+            <Select v-model="form.parentCategoryId" :id="f.id" :disabled="readonly" :invalid="f.invalid" :aria-describedby="f.describedBy">
+              <option v-for="o in parents" :key="o.id" :value="o.id">{{ o.label }}</option>
+              <option v-if="!parents.some((o) => o.id === form.parentCategoryId)" :value="form.parentCategoryId">Unavailable category</option>
+            </Select>
+          </FormField>
+          <p id="cat-level-help" class="text-xs text-muted-foreground">{{ levelNote }}</p>
+        </div>
+
+        <fieldset id="f-icon" tabindex="-1" class="m-0 flex min-w-0 flex-col gap-2 border-0 p-0" aria-describedby="cat-icon-help">
+          <legend class="mb-2 p-0 text-sm font-semibold text-ink-2">Icon</legend>
+          <!-- Native radios: one Tab stop, arrow keys move and choose, the group name is the legend. -->
+          <div class="grid grid-cols-[repeat(auto-fill,minmax(5.5rem,1fr))] gap-2" @keydown="onIconKey">
+            <label
+              v-for="o in iconOptions"
+              :key="o.key || 'none'"
+              class="relative flex min-h-[4.5rem] cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border px-1.5 py-2 text-center text-xs transition-ui duration-1 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary"
+              :class="[
+                form.icon === o.key ? 'border-2 border-primary bg-accent font-semibold text-primary' : 'border-input bg-card text-ink-2 hover:bg-surface-hover',
+                readonly && form.icon !== o.key && 'text-disabled-ink hover:bg-card',
+                readonly ? 'cursor-default' : '',
+              ]"
             >
-              <CategoryIcon :icon="key || null" :size="20" />
-              <span class="truncate">{{ key ? CATEGORY_ICONS[key][0] : "None" }}</span>
-            </button>
+              <input v-model="form.icon" type="radio" :name="iconGroup" :value="o.key" :disabled="readonly" class="peer sr-only" />
+              <Check v-if="form.icon === o.key" class="absolute right-1 top-1 size-4 rounded-full bg-primary p-0.5 text-primary-foreground" :stroke-width="3" aria-hidden="true" />
+              <CategoryIcon :icon="o.key || null" :size="24" />
+              <span class="break-words">{{ o.label }}</span>
+            </label>
           </div>
-          <span v-if="editor.fieldError('icon')" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("icon") }}</span>
-          <span v-else class="text-[11px] text-muted-foreground">Marks the category on maps, filters, and lists in the visitor app.</span>
-        </div>
-      </div>
-    </section>
+          <p v-if="editor.fieldError('icon')" id="cat-icon-help" class="text-xs font-medium text-destructive">{{ editor.fieldError("icon") }}</p>
+          <p v-else id="cat-icon-help" class="text-xs text-muted-foreground">
+            Chosen: <span class="font-semibold text-foreground">{{ iconName }}</span>. Marks the category on maps, filters and lists in the visitor app.
+          </p>
+        </fieldset>
+      </EditorSection>
 
-    <section class="overflow-hidden rounded-lg border bg-card">
-      <div class="border-b px-5 py-3.5">
-        <h2 class="text-[11px] font-extrabold uppercase tracking-[0.09em] text-muted-foreground">Details</h2>
-      </div>
-      <div class="flex flex-col gap-1.5 px-5 py-[18px]">
-        <label for="f-code" class="small-label">Code</label>
-        <input id="f-code" v-model="form.code" :readonly="readonly" spellcheck="false" class="field-input font-mono text-[13px]" :aria-invalid="editor.fieldError('code') ? 'true' : undefined" :aria-describedby="editor.fieldError('code') ? 'err-CategoryEditorView-2' : undefined" :class="{ invalid: editor.fieldError('code') }" />
-        <span v-if="editor.fieldError('code')" id="err-CategoryEditorView-2" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("code") }}</span>
-        <span v-else class="text-xs text-muted-foreground">Identifies the category in filters and links. Unique in the Project.</span>
-      </div>
-    </section>
-
-    <template #aside>
-      <section v-if="editor.resource" class="overflow-hidden rounded-lg border bg-card">
-        <div class="border-b px-3.5 py-[11px]">
-          <span class="text-[10px] font-extrabold uppercase tracking-[0.1em] text-muted-foreground">Content</span>
-        </div>
-        <p class="px-3.5 py-3.5 text-[13px] text-gray-700">
-          {{ used }} {{ editor.resource.scope === "ROUTE" ? (used === 1 ? "route" : "routes") : used === 1 ? "point of interest" : "points of interest" }}
-          in this category. Choose the category in each {{ editor.resource.scope === "ROUTE" ? "route" : "point of interest" }}'s editor.
-        </p>
-      </section>
-    </template>
+      <EditorSection id="details" title="Details" collapsible :default-open="false" :count="form.code ? 'Code set' : undefined">
+        <FormField label="Code" :error="editor.fieldError('code')" hint="Identifies the category in filters and links. Unique in the Project." id="f-code" v-slot="f">
+          <Input :id="f.id" v-model="form.code" :readonly="readonly" spellcheck="false" class="font-mono" :invalid="f.invalid" :aria-describedby="f.describedBy" />
+        </FormField>
+      </EditorSection>
+    </OtherSettings>
   </EditorShell>
 </template>

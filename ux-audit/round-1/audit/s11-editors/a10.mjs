@@ -1,0 +1,20 @@
+import { start, goP, log, dump, state, focused } from "./lib.mjs";
+import { addStops } from "./lib2.mjs";
+const s = await start("1440"); const { page } = s;
+const U = "http://localhost:5173" + state().routeUrl;
+await page.goto(U); await page.waitForTimeout(2000);
+await page.getByRole("button", { name: /discard/i }).first().click().catch(()=>{}); await page.waitForTimeout(500);
+log("stops now", await page.locator("text=/^Stop \\d+:/").count());
+await addStops(page, ["Bravo","Charlie","Delta","Echo"]);
+await page.getByRole("button", { name: "Hiking" }).click();
+await page.getByRole("button", { name: "Moderate" }).click();
+await page.getByLabel(/route total/i).fill("95");
+await page.getByLabel(/distance/i).fill("2400");
+await page.getByRole("button", { name: /^save/i }).first().click(); await page.waitForTimeout(1800);
+await page.evaluate(()=>document.querySelector("main")?.scrollTo(0,0));
+// stop 5 draft -> activation?
+await page.getByRole("button", { name: /^activate$/i }).click(); await page.waitForTimeout(1500);
+await s.shot("route-activate-click");
+log("dialog:", await dump(page, "[role=dialog],[role=alertdialog]").catch(()=>"none"));
+log("alerts:", await page.evaluate(()=>[...document.querySelectorAll("[role=alert],[role=status]")].map(e=>e.innerText.slice(0,300))));
+await s.browser.close();

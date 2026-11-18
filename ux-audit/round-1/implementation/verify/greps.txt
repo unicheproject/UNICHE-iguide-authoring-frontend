@@ -1,0 +1,51 @@
+## storage
+src/platform/auth.ts:139:    window.sessionStorage.setItem(REDIRECT_KEY, String(Date.now()));
+src/platform/auth.ts:202:    return Date.now() - Number(window.sessionStorage.getItem(REDIRECT_KEY) ?? 0) < REDIRECT_WINDOW_MS;
+src/views/workspace/media/MediaView.vue:196:    return localStorage.getItem(VIEW_KEY) === "list" ? "list" : "grid";
+src/views/workspace/media/MediaView.vue:204:    localStorage.setItem(VIEW_KEY, value);
+src/workspace/lastProject.ts:13:    const parsed: unknown = JSON.parse(window.localStorage.getItem(KEY) ?? "[]");
+src/workspace/lastProject.ts:35:    window.localStorage.setItem(KEY, JSON.stringify(next));
+src/workspace/lastProject.ts:44:    window.localStorage.setItem(KEY, JSON.stringify(read().filter((id) => id !== projectId)));
+src/workspace/useResourceEditor.ts:876:      const raw = key ? window.localStorage.getItem(key) : null;
+src/workspace/useResourceEditor.ts:890:      window.localStorage.setItem(key, JSON.stringify(draft));
+src/workspace/useResourceEditor.ts:901:      if (key) window.localStorage.removeItem(key);
+## urls
+src/components/map/basemap.ts:20:https://tiles.openfreemap.org/styles/bright
+src/components/map/basemap.ts:22:https://openfreemap.org
+src/components/map/basemap.ts:23:https://www.openmaptiles.org/
+src/components/map/basemap.ts:24:https://www.openstreetmap.org/copyright
+src/components/map/basemap.ts:26:https://tile.openstreetmap.org/{z}/{x}/{y}.png
+src/components/map/basemap.ts:27:https://www.openstreetmap.org/copyright
+src/platform/maps.ts:314:https://nominatim.openstreetmap.org/search?format=jsonv2&limit=6&addressdetails=0
+src/platform/templates.ts:114:https://fonts.googleapis.com/css2?${missing
+src/platform/surfaces.ts:12:https://guide.museum.gr
+src/views/workspace/SurfacesView.vue:195:https://guide.museum.gr
+src/views/workspace/SurfacesView.vue:205:http://localhost
+src/views/workspace/events/EventEditorView.vue:246:http://.
+## any
+## publish
+src/components/editor/EditorShell.vue:102:/** Publishes the height of the sticky header plus banner as `--editor-sticky-h`, for the side column and the sections. */
+src/components/list/ListToolbar.vue:7: * only while stuck; below that it scrolls away so sticky bars stay small at 200 % zoom. It publishes its height as
+src/lib/glossary.ts:3: * `ARCHIVED`, shown in sentence case); "published" is never used. The field label stays "Slug" (spec `12` §3).
+## api status
+ls: cannot access 'src/api': No such file or directory
+bfs: error: src/api: No such file or directory.
+## px
+src/views/workspace/TranslationsView.vue:54
+src/views/workspace/navigation/NavigationView.vue:17
+src/views/workspace/LanguagesView.vue:15
+src/views/workspace/OverviewView.vue:11
+src/views/workspace/SurfacesView.vue:10
+src/views/workspace/SectionView.vue:2
+## hex
+src/style.css:25
+src/views/workspace/TranslationsView.vue:6
+src/views/workspace/navigation/NavigationView.vue:5
+src/workspace/projectTheme.ts:4
+src/components/preview/ResourceContent.vue:4
+src/views/workspace/SurfacesView.vue:3
+src/workspace/useReorder.ts:2
+src/views/workspace/LanguagesView.vue:2
+src/components/preview/PreviewApp.vue:2
+src/platform/templates.ts:1
+src/components/preview/DeviceFrame.vue:1

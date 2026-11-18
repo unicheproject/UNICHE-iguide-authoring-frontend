@@ -13,7 +13,7 @@ test("a Guide story references a Point of Interest through the picker", async ({
   const guide = await api<{ id: string }>("POST", `${base}/guides`, { title: "Highlights" });
 
   await page.goto(`${base}/guides/${guide.id}`);
-  await page.getByRole("button", { name: "+ Reference" }).last().click();
+  await page.getByRole("button", { name: "Add reference" }).click();
   const picker = page.getByRole("dialog", { name: "Add a reference" });
   await expect(picker.getByRole("button", { name: "Points of interest", exact: true })).toHaveAttribute("aria-pressed", "true");
   await expectNoAxeViolations(page, "reference picker");

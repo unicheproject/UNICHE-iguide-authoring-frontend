@@ -1,0 +1,15 @@
+import { start, go, P } from "./common.mjs";
+const s = await start("1440"); const { page } = s;
+await go(page, P + "/floor-plans"); await page.waitForTimeout(1500);
+await page.getByRole("button", { name: "New floor plan" }).first().click(); await page.waitForTimeout(500);
+await page.getByRole("button",{name:"Choose image"}).click(); await page.waitForTimeout(1200);
+await page.getByText("plan-parthenon-gallery").first().click(); await page.waitForTimeout(300);
+console.log("selected text:", await page.getByText(/Selected|Nothing selected/).first().innerText().catch(()=>"?"));
+await page.getByRole("button",{name:"Use this file"}).click(); await page.waitForTimeout(800);
+await s.shot("newfp__image-chosen");
+await page.locator("#fp-name").fill("UX-s12-maps Plan");
+console.log("place options:", await page.locator("#fp-place option").allInnerTexts());
+await page.getByRole("button",{name:"Create floor plan"}).click(); await page.waitForTimeout(3000);
+console.log(page.url());
+await s.shot("fpeditor__fresh", true);
+await s.browser.close();

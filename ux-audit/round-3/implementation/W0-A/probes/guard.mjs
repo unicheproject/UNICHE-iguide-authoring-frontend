@@ -1,0 +1,28 @@
+import { open, go } from "../../../../tools/session.mjs";
+import { serveDist } from "./dist.mjs";
+const P = "6958c18f-60d2-4140-a524-5a43f8a2f6b5";
+const { browser, context, page } = await open("admin");
+await serveDist(context);
+const res = {};
+await go(page, `/projects/${P}/pois`); await page.waitForSelector("tbody tr");
+await page.locator("tbody tr").nth(3).locator("a").first().click();
+await page.waitForSelector("#editor-side-column"); await page.waitForTimeout(1500);
+const inp = page.locator("main input[id]").filter({ has: page.locator("xpath=.") }).first();
+const t = page.getByLabel("Title", { exact: false }).first(); await t.fill((await t.inputValue()) + " x"); await page.waitForTimeout(500); res.dirty = await page.locator("text=Unsaved").count();
+res.titleBefore = await page.title(); res.heading0 = await page.locator("main h1").innerText();
+const sw = page.locator("header button:has-text('UX Audit')").first();
+res.switcherLabel = (await sw.innerText()).slice(0, 40);
+await sw.click(); await page.waitForTimeout(400);
+const items = page.locator("[role=menuitem], [role=option], [role=menu] a, [role=listbox] [role=option]");
+res.items = await items.allInnerTexts();
+// choose a different project or "All projects"
+const other = page.getByRole("link", { name: /all projects|projects/i }).first();
+const menuBtns = page.locator("[data-radix-popper-content-wrapper] a, [data-radix-popper-content-wrapper] button");
+res.menuBtns = (await menuBtns.allInnerTexts()).map((t) => t.slice(0, 30));
+await menuBtns.nth(2).click(); await page.waitForTimeout(800);
+res.dialog = await page.locator("[role=dialog]").count();
+await page.keyboard.press("Escape"); await page.waitForTimeout(600);
+res.after = await page.evaluate(() => ({ title: document.title, active: document.activeElement.tagName + ":" + (document.activeElement.getAttribute("aria-label") || document.activeElement.textContent.trim().slice(0, 30)), polite: document.querySelector("div.sr-only[role=status]").textContent }));
+res.url = page.url().replace(P, "P");
+await browser.close();
+console.log(JSON.stringify(res, null, 1));

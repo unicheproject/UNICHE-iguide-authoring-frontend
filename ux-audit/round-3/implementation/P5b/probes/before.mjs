@@ -1,0 +1,23 @@
+import { session, go, P, ids, LOG, shot, ax, sleep } from "./h.mjs";
+const log = LOG(process.argv[2] ?? "before");
+const { browser, page } = await session({ viewport: "1440" });
+await page.addInitScript(() => { window.__say = []; });
+await go(page, P(`/events/${ids.event}`));
+await page.waitForSelector("#occ-start-o-1-day, [id^=occ-start]", { timeout: 20000 });
+await sleep(800);
+const val = (id) => page.locator("#" + id).inputValue();
+const key = await page.evaluate(() => document.querySelector("[id^=occ-end-][id$=-day]").id.replace(/^occ-end-/, "").replace(/-day$/, ""));
+log("key", key);
+const end = async () => ({ d: await val(`occ-end-${key}-day`), m: await page.locator(`#occ-end-${key}-month`).inputValue(), y: await val(`occ-end-${key}-year`), h: await val(`occ-end-${key}-hour`), mi: await val(`occ-end-${key}-minute`) });
+log("end before", await end());
+await page.locator(`#occ-start-${key}-hour`).fill("25"); await page.locator(`#occ-start-${key}-minute`).focus(); await sleep(300);
+log("end after hour 25", await end());
+log("hour err", await page.locator(`#occ-start-${key}-hour-error`).count() ? await page.locator(`#occ-start-${key}-hour-error`).innerText() : null);
+// readiness card text
+log("readiness", await page.evaluate(() => [...document.querySelectorAll("li")].filter((l) => /Warning:/.test(l.textContent)).slice(0, 3).map((l) => JSON.stringify(l.textContent))));
+log("readiness innerText", await page.evaluate(() => [...document.querySelectorAll("li")].filter((l) => /Warning:/.test(l.textContent)).slice(0, 3).map((l) => l.innerText)));
+log("ended chip count", await page.locator("text=Ended").count());
+log("opacity", await page.evaluate(() => [...document.querySelectorAll("ol[aria-label] > li")].map((l) => getComputedStyle(l).opacity)));
+log("axe", await ax(page));
+await shot(page, "before-event-1440", true);
+await browser.close();

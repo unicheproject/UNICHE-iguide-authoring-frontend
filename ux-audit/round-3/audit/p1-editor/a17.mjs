@@ -1,0 +1,43 @@
+import {open,go,P,shot,btns,hdr} from "./lib.mjs";
+const { browser, page } = await open("admin",{viewport:"1440"});
+let t=Date.now();
+await go(page,P+"/pois"); await page.waitForSelector("tbody tr");
+console.log("cold list ms",Date.now()-t);
+// sort by Updated via header
+await page.getByRole("button",{name:/^Updated/}).click(); await page.waitForTimeout(900);
+console.log("sort1 url:",page.url().split("?")[1], "first:",await page.locator("tbody tr").first().innerText().then(s=>s.split("\n")[0]), "aria-sort:",await page.evaluate(()=>[...document.querySelectorAll("th")].map(h=>h.innerText.trim().split("\n")[0]+"="+h.getAttribute("aria-sort")).join(",")));
+console.log("live:",await page.evaluate(()=>[...document.querySelectorAll("[aria-live]")].map(e=>e.innerText.trim()).filter(Boolean)));
+await shot(page,"pois-list__sort-updated__1440");
+const rows=await page.evaluate(()=>[...document.querySelectorAll("tbody tr")].slice(0,8).map(r=>r.innerText.replace(/\s+/g," ").slice(0,60)+" || "+(r.querySelector("td:nth-child(5)")?.innerText||"").replace(/\s+/g," ")));
+console.log(rows.join("\n"));
+// search + status
+await page.keyboard.press("Escape");
+await page.mouse.click(900,110);
+await page.keyboard.press("/"); 
+console.log("slash focus:",await page.evaluate(()=>document.activeElement.type+":"+document.activeElement.placeholder));
+await page.keyboard.type("UX-R3");
+await page.waitForTimeout(1200);
+console.log("search url:",page.url().split("?")[1],"rows",await page.locator("tbody tr").count());
+await shot(page,"pois-list__search-ux-r3__1440");
+await page.locator("label").filter({hasText:/Active/}).first().click(); await page.waitForTimeout(800);
+console.log("status url:",page.url().split("?")[1],"rows",await page.locator("tbody tr").count());
+await page.locator("tbody tr").first().getByText(/UX-R3/).first().click();
+await page.waitForURL(/pois\/[0-9a-f-]{36}/); await page.waitForTimeout(800);
+await page.goBack(); await page.waitForTimeout(1200);
+console.log("back url:",page.url().split("?")[1],"search val:",await page.locator("input[type=search]").first().inputValue(),"rows",await page.locator("tbody tr").count());
+await page.reload(); await page.waitForTimeout(1500);
+console.log("reload url:",page.url().split("?")[1],"search val:",await page.locator("input[type=search]").first().inputValue(),"rows",await page.locator("tbody tr").count());
+await shot(page,"pois-list__reload-state__1440");
+// paging
+t=Date.now();
+await go(page,P+"/pois?sort=title"); await page.waitForSelector("tbody tr");
+const pager=await page.evaluate(()=>[...document.querySelectorAll("nav[aria-label*=agin],nav")].map(n=>n.getAttribute("aria-label")+":"+n.innerText.replace(/\s+/g," ").slice(0,120)));
+console.log("pager:",pager);
+await page.getByRole("button",{name:/Next page|^Next/}).first().click().catch(async()=>await page.getByRole("link",{name:/Next/}).first().click());
+t=Date.now();
+await page.waitForFunction(()=>/page=2/.test(location.href),null,{timeout:8000}).catch(()=>{});
+await page.waitForTimeout(300);
+console.log("page2 url:",page.url().split("?")[1],"ms",Date.now()-t,"rows",await page.locator("tbody tr").count());
+console.log("focus after pager:",await page.evaluate(()=>document.activeElement.tagName+":"+(document.activeElement.innerText||document.activeElement.getAttribute("aria-label")||"").slice(0,40)),"scrollTop",await page.evaluate(()=>document.querySelector("main")?.scrollTop));
+await shot(page,"pois-list__page2__1440");
+await browser.close();

@@ -1,0 +1,10 @@
+import { open, go } from "../../../tools/session.mjs";
+const P = "6958c18f-60d2-4140-a524-5a43f8a2f6b5";
+const { browser, page } = await open("admin", { viewport: process.argv[2] ?? "1280" });
+await go(page, `/projects/${P}/pois`);
+await page.waitForSelector("thead th, [role=search]"); await page.waitForTimeout(1500);
+await page.getByRole("button", { name: /^Filters/ }).click(); await page.waitForTimeout(400);
+await page.screenshot({ path: `after/poi-list-filters-${process.argv[2] ?? "1280"}.png` });
+await page.keyboard.press("Escape");
+console.log("focus back on:", await page.evaluate(() => document.activeElement?.textContent?.trim()));
+await browser.close();

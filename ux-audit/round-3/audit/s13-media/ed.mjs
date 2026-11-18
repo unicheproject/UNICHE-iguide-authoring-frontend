@@ -1,0 +1,15 @@
+import { open, go, P, shot, settle } from "./h.mjs";
+const vp = process.argv[2] ?? "1440";
+const { browser, page } = await open("admin", { viewport: vp });
+await go(page, `/projects/${P}/media?q=${encodeURIComponent("UX-R3-s13 big")}`); await settle(page);
+await go(page, `/projects/${P}/media?q=${encodeURIComponent("UX-R3-s13 retry2.png")}`); await settle(page);
+const link = page.locator("ul[aria-label='Media files'] a, tbody a").first();
+console.log("found", await link.textContent().catch(()=>null));
+await link.click(); await page.waitForTimeout(2500);
+console.log("url", page.url().replace(/.*\/projects\//, ""));
+const m = await page.evaluate(() => { const ta = document.querySelector("textarea"); const img = document.querySelector("main img"); const f = (e) => e && (r => [Math.round(r.x), Math.round(r.y), Math.round(r.width), Math.round(r.height)])(e.getBoundingClientRect()); return { alt: f(ta), altLabel: ta && (document.querySelector(`label[for='${ta.id}']`)?.textContent.trim()), thumb: f(img), h1: document.querySelector("h1")?.textContent.trim(), text: document.querySelector("main").innerText.replace(/\n+/g, " | ").slice(0, 1800), hscroll: document.documentElement.scrollWidth > innerWidth }; });
+console.log(JSON.stringify(m, null, 1));
+await shot(page, `editor__initial__${vp}`);
+await page.evaluate(() => scrollTo(0, 99999)); await page.waitForTimeout(300);
+await shot(page, `editor__bottom__${vp}`);
+await browser.close();

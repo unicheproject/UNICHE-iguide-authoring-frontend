@@ -1,0 +1,14 @@
+import { start, goP, log, dump, state, focused } from "./lib.mjs";
+const s = await start("1440"); const { page } = s;
+await page.goto("http://localhost:5173" + state().guideUrl); await page.waitForTimeout(2500);
+const add = async (name) => { await page.getByRole("button", { name }).first().click(); await page.waitForTimeout(500); };
+await add(/^\+ ?heading/i);
+log("focus after add heading:", await focused(page));
+await page.keyboard.type("The first heading"); 
+await add(/^\+ ?paragraph/i);
+log("focus after add paragraph:", await focused(page));
+await page.keyboard.type("A first paragraph of text for the story.");
+await add(/^\+ ?reference/i); await page.waitForTimeout(800);
+log("after + reference:", await page.locator("[role=dialog]").count(), (await dump(page, "[role=dialog]").catch(()=>"")).slice(0,200));
+await s.shot("guide-add-reference");
+await s.browser.close();

@@ -1,0 +1,24 @@
+import { open, go, PID, shot, fs, listReady } from "./lib.mjs";
+import { createRequire } from "node:module";
+const require = createRequire("C:\\Users\\mirto\\IdeaProjects\\iguide\\uniche_iguide_frontend\\package.json");
+const { AxeBuilder } = require("@axe-core/playwright");
+const ids = JSON.parse(fs.readFileSync(new URL("./ids.json", import.meta.url)));
+const { browser, page } = await open("curator", { viewport: "1440" });
+const axe = async (name) => { const r = await new AxeBuilder({ page }).withTags(["wcag2a","wcag2aa","wcag21a","wcag21aa"]).analyze(); console.log("AXE", name, r.violations.map(v => `${v.id}(${v.impact}) x${v.nodes.length}: ${v.nodes[0].target.join(" ").slice(0,70)}`).join(" || ") || "clean"); };
+await go(page, `/projects/${PID}/pois?missing=it&lang=it`); await listReady(page); await axe("pois missing=it");
+await go(page, `/projects/${PID}/pois/${ids.poi}`);
+await page.waitForFunction(() => document.querySelector("h1")?.innerText.includes("UX-R2"), null, { timeout: 40000 }).catch(()=>{}); await page.waitForTimeout(2000);
+await page.getByRole("tab", { name: /Ελληνικά/ }).click(); await page.waitForTimeout(500); await axe("poi editor el");
+await go(page, `/projects/${PID}/routes/${ids.route}`); await page.waitForTimeout(3000);
+await page.getByRole("tab", { name: /Ελληνικά/ }).click(); await page.waitForTimeout(500); await axe("route editor el");
+await go(page, `/projects/${PID}/media/${ids.asset}`); await page.waitForTimeout(3000);
+await page.getByRole("tab", { name: /Ελληνικά/ }).click(); await page.waitForTimeout(500); await axe("asset editor el");
+// Preview in app with Greek tab
+await go(page, `/projects/${PID}/pois/${ids.poi}`); await page.waitForTimeout(3000);
+await page.getByRole("tab", { name: /Ελληνικά/ }).click(); await page.waitForTimeout(500);
+await page.getByRole("button", { name: /Preview in app/ }).first().click(); await page.waitForTimeout(2500);
+await shot(page, "poi-editor__preview-in-app-greek", "1440", false);
+console.log("preview language shown:", (await page.locator("#editor-preview, [aria-label*=review]").first().innerText().catch(()=> "")).replace(/\n+/g," | ").slice(0,300));
+await page.keyboard.press("Escape"); await page.waitForTimeout(500);
+console.log("after esc preview visible:", await page.locator("#editor-preview").count());
+await browser.close();

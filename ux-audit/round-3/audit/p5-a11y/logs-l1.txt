@@ -1,0 +1,26 @@
+first tabs:
+0 a "Skip to content" 12,12,142,40  solid 2px rgb(76, 29, 139) off 2px 
+1 button "Menu" 16,6,44,44  solid 2px rgb(76, 29, 139) off 2px 
+2 a "UNICHE, all projects" 72,15,123,26  solid 2px rgb(76, 29, 139) off 2px 
+3 button "UX Audit – PopulatedApp: Draft. Switch project" 303,8,320,40  solid 2px rgb(76, 29, 139) off 2px 
+4 button "PAP. Admin, account menu" 635,8,117,40  solid 2px rgb(76, 29, 139) off 2px 
+5 button "New point of interest" 566,80,186,40  solid 2px rgb(255, 255, 255) off 2px LOWRING 1.09
+nav visible? {"rect":[0,0,0,0],"vis":"visible","inert":""}
+menu btn Menu|false|workspace-nav
+[open drawer] Enter -> a "Points of Interest" 8,203,304,44  solid 2px rgb(76, 29, 139) off 2px | live=[]
+dlg {"name":"Primary","modal":"true"}
+bg inert? {"mainInert":null,"ae":"A:Points of Interest"}
+tab in drawer:
+0 a "Routes" 8,249,304,44  solid 2px rgb(76, 29, 139) off 2px 
+1 a "Guides" 8,295,304,44  solid 2px rgb(76, 29, 139) off 2px 
+2 a "Events" 8,341,304,44  solid 2px rgb(76, 29, 139) off 2px 
+18 a "Routes" 8,249,304,44  solid 2px rgb(76, 29, 139) off 2px 
+19 a "Guides" 8,295,304,44  solid 2px rgb(76, 29, 139) off 2px 
+20 a "Events" 8,341,304,44  solid 2px rgb(76, 29, 139) off 2px 
+21 a "Categories" 8,387,304,44  solid 2px rgb(76, 29, 139) off 2px 
+AXE {"label":"nav-drawer","url":"http://localhost:5173/projects/PID/pois","counts":{},"v":[]}
+[esc drawer] Escape -> button "Menu" 16,6,44,44  solid 2px rgb(76, 29, 139) off 2px | live=[]
+after esc {"w":2,"off":2,"style":"solid","ring":"rgb(76, 29, 139)","ringOnWrapper":false,"vsOutside":11.32,"bg":"255,255,255","clipped":null,"obscured":null,"offscreen":false,"rect":[16,6,44,44]}
+[choose Routes] Enter -> h1 "Routes" 16,80,72,26  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) | live=["Routes loaded"]
+after choose {"title":"Routes · UX Audit – Populated · iGuide CMS","h1":"Routes","ae":"H1"} h1 "Routes" 16,80,72,26  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) drawer open? 0
+AXE {"label":"routes-768","url":"http://localhost:5173/projects/PID/routes","counts":{},"v":[]}

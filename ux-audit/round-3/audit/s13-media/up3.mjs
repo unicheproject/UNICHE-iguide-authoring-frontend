@@ -1,0 +1,37 @@
+import { open, go, P, shot, settle } from "./h.mjs";
+const vp = process.argv[2] ?? "1440";
+const rm = process.argv[3] === "rm";
+const { browser, page } = await open("admin", { viewport: vp, reducedMotion: rm ? "reduce" : "no-preference" });
+const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==", "base64");
+await go(page, `/projects/${P}/media`); await settle(page);
+await page.getByRole("button", { name: "Upload files" }).first().click(); await page.waitForTimeout(500);
+let fail = true, n = 0;
+await page.route(/\/projects\/[^/]+\/assets$/, async (route) => {
+  if (route.request().method() !== "POST") return route.fallback();
+  n++; await new Promise(r => setTimeout(r, 2500));
+  if (fail) return route.fulfill({ status: 500, contentType: "application/problem+json", body: JSON.stringify({ title: "SECRET", status: 500, detail: "boom NPE", code: "INTERNAL", requestId: "req-s13-up" }) });
+  return route.fallback();
+});
+await page.locator("input[type=file]").setInputFiles([{ name: "UX-R3-s13 retry.png", mimeType: "image/png", buffer: png }, { name: "UX-R3-s13 cancel.png", mimeType: "image/png", buffer: Buffer.from(png) }]);
+await page.waitForTimeout(700);
+await shot(page, `upload__progress${rm ? "-reduced" : ""}__${vp}`);
+console.log("anims", await page.evaluate(() => document.getAnimations().map(a => `${a.animationName ?? ""}|${a.effect?.getTiming().duration}|${(a.effect?.target?.className ?? "").toString().slice(0, 50)}`)));
+console.log("rows", await page.evaluate(() => [...document.querySelectorAll("[role=dialog] ul[aria-label=Files] li")].map(li => { const b = li.getBoundingClientRect(); const p = li.querySelector("[role=progressbar],progress"); return `${li.innerText.replace(/\n+/g, " | ")} h${Math.round(b.height)} pb:${p ? p.getAttribute("aria-valuenow") + "/" + p.getBoundingClientRect().width : "none"}`; })));
+console.log("buttons", await page.evaluate(() => [...document.querySelectorAll("[role=dialog] button")].map(b => b.textContent.trim() + "|" + b.getAttribute("aria-label"))));
+const cancel = page.getByRole("button", { name: /^Cancel/ });
+console.log("cancel buttons", await cancel.count());
+if (await cancel.count()) { await cancel.last().click(); await page.waitForTimeout(400); console.log("after cancel", await page.evaluate(() => [...document.querySelectorAll("[role=dialog] ul[aria-label=Files] li")].map(li => li.innerText.replace(/\n+/g, " | ")))); console.log("focus", await page.evaluate(() => document.activeElement.tagName + " " + document.activeElement.textContent.trim().slice(0, 30))); await shot(page, `upload__cancelled__${vp}`); }
+await page.waitForTimeout(3500);
+await shot(page, `upload__failed__${vp}`);
+console.log("failed", await page.evaluate(() => document.querySelector("[role=dialog]").innerText.replace(/\n+/g, " | ")));
+console.log("log", await page.evaluate(() => document.querySelector("[role=log]")?.textContent));
+fail = false;
+const retry = page.getByRole("button", { name: /Retry/ });
+console.log("retry", await retry.count(), await retry.first().getAttribute("aria-label"));
+await retry.first().click(); await page.waitForTimeout(600);
+console.log("focus after retry click", await page.evaluate(() => document.activeElement.tagName + " " + document.activeElement.textContent.trim().slice(0, 30)));
+await page.waitForTimeout(3500);
+await shot(page, `upload__retried__${vp}`);
+console.log("after retry", await page.evaluate(() => document.querySelector("[role=dialog]").innerText.replace(/\n+/g, " | ")));
+console.log("focus", await page.evaluate(() => document.activeElement.tagName + " " + document.activeElement.textContent.trim().slice(0, 30)));
+await browser.close();

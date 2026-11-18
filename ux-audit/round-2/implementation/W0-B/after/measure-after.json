@@ -1,0 +1,198 @@
+{
+ "poi-editor@1440": {
+  "vh": 900,
+  "mainTop": 56,
+  "stuckBottom": 154,
+  "stuckHeight": 98,
+  "pct": 11,
+  "stuck": [
+   "DIV.editor-header sticky -top-6 z-sticky -mx:56-112",
+   "DIV.editor-banner z-sticky -mx-[var(--gutter:112-154"
+  ],
+  "prop": "98px",
+  "scrollPadding": "98px",
+  "scrollH": 2393,
+  "tabUnderBar": 0,
+  "tabUnderSample": []
+ },
+ "route-editor@1440": {
+  "vh": 900,
+  "mainTop": 56,
+  "stuckBottom": 154,
+  "stuckHeight": 98,
+  "pct": 11,
+  "stuck": [
+   "DIV.editor-header sticky -top-6 z-sticky -mx:56-112",
+   "DIV.editor-banner z-sticky -mx-[var(--gutter:112-154"
+  ],
+  "prop": "98px",
+  "scrollPadding": "98px",
+  "scrollH": 4303
+ },
+ "category-editor@1440": {
+  "vh": 900,
+  "mainTop": 56,
+  "stuckBottom": 154,
+  "stuckHeight": 98,
+  "pct": 11,
+  "stuck": [
+   "DIV.editor-header sticky -top-6 z-sticky -mx:56-112",
+   "DIV.editor-banner z-sticky -mx-[var(--gutter:112-154"
+  ],
+  "prop": "98px",
+  "scrollPadding": "98px",
+  "scrollH": 1371
+ },
+ "poi-list@1440": {
+  "vh": 900,
+  "mainTop": 56,
+  "stuckBottom": 162,
+  "stuckHeight": 106,
+  "pct": 12,
+  "stuck": [
+   "DIV.z-sticky flex flex-wrap items-center gap:56-113",
+   "TH.list-th w-[40%]:113-162",
+   "TH.list-th w-40:113-162",
+   "TH.list-th w-44:113-162",
+   "TH.list-th:113-162"
+  ],
+  "prop": "106px",
+  "scrollPadding": "106px",
+  "scrollH": 9033
+ },
+ "poi-editor@1280": {
+  "vh": 720,
+  "mainTop": 56,
+  "stuckBottom": 112,
+  "stuckHeight": 56,
+  "pct": 8,
+  "stuck": [
+   "DIV.editor-header sticky -top-6 z-sticky -mx:56-112"
+  ],
+  "prop": "56px",
+  "scrollPadding": "56px",
+  "scrollH": 2471,
+  "tabUnderBar": 0,
+  "tabUnderSample": []
+ },
+ "route-editor@1280": {
+  "vh": 720,
+  "mainTop": 56,
+  "stuckBottom": 112,
+  "stuckHeight": 56,
+  "pct": 8,
+  "stuck": [
+   "DIV.editor-header sticky -top-6 z-sticky -mx:56-112"
+  ],
+  "prop": "56px",
+  "scrollPadding": "56px",
+  "scrollH": 4389
+ },
+ "category-editor@1280": {
+  "vh": 720,
+  "mainTop": 56,
+  "stuckBottom": 112,
+  "stuckHeight": 56,
+  "pct": 8,
+  "stuck": [
+   "DIV.editor-header sticky -top-6 z-sticky -mx:56-112"
+  ],
+  "prop": "56px",
+  "scrollPadding": "56px",
+  "scrollH": 1451
+ },
+ "poi-list@1280": {
+  "vh": 720,
+  "mainTop": 56,
+  "stuckBottom": 162,
+  "stuckHeight": 106,
+  "pct": 15,
+  "stuck": [
+   "DIV.z-sticky flex flex-wrap items-center gap:56-113",
+   "TH.list-th w-[40%]:113-162",
+   "TH.list-th w-40:113-162",
+   "TH.list-th w-44:113-162",
+   "TH.list-th:113-162"
+  ],
+  "prop": "106px",
+  "scrollPadding": "106px",
+  "scrollH": 10171
+ },
+ "poi-editor@zoom200": {
+  "vh": 360,
+  "mainTop": 56,
+  "stuckBottom": 112,
+  "stuckHeight": 56,
+  "pct": 16,
+  "stuck": [
+   "DIV.editor-header sticky -top-6 z-sticky -mx:56-112"
+  ],
+  "prop": "56px",
+  "scrollPadding": "56px",
+  "scrollH": 3280,
+  "tabUnderBar": 3,
+  "tabUnderSample": [
+   {
+    "inMain": true,
+    "top": -97,
+    "stack": 56,
+    "tag": "TEXTAREA",
+    "id": "f-description",
+    "sticky": false
+   },
+   {
+    "inMain": true,
+    "top": 24,
+    "stack": 56,
+    "tag": "A",
+    "id": "",
+    "sticky": false
+   },
+   {
+    "inMain": true,
+    "top": -97,
+    "stack": 56,
+    "tag": "TEXTAREA",
+    "id": "f-description",
+    "sticky": false
+   }
+  ]
+ },
+ "route-editor@zoom200": {
+  "vh": 360,
+  "mainTop": 56,
+  "stuckBottom": 112,
+  "stuckHeight": 56,
+  "pct": 16,
+  "stuck": [
+   "DIV.editor-header sticky -top-6 z-sticky -mx:56-112"
+  ],
+  "prop": "56px",
+  "scrollPadding": "56px",
+  "scrollH": 4925
+ },
+ "category-editor@zoom200": {
+  "vh": 360,
+  "mainTop": 56,
+  "stuckBottom": 112,
+  "stuckHeight": 56,
+  "pct": 16,
+  "stuck": [
+   "DIV.editor-header sticky -top-6 z-sticky -mx:56-112"
+  ],
+  "prop": "56px",
+  "scrollPadding": "56px",
+  "scrollH": 2980
+ },
+ "poi-list@zoom200": {
+  "vh": 360,
+  "mainTop": 56,
+  "stuckBottom": 0,
+  "stuckHeight": -56,
+  "pct": -16,
+  "stuck": [],
+  "prop": "0px",
+  "scrollPadding": "0px",
+  "scrollH": 11791
+ }
+}

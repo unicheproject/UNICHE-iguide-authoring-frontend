@@ -1,23 +1,32 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from "vue";
 import { useRouter } from "vue-router";
+import ListEmpty from "@/components/list/ListEmpty.vue";
+import ListFooter from "@/components/list/ListFooter.vue";
+import ListTable, { type ListColumn } from "@/components/list/ListTable.vue";
+import ListToolbar from "@/components/list/ListToolbar.vue";
+import RowMenu from "@/components/list/RowMenu.vue";
+import { matchesStatus, statusCounts, useListQuery, useResultAnnouncer, useScrollRestore } from "@/components/list/useListQuery";
+import PageFrame from "@/components/PageFrame.vue";
 import PageHead from "@/components/PageHead.vue";
 import StatusChip from "@/components/StatusChip.vue";
-import SectionTabs from "@/components/SectionTabs.vue";
-import StatusChangeDialog from "@/components/StatusChangeDialog.vue";
+import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { focusSuccessor } from "@/lib/focus";
 import { formatDate } from "@/lib/format";
 import { ApiError } from "@/platform/api";
 import { changeMapStatus, fetchMapReferences, listMaps, type GeoMap } from "@/platform/maps";
 import { listPlaces, placeTitle, type Place } from "@/platform/places";
 import { listPois } from "@/platform/pois";
-import type { ResourceReference } from "@/platform/references";
 import { showToast } from "@/stores/toast";
 import { useCurrentProject } from "@/workspace/currentProject";
-import { referenceLink } from "@/workspace/referenceLinks";
 import { findSection } from "@/workspace/sections";
 import { useProjectLanguages } from "@/workspace/useProjectLanguages";
-import { useStatusActions } from "@/workspace/useStatusActions";
+import LifecycleDialogs from "../LifecycleDialogs.vue";
+import { sortByQuery } from "../listRows";
+import { fold } from "@/lib/utils";
+import { useListLifecycle } from "../useListLifecycle";
+import MapsTabs from "./MapsTabs.vue";
 import NewMapDialog from "./NewMapDialog.vue";
 
 const section = findSection("maps")!;
@@ -32,6 +41,13 @@ const placeableCount = ref(0);
 const loading = ref(true);
 const loadError = ref<ApiError | null>(null);
 let controller: AbortController | null = null;
+const errorCard = ref<InstanceType<typeof Alert> | null>(null);
+
+/** "Try again": focus moves off the error card before it goes, to the page heading (D-103). */
+function retry() {
+  focusSuccessor(errorCard.value?.$el as HTMLElement | undefined, ["main h1"]);
+  void load();
+}
 
 async function load() {
   controller?.abort();
@@ -62,91 +78,95 @@ const placeName = (id: string | null) => {
   const p = id ? places.value.find((x) => x.id === id) : undefined;
   return p ? placeTitle(p, null, defaultLanguage.value) : null;
 };
-function meta(m: GeoMap): string {
-  const shows = [m.showPois ? "POIs" : "", m.showRoutes ? "Routes" : ""].filter(Boolean).join(" + ") || "nothing";
-  const place = placeName(m.placeId);
-  return `${place ? `Place: ${place} · ` : ""}${m.placements.length} placed · ${Math.max(0, placeableCount.value - m.placements.length)} unplaced · shows ${shows}`;
-}
+const shows = (m: GeoMap) => [m.showPois ? "Points of interest" : "", m.showRoutes ? "Routes" : ""].filter(Boolean).join(" and ") || "nothing but Places";
+const unplacedCount = (m: GeoMap) => Math.max(0, placeableCount.value - m.placements.length);
 
-const actions = useStatusActions<GeoMap>({
-  items: maps,
-  kind: "map",
-  title: (m) => m.internalName,
-  change: (m, target) => changeMapStatus(projectId.value, m.id, target, m.version),
-  reload: load,
-  open: (m) => void router.push({ name: "map-editor", params: { projectId: projectId.value, mapId: m.id } }),
+const editorRoute = (m: GeoMap) => ({ name: "map-editor", params: { projectId: projectId.value, mapId: m.id } });
+
+const query = useListQuery();
+if (query.sort.value === "manual") query.sort.value = "updated";
+const rows = computed(() => {
+  const q = fold(query.q.value.trim());
+  const found = maps.value.filter((m) => matchesStatus(m, query.status.value) && (!query.pending.value || m.hasWorkingCopy) && (!q || fold(m.internalName).includes(q)));
+  return sortByQuery(found, query, (m) => ({ title: m.internalName, status: m.status, updated: m.updatedAt, translations: 0, sortOrder: m.sortOrder }));
 });
-const { pendingId, confirm, confirmCopy } = actions;
-const toReference = (r: ResourceReference) => referenceLink(projectId.value, r);
+const lifecycle = useListLifecycle<GeoMap>({
+  items: maps,
+  projectId,
+  noun: "map",
+  referenceType: "MAP",
+  title: (m) => m.internalName,
+  changeStatus: changeMapStatus,
+  fetchReferences: fetchMapReferences,
+  editorRoute,
+  reload: load,
+});
+const ready = computed(() => !loading.value);
+useScrollRestore(ready);
+useResultAnnouncer(computed(() => rows.value.length), computed(() => maps.value.length), ready);
+
+const columns: ListColumn[] = [
+  { key: "title", label: "Name", sortKey: "title", class: "w-[40%]" },
+  { key: "placed", label: "Placed" },
+  { key: "status", label: "Status", sortKey: "status", class: "w-44" },
+];
+// Maps have no stored order (the backend has no order endpoint for them), so there is no Manual order and no handle.
+const SORTS = [
+  { value: "title", label: "Name" },
+  { value: "status", label: "Status" },
+  { value: "updated", label: "Updated" },
+];
 
 const creating = ref(false);
 function onCreated(m: GeoMap) {
   creating.value = false;
   showToast("Map created", `${m.internalName}. Place Points of Interest from the list.`);
-  void router.push({ name: "map-editor", params: { projectId: projectId.value, mapId: m.id } });
+  void router.push(editorRoute(m));
 }
 </script>
 
 <template>
-  <main class="relative min-w-0 flex-1 overflow-y-auto px-4 pb-16 pt-6 md:px-7">
-    <PageHead :title="section.title" :subtitle="section.subtitle">
+  <PageFrame>
+    <PageHead :title="section.title" :subtitle="section.subtitle" section="maps">
       <template #actions>
-        <Button variant="brand" @click="creating = true">New map</Button>
+        <Button @click="creating = true">New map</Button>
       </template>
     </PageHead>
-    <SectionTabs :project-id="projectId" section="maps" />
+    <MapsTabs :project-id="projectId" section="maps" :maps-count="loading || loadError ? null : maps.filter((m) => m.status !== 'ARCHIVED').length" />
 
-    <div v-if="loadError" role="alert" class="max-w-[640px] rounded-lg border border-l-[3px] border-l-destructive bg-card px-[18px] py-4">
-      <strong class="block text-[13px] font-bold text-destructive">The maps could not be loaded</strong>
-      <p class="mt-1 text-[13px] text-gray-700">{{ loadError.message }}</p>
-      <Button variant="outline" size="sm" class="mt-3" @click="load">Try again</Button>
-    </div>
+    <Alert v-if="loadError" ref="errorCard" tone="danger" title="The maps could not be loaded" :request-id="loadError.requestId">
+      {{ loadError.message }}
+      <template #actions><Button variant="secondary" size="sm" @click="retry">Try again</Button></template>
+    </Alert>
 
-    <div v-else class="overflow-hidden rounded-lg border bg-card shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-      <div v-if="loading" class="animate-skeleton" role="status" aria-busy="true" aria-label="Loading maps">
-        <div v-for="n in 2" :key="n" class="border-b border-gray-100 px-[18px] py-4"><div class="h-[13px] w-1/3 rounded bg-[#e2e3e7]"></div></div>
-      </div>
-      <ul v-else-if="maps.length">
-        <li v-for="m in maps" :key="m.id" class="flex flex-wrap items-center gap-3 border-b border-gray-100 px-[18px] py-3.5 last:border-b-0 hover:bg-muted">
-          <div class="min-w-[min(100%,260px)] flex-1">
-            <RouterLink :to="{ name: 'map-editor', params: { projectId, mapId: m.id } }" class="text-[13px] font-semibold text-foreground no-underline hover:underline">
-              {{ m.internalName }}
-            </RouterLink>
-            <div class="mt-[3px] text-[11px] text-gray-500">{{ meta(m) }} · {{ formatDate(m.updatedAt) }}</div>
-          </div>
-          <StatusChip :status="m.status" />
-          <StatusChip
-            v-if="m.hasWorkingCopy"
-            status="PENDING"
-            label="Pending changes"
-            title="Has pending changes that visitors do not see yet"
-          />
-          <RouterLink :to="{ name: 'map-editor', params: { projectId, mapId: m.id } }" class="text-[10px] font-bold uppercase tracking-[0.06em] text-primary no-underline">Open</RouterLink>
-          <button
-            type="button"
-            class="rounded-full border bg-muted px-[13px] py-1.5 text-[10px] font-bold uppercase tracking-[0.06em] text-gray-700 disabled:opacity-50"
-            :disabled="pendingId === m.id"
-            @click="actions.onToggle(m)"
-          >
-            {{ actions.toggleLabel(m) }}
-          </button>
-          <button
-            v-if="m.status !== 'ARCHIVED'"
-            type="button"
-            class="text-[10px] font-bold uppercase tracking-[0.06em] text-destructive disabled:opacity-50"
-            :disabled="pendingId === m.id"
-            @click="actions.ask(m, 'ARCHIVED')"
-          >
-            Archive
-          </button>
-        </li>
-      </ul>
-      <div v-else class="px-6 py-12 text-center">
-        <p class="mx-auto mb-[18px] max-w-[440px] text-[13px] text-muted-foreground">
-          This Project has no geographic map yet. Create one to place Points of Interest and Places by coordinates.
-        </p>
-        <Button variant="brand" @click="creating = true">New map</Button>
-      </div>
+    <div v-else class="rounded-lg border border-border bg-card shadow-1">
+      <template v-if="loading || maps.length">
+        <ListToolbar :query="query" :counts="statusCounts(maps)" :languages="[]" :show-missing="false" search-placeholder="Search map names" :sort-options="SORTS" />
+        <ListTable :columns="columns" :rows="rows" :loading="loading" :query="query" :row-label="(m) => m.internalName" label="Maps" openable @open="(m) => router.push(editorRoute(m))">
+          <template #cell-title="{ row }">
+            <RouterLink :to="editorRoute(row)" class="font-semibold no-underline hover:underline" :class="row.status === 'ARCHIVED' ? 'text-muted-foreground' : 'text-foreground'">{{ row.internalName }}</RouterLink>
+            <p class="text-compact text-muted-foreground">{{ placeName(row.placeId) ? `Linked Place: ${placeName(row.placeId)}` : "Not linked to a Place" }} · Updated {{ formatDate(row.updatedAt) }}</p>
+          </template>
+          <template #cell-placed="{ row }">
+            <p class="text-sm font-medium">{{ row.placements.length }} placed, {{ unplacedCount(row) }} not placed</p>
+            <p class="text-compact text-muted-foreground">Shows {{ shows(row) }}</p>
+          </template>
+          <template #cell-status="{ row }">
+            <div class="flex flex-wrap gap-1">
+              <StatusChip :status="row.status" />
+              <StatusChip v-if="row.hasWorkingCopy" status="PENDING" label="Pending changes" title="Has pending changes that visitors do not see yet" />
+            </div>
+          </template>
+          <template #menu="{ row }">
+            <RowMenu :title="row.internalName" :actions="lifecycle.actionsFor(row)" :item="row" @select="(key) => lifecycle.onSelect(row, key)" />
+          </template>
+        </ListTable>
+      </template>
+      <ListEmpty v-if="!loading && !rows.length" noun="maps" empty-title="No maps yet" :filtered="maps.length > 0" :filters="query.chips([], [])" @clear="query.clear()">
+        A map shows Points of Interest and Places by coordinates on real streets. Create one to set its area and place items.
+        <template #actions><Button @click="creating = true">New map</Button></template>
+      </ListEmpty>
+      <ListFooter v-if="maps.length" :shown="rows.length" :total="maps.length" noun="maps" :filtered="query.isFiltered.value" @clear="query.clear()" />
     </div>
 
     <NewMapDialog
@@ -158,19 +178,6 @@ function onCreated(m: GeoMap) {
       @close="creating = false"
       @created="onCreated"
     />
-
-    <StatusChangeDialog
-      v-if="confirm && confirmCopy"
-      :heading="confirmCopy.heading"
-      :body="confirm.target === 'ARCHIVED' ? 'An archived map leaves the visitor app and its Place stops showing it. Restoring it makes it a draft again.' : confirmCopy.body"
-      :action-label="confirmCopy.action"
-      :danger="confirm.target === 'ARCHIVED'"
-      :busy="pendingId === confirm.item.id"
-      :load-references="() => fetchMapReferences(projectId, confirm!.item.id)"
-      :blocked-by="confirm.blockedBy ?? null"
-      :link-for="toReference"
-      @close="actions.cancel()"
-      @confirm="actions.transition(confirm.item, confirm.target)"
-    />
-  </main>
+    <LifecycleDialogs :lifecycle="lifecycle" />
+  </PageFrame>
 </template>

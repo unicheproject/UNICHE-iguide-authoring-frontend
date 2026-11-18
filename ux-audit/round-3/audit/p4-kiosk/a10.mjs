@@ -1,0 +1,11 @@
+import { open, go } from "../../../tools/session.mjs"; import {P,shotp,log} from "./lib.mjs";
+const { browser, page } = await open("admin",{viewport:"1440"});
+await go(page,`/projects/${P}/preview`); await page.waitForSelector("[data-preview-frame]"); await page.waitForTimeout(1200);
+const m=await page.evaluate(()=>{const c=e=>{const b=e.getBoundingClientRect();return {x:+b.x.toFixed(1),r:+b.right.toFixed(1),y:+b.y.toFixed(1),cy:+(b.y+b.height/2).toFixed(1),h:+b.height.toFixed(1)}};
+ const find=(re,sel="main *")=>[...document.querySelectorAll(sel)].filter(e=>re.test(e.textContent.trim())&&e.children.length===0)[0];
+ const h1=document.querySelector("main h1"); const tl=[...document.querySelectorAll("main [role=tablist]")];
+ const card=tl[0].closest("div.rounded-lg,div[class*=border]")?.parentElement;
+ const toolbar=[...document.querySelectorAll("main div")].find(d=>d.contains(tl[0])&&d.getBoundingClientRect().width>600&&getComputedStyle(d).borderTopWidth!=="0px");
+ return {h1:c(h1),toolbar:toolbar&&c(toolbar),labels:{Surface:c(find(/^Surface$/)),Language:c(find(/^Language$/)),Content:c(find(/^Content$/)),Fire:c(find(/^Fire a trigger$/))},tabsy:tl.map(t=>[t.getAttribute("aria-label"),c(t)]),firstTab:c(tl[0].querySelector("[role=tab]")),caption:c(find(/Shown at/)),interact:c([...document.querySelectorAll("button")].find(b=>/Interact/.test(b.textContent))),frame:c(document.querySelector("[data-preview-frame]").firstElementChild),filter:c(document.querySelector("input[placeholder^=Filter]")),select:c(document.querySelector("main select"))}});
+log(JSON.stringify(m,null,0));
+await browser.close();

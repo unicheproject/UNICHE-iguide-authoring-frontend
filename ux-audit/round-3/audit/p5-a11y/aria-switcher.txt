@@ -1,0 +1,63 @@
+- dialog "Switch project":
+  - text: Search projects by name, address or organisation
+  - searchbox "Search projects"
+  - region "Needs setup (10+)":
+    - heading "Needs setup (10+)" [level=2]:
+      - button "Needs setup (10+)"
+    - paragraph: Created but not initialized. Open the group to resume initialization. 15 projects have not been checked for setup yet.
+  - region "Test Museum (17)":
+    - heading "Test Museum (17)" [level=2]
+    - list:
+      - listitem:
+        - 'link "\"UX-P1 App: Draft ux-p1 Multi-region network Updated 12 Nov 2026"':
+          - /url: /projects/510ee9b6-9f28-46e2-aae9-19b37be9ce03
+      - listitem:
+        - 'link "athina App: Draft athina Multi-region network Updated 11 Nov 2026"':
+          - /url: /projects/d0c8c41e-c9bb-4fd5-9248-0d6b1ac4eea7
+      - listitem:
+        - link "test-museotekbox-1 Setup not checked test-museotekbox-1 Updated 28 Sep 2026":
+          - /url: /projects/2c1eefc7-734a-4460-918f-332bf2560eb8
+      - listitem:
+        - link "test3/11/26 Setup not checked test3-11-26 Updated 3 Nov 2026":
+          - /url: /projects/1f39af7e-76dc-490e-980e-888ea56f4a0b
+      - listitem:
+        - link "test11/11/2026-2 Setup not checked test11-11-2026-2 Updated 11 Nov 2026":
+          - /url: /projects/447e7594-432e-4882-91c8-c56d18cfaa0b
+      - listitem:
+        - link "UX Audit – Empty Setup not checked ux-audit-empty Updated 12 Nov 2026":
+          - /url: /projects/65f8958a-144a-46fe-851b-f1176b2a597e
+      - listitem:
+        - link "UX Audit – Empty B Setup not checked ux-audit-empty-b Updated 12 Nov 2026":
+          - /url: /projects/1d6971ce-6391-4da8-848e-8d7466d25128
+      - listitem:
+        - link "UX Audit – Empty C Setup not checked ux-audit-empty-c Updated 12 Nov 2026":
+          - /url: /projects/ceee1b24-e7c4-474e-93ba-f77067ed8a72
+      - listitem:
+        - link "UX Audit – Empty D Setup not checked ux-audit-empty-d Updated 13 Nov 2026":
+          - /url: /projects/f56e8c75-94af-4c87-88c8-06cba46240a1
+      - listitem:
+        - link "UX Audit – Populated Setup not checked ux-audit-populated Updated 12 Nov 2026":
+          - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5
+      - listitem:
+        - link "UX-p2-manager Trail Setup not checked ux-p2-manager-trail Updated 12 Nov 2026":
+          - /url: /projects/ef9a58e0-8f16-45a4-93ff-ab6590ddfc37
+      - listitem:
+        - link "UX-R2-p2 Trail Setup not checked ux-r2-p2-trail Updated 13 Nov 2026":
+          - /url: /projects/cddb627d-1ec0-4f83-9dca-91da3df58183
+      - listitem:
+        - link "UX-s7-chrome Project Setup not checked ux-s7-chrome-project Updated 12 Nov 2026":
+          - /url: /projects/7bb83c0c-d080-4971-84dc-d01cc914a62b
+      - listitem:
+        - link "UX-verify do not submit Setup not checked ux-verify-do-not-submit Updated 13 Nov 2026":
+          - /url: /projects/00ebb938-a357-4482-adae-85a63440a744
+      - listitem:
+        - link "Ευβοια Setup not checked eyvoia Updated 4 Nov 2026":
+          - /url: /projects/8231bff6-3852-44e0-ac98-75a5cbf2660f
+      - listitem:
+        - link "Έυβοια Setup not checked evia Updated 4 Nov 2026":
+          - /url: /projects/d800ed5e-785c-4402-86a9-22f2e0e79a27
+      - listitem:
+        - link "τεστ1_1 Setup not checked 1-1 Updated 2 Oct 2026":
+          - /url: /projects/a64248eb-1ea9-4cfa-b9e1-f20490d88fb4
+  - link "Create Project":
+    - /url: /projects/new

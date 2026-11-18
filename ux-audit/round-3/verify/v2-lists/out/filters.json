@@ -1,0 +1,630 @@
+{
+ "places@1440": {
+  "btnText": "Filters",
+  "btnName": "Filters",
+  "pop": {
+   "name": "Filters",
+   "top": 210,
+   "bottom": 514,
+   "h": 304,
+   "innerHeight": 900,
+   "scrolls": false,
+   "done": true,
+   "doneVisible": true,
+   "labels": [
+    "Language",
+    "Pending changes",
+    "Needs translation",
+    "Featured only"
+   ],
+   "langControls": 1,
+   "selW": [
+    318
+   ]
+  },
+  "axe": [],
+  "afterDone": {
+   "tag": "BUTTON",
+   "id": "",
+   "label": "Filters",
+   "top": 164,
+   "inViewport": true
+  },
+  "afterEsc": {
+   "tag": "BUTTON",
+   "id": "",
+   "label": "Filters",
+   "top": 164,
+   "inViewport": true
+  }
+ },
+ "pois@1440": {
+  "btnText": "Filters",
+  "btnName": "Filters",
+  "pop": {
+   "name": "Filters and sort",
+   "top": 210,
+   "bottom": 652,
+   "h": 442,
+   "innerHeight": 900,
+   "scrolls": false,
+   "done": true,
+   "doneVisible": true,
+   "labels": [
+    "Language",
+    "Sort by",
+    "Pending changes",
+    "Needs translation",
+    "Category",
+    "Featured only"
+   ],
+   "langControls": 1,
+   "selW": [
+    318,
+    318,
+    318
+   ]
+  },
+  "axe": [],
+  "afterDone": {
+   "tag": "BUTTON",
+   "id": "",
+   "label": "Filters",
+   "top": 164,
+   "inViewport": true
+  },
+  "afterEsc": {
+   "tag": "BUTTON",
+   "id": "",
+   "label": "Filters",
+   "top": 164,
+   "inViewport": true
+  }
+ },
+ "routes@1440": {
+  "btnText": "Filters",
+  "btnName": "Filters",
+  "pop": {
+   "name": "Filters and sort",
+   "top": 210,
+   "bottom": 652,
+   "h": 442,
+   "innerHeight": 900,
+   "scrolls": false,
+   "done": true,
+   "doneVisible": true,
+   "labels": [
+    "Language",
+    "Sort by",
+    "Pending changes",
+    "Needs translation",
+    "Category",
+    "Featured only"
+   ],
+   "langControls": 1,
+   "selW": [
+    318,
+    318,
+    318
+   ]
+  },
+  "axe": [],
+  "afterDone": {
+   "tag": "BUTTON",
+   "id": "",
+   "label": "Filters",
+   "top": 164,
+   "inViewport": true
+  },
+  "afterEsc": {
+   "tag": "BUTTON",
+   "id": "",
+   "label": "Filters",
+   "top": 164,
+   "inViewport": true
+  }
+ },
+ "guides@1440": {
+  "btnText": "Filters",
+  "btnName": "Filters",
+  "pop": {
+   "name": "Filters and sort",
+   "top": 210,
+   "bottom": 583,
+   "h": 373,
+   "innerHeight": 900,
+   "scrolls": false,
+   "done": true,
+   "doneVisible": true,
+   "labels": [
+    "Language",
+    "Sort by",
+    "Pending changes",
+    "Needs translation",
+    "Featured only"
+   ],
+   "langControls": 1,
+   "selW": [
+    318,
+    318
+   ]
+  },
+  "axe": [],
+  "afterDone": {
+   "tag": "BUTTON",
+   "id": "",
+   "label": "Filters",
+   "top": 164,
+   "inViewport": true
+  },
+  "afterEsc": {
+   "tag": "BUTTON",
+   "id": "",
+   "label": "Filters",
+   "top": 164,
+   "inViewport": true
+  }
+ },
+ "events@1440": {
+  "btnText": "Filters",
+  "btnName": "Filters",
+  "pop": {
+   "name": "Filters and sort",
+   "top": 210,
+   "bottom": 583,
+   "h": 373,
+   "innerHeight": 900,
+   "scrolls": false,
+   "done": true,
+   "doneVisible": true,
+   "labels": [
+    "Language",
+    "Sort by",
+    "Pending changes",
+    "Needs translation",
+    "Featured only"
+   ],
+   "langControls": 1,
+   "selW": [
+    318,
+    318
+   ]
+  },
+  "axe": [],
+  "afterDone": {
+   "tag": "BUTTON",
+   "id": "",
+   "label": "Filters",
+   "top": 164,
+   "inViewport": true
+  },
+  "afterEsc": {
+   "tag": "BUTTON",
+   "id": "",
+   "label": "Filters",
+   "top": 164,
+   "inViewport": true
+  }
+ },
+ "categories@1440": {
+  "btnText": "Filters",
+  "btnName": "Filters",
+  "pop": {
+   "name": "Filters",
+   "top": 210,
+   "bottom": 527,
+   "h": 317,
+   "innerHeight": 900,
+   "scrolls": false,
+   "done": true,
+   "doneVisible": true,
+   "labels": [
+    "Language",
+    "Pending changes",
+    "Needs translation",
+    "Applies to"
+   ],
+   "langControls": 1,
+   "selW": [
+    318,
+    318
+   ]
+  },
+  "axe": [],
+  "afterDone": {
+   "tag": "BUTTON",
+   "id": "",
+   "label": "Filters",
+   "top": 164,
+   "inViewport": true
+  },
+  "afterEsc": {
+   "tag": "BUTTON",
+   "id": "",
+   "label": "Filters",
+   "top": 164,
+   "inViewport": true
+  }
+ },
+ "places@zoom200": {
+  "btnText": "Filters 1",
+  "btnName": "Filters 1",
+  "pop": {
+   "name": "Filters",
+   "top": 8,
+   "bottom": 158,
+   "h": 150,
+   "innerHeight": 360,
+   "scrolls": true,
+   "done": true,
+   "doneVisible": true,
+   "labels": [
+    "Status",
+    "Not archived 32",
+    "Active 11",
+    "Draft 21",
+    "Archived 1",
+    "Language",
+    "Pending changes",
+    "Needs translation",
+    "Featured only"
+   ],
+   "langControls": 1,
+   "selW": [
+    318
+   ]
+  },
+  "afterDone": {
+   "tag": "BUTTON",
+   "id": "",
+   "label": "Filters 1",
+   "top": 164,
+   "inViewport": true
+  },
+  "afterEsc": {
+   "tag": "BUTTON",
+   "id": "",
+   "label": "Filters 1",
+   "top": 164,
+   "inViewport": true
+  }
+ },
+ "pois@zoom200": {
+  "btnText": "Filters 1",
+  "btnName": "Filters 1",
+  "pop": {
+   "name": "Filters and sort",
+   "top": 8,
+   "bottom": 158,
+   "h": 150,
+   "innerHeight": 360,
+   "scrolls": true,
+   "done": true,
+   "doneVisible": true,
+   "labels": [
+    "Status",
+    "Not archived 138",
+    "Active 66",
+    "Draft 72",
+    "Archived 8",
+    "Language",
+    "Sort by",
+    "Pending changes",
+    "Needs translation",
+    "Category",
+    "Featured only"
+   ],
+   "langControls": 1,
+   "selW": [
+    318,
+    318,
+    318
+   ]
+  },
+  "afterDone": {
+   "tag": "BUTTON",
+   "id": "",
+   "label": "Filters 1",
+   "top": 164,
+   "inViewport": true
+  },
+  "afterEsc": {
+   "tag": "BUTTON",
+   "id": "",
+   "label": "Filters 1",
+   "top": 164,
+   "inViewport": true
+  }
+ },
+ "routes@zoom200": {
+  "btnText": "Filters 1",
+  "btnName": "Filters 1",
+  "pop": {
+   "name": "Filters and sort",
+   "top": 8,
+   "bottom": 158,
+   "h": 150,
+   "innerHeight": 360,
+   "scrolls": true,
+   "done": true,
+   "doneVisible": true,
+   "labels": [
+    "Status",
+    "Not archived 28",
+    "Active 7",
+    "Draft 21",
+    "Archived 2",
+    "Language",
+    "Sort by",
+    "Pending changes",
+    "Needs translation",
+    "Category",
+    "Featured only"
+   ],
+   "langControls": 1,
+   "selW": [
+    318,
+    318,
+    318
+   ]
+  },
+  "afterDone": {
+   "tag": "BUTTON",
+   "id": "",
+   "label": "Filters 1",
+   "top": 164,
+   "inViewport": true
+  },
+  "afterEsc": {
+   "tag": "BUTTON",
+   "id": "",
+   "label": "Filters 1",
+   "top": 164,
+   "inViewport": true
+  }
+ },
+ "guides@zoom200": {
+  "btnText": "Filters 1",
+  "btnName": "Filters 1",
+  "pop": {
+   "name": "Filters and sort",
+   "top": 8,
+   "bottom": 179,
+   "h": 171,
+   "innerHeight": 360,
+   "scrolls": true,
+   "done": true,
+   "doneVisible": true,
+   "labels": [
+    "Status",
+    "Not archived 29",
+    "Active 4",
+    "Draft 25",
+    "Archived 2",
+    "Language",
+    "Sort by",
+    "Pending changes",
+    "Needs translation",
+    "Featured only"
+   ],
+   "langControls": 1,
+   "selW": [
+    318,
+    318
+   ]
+  },
+  "afterDone": {
+   "tag": "BUTTON",
+   "id": "",
+   "label": "Filters 1",
+   "top": 185,
+   "inViewport": true
+  },
+  "afterEsc": {
+   "tag": "BUTTON",
+   "id": "",
+   "label": "Filters 1",
+   "top": 185,
+   "inViewport": true
+  }
+ },
+ "events@zoom200": {
+  "btnText": "Filters 1",
+  "btnName": "Filters 1",
+  "pop": {
+   "name": "Filters and sort",
+   "top": 8,
+   "bottom": 158,
+   "h": 150,
+   "innerHeight": 360,
+   "scrolls": true,
+   "done": true,
+   "doneVisible": true,
+   "labels": [
+    "Status",
+    "Not archived 29",
+    "Active 6",
+    "Draft 23",
+    "Archived 2",
+    "Language",
+    "Sort by",
+    "Pending changes",
+    "Needs translation",
+    "Featured only"
+   ],
+   "langControls": 1,
+   "selW": [
+    318,
+    318
+   ]
+  },
+  "afterDone": {
+   "tag": "BUTTON",
+   "id": "",
+   "label": "Filters 1",
+   "top": 164,
+   "inViewport": true
+  },
+  "afterEsc": {
+   "tag": "BUTTON",
+   "id": "",
+   "label": "Filters 1",
+   "top": 164,
+   "inViewport": true
+  }
+ },
+ "categories@zoom200": {
+  "btnText": "Filters 1",
+  "btnName": "Filters 1",
+  "pop": {
+   "name": "Filters",
+   "top": 8,
+   "bottom": 158,
+   "h": 150,
+   "innerHeight": 360,
+   "scrolls": true,
+   "done": true,
+   "doneVisible": true,
+   "labels": [
+    "Status",
+    "Not archived 44",
+    "Active 19",
+    "Draft 25",
+    "Archived 1",
+    "Language",
+    "Pending changes",
+    "Needs translation",
+    "Applies to"
+   ],
+   "langControls": 1,
+   "selW": [
+    318,
+    318
+   ]
+  },
+  "afterDone": {
+   "tag": "BUTTON",
+   "id": "",
+   "label": "Filters 1",
+   "top": 164,
+   "inViewport": true
+  },
+  "afterEsc": {
+   "tag": "BUTTON",
+   "id": "",
+   "label": "Filters 1",
+   "top": 164,
+   "inViewport": true
+  }
+ },
+ "places@chips@1024": [
+  "Remove filter Status: Draft",
+  "Remove filter Needs translation in Italiano"
+ ],
+ "pois@chips@1024": [
+  "Remove filter Status: Draft",
+  "Remove filter Needs translation in Italiano"
+ ],
+ "routes@chips@1024": [
+  "Remove filter Status: Draft",
+  "Remove filter Needs translation in Italiano"
+ ],
+ "guides@chips@1024": [
+  "Remove filter Status: Draft",
+  "Remove filter Needs translation in Italiano"
+ ],
+ "events@chips@1024": [
+  "Remove filter Status: Draft",
+  "Remove filter Needs translation in Italiano"
+ ],
+ "categories@chips@1024": [
+  "Remove filter Status: Draft",
+  "Remove filter Needs translation in Italiano"
+ ],
+ "places@chips@768": [
+  "Remove filter Status: Draft",
+  "Remove filter Needs translation in Italiano"
+ ],
+ "pois@chips@768": [
+  "Remove filter Status: Draft",
+  "Remove filter Needs translation in Italiano"
+ ],
+ "routes@chips@768": [
+  "Remove filter Status: Draft",
+  "Remove filter Needs translation in Italiano"
+ ],
+ "guides@chips@768": [
+  "Remove filter Status: Draft",
+  "Remove filter Needs translation in Italiano"
+ ],
+ "events@chips@768": [
+  "Remove filter Status: Draft",
+  "Remove filter Needs translation in Italiano"
+ ],
+ "categories@chips@768": [
+  "Remove filter Status: Draft",
+  "Remove filter Needs translation in Italiano"
+ ],
+ "places@sort": "NO ROWS",
+ "pois@sort": {
+  "seq": [
+   "?sort=title",
+   "?sort=title&dir=desc",
+   "(clean)"
+  ],
+  "firstTitles": [
+   "Acropolis View Terrace",
+   "UX-W0.2 point",
+   "Parthenon Frieze – North Side"
+  ],
+  "status": [
+   "Manual order"
+  ]
+ },
+ "routes@sort": {
+  "seq": [
+   "?sort=title",
+   "?sort=title&dir=desc",
+   "(clean)"
+  ],
+  "firstTitles": [
+   "Acropolis Highlights – Classical Walk",
+   "UX-s11-editors Route (edited)",
+   "Acropolis Highlights – Classical Walk"
+  ],
+  "status": [
+   "Manual order"
+  ]
+ },
+ "guides@sort": {
+  "seq": [
+   "?sort=title",
+   "?sort=title&dir=desc",
+   "(clean)"
+  ],
+  "firstTitles": [
+   "Everyday Life in the Ancient Agora",
+   "UX-s11-editors Guide",
+   "The Story of the Parthenon: From Temple to Monument"
+  ],
+  "status": [
+   "Manual order"
+  ]
+ },
+ "events@sort": {
+  "seq": [
+   "?sort=title",
+   "?sort=title&dir=desc",
+   "(clean)"
+  ],
+  "firstTitles": [
+   "Agora Archaeology Lecture Series",
+   "UX-s11-editors Event",
+   "Full Moon Night at the Acropolis"
+  ],
+  "status": [
+   "Manual order"
+  ]
+ },
+ "categories@sort": "NO ROWS"
+}

@@ -1,0 +1,444 @@
+{
+ "places@1440": {
+  "mode": "table",
+  "rows": 28,
+  "titleMin": 366,
+  "titleMax": 366,
+  "overlaps": 0,
+  "overflow": 0,
+  "theadH": [
+   35,
+   35,
+   35,
+   35,
+   35,
+   35,
+   35
+  ],
+  "orderW": 48,
+  "docOverflow": false
+ },
+ "pois@1440": {
+  "mode": "table",
+  "rows": 50,
+  "titleMin": 347,
+  "titleMax": 347,
+  "overlaps": 0,
+  "overflow": 0,
+  "theadH": [
+   49,
+   49,
+   49,
+   49,
+   49,
+   49,
+   49
+  ],
+  "orderW": 53,
+  "docOverflow": false
+ },
+ "routes@1440": {
+  "mode": "table",
+  "rows": 24,
+  "titleMin": 286,
+  "titleMax": 286,
+  "overlaps": 0,
+  "overflow": 2,
+  "theadH": [
+   49,
+   49,
+   49,
+   49,
+   49,
+   49,
+   49,
+   49
+  ],
+  "orderW": 48,
+  "docOverflow": false
+ },
+ "guides@1440": {
+  "mode": "table",
+  "rows": 24,
+  "titleMin": 382,
+  "titleMax": 382,
+  "overlaps": 0,
+  "overflow": 2,
+  "theadH": [
+   49,
+   49,
+   49,
+   49,
+   49,
+   49,
+   49
+  ],
+  "orderW": 48,
+  "docOverflow": false
+ },
+ "events@1440": {
+  "mode": "table",
+  "rows": 26,
+  "titleMin": 334,
+  "titleMax": 334,
+  "overlaps": 0,
+  "overflow": 0,
+  "theadH": [
+   49,
+   49,
+   49,
+   49,
+   49,
+   49,
+   49
+  ],
+  "orderW": 48,
+  "docOverflow": false
+ },
+ "categories@1440": {
+  "mode": "table",
+  "rows": 38,
+  "titleMin": 394,
+  "titleMax": 394,
+  "overlaps": 0,
+  "overflow": 0,
+  "theadH": [
+   48,
+   48,
+   48,
+   48,
+   48,
+   48,
+   48
+  ],
+  "orderW": 48,
+  "docOverflow": false
+ },
+ "places@1280": {
+  "mode": "table",
+  "rows": 29,
+  "titleMin": 206,
+  "titleMax": 206,
+  "overlaps": 0,
+  "overflow": 1,
+  "theadH": [
+   35,
+   35,
+   35,
+   35,
+   35,
+   35,
+   35
+  ],
+  "orderW": 48,
+  "docOverflow": false
+ },
+ "pois@1280": {
+  "mode": "table",
+  "rows": 50,
+  "titleMin": 270,
+  "titleMax": 270,
+  "overlaps": 0,
+  "overflow": 8,
+  "theadH": [
+   53,
+   53,
+   53,
+   53,
+   53,
+   53,
+   53
+  ],
+  "orderW": 48,
+  "docOverflow": false
+ },
+ "routes@1280": {
+  "mode": "table",
+  "rows": 24,
+  "titleMin": 126,
+  "titleMax": 126,
+  "overlaps": 0,
+  "overflow": 2,
+  "theadH": [
+   49,
+   49,
+   49,
+   49,
+   49,
+   49,
+   49,
+   49
+  ],
+  "orderW": 48,
+  "docOverflow": false
+ },
+ "guides@1280": {
+  "mode": "table",
+  "rows": 24,
+  "titleMin": 222,
+  "titleMax": 222,
+  "overlaps": 0,
+  "overflow": 2,
+  "theadH": [
+   49,
+   49,
+   49,
+   49,
+   49,
+   49,
+   49
+  ],
+  "orderW": 48,
+  "docOverflow": false
+ },
+ "events@1280": {
+  "mode": "table",
+  "rows": 26,
+  "titleMin": 174,
+  "titleMax": 174,
+  "overlaps": 0,
+  "overflow": 0,
+  "theadH": [
+   49,
+   49,
+   49,
+   49,
+   49,
+   49,
+   49
+  ],
+  "orderW": 48,
+  "docOverflow": false
+ },
+ "categories@1280": {
+  "mode": "table",
+  "rows": 38,
+  "titleMin": 238,
+  "titleMax": 238,
+  "overlaps": 0,
+  "overflow": 0,
+  "theadH": [
+   48,
+   48,
+   48,
+   48,
+   48,
+   48,
+   48
+  ],
+  "orderW": 48,
+  "docOverflow": false
+ },
+ "places@1024": {
+  "mode": "table",
+  "rows": 30,
+  "titleMin": 198,
+  "titleMax": 198,
+  "overlaps": 0,
+  "overflow": 1,
+  "theadH": [
+   35,
+   35,
+   35,
+   35,
+   35,
+   35,
+   35
+  ],
+  "orderW": 48,
+  "docOverflow": false
+ },
+ "pois@1024": {
+  "mode": "table",
+  "rows": 50,
+  "titleMin": 262,
+  "titleMax": 262,
+  "overlaps": 0,
+  "overflow": 9,
+  "theadH": [
+   53,
+   53,
+   53,
+   53,
+   53,
+   53,
+   53
+  ],
+  "orderW": 48,
+  "docOverflow": false
+ },
+ "routes@1024": {
+  "mode": "table",
+  "rows": 24,
+  "titleMin": 118,
+  "titleMax": 118,
+  "overlaps": 0,
+  "overflow": 3,
+  "theadH": [
+   49,
+   49,
+   49,
+   49,
+   49,
+   49,
+   49,
+   49
+  ],
+  "orderW": 48,
+  "docOverflow": false
+ },
+ "guides@1024": {
+  "mode": "table",
+  "rows": 24,
+  "titleMin": 214,
+  "titleMax": 214,
+  "overlaps": 0,
+  "overflow": 2,
+  "theadH": [
+   49,
+   49,
+   49,
+   49,
+   49,
+   49,
+   49
+  ],
+  "orderW": 48,
+  "docOverflow": false
+ },
+ "events@1024": {
+  "mode": "table",
+  "rows": 26,
+  "titleMin": 166,
+  "titleMax": 166,
+  "overlaps": 0,
+  "overflow": 0,
+  "theadH": [
+   49,
+   49,
+   49,
+   49,
+   49,
+   49,
+   49
+  ],
+  "orderW": 48,
+  "docOverflow": false
+ },
+ "categories@1024": {
+  "mode": "table",
+  "rows": 38,
+  "titleMin": 230,
+  "titleMax": 230,
+  "overlaps": 0,
+  "overflow": 0,
+  "theadH": [
+   48,
+   48,
+   48,
+   48,
+   48,
+   48,
+   48
+  ],
+  "orderW": 48,
+  "docOverflow": false
+ },
+ "places@768": {
+  "mode": "cards",
+  "rows": 30,
+  "titleMin": 578,
+  "titleMax": 658,
+  "overlaps": 0,
+  "overflow": 0,
+  "theadH": [],
+  "orderW": null,
+  "docOverflow": false
+ },
+ "pois@768": {
+  "mode": "cards",
+  "rows": 50,
+  "titleMin": 658,
+  "titleMax": 658,
+  "overlaps": 0,
+  "overflow": 0,
+  "theadH": [],
+  "orderW": null,
+  "docOverflow": false
+ },
+ "routes@768": {
+  "mode": "cards",
+  "rows": 24,
+  "titleMin": 658,
+  "titleMax": 658,
+  "overlaps": 0,
+  "overflow": 0,
+  "theadH": [],
+  "orderW": null,
+  "docOverflow": false
+ },
+ "guides@768": {
+  "mode": "cards",
+  "rows": 24,
+  "titleMin": 658,
+  "titleMax": 658,
+  "overlaps": 0,
+  "overflow": 0,
+  "theadH": [],
+  "orderW": null,
+  "docOverflow": false
+ },
+ "events@768": {
+  "mode": "cards",
+  "rows": 26,
+  "titleMin": 658,
+  "titleMax": 658,
+  "overlaps": 0,
+  "overflow": 0,
+  "theadH": [],
+  "orderW": null,
+  "docOverflow": false
+ },
+ "categories@768": {
+  "mode": "cards",
+  "rows": 38,
+  "titleMin": 610,
+  "titleMax": 658,
+  "overlaps": 0,
+  "overflow": 0,
+  "theadH": [],
+  "orderW": null,
+  "docOverflow": false
+ },
+ "greek-pois@1024": [
+  {
+   "text": 19,
+   "lines": 1,
+   "bad": 0
+  },
+  {
+   "text": 19,
+   "lines": 1,
+   "bad": 0
+  },
+  {
+   "text": 71,
+   "lines": 3,
+   "bad": 0
+  }
+ ],
+ "greek-events@1024": [
+  {
+   "text": 71,
+   "lines": 6,
+   "bad": 0
+  }
+ ],
+ "greek-guides@1024": [
+  {
+   "text": 71,
+   "lines": 4,
+   "bad": 0
+  }
+ ]
+}

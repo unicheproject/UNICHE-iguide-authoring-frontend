@@ -1,0 +1,17 @@
+import * as H from "./h.mjs";
+import { join } from "node:path";
+const log = H.LOG("e22");
+const { browser, page } = await H.session();
+const api = (u) => u.pathname.includes("/iguide/api/");
+await H.go(page, H.P("/media")); await H.sleep(1500);
+await page.getByRole("button", { name: /Upload files/ }).first().click(); await H.sleep(600);
+const dlg = page.getByRole("dialog");
+const calls = []; page.on("request", (r) => { if (api(new URL(r.url())) && r.method() !== "GET") calls.push(r.method() + " " + new URL(r.url()).pathname.replace(H.PID, "PID")); });
+await dlg.locator("input[type=file]").setInputFiles([17,18].map(i=>join(H.here,"files",`ux-r3-p6-img${i}.png`))); await H.sleep(4000);
+log("done", { text: (await dlg.innerText()).replace(/\s+/g," ").slice(-300), btns: await dlg.getByRole("button").allInnerTexts() });
+await H.shot(page, "upload__two-done__1440");
+await page.route(api, (r) => r.request().method()!=="GET" && /ai|describe|suggest|alt/i.test(new URL(r.request().url()).pathname) ? r.fulfill(H.problem(503, "SERVICE_UNAVAILABLE")) : r.continue());
+await dlg.getByRole("button", { name: /Describe now/ }).click(); await H.sleep(3500);
+log("describe", { calls: calls.slice(-6), dialogs: await page.getByRole("dialog").count(), url: page.url().replace(H.PID,"PID"), text: (await page.getByRole("dialog").allInnerTexts()).join("|").replace(/\s+/g," ").slice(0,500), msgs: (await H.msgs(page)).slice(0,4), focus: await H.AE(page) });
+await H.shot(page, "upload__describe-now__1440");
+await browser.close();

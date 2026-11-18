@@ -1,19 +1,19 @@
 <script setup lang="ts">
 /**
- * A status chip: symbol, word, and colour together, so the status never rests on colour alone (`14` §4,
- * DECISIONS.md D-042). `status="PENDING"` with a `label` is the "Pending changes" chip of a working copy.
+ * The status chip (D-070, D-072): a drawn icon, the word in sentence case, and a tone, so status never rests on colour
+ * alone (`14` §4). `DRAFT` has a dashed circle on sunken grey, `ARCHIVED` an outline with an archive box, `ACTIVE` a
+ * check on success; `status="PENDING"` with a `label` is the "Pending changes" chip of a Working Copy. `size` is kept
+ * for older callers and no longer changes the look: every chip is 24 px tall. `wrap` lets a long label ("Pending changes" in a narrow Status column) break onto two lines as a
+ * rounded pill instead of overflowing.
  */
-import { statusChipStyle, statusGlyph } from "@/lib/format";
+import { computed } from "vue";
+import { Chip } from "@/components/ui/chip";
+import { statusInfo } from "@/lib/format";
 
-withDefaults(defineProps<{ status: string; label?: string; size?: "page" | "row" }>(), { size: "row" });
+const props = withDefaults(defineProps<{ status: string; label?: string; size?: "page" | "row"; wrap?: boolean }>(), { size: "row", label: undefined, wrap: false });
+const info = computed(() => statusInfo(props.status));
 </script>
 
 <template>
-  <span
-    class="inline-flex items-center gap-[5px] whitespace-nowrap rounded-full text-[10px] font-bold uppercase tracking-[0.07em]"
-    :class="size === 'page' ? 'px-2.5 py-1' : 'px-[9px] py-[3px]'"
-    :style="statusChipStyle(status)"
-  >
-    <span aria-hidden="true">{{ statusGlyph(status) }}</span>{{ label ?? status }}
-  </span>
+  <Chip :tone="info.tone" :icon="info.icon" :class="wrap && 'max-w-full whitespace-normal rounded-lg py-0.5 text-left'">{{ label ?? info.label }}</Chip>
 </template>

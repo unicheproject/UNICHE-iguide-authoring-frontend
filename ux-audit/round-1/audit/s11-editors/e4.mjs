@@ -1,0 +1,16 @@
+import { start, goP, log, dump, state, focused } from "./lib.mjs";
+const s = await start("1440"); const { page } = s;
+await page.goto("http://localhost:5173" + state().eventUrl); await page.waitForTimeout(3000);
+await page.getByRole("button", { name: /add occurrence/i }).click(); await page.waitForTimeout(400);
+const starts = page.locator("input[type=datetime-local]");
+await starts.nth(0).fill("2026-12-20T18:00"); await starts.nth(1).fill("2026-12-20T20:00");
+await page.getByRole("button", { name: /repeat weekly/i }).click(); await page.waitForTimeout(400);
+await page.getByRole("button", { name: "Cancelled" }).nth(1).click(); await page.waitForTimeout(300);
+await page.getByRole("button", { name: /^save/i }).first().click(); await page.waitForTimeout(2000);
+log("alerts:", await page.evaluate(()=>[...document.querySelectorAll("[role=alert],[role=status]")].map(e=>e.innerText.slice(0,300))));
+await page.reload(); await page.waitForTimeout(3000);
+log("occ values:", await page.locator("input[type=datetime-local]").evaluateAll(e=>e.map(x=>x.value)));
+log("pressed:", await page.getByRole("button", { name: /^(scheduled|cancelled)$/i }).evaluateAll(e=>e.map(x=>x.innerText+":"+x.getAttribute("aria-pressed"))));
+await s.tall("event-editor__saved-tall");
+const t = await dump(page); log(t.slice(t.indexOf("WHERE AND BOOKING"), t.indexOf("WHERE AND BOOKING")+1200));
+await s.browser.close();

@@ -1,0 +1,6 @@
+created http://localhost:5173/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/278c95e5-bab4-41d5-8d8b-7e5da69d6890
+empty DRAFT POI 1440 {"mainScroll":1408,"docScroll":900,"client":844}
+populated frieze 1440 {"mainScroll":1983,"docScroll":900,"client":844}
+populated pediment (ACTIVE) 1440 {"mainScroll":1965,"docScroll":900,"client":844}
+populated horsemen (DRAFT) 1440 {"mainScroll":1536,"docScroll":900,"client":844}
+toast-probe after save [{"role":"status","text":"Saved 15:45","r":{"x":961.09375,"y":134,"width":78.828125,"height":21,"top":134,"right":1039.921875,"bottom":155,"left":961.09375}},{"role":"status","text":"UX-R2-verify Empty POI loaded","r":{"x":-1,"y":-1,"width":1,"height":1,"top":-1,"right":0,"bottom":0,"left":-1}},{"role":"alert","text":"","r":{"x":-1,"y":-1,"width":1,"height":1,"top":-1,"right":0,"bottom":0,"left":-1}}]

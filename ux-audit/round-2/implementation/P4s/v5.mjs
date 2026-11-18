@@ -1,0 +1,55 @@
+import { open, go } from "../../../tools/session.mjs";
+import { call, closeAll, ensure } from "../../../tools/lib.mjs";
+const P = "6958c18f-60d2-4140-a524-5a43f8a2f6b5";
+const D = "4e03e8e8-7d90-46bb-a3b0-4aab41d67135";
+const R = "9743e460-8351-4897-8ee5-eecc13fcbf19";
+const vp = process.argv[2] ?? "1280";
+const { browser, page } = await open("admin", { viewport: vp });
+const log = (...a) => console.log(...a);
+// three-way auto merge
+await go(page, `/projects/${P}/pois/${D}`);
+await page.waitForSelector("[data-sticky-bar]", { timeout: 30000 }); await page.waitForTimeout(1500);
+await page.getByLabel(/^summary$/i).first().fill("Mine only summary");
+await ensure("admin");
+const cur = await call("admin", "GET", `/projects/${P}/pois/${D}`);
+await call("admin", "PUT", `/projects/${P}/pois/${D}`, { ...cur, translations: { ...cur.translations, en: { ...cur.translations.en, description: "Theirs only description" } } });
+await page.getByRole("button", { name: /^Save$/ }).first().click();
+await page.waitForTimeout(2500);
+log("auto:", await page.evaluate(() => document.querySelector("[role=dialog]")?.innerText.replace(/\s+/g, " ")));
+await page.screenshot({ path: `after/conflict-auto-${vp}.png` });
+await page.getByRole("dialog").getByRole("button", { name: /Keep my changes/ }).click();
+await page.waitForTimeout(2500);
+const after = await call("admin", "GET", `/projects/${P}/pois/${D}`);
+log("saved:", after.translations.en.summary, "|", after.translations.en.description);
+// restore notice: type, reload
+await page.getByLabel(/^summary$/i).first().fill("Draft kept in browser");
+await page.waitForTimeout(900);
+await page.reload({ waitUntil: "networkidle" }).catch(() => {});
+await page.waitForSelector("[data-sticky-bar]", { timeout: 30000 }); await page.waitForTimeout(1500);
+const notice = page.locator("[data-restore-notice]");
+log("notice:", await notice.count() ? await notice.innerText() : "none", "height", await notice.count() ? Math.round((await notice.boundingBox()).height) : 0);
+await page.screenshot({ path: `after/restore-notice-${vp}.png` });
+await notice.getByRole("button", { name: /^Restore/ }).click(); await page.waitForTimeout(600);
+log("after restore focus:", await page.evaluate(() => document.activeElement?.getAttribute("data-path") || document.activeElement?.tagName), "notice gone", await notice.count() === 0);
+await page.getByRole("button", { name: /^Save$/ }).first().click(); await page.waitForTimeout(2000);
+log("notice after save", await notice.count());
+// archive and restore (own record)
+await page.getByRole("button", { name: "More actions" }).click();
+await page.getByRole("menuitem", { name: /Archive/ }).click(); await page.waitForTimeout(500);
+await page.getByRole("dialog").getByRole("button", { name: /^Archive$/ }).click(); await page.waitForTimeout(2500);
+log("archived focus:", await page.evaluate(() => document.activeElement?.id || document.activeElement?.tagName), "restore buttons:", await page.getByRole("button", { name: /Restore as draft/ }).count(), "title hint present:", await page.getByText(/Required in the default language/).count());
+await page.screenshot({ path: `after/archived-${vp}.png` });
+await page.getByRole("button", { name: /Restore as draft/ }).first().click(); await page.waitForTimeout(2500);
+log("restored focus:", await page.evaluate(() => document.activeElement?.getAttribute("data-path") || document.activeElement?.tagName));
+// undo on route (no save)
+await go(page, `/projects/${P}/routes/${R}`);
+await page.waitForSelector("[data-sticky-bar]", { timeout: 30000 }); await page.waitForTimeout(2000);
+const rm = page.getByRole("button", { name: /^Remove/ }).first();
+log("remove buttons", await page.getByRole("button", { name: /^Remove/ }).count());
+await rm.click(); await page.waitForTimeout(500);
+const bar = page.locator("[data-removed-bar]");
+const box = await bar.boundingBox(); log("undo bar visible in viewport:", box && box.y + box.height <= (await page.viewportSize()).height && box.y >= 0, JSON.stringify(box));
+await page.screenshot({ path: `after/undo-${vp}.png` });
+await page.keyboard.press("Control+z"); await page.waitForTimeout(500);
+log("after ctrl+z bar count:", await bar.count());
+await closeAll(); await browser.close();

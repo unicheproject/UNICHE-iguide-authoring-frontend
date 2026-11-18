@@ -1,0 +1,21 @@
+import { open, go, P, ids, shot, settle, alerts, focused, main, problem, AP } from "./lib.mjs";
+import { call, closeAll } from "../../../tools/lib.mjs";
+const I = ids(); const PP = `/projects/${P}`;
+const { browser, page } = await open("curator", { viewport: "1440" });
+await go(page, `${PP}/routes/${I.route}`); await settle(page, 800);
+await page.evaluate(() => localStorage.clear());
+await go(page, `${PP}/routes/${I.route}`); await settle(page, 800);
+await shot(page, "route-editor__draft-baseline", "1440", true);
+const cur = await call("curator", "GET", `${PP}/routes/${I.route}`);
+console.log("stops", cur.stops?.length, Object.keys(cur));
+await call("curator", "PUT", `${PP}/routes/${I.route}`, { ...cur, translations: { en: { ...cur.translations.en, summary: "THEIRS route summary" } } });
+// colleague removes stop 2
+if (cur.stops?.[1]) await call("curator", "DELETE", `${PP}/routes/${I.route}/stops/${cur.stops[1].id}`).catch(e => console.log("del stop", e.message.slice(0,200)));
+console.log("fields", await page.evaluate(() => [...document.querySelectorAll("input,textarea,select")].filter(e=>e.offsetParent).map(e=>e.id||e.name).join(",")));
+await page.locator("textarea").first().fill("MINE route summary").catch(()=>{});
+console.log("buttons", await page.evaluate(() => [...document.querySelectorAll("button")].filter(e=>e.offsetParent).map(e=>(e.getAttribute("aria-label")||e.textContent).trim().replace(/\s+/g," ").slice(0,40)).join(" ; ")));
+await page.getByRole("button", { name: /^Save/ }).first().click(); await page.waitForTimeout(3000);
+console.log("DIALOG", await page.locator("[role=dialog],[role=alertdialog]").first().innerText().catch(() => "(none)"));
+console.log("ALERTS", JSON.stringify(await alerts(page)).slice(0,500));
+await shot(page, "route-editor__save-409-real");
+await closeAll(); await browser.close();

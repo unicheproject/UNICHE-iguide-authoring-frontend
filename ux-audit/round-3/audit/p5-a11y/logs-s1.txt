@@ -1,0 +1,17 @@
+AXE {"label":"pois?pending=1","url":"http://localhost:5173/projects/PID/pois?pending=1","counts":{"serious":1},"v":[{"id":"label-content-name-mismatch","impact":"serious","n":1,"sel":["button[data-variant=\"secondary\"] :: <button type=\"button\" data-variant=\"secondary\" class=\"inline-flex items-ce...\" aria-label=\"Filters and sort, 1 ...\" aria-haspopup=\"dialog\" a"]}]}
+mismatch node ["Filters and sort, 1 on|Filters 1|"]
+STICKY@1280x720 poi-list 36.9% 266 ["DIV.z-sticky flex flex-wrap items-@156+57","TH.list-th w-[30%]@213+53","TH.list-th w-36@213+53","TH.list-th w-40@213+53","TH.list-th w-32@213+53","TH.list-th list-th-translations@213+53"]
+STICKY@1280x720 poi-editor 106.3% 765 ["DIV.editor-header sticky -top-6 z-@117+56","ASIDE.side-more flex min-w-0 flex-co@189+576"]
+STICKY@1280x720 poi-editor-active 112.1% 807 ["DIV.editor-header sticky -top-6 z-@117+61","ASIDE.side-more flex min-w-0 flex-co@236+571"]
+[user menu open] Enter -> div[menuitem] "Sign out" 1005,143,246,36  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) | live=[]
+menu ["Sign out"]
+[user menu] ArrowDown -> div[menuitem] "Sign out" 1005,143,246,36  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) | live=[]
+[user menu] ArrowDown -> div[menuitem] "Sign out" 1005,143,246,36  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) | live=[]
+[user menu] ArrowUp -> div[menuitem] "Sign out" 1005,143,246,36  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) | live=[]
+[user menu] End -> div[menuitem] "Sign out" 1005,143,246,36  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) | live=[]
+[user menu] Home -> div[menuitem] "Sign out" 1005,143,246,36  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) | live=[]
+[user menu esc] Escape -> button "PAP. Admin, account menu" 1139,8,117,40  solid 2px rgb(76, 29, 139) off 2px | live=[]
+skeleton live: [] nav inert: null aria-busy: 1
+404 {"title":"This Project is not available · iGuide CMS","h1":"This Project is not available","ae":"H1"} [] h1 "This Project is not available" 377,149,336,30  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px)
+AXE {"label":"project-404","url":"http://localhost:5173/projects/PID/pois","counts":{},"v":[]}
+media h1 {"title":"Media · UX Audit – Populated · iGuide CMS","h1":"Media","ae":"BODY"}

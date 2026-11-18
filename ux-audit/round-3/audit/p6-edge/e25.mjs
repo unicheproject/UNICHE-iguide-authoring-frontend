@@ -1,0 +1,18 @@
+import * as H from "./h.mjs";
+const log = H.LOG("e25");
+const { browser, page } = await H.session();
+await H.go(page, H.P("/maps")); await H.sleep(1800);
+const href = await page.locator("a[href*='/maps/']").first().getAttribute("href");
+log("first map", href);
+await page.route((u) => /tile|openstreetmap|maptiler|carto|arcgis|mapbox/i.test(u.hostname + u.pathname), (r) => r.abort("failed"));
+await H.go(page, href); await H.sleep(5000);
+log("map tiles blocked", { msgs: await H.msgs(page), body: (await H.body(page)).replace(/\s+/g," ").match(/.{0,80}(tile|map).{0,120}(could|unavailable|load)[^.]*\./i)?.[0], live: (await H.live(page)).map(x=>x.text).slice(-3) });
+await H.shot(page, "map-editor__tiles-blocked__1440");
+await H.go(page, H.P("/floor-plans")); await H.sleep(1500);
+const fh = await page.locator("a[href*='/floor-plans/']").first().getAttribute("href");
+await page.unrouteAll({behavior:"ignoreErrors"});
+await page.route((u) => /\.(png|jpe?g|webp)$/i.test(u.pathname) || /\/assets\/.*\/(content|file|download)/.test(u.pathname), (r) => r.abort("failed"));
+await H.go(page, fh); await H.sleep(3500);
+log("floor plan image blocked", { msgs: await H.msgs(page) });
+await H.shot(page, "floorplan-editor__image-blocked__1440");
+await browser.close();

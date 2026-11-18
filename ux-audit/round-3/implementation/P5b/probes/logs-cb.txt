@@ -1,0 +1,6 @@
+1440 poi accent-free 'παρθενωνας' options: ["UX-R3-p3 Poi Παρθενώνας test","UX-R3-P5b Parthenon Παρθενώνας\nDraft"]
+1440 upper: 2
+1440 chosen value UX-R3-p3 Poi Παρθενώνας test
+1440 place options (text,padding) [{"t":"None","pad":"0px"},{"t":"Athens Historic Centre","pad":"0px"},{"t":"Acropolis Museum","pad":"20px"},{"t":"Ground Floor – Slopes Level","pad":"40px"},{"t":"Excavation Hall of the Slopes","pad":"60px"},{"t":"First Floor – Archaic Gallery","pad":"40px"}]
+1440 closed place value "Acropolis Museum"
+1440 axe []

@@ -1,0 +1,30 @@
+import { open, go, P, shot, settle, IDS, url, txt } from "./lib.mjs";
+const vp=process.argv[2]||"1440";
+const { browser, page } = await open("admin", { viewport: vp });
+await go(page, url("events", IDS.event)); await settle(page,1500);
+await page.locator("#occ-add").click(); await settle(page,300);
+const setf=async(id,v)=>page.locator("#"+id).fill(v);
+await setf("occ-start-o-1-day","10"); await page.locator("#occ-start-o-1-month").selectOption("1"); await setf("occ-start-o-1-year","2026"); await page.keyboard.press("Tab"); await settle(page,400);
+const card = page.locator("#dates li").first();
+await card.scrollIntoViewIfNeeded();
+await shot(page,`event__ended-card__${vp}`);
+const m = await page.evaluate(()=>{const li=document.querySelector("#dates li"); const out=[]; let e=li; const chain=[]; while(e&&e!==document.body){const s=getComputedStyle(e); if(s.opacity!=="1") chain.push(e.tagName+"."+e.className.slice(0,50)+" opacity="+s.opacity); e=e.parentElement;}
+ const walk=[...li.querySelectorAll("h3, span, p, legend, label")].slice(0,12).map(n=>{let o=1,x=n;while(x&&x!==document.body){o*=parseFloat(getComputedStyle(x).opacity);x=x.parentElement;} const cs=getComputedStyle(n); return n.tagName+":"+n.textContent.trim().slice(0,25)+" color="+cs.color+" effOpacity="+o.toFixed(2)});
+ return {chain,walk}});
+console.log(JSON.stringify(m,null,1));
+// combobox
+const place = page.locator("#f-placeId");
+await place.scrollIntoViewIfNeeded(); await place.click(); await settle(page,300);
+console.log("combo attrs", await place.evaluate(e=>[...e.attributes].map(a=>a.name+"="+a.value.slice(0,40)).join(" ")));
+await page.keyboard.type("ακροπολ"); await settle(page,500);
+console.log("opts 'ακροπολ':", await page.locator("[role=option]").allInnerTexts());
+await place.fill(""); await page.keyboard.type("Ακρόπολ"); await settle(page,500);
+console.log("opts 'Ακρόπολ':", await page.locator("[role=option]").allInnerTexts());
+await place.fill(""); await page.keyboard.type("zzzz"); await settle(page,500);
+console.log("none:", await page.evaluate(()=>[...document.querySelectorAll("[role=listbox],[role=status]")].map(e=>e.textContent.trim()).join(" || ")));
+await shot(page,`event__combo-empty__${vp}`);
+await place.fill(""); await page.keyboard.type("Acropolis"); await settle(page,500);
+await page.keyboard.press("ArrowDown"); await page.keyboard.press("ArrowDown"); await page.keyboard.press("Enter"); await settle(page,400);
+console.log("picked:", await place.inputValue(), "| live:", await page.evaluate(()=>[...document.querySelectorAll("[aria-live],[role=status]")].map(e=>e.textContent.trim()).filter(Boolean).join(" || ")));
+await shot(page,`event__combo-picked__${vp}`);
+await browser.close();

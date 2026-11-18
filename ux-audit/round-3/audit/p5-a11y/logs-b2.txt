@@ -1,0 +1,4 @@
+[open] Enter -> h1 "UX-R3-p5 POI A" 256,132,159,26  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) | live=["1 of 97 points of interest","UX-R3-p5 POI A loaded"]
+lang tab button[tab] "Englishdefault1 of 5" 256,211,135,52  solid 2px rgb(76, 29, 139) off 2px {"w":2,"off":2,"style":"solid","ring":"rgb(76, 29, 139)","ringOnWrapper":false,"vsOutside":10.37,"bg":"244,245,247","clipped":"DIV.flex min-w-0 flex-1 overflow-x-auto L4,T4,B4","obscured":null,"offscreen":false,"rect":[256,211,135,52]}
+on this page {"w":2,"off":2,"style":"solid","ring":"rgb(76, 29, 139)","ringOnWrapper":false,"vsOutside":11.32,"bg":"255,255,255","clipped":null,"obscured":null,"offscreen":false,"rect":[1029,582,318,36]}
+tablist roles ["tablist:Englishdefault1 of 5","tab:Englishdefault1 of 5","tab:ΕλληνικάMissing","tab:ItalianoMissing"]

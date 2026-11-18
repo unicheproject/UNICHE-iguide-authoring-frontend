@@ -1,0 +1,11 @@
+import { shot, CMS } from "./h.mjs";
+import { open, go } from "../../../tools/session.mjs";
+const E="/projects/65f8958a-144a-46fe-851b-f1176b2a597e";
+const { browser, page } = await open("admin", { viewport: "1440" });
+await go(page, E+"/places"); await page.waitForTimeout(1200);
+await page.getByRole("button", { name: /new place/i }).first().click(); await page.waitForTimeout(500);
+const d=page.getByRole("dialog");
+await d.getByText("Top-level place").click(); await page.waitForTimeout(400);
+await shot(page, "place-create__toplevel-chosen", "1440");
+console.log("DIALOG:", (await d.innerText()).replace(/\n+/g," | "));
+await browser.close();

@@ -16,7 +16,16 @@ Catalogue stand-in forgets those Projects when it restarts.
 | `editor-preview.spec.ts` | "Preview in app" of an editor opens as a pop-up card below its button with the unsaved form, switches surface, passes axe, and returns focus on Escape and Close (D-056, D-059) |
 | `guide-reference.spec.ts` | a Guide story references a Point of Interest through the shared Resource picker |
 | `zoom-and-structure.spec.ts` | every Content list and editor at 200% zoom (700 × 450) and at 320 px: no sideways page scrolling, title and main action reachable; landmarks, one level-1 heading, no skipped level (D-054) |
+| `focus-and-gates.spec.ts` | one focus ring on every control, a visible menu highlight, toasts clear of the form column, icon-only buttons of 32/44 px, focus never on `<body>` after a removal, no sign-in response left in the address bar (round 3, D-100 to D-106) |
+| `touch-and-forced-colours.spec.ts` | an icon-only button is at least 32 px (44 on a coarse pointer), a `hit-44` link reaches 44 by 44, a dialog keeps a visible boundary in forced colours (round 2, D-086) |
 | `place-map-link.spec.ts` | an ACTIVE map linked and unlinked from the Place editor, refused while it has pending changes (backend D-044, D-050) |
+
+## Static gates (no stack needed)
+
+`make check` (or `pnpm check`) runs both source gates: `make check-css` (`scripts/check-css-tokens.mjs --all`: every
+token class has a CSS rule) and `make check-literals` (`scripts/check-literals.mjs`: no px font size, arbitrary radius,
+shadow or z-index, uppercase or hex colour in CMS chrome; exceptions are listed in the script). They are not part of
+`make build`.
 
 ## Run
 

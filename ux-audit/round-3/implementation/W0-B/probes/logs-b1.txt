@@ -1,0 +1,12 @@
+DRAFT header badge: ["3 warnings, nothing blocks in this point of interest: show what needs attention"]
+DRAFT card sentence: ["3 warnings, nothing blocks"] plus: ["plus checks run on activation"]
+DRAFT lines: ["Warning:English: 4 texts missing","Warning:Ελληνικά: 5 texts missing","Warning:Italiano: 5 texts missing","Texts3 languages incomplete","PlacementNo position yet","MediaPrimary image missing","How visitors reach itBrowsing only","Details0 of 4 set","Englishdefaultediting1 of 5","ΕλληνικάMissing","ItalianoMissing"]
+CONFIRM sentences: ["3 warnings, nothing blocks"] plus: ["plus checks run on activation"]
+CONFIRM full text: Activate UX-R3-W0B POI actA? UX-R3-W0B POI actA goes from draft to active. Visitors will see this point of interest on their next refresh of the app. You can deactivate it again at any time; it then returns to draft. 3 warnings, nothing blocks plus checks run on activation Texts (3) Warning:English: 4 texts missing Warning:Ελληνικά: 5 texts missing Warning:Italiano: 5 texts missing Review in editor Cancel Activate
+CONFIRM count of 'warning' words: ["3 warnings"]
+TOAST: ["","","Activated. 3 warnings, nothing blocksVisitors see it on their next refresh.",""]
+ACTIVE header badge: ["3 warnings, nothing blocks in this point of interest: show what needs attention"]
+ACTIVE card sentence: ["3 warnings, nothing blocks"]
+ACTIVE lines: ["Warning:English: 4 texts missing","Warning:Ελληνικά: 5 texts missing","Warning:Italiano: 5 texts missing","Texts3 languages incomplete","PlacementNo position yet","MediaPrimary image missing","How visitors reach itBrowsing only","Details0 of 4 set","Englishdefaultediting1 of 5","ΕλληνικάMissing","ItalianoMissing"]
+accessibility mentions in card: 0
+activeElement after activate: h2#status-card-heading "Status"

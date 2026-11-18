@@ -1,0 +1,21 @@
+import { start, go, P } from "./common.mjs";
+import { readFileSync } from "node:fs";
+const ids = JSON.parse(readFileSync(new URL("./ids.json", import.meta.url)));
+const s = await start("1440"); const { page } = s;
+await go(page, `${P}/floor-plans/${ids.plan}`); await page.waitForTimeout(2500);
+// fix invalid? reload gives saved state (v1 with 3 placements)
+await s.shot("fpeditor__active", true);
+const top = async()=> page.locator("img[draggable=false]").evaluate(e=>Math.round(e.getBoundingClientRect().top));
+console.log("img top active, before edit:", await top());
+await page.locator("img[draggable=false]").scrollIntoViewIfNeeded();
+const mk = page.locator("button[aria-label*='arrow keys']");
+let b = await mk.nth(2).boundingBox(); console.log("marker3", b, "img top", await top());
+await page.mouse.move(b.x+13,b.y+13); await page.mouse.down();
+await page.mouse.move(b.x-20,b.y+20,{steps:3}); console.log("mid drag img top", await top());
+await page.mouse.move(b.x-100,b.y+60,{steps:6}); console.log("mid2 img top", await top());
+await page.mouse.up(); await page.waitForTimeout(500);
+console.log("after drag img top", await top());
+await s.shot("fpeditor__active-after-drag");
+await page.evaluate(()=>window.scrollTo(0,0));
+console.log((await page.locator("main").first().innerText()).slice(0,500).replace(/\n/g," | "));
+await s.browser.close();

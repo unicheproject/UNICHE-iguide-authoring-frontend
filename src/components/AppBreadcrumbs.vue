@@ -17,18 +17,18 @@ defineProps<{ items: Crumb[] }>();
 </script>
 
 <template>
-  <nav aria-label="Breadcrumb" class="mb-1.5 min-w-0 max-w-[1090px]">
-    <ol class="m-0 flex min-w-0 list-none items-center p-0 text-xs leading-none">
+  <nav aria-label="Breadcrumb" class="mb-1 min-w-0 max-w-5xl">
+    <ol class="m-0 flex min-w-0 list-none items-center p-0 text-xs">
       <li v-for="(item, i) in items" :key="i" class="flex items-center" :class="item.to ? 'shrink-0' : 'min-w-0'">
-        <ChevronRight v-if="i > 0" class="mx-1 size-3.5 shrink-0 text-muted-foreground rtl:-scale-x-100" aria-hidden="true" :stroke-width="2.25" />
+        <ChevronRight v-if="i > 0" class="mx-1 size-4 shrink-0 text-muted-foreground rtl:-scale-x-100" aria-hidden="true" />
         <RouterLink
           v-if="item.to"
           :to="item.to"
-          class="inline-flex min-h-6 items-center whitespace-nowrap rounded-sm font-bold tracking-[0.04em] text-primary no-underline underline-offset-[3px] hover:text-primary hover:underline"
+          class="inline-flex min-h-8 items-center whitespace-nowrap rounded-sm font-semibold [@media(pointer:coarse)]:min-h-11"
         >
           {{ item.label }}
         </RouterLink>
-        <span v-else aria-current="page" :title="item.label" class="block truncate py-[6px] font-semibold tracking-[0.02em] text-muted-foreground">
+        <span v-else aria-current="page" :title="item.label" class="block truncate py-1.5 font-medium text-muted-foreground">
           {{ item.label }}
         </span>
       </li>

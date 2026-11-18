@@ -1,0 +1,10 @@
+import { open, go, base, shot } from "./lib.mjs";
+const { browser, page } = await open("admin", { viewport: "1440" });
+await go(page, base+"/preview"); await page.waitForSelector("h1"); await page.waitForTimeout(3000);
+console.log(await page.evaluate(()=>[...document.querySelectorAll("select")].map(s=>(s.labels?.[0]?.innerText||s.getAttribute("aria-label"))+": "+[...s.options].slice(0,6).map(o=>o.text).join(", ")).join("\n")));
+const sel = page.locator("select").filter({hasText:/Ελληνικά/}).first();
+await sel.selectOption({label:"Ελληνικά"}).catch(async e=>{ console.log("sel fail", String(e).slice(0,100)); });
+await page.waitForTimeout(2500);
+await shot(page,"preview__greek__1440");
+console.log(await page.evaluate(()=>{const f=document.querySelector("iframe,[aria-label*=Preview],[role=region]"); const root=document.querySelector("[lang=el]"); const up=[...document.querySelectorAll("*")].filter(e=>e.children.length===0&&getComputedStyle(e).textTransform==="uppercase"&&/[\u0370-\u03FF]/.test(e.innerText||"")).slice(0,5).map(e=>`${e.tagName} lang=${e.closest("[lang]")?.lang} text="${e.innerText.trim().slice(0,40)}" css=${getComputedStyle(e).textTransform}`); return JSON.stringify({rootLang:root?.tagName, up, missingLinks:[...document.querySelectorAll("a")].filter(a=>/missing/i.test(a.innerText)).map(a=>a.innerText.trim()+" -> "+a.getAttribute("href"))})}));
+await browser.close();

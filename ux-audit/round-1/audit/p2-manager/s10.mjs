@@ -1,0 +1,15 @@
+import { shot, CMS } from "./h.mjs";
+import { open, go } from "../../../tools/session.mjs";
+const E="/projects/65f8958a-144a-46fe-851b-f1176b2a597e";
+const { browser, page } = await open("admin", { viewport: "1440" });
+await go(page, E+"/places"); await page.waitForTimeout(1500);
+await shot(page, "places-empty__list", "1440");
+console.log((await page.locator("main").innerText()).slice(0,1500));
+const btns=await page.locator("main button, main a").allInnerTexts(); console.log(btns.join(" | "));
+await page.getByRole("button", { name: /new place|create|add/i }).first().click(); await page.waitForTimeout(600);
+await shot(page, "place-create__dialog", "1440");
+console.log("DIALOG:", await page.getByRole("dialog").innerText());
+await page.getByRole("dialog").getByRole("button", { name: /create/i }).click(); await page.waitForTimeout(500);
+await shot(page, "place-create__empty-submit", "1440");
+console.log("AFTER EMPTY:", await page.getByRole("dialog").innerText());
+await browser.close();

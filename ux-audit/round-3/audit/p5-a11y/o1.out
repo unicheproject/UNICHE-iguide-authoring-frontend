@@ -1,0 +1,65 @@
+STICKY poi-list {"pct":0,"covered":0,"vh":360,"items":[]}
+hscroll poi-list {"sw":640,"cw":640}
+AXE {"label":"poi-list@zoom200","url":"http://localhost:5173/projects/PID/pois","counts":{},"v":[]}
+[poi-list@zoom200] #1 button "New point of interest" -> LOWRING 1.09
+[poi-list@zoom200] 10 stops, 1 flagged
+STICKY poi-editor {"pct":31.1,"covered":112,"vh":360,"items":["DIV.editor-header sticky -top-6 z-@56+56"]}
+hscroll poi-editor {"sw":640,"cw":640}
+AXE {"label":"poi-editor@zoom200","url":"http://localhost:5173/projects/PID/pois/e51249c1-755b-42d5-9a20-5912046ea9c9","counts":{},"v":[]}
+[poi-editor@zoom200] #4 button "Activate" -> LOWRING 1
+[poi-editor@zoom200] #6 button "Englishdefault1 of 5" -> CLIPPED DIV.flex min-w-0 flex-1 overflow-x-auto L4,T4,B4
+[poi-editor@zoom200] 25 stops, 2 flagged
+STICKY poi-editor-active {"pct":32.5,"covered":117,"vh":360,"items":["DIV.editor-header sticky -top-6 z-@56+61"]}
+hscroll poi-editor-active {"sw":640,"cw":640}
+AXE {"label":"poi-editor-active@zoom200","url":"http://localhost:5173/projects/PID/pois/546c5177-effd-49c8-acae-85d751f89bbe","counts":{},"v":[]}
+[poi-editor-active@zoom200] #1 button "Apply changes" -> LOWRING 1
+[poi-editor-active@zoom200] #8 button "EnglishdefaultComplete" -> CLIPPED DIV.flex min-w-0 flex-1 overflow-x-auto L4,T4,B4
+[poi-editor-active@zoom200] #12 textarea "Archaeologists date the piece to the middle of the fifth cen" -> CLIPPED MAIN.relative min-w-0 flex-1 overflow-y-auto  T203; OBSCURED SPAN.min-w-0 flex-1 truncate text-sm font-sem
+[poi-editor-active@zoom200] 25 stops, 3 flagged
+STICKY route-editor {"pct":31.1,"covered":112,"vh":360,"items":["DIV.editor-header sticky -top-6 z-@56+56"]}
+hscroll route-editor {"sw":640,"cw":640}
+AXE {"label":"route-editor@zoom200","url":"http://localhost:5173/projects/PID/routes/f399b1d0-e035-4121-b896-612959811369","counts":{},"v":[]}
+[route-editor@zoom200] #4 button "Activate" -> LOWRING 1
+[route-editor@zoom200] #6 button "Englishdefault1 of 13" -> CLIPPED DIV.flex min-w-0 flex-1 overflow-x-auto L4,T4,B4
+[route-editor@zoom200] 9 stops, 2 flagged
+STICKY media {"pct":0,"covered":0,"vh":360,"items":[]}
+hscroll media {"sw":640,"cw":640}
+AXE {"label":"media@zoom200","url":"http://localhost:5173/projects/PID/media","counts":{},"v":[]}
+[media@zoom200] #1 button "Upload files" -> LOWRING 1.09
+[media@zoom200] #4 a "UX-R3-p3-asset.pngImage · 240 × 160 · 80 KBDraftUnused" -> CLIPPED MAIN.relative min-w-0 flex-1 overflow-y-auto  T67
+[media@zoom200] #5 a "AudioUX-R3-p1-editor-tone.wavAudio · 00:02 · 31 KBDraftUnuse" -> CLIPPED MAIN.relative min-w-0 flex-1 overflow-y-auto  T67
+[media@zoom200] #6 a "UX-R3-p5 upload b.pngImage · 200 × 200 · 590 BDraftUnusedEng" -> CLIPPED MAIN.relative min-w-0 flex-1 overflow-y-auto  T68
+[media@zoom200] #7 a "UX-R3-p5 upload a.pngImage · 320 × 240 · 780 BDraftUnusedEng" -> CLIPPED MAIN.relative min-w-0 flex-1 overflow-y-auto  T68
+[media@zoom200] #8 a "OtherUX-R2-P7a-one.exeOther · application/x-msdownload · 3 B" -> CLIPPED MAIN.relative min-w-0 flex-1 overflow-y-auto  T67
+[media@zoom200] #9 a "OtherUX-R2-P7a-one.exeOther · application/x-msdownload · 3 B" -> CLIPPED MAIN.relative min-w-0 flex-1 overflow-y-auto  T67
+[media@zoom200] #10 a "UX-R2-s13 zeta.pngImage · 1000 × 600 · 18 KBDraftUnusedEngli" -> CLIPPED MAIN.relative min-w-0 flex-1 overflow-y-auto  T83
+[media@zoom200] #11 a "UX-R2-s13 epsilon.pngImage · 500 × 700 · 395 KBDraftUnusedDe" -> CLIPPED MAIN.relative min-w-0 flex-1 overflow-y-auto  T83
+[media@zoom200] #12 a "UX-R2-s13 delta.pngImage · 700 × 500 · 397 KBDraftUnusedEngl" -> CLIPPED MAIN.relative min-w-0 flex-1 overflow-y-auto  T67
+[media@zoom200] #13 a "OtherUX-R2-s13 tool.exeOther · application/x-msdownload · 7 " -> CLIPPED MAIN.relative min-w-0 flex-1 overflow-y-auto  T67
+[media@zoom200] #14 a "UX-R2-s13 alpha.pngImage · 800 × 600 · 542 KBDraftUnusedEngl" -> CLIPPED MAIN.relative min-w-0 flex-1 overflow-y-auto  T67
+[media@zoom200] #15 a "UX-R2-s13 beta.pngImage · 600 × 900 · 572 KBDraftUnusedEngli" -> CLIPPED MAIN.relative min-w-0 flex-1 overflow-y-auto  T67
+[media@zoom200] #16 a "UX-R2-s13 gamma.jpgImage · 1000 × 600 · 18 KBDraftUnusedEngl" -> CLIPPED MAIN.relative min-w-0 flex-1 overflow-y-auto  T67
+[media@zoom200] #17 a "UX-R2-p6-fresh-1.pngImage · 400 × 300 · 120 KBDraftUnusedEng" -> CLIPPED MAIN.relative min-w-0 flex-1 overflow-y-auto  T67
+[media@zoom200] #18 a "UX-R2-p6-fresh-2.pngImage · 400 × 300 · 120 KBDraftUnusedEng" -> CLIPPED MAIN.relative min-w-0 flex-1 overflow-y-auto  T67
+[media@zoom200] #19 a "UX-R2-p6-many-12.pngImage · 400 × 300 · 120 KBDraftUnusedEng" -> CLIPPED MAIN.relative min-w-0 flex-1 overflow-y-auto  T67
+[media@zoom200] #20 a "UX-R2-p6-many-11.pngImage · 400 × 300 · 120 KBDraftUnusedEng" -> CLIPPED MAIN.relative min-w-0 flex-1 overflow-y-auto  T67
+[media@zoom200] #21 a "UX-R2-p6-many-10.pngImage · 400 × 300 · 120 KBDraftUnusedEng" -> CLIPPED MAIN.relative min-w-0 flex-1 overflow-y-auto  T67
+[media@zoom200] #22 a "UX-R2-p6-many-9.pngImage · 400 × 300 · 120 KBDraftUnusedEngl" -> CLIPPED MAIN.relative min-w-0 flex-1 overflow-y-auto  T67
+[media@zoom200] #23 a "UX-R2-p6-many-8.pngImage · 400 × 300 · 120 KBDraftUnusedEngl" -> CLIPPED MAIN.relative min-w-0 flex-1 overflow-y-auto  T67
+[media@zoom200] #24 a "UX-R2-p6-many-7.pngImage · 400 × 300 · 120 KBDraftUnusedEngl" -> CLIPPED MAIN.relative min-w-0 flex-1 overflow-y-auto  T68
+[media@zoom200] #25 a "UX-R2-p6-many-6.pngImage · 400 × 300 · 120 KBDraftUnusedEngl" -> CLIPPED MAIN.relative min-w-0 flex-1 overflow-y-auto  T68
+[media@zoom200] 25 stops, 23 flagged
+STICKY dashboard {"pct":0,"covered":0,"vh":360,"items":[]}
+hscroll dashboard {"sw":640,"cw":640}
+AXE {"label":"dashboard@zoom200","url":"http://localhost:5173/projects/PID/","counts":{},"v":[]}
+[dashboard@zoom200] #2 a "Preview the app" -> LOWRING 1
+[dashboard@zoom200] 25 stops, 1 flagged
+STICKY preview {"pct":0,"covered":0,"vh":360,"items":[]}
+hscroll preview {"sw":640,"cw":640}
+AXE {"label":"preview@zoom200","url":"http://localhost:5173/projects/PID/preview","counts":{},"v":[]}
+[preview@zoom200] #2 button "Web" -> CLIPPED DIV.flex overflow-x-auto border-border borde L4,T4,B5
+[preview@zoom200] #3 button "English" -> CLIPPED DIV.flex overflow-x-auto border-border borde L4,T4,B5
+[preview@zoom200] #4 button "Working" -> CLIPPED DIV.flex overflow-x-auto border-border borde L4,T4,B5
+[preview@zoom200] #9 button "Fit width" -> CLIPPED DIV.flex overflow-x-auto border-border borde L4,T4,B5
+[preview@zoom200] #11 body "Skip to content  iGuide CMS UX Audit – PopulatedApp: Draft. " -> BODY
+[preview@zoom200] 16 stops, 5 flagged

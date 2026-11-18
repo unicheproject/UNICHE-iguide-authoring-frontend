@@ -1,0 +1,62 @@
+- dialog "New point of interest":
+  - heading "New point of interest" [level=2]
+  - button "Close dialog"
+  - paragraph: It starts as a draft. Visitors see it once it is complete and you activate it.
+  - text: Title · English(required)
+  - textbox "Title · English(required)"
+  - text: Place
+  - combobox "Place":
+    - option "Not inside a Place" [selected]
+    - option "Athens Historic Centre"
+    - option "Acropolis Museum"
+    - option "Ground Floor – Slopes Level"
+    - option "Excavation Hall of the Slopes"
+    - option "First Floor – Archaic Gallery"
+    - option "Room of the Korai"
+    - option "Parthenon Gallery"
+    - option "Acropolis of Athens"
+    - option "Propylaea and Temple of Athena Nike"
+    - option "Theatre of Dionysus"
+    - option "Ancient Agora of Athens"
+    - option "Stoa of Attalos Museum"
+    - option "UX-R2-s9 temp"
+    - option "UX-R2-s9 temp2"
+    - option "UX-p6-edge Place"
+    - option "UX-s10-poi-place Κήπος Ωδείου – Odeon Garden with a deliberately long name to test wrapping"
+    - option "UX-P4 outdoor place"
+    - option "UX-P4 indoor place"
+    - option "UX-P4 sub place"
+    - option "UX-R2-p6 Place"
+    - option "UX-R2-s10 Place"
+    - option "UX-R2-s9 Place"
+    - option "UX-R2-P4 Empty place"
+  - text: Category
+  - combobox "Category":
+    - option "No category" [selected]
+    - option "Monuments and Temples"
+    - option "Monuments and Temples › UX-R2-s9 Subcat"
+    - option "Sculpture"
+    - option "Pottery and Everyday Life"
+    - option "Visitor Services"
+    - option "Visitor Services › Food and Drink"
+    - option "Visitor Services › Shops"
+    - option "Viewpoints"
+    - option "UX-p3-translator categorie"
+    - option "UX-p6-edge Category"
+    - option "UX-p6-edge dup categories"
+    - option "UX-P5b category"
+    - option "UX-R2-p3 Marketplace Life"
+    - option "UX-R2-p5 Category"
+    - option "UX-R2-p6 Category"
+    - option "UX-R2-s7-chrome category"
+    - option "UX-R2-s9 Category"
+    - option "UX-R2-P5b Category"
+  - text: Exhibit code
+  - paragraph: Optional. Visitors can type it in, for example KN-001.
+  - textbox "Exhibit code"
+  - text: "Slug:"
+  - code: built from the title
+  - button "Edit slug"
+  - contentinfo:
+    - button "Cancel"
+    - button "Create and open"

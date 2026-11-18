@@ -1,0 +1,52 @@
+{
+ "768": {
+  "count": "Showing 48 of 118 files (1 archived)",
+  "hscroll": false,
+  "list": {
+   "usedCells": [],
+   "overflow": 0,
+   "rowH": 0
+  }
+ },
+ "1024": {
+  "count": "Showing 48 of 118 files (1 archived)",
+  "hscroll": false,
+  "list": {
+   "date": "18 Nov 2026, 10:15",
+   "usedCells": [
+    "Not used yet"
+   ],
+   "overflow": 0,
+   "rowH": 72
+  }
+ },
+ "1440": {
+  "count": "Showing 48 of 118 files (1 archived)",
+  "hscroll": false,
+  "list": {
+   "date": "18 Nov 2026, 10:15",
+   "usedCells": [
+    "Not used yet"
+   ],
+   "overflow": 0,
+   "rowH": 72
+  }
+ },
+ "zoom200": {
+  "count": "Showing 48 of 118 files (1 archived)",
+  "hscroll": false,
+  "list": {
+   "usedCells": [],
+   "overflow": 0,
+   "rowH": 0
+  }
+ },
+ "chipRemove": {
+  "tag": "BODY",
+  "label": null
+ },
+ "chipRemoveLast": {
+  "tag": "INPUT",
+  "label": "Name, file name or title"
+ }
+}

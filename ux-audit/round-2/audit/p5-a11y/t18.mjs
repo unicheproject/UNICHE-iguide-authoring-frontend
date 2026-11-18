@@ -1,0 +1,15 @@
+import * as L from "./lib.mjs";
+const { page, browser } = await L.open("curator", { viewport: "1440" });
+const k = page.keyboard;
+const R = "11d2dfe4-09fa-48b1-8b5b-494964cf3d52";
+await L.nav(page, L.P("/routes/" + R), 1500);
+await L.watchLive(page);
+L.log("t18", "headings", await page.evaluate(() => [...document.querySelectorAll("h1,h2,h3")].map((h) => h.tagName + " " + h.textContent.trim().slice(0, 40))));
+L.log("t18", "axe route", await L.axe(page, "route-editor-new"));
+const addBtn = page.getByRole("button", { name: /add stop|add stops/i }).first();
+L.log("t18", "add btn", await addBtn.textContent());
+await addBtn.focus(); await k.press("Enter"); await page.waitForTimeout(1200);
+L.log("t18", "stop picker open: focus", await L.focus(page));
+await L.shot(page, "route__stop-picker__1440");
+L.log("t18", "picker aria", (await L.snap(page, "stop-picker", "[role=dialog]")).split("\n").slice(0, 40).join("\n"));
+await browser.close();

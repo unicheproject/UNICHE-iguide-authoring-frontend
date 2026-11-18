@@ -1,0 +1,11 @@
+import { open, go } from "../../../tools/session.mjs"; import {P,shotp,log} from "./lib.mjs";
+const { browser, page } = await open("admin",{viewport:"1440"});
+await go(page,`/projects/${P}/pois/a12564e2-1d45-4441-b421-ef3497979ef6`); await page.waitForSelector("text=How visitors reach it"); await page.waitForTimeout(800);
+await page.getByRole("button",{name:/Preview in app/}).first().click(); await page.waitForTimeout(2000);
+const st=()=>page.evaluate(()=>{const f=document.querySelector("[data-preview-frame]");const p=f.closest("section")?.parentElement;const m=document.scrollingElement;const mm=document.querySelector("main");return {winY:m.scrollTop, mainTop:mm.scrollTop, frame:[f.getBoundingClientRect().y|0,f.getBoundingClientRect().width|0,f.getBoundingClientRect().height|0], btns:[...document.querySelectorAll("button")].filter(b=>/Expand|Collapse|Close preview|Preview in app/.test(b.textContent)).map(b=>b.textContent.trim()+"@"+(b.getBoundingClientRect().y|0))}});
+log("open",await st());
+await page.getByRole("button",{name:/Expand/}).first().click(); await page.waitForTimeout(1200);
+log("exp",await st()); await page.screenshot({path:shotp("poi-preview-panel__after-expand-click__1440")});
+await page.evaluate(()=>{window.scrollTo(0,0);document.querySelector("main")?.scrollTo(0,0)}); await page.waitForTimeout(500);
+log("exp top",await st()); await page.screenshot({path:shotp("poi-preview-panel__expanded-top__1440")});
+await browser.close();

@@ -1,0 +1,40 @@
+1440 at top: buttons ["Save and apply","Save draft"]
+1440 scrolled: app header 56 + sticky 0 = 56px = 6.2% of 900 []
+1440 scrolled: Save draft in tree: 1 visible banner save: none header save: 1
+1440 Save draft position: {"top":64,"inView":true}
+1440 Tab presses from title to Save draft: 5
+1280 at top: buttons ["Save and apply","Save draft"]
+1280 scrolled: app header 56 + sticky 0 = 56px = 7.8% of 720 []
+1280 scrolled: Save draft in tree: 1 visible banner save: none header save: 1
+1280 Save draft position: {"top":64,"inView":true}
+1280 Tab presses from title to Save draft: 5
+1024 at top: buttons ["Save and apply","Save draft"]
+1024 scrolled: app header 56 + sticky 0 = 56px = 7.3% of 768 []
+1024 scrolled: Save draft in tree: 1 visible banner save: none header save: 1
+1024 Save draft position: {"top":60,"inView":true}
+1024 Tab presses from title to Save draft: 4
+zoom200 at top: buttons ["Save draft","Save and apply"]
+zoom200 scrolled: app header 56 + sticky 0 = 56px = 15.6% of 360 []
+zoom200 scrolled: Save draft in tree: 1 visible banner save: none header save: 1
+zoom200 Save draft position: {"top":-369,"inView":false}
+zoom200 Tab presses from title to Save draft: 4
+1440 at top: buttons ["Save and apply","Save draft"]
+1440 scrolled: chrome (app header 56 + sticky) = 105px = 11.7% of 900 ["div.editor-header.z-sticky:49"]
+1440 scrolled: Save draft in tree: 1 visible banner save: none header save: 1
+1440 Save draft position: {"top":64,"inView":true}
+1440 Tab presses from title to Save draft: 5
+1280 at top: buttons ["Save and apply","Save draft"]
+1280 scrolled: chrome (app header 56 + sticky) = 105px = 14.6% of 720 ["div.editor-header.z-sticky:49"]
+1280 scrolled: Save draft in tree: 1 visible banner save: none header save: 1
+1280 Save draft position: {"top":64,"inView":true}
+1280 Tab presses from title to Save draft: 5
+1024 at top: buttons ["Save and apply","Save draft"]
+1024 scrolled: chrome (app header 56 + sticky) = 109px = 14.2% of 768 ["div.editor-header.z-sticky:53"]
+1024 scrolled: Save draft in tree: 1 visible banner save: none header save: 1
+1024 Save draft position: {"top":60,"inView":true}
+1024 Tab presses from title to Save draft: 4
+zoom200 at top: buttons ["Save draft","Save and apply"]
+zoom200 scrolled: chrome (app header 56 + sticky) = 56px = 15.6% of 360 []
+zoom200 scrolled: Save draft in tree: 1 visible banner save: none header save: 1
+zoom200 Save draft position: {"top":-369,"inView":false}
+zoom200 Tab presses from title to Save draft: 4

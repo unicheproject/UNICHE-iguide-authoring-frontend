@@ -1,0 +1,16 @@
+import { open, go, POP, API } from "./lib.mjs";
+import { browserMedia } from "../../../tools/media.mjs";
+import { writeFileSync } from "node:fs";
+const { browser, context, page } = await open("curator", { viewport: "1440" });
+const tok = await (await import("../../../tools/session.mjs")).bearer(page);
+const r = await fetch(`${API}/upload-limits`, { headers: { Authorization: `Bearer ${tok}` } });
+console.log(r.status, await r.text());
+const m = await browserMedia(context);
+const dir = "ux-audit/round-2/audit/s13-media/fixtures/";
+writeFileSync(dir+"UX-R2-s13 alpha.png", await m.image(800,600,"UX-R2-s13 alpha","image/png",200));
+writeFileSync(dir+"UX-R2-s13 beta.png", await m.image(600,900,"UX-R2-s13 beta","image/png",20));
+writeFileSync(dir+"UX-R2-s13 gamma.jpg", await m.image(1000,600,"UX-R2-s13 gamma","image/jpeg",120));
+writeFileSync(dir+"UX-R2-s13 notes.txt", "hello notes");
+writeFileSync(dir+"UX-R2-s13 tool.exe", Buffer.from("MZ fake"));
+console.log(Object.keys(m));
+await browser.close();

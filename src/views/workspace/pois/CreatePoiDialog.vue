@@ -1,63 +1,78 @@
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
-import AppDialog from "@/components/AppDialog.vue";
-import { SLUG_PATTERN, slugify } from "@/lib/format";
+/**
+ * "New point of interest" on the shared `FormDialog` (plan 2.4): Title first, then the Place and the Category, the
+ * exhibit code behind nothing more than an optional field, the slug under "Edit slug". "Create and open" creates the
+ * draft and the list opens its editor.
+ */
+import { computed, ref } from "vue";
+import FormDialog from "@/components/ui/dialog/FormDialog.vue";
+import FormField from "@/components/ui/field/FormField.vue";
+import Input from "@/components/ui/input/Input.vue";
+import Select from "@/components/ui/select/Select.vue";
 import { ApiError } from "@/platform/api";
+import { setResourceCategory } from "@/platform/categories";
 import type { ProjectLanguage } from "@/platform/languages";
 import { createPoi, POI_CODE_PATTERN, type Poi } from "@/platform/pois";
+import { showToast } from "@/stores/toast";
 import type { PlaceOption } from "../places/placeTree";
-import { useFocusOnErrors } from "@/lib/focus";
+import { createFailure } from "../createFailure";
 
 const props = defineProps<{
   projectId: string;
   defaultLanguage: ProjectLanguage;
   placeOptions: PlaceOption[];
+  /** Categories that apply to Points of Interest; the Category field is left out while there are none. */
+  categoryOptions: { id: string; label: string }[];
+  /** The Places could not be read: the Place field says so instead of offering an empty list. */
+  placesFailed?: boolean;
 }>();
 const emit = defineEmits<{ close: []; created: [poi: Poi] }>();
 
 const title = ref("");
-const placeId = ref("");
-const code = ref("");
 const slug = ref("");
-const slugEdited = ref(false);
+// The only Place is the obvious one (the Dashboard guide opens this dialog right after the first Place).
+const placeId = ref(props.placeOptions.length === 1 ? props.placeOptions[0]!.id : "");
+const categoryId = ref("");
+const code = ref("");
 const submitting = ref(false);
 const errors = ref<Record<string, string>>({});
-useFocusOnErrors(errors);
 const formError = ref<string | null>(null);
+const requestId = ref<string | null>(null);
 
-watch(title, (value) => {
-  if (!slugEdited.value) slug.value = slugify(value);
-});
+const trimmedCode = computed(() => code.value.trim());
+const dirty = computed(() => !!(trimmedCode.value || categoryId.value || (placeId.value && props.placeOptions.length !== 1)));
 
-function onSlugInput(event: Event) {
-  slugEdited.value = true;
-  slug.value = (event.target as HTMLInputElement).value;
+/** The kind's own checks, run with Title and slug in one pass (C2-44). */
+function validate(): Record<string, string> {
+  const c = trimmedCode.value;
+  if (c && (c.length > 32 || !POI_CODE_PATTERN.test(c))) return { code: "Letters, digits and single hyphens, at most 32 characters, for example KN-001." };
+  return {};
 }
-
-const titleLabel = computed(() => `Title · ${props.defaultLanguage.displayName}`);
 
 async function submit() {
   errors.value = {};
   formError.value = null;
-  const trimmedCode = code.value.trim();
-  if (!title.value.trim()) errors.value.title = "Enter a title in the default language.";
-  if (!SLUG_PATTERN.test(slug.value)) errors.value.slug = "Use lowercase Latin letters, digits, and single hyphens.";
-  if (trimmedCode && (trimmedCode.length > 32 || !POI_CODE_PATTERN.test(trimmedCode))) {
-    errors.value.code = "Letters, digits, and single hyphens, at most 32 characters, for example KN-001.";
-  }
-  if (Object.keys(errors.value).length) return;
-
+  requestId.value = null;
   submitting.value = true;
   try {
     const poi = await createPoi(props.projectId, {
       title: title.value.trim(),
       slug: slug.value,
       placeId: placeId.value || null,
-      code: trimmedCode || null,
+      code: trimmedCode.value || null,
     });
+    if (categoryId.value) {
+      try {
+        await setResourceCategory(props.projectId, "pois", poi.id, categoryId.value);
+      } catch (e) {
+        if (!(e instanceof ApiError)) throw e;
+        showToast("Category not set", "The point of interest was created. Choose its category in the editor.", "warning", { requestId: e.requestId, persist: true });
+      }
+    }
     emit("created", poi);
   } catch (e) {
     if (!(e instanceof ApiError)) throw e;
+    requestId.value = e.requestId;
     if (e.code === "DUPLICATE_VALUE") {
       const field = Object.keys(e.fieldMessages())[0] ?? "slug";
       errors.value = {
@@ -66,9 +81,9 @@ async function submit() {
     } else if (e.status === 422 || e.status === 400) {
       const byField = e.fieldMessages();
       errors.value = byField;
-      formError.value = byField[""] ?? (Object.keys(byField).length ? null : e.message);
+      formError.value = Object.keys(byField).length ? null : createFailure(e, "point of interest");
     } else {
-      formError.value = e.platformUnavailable ? "The UNICHE platform is not reachable. Nothing was created." : e.message;
+      formError.value = createFailure(e, "point of interest");
     }
   } finally {
     submitting.value = false;
@@ -77,118 +92,45 @@ async function submit() {
 </script>
 
 <template>
-  <AppDialog title="New point of interest" :busy="submitting" @close="emit('close')">
-    <p class="mb-4 text-[13px] text-gray-700">
-      It starts as a draft. Visitors see it once it is complete and you activate it.
-    </p>
-    <form id="create-poi-form" novalidate class="flex flex-col gap-4" @submit.prevent="submit">
-      <p v-if="formError" role="alert" class="text-[13px] font-semibold text-destructive">{{ formError }}</p>
-
-      <div class="flex flex-col gap-1.5">
-        <label for="poi-title" class="field-label">{{ titleLabel }}</label>
-        <input
-          id="poi-title"
-          v-model="title"
-          type="text"
-          autocomplete="off"
-          :dir="defaultLanguage.direction.toLowerCase()"
-          :lang="defaultLanguage.languageCode"
-          class="field-input"
-          :aria-describedby="errors.title ? 'err-CreatePoiDialog-1' : undefined"
-          :class="{ invalid: errors.title }"
-          :aria-invalid="!!errors.title"
-        />
-        <span v-if="errors.title" id="err-CreatePoiDialog-1" class="text-xs font-semibold text-destructive">⚠ {{ errors.title }}</span>
-      </div>
-
-      <div class="flex gap-3">
-        <div class="flex flex-[2] flex-col gap-1.5">
-          <label for="poi-place" class="field-label">Place</label>
-          <select id="poi-place" v-model="placeId" class="field-input" :aria-invalid="errors.placeId ? 'true' : undefined" :aria-describedby="errors.placeId ? 'err-CreatePoiDialog-2' : undefined" :class="{ invalid: errors.placeId }">
-            <option value="">Not inside a Place</option>
-            <option v-for="o in placeOptions" :key="o.id" :value="o.id">{{ o.label }}</option>
-          </select>
-          <span v-if="errors.placeId" id="err-CreatePoiDialog-2" class="text-xs font-semibold text-destructive">⚠ {{ errors.placeId }}</span>
-        </div>
-        <div class="flex flex-1 flex-col gap-1.5">
-          <label for="poi-code" class="field-label">Exhibit code</label>
-          <input
-            id="poi-code"
-            v-model="code"
-            type="text"
-            autocomplete="off"
-            spellcheck="false"
-            placeholder="KN-001"
-            class="field-input font-mono text-[13px]"
-            :aria-invalid="errors.code ? 'true' : undefined"
-            :aria-describedby="errors.code ? 'err-CreatePoiDialog-3' : undefined"
-            :class="{ invalid: errors.code }"
-          />
-          <span v-if="errors.code" id="err-CreatePoiDialog-3" class="text-xs font-semibold text-destructive">⚠ {{ errors.code }}</span>
-        </div>
-      </div>
-
-      <div class="flex flex-col gap-1.5">
-        <label for="poi-slug" class="field-label">Slug</label>
-        <input
-          id="poi-slug"
-          :value="slug"
-          type="text"
-          autocomplete="off"
-          spellcheck="false"
-          class="field-input font-mono text-[13px]"
-          :class="{ invalid: errors.slug }"
-          aria-describedby="poi-slug-help"
-          :aria-invalid="errors.slug ? 'true' : undefined"
-          @input="onSlugInput"
-        />
-        <span v-if="errors.slug" id="poi-slug-help" class="text-xs font-semibold text-destructive">⚠ {{ errors.slug }}</span>
-        <span v-else id="poi-slug-help" class="text-xs text-muted-foreground">Used in URLs and QR targets. Unique in the Project.</span>
-      </div>
-    </form>
-
-    <template #actions>
-      <button
-        type="button"
-        class="rounded-full border bg-muted px-5 py-2.5 text-[11px] font-bold uppercase tracking-[0.06em] text-gray-700"
-        :disabled="submitting"
-        @click="emit('close')"
+  <FormDialog
+    v-model:title="title"
+    v-model:slug="slug"
+    v-model:errors="errors"
+    heading="New point of interest"
+    intro="It starts as a draft. Visitors see it once it is complete and you activate it."
+    noun="point of interest"
+    :default-language="defaultLanguage"
+    :busy="submitting"
+    :form-error="formError"
+    :request-id="requestId"
+    :labels="{ placeId: 'Place', categoryId: 'Category', code: 'Exhibit code' }"
+    :validate="validate"
+    :dirty="dirty"
+    @close="emit('close')"
+    @submit="submit"
+  >
+    <template #default="{ id }">
+      <FormField
+        label="Place"
+        :hint="placesFailed ? 'The places could not be loaded. Create the point of interest and choose its place in the editor.' : undefined"
+        :error="errors.placeId"
+        :id="id('placeId')"
+        v-slot="f"
       >
-        Cancel
-      </button>
-      <button
-        type="submit"
-        form="create-poi-form"
-        class="rounded-full bg-primary px-5 py-2.5 text-[11px] font-bold uppercase tracking-[0.06em] text-white disabled:opacity-60"
-        :disabled="submitting"
-      >
-        {{ submitting ? "Creating…" : "Create" }}
-      </button>
+        <Select v-model="placeId" :id="f.id" :aria-describedby="f.describedBy" :invalid="f.invalid" :disabled="placesFailed">
+          <option value="">Not inside a Place</option>
+          <option v-for="o in placeOptions" :key="o.id" :value="o.id">{{ o.label }}</option>
+        </Select>
+      </FormField>
+      <FormField v-if="categoryOptions.length" label="Category" :error="errors.categoryId" :id="id('categoryId')" v-slot="f">
+        <Select v-model="categoryId" :id="f.id" :aria-describedby="f.describedBy" :invalid="f.invalid">
+          <option value="">No category</option>
+          <option v-for="o in categoryOptions" :key="o.id" :value="o.id">{{ o.label }}</option>
+        </Select>
+      </FormField>
+      <FormField label="Exhibit code" hint="Optional. Visitors can type it in, for example KN-001." :error="errors.code" :id="id('code')" v-slot="f">
+        <Input v-model="code" type="text" autocomplete="off" spellcheck="false" class="mono" :id="f.id" :aria-describedby="f.describedBy" :invalid="f.invalid" />
+      </FormField>
     </template>
-  </AppDialog>
+  </FormDialog>
 </template>
-
-<style scoped>
-.field-label {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #374151;
-}
-.field-input {
-  width: 100%;
-  border: 1.5px solid #e5e7eb;
-  border-radius: 8px;
-  background: #fff;
-  padding: 10px 12px;
-  font-size: 14px;
-}
-.field-input:focus {
-  border-color: #4c1d8b;
-  outline: none;
-}
-.field-input.invalid {
-  border-color: #c0185e;
-}
-</style>

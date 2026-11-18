@@ -1,56 +1,56 @@
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
-import AppDialog from "@/components/AppDialog.vue";
-import { SLUG_PATTERN, slugify } from "@/lib/format";
+/**
+ * "New route" on the shared `FormDialog` (plan 2.4): Title first, then where the route runs (indoor or outdoor), the
+ * slug under "Edit slug". "Create and open" creates the draft without stops; the list opens its editor.
+ */
+import { Check } from "lucide-vue-next";
+import { ref, useId, watch } from "vue";
+import FormDialog from "@/components/ui/dialog/FormDialog.vue";
 import { ApiError } from "@/platform/api";
 import type { ProjectLanguage } from "@/platform/languages";
 import { createRoute, ROUTE_TYPE_HINTS, ROUTE_TYPES, routeTypeLabel, type Route, type RouteType } from "@/platform/routes";
-import { useFocusOnErrors } from "@/lib/focus";
+import { createFailure } from "../createFailure";
 
 const props = defineProps<{ projectId: string; defaultLanguage: ProjectLanguage }>();
 const emit = defineEmits<{ close: []; created: [route: Route] }>();
 
 const title = ref("");
-const type = ref<RouteType | null>(null);
 const slug = ref("");
-const slugEdited = ref(false);
+const type = ref<RouteType | "">("");
+const typeName = useId();
 const submitting = ref(false);
 const errors = ref<Record<string, string>>({});
-useFocusOnErrors(errors);
 const formError = ref<string | null>(null);
+const requestId = ref<string | null>(null);
 
-watch(title, (value) => {
-  if (!slugEdited.value) slug.value = slugify(value);
+watch(type, () => {
+  if (errors.value.type) errors.value = {};
 });
 
-function onSlugInput(event: Event) {
-  slugEdited.value = true;
-  slug.value = (event.target as HTMLInputElement).value;
+/** The kind's own check, run with Title and slug in one pass (C2-44). */
+function validate(): Record<string, string> {
+  return type.value ? {} : { type: "Choose where the route runs: indoor or outdoor." };
 }
-
-const titleLabel = computed(() => `Title · ${props.defaultLanguage.displayName}`);
 
 async function submit() {
   errors.value = {};
   formError.value = null;
-  if (!type.value) errors.value.type = "Choose where the route runs.";
-  if (!title.value.trim()) errors.value.title = "Enter a title in the default language.";
-  if (!SLUG_PATTERN.test(slug.value)) errors.value.slug = "Use lowercase Latin letters, digits, and single hyphens.";
-  if (Object.keys(errors.value).length) return;
-
+  requestId.value = null;
+  if (!type.value) return;
   submitting.value = true;
   try {
-    emit("created", await createRoute(props.projectId, { title: title.value.trim(), slug: slug.value, type: type.value! }));
+    emit("created", await createRoute(props.projectId, { title: title.value.trim(), slug: slug.value, type: type.value }));
   } catch (e) {
     if (!(e instanceof ApiError)) throw e;
+    requestId.value = e.requestId;
     if (e.code === "DUPLICATE_VALUE") {
       errors.value = { slug: "Another route already uses this slug. Choose a different one." };
     } else if (e.status === 422 || e.status === 400) {
       const byField = e.fieldMessages();
       errors.value = byField;
-      formError.value = byField[""] ?? (Object.keys(byField).length ? null : e.message);
+      formError.value = Object.keys(byField).length ? null : createFailure(e, "route");
     } else {
-      formError.value = e.platformUnavailable ? "The UNICHE platform is not reachable. Nothing was created." : e.message;
+      formError.value = createFailure(e, "route");
     }
   } finally {
     submitting.value = false;
@@ -59,117 +59,43 @@ async function submit() {
 </script>
 
 <template>
-  <AppDialog title="New route" :busy="submitting" @close="emit('close')">
-    <p class="mb-4 text-[13px] text-gray-700">
-      Choose where the route runs. It starts as a draft without stops; add them in the editor, then activate it.
-    </p>
-    <form id="create-route-form" novalidate class="flex flex-col gap-4" @submit.prevent="submit">
-      <p v-if="formError" role="alert" class="text-[13px] font-semibold text-destructive">{{ formError }}</p>
-
-
-      <div
-        class="flex flex-col gap-2"
-        role="group"
-        aria-labelledby="route-setting-label"
-        :aria-invalid="errors.type ? 'true' : undefined"
-        :aria-describedby="errors.type ? 'route-type-error' : undefined"
-      >
-        <span id="route-setting-label" class="field-label">Setting</span>
-        <div class="grid grid-cols-2 gap-2.5">
-          <button
+  <FormDialog
+    v-model:title="title"
+    v-model:slug="slug"
+    v-model:errors="errors"
+    heading="New route"
+    intro="It starts as a draft without stops; add them in the editor, then activate it."
+    noun="route"
+    :default-language="defaultLanguage"
+    :busy="submitting"
+    :form-error="formError"
+    :request-id="requestId"
+    :labels="{ type: 'Setting' }"
+    :validate="validate"
+    :dirty="!!type"
+    @close="emit('close')"
+    @submit="submit"
+  >
+    <template #default="{ id }">
+      <!-- The same radio cards as the Level of a Place and the scope and Level of a Category (C3-93). -->
+      <fieldset :id="id('type')" class="min-w-0" :aria-invalid="errors.type ? 'true' : undefined">
+        <legend class="mb-1.5 text-sm font-semibold text-ink-2">Setting<span class="ml-1 font-medium text-muted-foreground">(required)</span></legend>
+        <div class="grid grid-cols-1 gap-2 min-[480px]:grid-cols-2">
+          <label
             v-for="t in ROUTE_TYPES"
             :key="t"
-            type="button"
-            :aria-pressed="type === t"
-            class="flex flex-col gap-1 rounded-lg border-[1.5px] px-3.5 py-3 text-left"
-            :class="type === t ? 'border-primary bg-[#f5f0fb]' : 'border-gray-200 bg-white hover:border-primary'"
-            @click="type = t"
+            class="relative flex cursor-pointer flex-col gap-0.5 rounded-lg border px-3.5 py-3 hover:bg-surface-hover has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary"
+            :class="type === t ? 'border-primary bg-accent' : errors.type ? 'border-destructive bg-card' : 'border-input bg-card'"
           >
-            <span class="text-[13px] font-bold"><span v-if="type === t" aria-hidden="true" class="text-primary">✓ </span>{{ routeTypeLabel(t) }}</span>
-            <span class="text-xs text-muted-foreground">{{ ROUTE_TYPE_HINTS[t] }}</span>
-          </button>
+            <input v-model="type" type="radio" :name="typeName" :value="t" :aria-describedby="errors.type ? `${id('type')}-err` : undefined" class="sr-only" />
+            <span class="flex items-center gap-1.5 text-sm font-semibold">
+              <Check v-if="type === t" class="size-4 text-primary" aria-hidden="true" :stroke-width="3" />{{ routeTypeLabel(t) }}
+            </span>
+            <span class="text-xs text-muted-foreground">{{ ROUTE_TYPE_HINTS[t] }}.</span>
+          </label>
         </div>
-        <span v-if="errors.type" id="route-type-error" class="text-xs font-semibold text-destructive">⚠ {{ errors.type }}</span>
-      </div>
-
-      <div class="flex flex-col gap-1.5">
-        <label for="route-title" class="field-label">{{ titleLabel }}</label>
-        <input
-          id="route-title"
-          v-model="title"
-          type="text"
-          autocomplete="off"
-          :dir="defaultLanguage.direction.toLowerCase()"
-          :lang="defaultLanguage.languageCode"
-          class="field-input"
-          :aria-describedby="errors.title ? 'err-CreateRouteDialog-1' : undefined"
-          :class="{ invalid: errors.title }"
-          :aria-invalid="!!errors.title"
-        />
-        <span v-if="errors.title" id="err-CreateRouteDialog-1" class="text-xs font-semibold text-destructive">⚠ {{ errors.title }}</span>
-      </div>
-
-      <div class="flex flex-col gap-1.5">
-        <label for="route-slug" class="field-label">Slug</label>
-        <input
-          id="route-slug"
-          :value="slug"
-          type="text"
-          autocomplete="off"
-          spellcheck="false"
-          class="field-input font-mono text-[13px]"
-          :class="{ invalid: errors.slug }"
-          aria-describedby="route-slug-help"
-          :aria-invalid="errors.slug ? 'true' : undefined"
-          @input="onSlugInput"
-        />
-        <span v-if="errors.slug" id="route-slug-help" class="text-xs font-semibold text-destructive">⚠ {{ errors.slug }}</span>
-        <span v-else id="route-slug-help" class="text-xs text-muted-foreground">Used in URLs and QR targets. Unique in the Project.</span>
-      </div>
-    </form>
-
-    <template #actions>
-      <button
-        type="button"
-        class="rounded-full border bg-muted px-5 py-2.5 text-[11px] font-bold uppercase tracking-[0.06em] text-gray-700"
-        :disabled="submitting"
-        @click="emit('close')"
-      >
-        Cancel
-      </button>
-      <button
-        type="submit"
-        form="create-route-form"
-        class="rounded-full bg-primary px-5 py-2.5 text-[11px] font-bold uppercase tracking-[0.06em] text-white disabled:opacity-60"
-        :disabled="submitting"
-      >
-        {{ submitting ? "Creating…" : "Create route" }}
-      </button>
+        <p v-if="errors.type" :id="`${id('type')}-err`" class="mt-1.5 text-xs font-medium text-destructive">{{ errors.type }}</p>
+      </fieldset>
     </template>
-  </AppDialog>
+  </FormDialog>
 </template>
-
-<style scoped>
-.field-label {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #374151;
-}
-.field-input {
-  width: 100%;
-  border: 1.5px solid #e5e7eb;
-  border-radius: 8px;
-  background: #fff;
-  padding: 10px 12px;
-  font-size: 14px;
-}
-.field-input:focus {
-  border-color: #4c1d8b;
-  outline: none;
-}
-.field-input.invalid {
-  border-color: #c0185e;
-}
-</style>

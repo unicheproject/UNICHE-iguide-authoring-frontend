@@ -1,0 +1,16 @@
+[open preview in app] Enter -> div "In the appWebMobileKiosk Skip preview Desktop browser, 1280 " 256,189,1160,630  (no outline; shadow rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0)) | live=[]
+state {"labels":["Preview: Web, English, saved form"]}
+tab inside:
+0 button[tab] "Web" 1205,198,58,40  solid 2px rgb(76, 29, 139) off 2px CLIPPED DIV.flex overflow-x-auto border-border borde L4,T4,B5
+1 a "Skip preview" 273,262,127,40  solid 2px rgb(76, 29, 139) off 2px 
+2 button "Open at real size" 1099,266,170,32  solid 2px rgb(76, 29, 139) off 2px 
+3 button "Interact with the preview" 1285,262,114,40  solid 2px rgb(76, 29, 139) off 2px 
+4 div[group] "Screen content, scrolls" 274,176,1126,655  solid 2px rgb(76, 29, 139) off 2px CLIPPED DIV.relative overflow-hidden L4,R6,B4
+5 button[tab] "Englishdefault1 of 5" 256,432,135,52  solid 2px rgb(76, 29, 139) off 2px CLIPPED DIV.flex min-w-0 flex-1 overflow-x-auto L4,T4,B4
+6 textarea "UX-R3-p5 POI A – Parthenon test" 281,560,686,40  solid 2px rgb(76, 29, 139) off 2px 
+7 textarea "" 281,643,335,60  solid 2px rgb(76, 29, 139) off 2px 
+AXE {"label":"preview-in-app-open","url":"http://localhost:5173/projects/PID/pois/e51249c1-755b-42d5-9a20-5912046ea9c9","counts":{},"v":[]}
+[interact] Enter -> button "Stop interacting with the preview" 1225,262,174,40  solid 2px rgb(76, 29, 139) off 2px | live=[]
+[esc1 (stop interacting)] Escape -> button "Interact with the preview" 1285,248,114,40  solid 2px rgb(76, 29, 139) off 2px | live=["Stopped interacting with the preview"]
+[esc2 (close panel)] Escape -> button "Preview in app" 1016,511,344,40  solid 2px rgb(76, 29, 139) off 2px | live=[]
+after esc2 {"w":2,"off":2,"style":"solid","ring":"rgb(76, 29, 139)","ringOnWrapper":false,"vsOutside":10.37,"bg":"244,245,247","clipped":null,"obscured":null,"offscreen":false,"rect":[1016,511,344,40]} false

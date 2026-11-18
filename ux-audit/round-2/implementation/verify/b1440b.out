@@ -1,0 +1,12 @@
+switcher-open  | Dashboard | ov 0 hs false viol  err 0 0
+pois-pristine-empty  | Points of Interest | ov 0 hs false viol  err 0 0
+409 leaks server text: false
+pois-503  | Points of Interest | ov 0 hs false viol  err 0 0
+503 leaks: false
+pois-403  | Points of Interest | ov 0 hs false viol  err 0 0
+403 leaks: false
+project-404  | This Project is not available | ov 0 hs false viol  err 0 0
+404 leaks: false
+project-403  | You no longer have access to this Project | ov 0 hs false viol  err 0 0
+FAILS:
+

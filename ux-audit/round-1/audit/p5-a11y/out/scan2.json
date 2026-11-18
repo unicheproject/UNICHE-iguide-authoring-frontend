@@ -1,0 +1,77 @@
+{
+ "all": [
+  {
+   "label": "guide-editor",
+   "id": "label-content-name-mismatch",
+   "impact": "serious",
+   "help": "Elements must have their visible text as part of their accessible name",
+   "nodes": 2,
+   "sample": [
+    "div[aria-label=\"Level of heading 1\"] > .border-primary.disabled\\:cursor-default[aria-label=\"Level 2\"] ::   Text inside the element is not included in the accessible name",
+    "div[aria-label=\"Level of heading 1\"] > .disabled\\:cursor-default.px-2[aria-label=\"Level 3\"] ::   Text inside the element is not included in the accessible name"
+   ]
+  }
+ ],
+ "info": {
+  "place-editor": {
+   "h": "12222232",
+   "lm": 4,
+   "active": "BODY",
+   "title": "iGuide CMS"
+  },
+  "route-editor": {
+   "h": "122222232",
+   "lm": 6,
+   "active": "BODY",
+   "title": "iGuide CMS"
+  },
+  "guide-editor": {
+   "h": "122232",
+   "lm": 4,
+   "active": "BODY",
+   "title": "iGuide CMS"
+  },
+  "event-editor": {
+   "h": "122222232",
+   "lm": 4,
+   "active": "BODY",
+   "title": "iGuide CMS"
+  },
+  "category-editor": {
+   "h": "122232",
+   "lm": 4,
+   "active": "BODY",
+   "title": "iGuide CMS"
+  },
+  "map-editor": {
+   "h": "1222232",
+   "lm": 6,
+   "active": "BODY",
+   "title": "iGuide CMS"
+  },
+  "floorplan-editor-existing": {
+   "h": "122232",
+   "lm": 4,
+   "active": "BODY",
+   "title": "iGuide CMS"
+  },
+  "asset-editor": {
+   "h": "12232",
+   "lm": 4,
+   "active": "BODY",
+   "title": "iGuide CMS"
+  },
+  "navigation": {
+   "h": "1221222222",
+   "lm": 3,
+   "active": "BODY",
+   "title": "iGuide CMS"
+  },
+  "translations": {
+   "h": "122",
+   "lm": 2,
+   "active": "BODY",
+   "title": "iGuide CMS"
+  }
+ }
+}

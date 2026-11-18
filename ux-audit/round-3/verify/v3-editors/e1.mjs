@@ -1,0 +1,25 @@
+import { open, go, shot, wait, url, ids, active, txt, live, liveLog } from "./h.mjs";
+const { browser, page } = await open("admin", { viewport: "1440" });
+const problem = (status, code, extra={}) => JSON.stringify({ type:`urn:uniche:iguide:problem:${code}`, title:"SECRET-SERVER-DETAIL", status, detail:"SECRET-SERVER-DETAIL", code, requestId:"req-v3-409-abc123", ...extra });
+await go(page, url("pois", ids.poiDraft)); await wait(page, 1800);
+await live(page);
+let mode = "conflict";
+await page.route(/\/pois\/[^/]+\/working-copy$/, r => { if (r.request().method()==="PUT" && mode==="conflict") return r.fulfill({ status:409, contentType:"application/problem+json", body: problem(409,"VERSION_CONFLICT",{currentVersion: 99}) }); return r.continue(); });
+await page.route(/\/pois\/[^/]+\/working-copy\/apply$/, r => r.fulfill({ status:409, contentType:"application/problem+json", body: problem(409,"VERSION_CONFLICT",{currentVersion: 99}) }));
+await page.locator("#f-summary").fill("Edit for 409"); await wait(page,300);
+await page.getByRole("button",{name:/^Save draft/}).first().click(); await wait(page,1500);
+let d = page.getByRole("dialog");
+console.log("WC SAVE 409 DIALOG:", await d.innerText().then(t=>t.replace(/\n+/g," | ")));
+console.log("canary on screen:", (await page.content()).includes("SECRET-SERVER-DETAIL") ? "LEAK":"none (page)");
+await shot(page,"poi-active__409-wc-save__1440");
+await page.keyboard.press("Escape"); await wait(page,500);
+// Apply 409: save and apply path -> the first PUT conflicts; instead test Apply from clean state? use save-and-apply
+mode = "ok";
+await page.getByRole("button",{name:/Save and apply/}).first().click(); await wait(page,700);
+await page.getByRole("dialog").getByRole("button",{name:/Save and apply/}).click(); await wait(page,2500);
+d = page.getByRole("dialog");
+console.log("APPLY 409 DIALOG count", await d.count(), await d.count()? await d.innerText().then(t=>t.replace(/\n+/g," | ")):"");
+console.log("summary/toast:", await txt(page,"main").then(t=>t.slice(0,300)));
+await shot(page,"poi-active__409-apply__1440");
+console.log("canary:", (await page.content()).includes("SECRET-SERVER-DETAIL") ? "LEAK":"none");
+await browser.close();

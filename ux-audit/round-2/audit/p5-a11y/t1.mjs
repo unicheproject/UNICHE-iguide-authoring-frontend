@@ -1,0 +1,11 @@
+import * as L from "./lib.mjs";
+const { page, browser } = await L.open("curator", { viewport: "1440" });
+await L.go(page, "/");
+await L.watchLive(page);
+L.log("t1", "HOME title:", await page.title(), "focus:", await L.focus(page));
+L.log("t1", "tabs", await L.tabs(page, 14));
+await L.shot(page, "home__first-tabs__1440");
+const s = await L.snap(page, "home");
+L.log("t1", s.slice(0, 2500));
+L.log("t1", await L.axe(page, "home"));
+await browser.close();

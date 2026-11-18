@@ -1,0 +1,377 @@
+{
+ "normal": {
+  "url": "http://localhost:5173/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois",
+  "icons": [
+   "18x18 Actions for Parthenon Frieze – North Side",
+   "18x18 Actions for East Pediment Fragments",
+   "18x18 Actions for South Metope XXXI: Centaur and Lapith",
+   "18x18 Actions for Dionysos, Hestia and Aphrodite",
+   "18x18 Actions for The Horsemen of the Panathenaic Procession",
+   "18x18 Actions for Moschophoros (The Calf-Bearer)",
+   "18x18 Actions for Rampin Rider",
+   "18x18 Actions for Archaic Pediment: Herakles and the Hydra",
+   "18x18 Actions for Typhon, the Three-Bodied Daemon",
+   "18x18 Actions for Hekatompedon Pediment Lions",
+   "18x18 Actions for Peplos Kore",
+   "18x18 Actions for Chian Kore (Kore 675)"
+  ],
+  "focus": [
+   {
+    "tag": "A",
+    "txt": "Skip to content",
+    "outline": "solid 2px rgb(76, 29, 139) off2px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(21, 28,"
+   },
+   {
+    "tag": "A",
+    "txt": "UNICHE, all projects",
+    "outline": "solid 2px rgb(76, 29, 139) off2px",
+    "shadow": "rgb(255, 255, 255) 0px 0px 0px 4px"
+   },
+   {
+    "tag": "BUTTON",
+    "txt": "UX Audit – PopulatedApp:",
+    "outline": "solid 2px rgb(76, 29, 139) off2px",
+    "shadow": "rgb(255, 255, 255) 0px 0px 0px 4px"
+   },
+   {
+    "tag": "BUTTON",
+    "txt": "PAP. Admin, account menu",
+    "outline": "solid 2px rgb(76, 29, 139) off2px",
+    "shadow": "rgb(255, 255, 255) 0px 0px 0px 4px"
+   },
+   {
+    "tag": "A",
+    "txt": "Dashboard",
+    "outline": "solid 2px rgb(76, 29, 139) off2px",
+    "shadow": "rgb(255, 255, 255) 0px 0px 0px 4px"
+   },
+   {
+    "tag": "A",
+    "txt": "Places",
+    "outline": "solid 2px rgb(76, 29, 139) off2px",
+    "shadow": "rgb(255, 255, 255) 0px 0px 0px 4px"
+   },
+   {
+    "tag": "A",
+    "txt": "Points of Interest",
+    "outline": "solid 2px rgb(76, 29, 139) off2px",
+    "shadow": "rgb(76, 29, 139) 3px 0px 0px 0px inset"
+   },
+   {
+    "tag": "A",
+    "txt": "Routes",
+    "outline": "solid 2px rgb(76, 29, 139) off2px",
+    "shadow": "rgb(255, 255, 255) 0px 0px 0px 4px"
+   },
+   {
+    "tag": "A",
+    "txt": "Guides",
+    "outline": "solid 2px rgb(76, 29, 139) off2px",
+    "shadow": "rgb(255, 255, 255) 0px 0px 0px 4px"
+   },
+   {
+    "tag": "A",
+    "txt": "Events",
+    "outline": "solid 2px rgb(76, 29, 139) off2px",
+    "shadow": "rgb(255, 255, 255) 0px 0px 0px 4px"
+   },
+   {
+    "tag": "A",
+    "txt": "Categories",
+    "outline": "solid 2px rgb(76, 29, 139) off2px",
+    "shadow": "rgb(255, 255, 255) 0px 0px 0px 4px"
+   },
+   {
+    "tag": "A",
+    "txt": "Maps & Floor Plans",
+    "outline": "solid 2px rgb(76, 29, 139) off2px",
+    "shadow": "rgb(255, 255, 255) 0px 0px 0px 4px"
+   },
+   {
+    "tag": "A",
+    "txt": "Media",
+    "outline": "solid 2px rgb(76, 29, 139) off2px",
+    "shadow": "rgb(255, 255, 255) 0px 0px 0px 4px"
+   },
+   {
+    "tag": "A",
+    "txt": "Overview",
+    "outline": "solid 2px rgb(76, 29, 139) off2px",
+    "shadow": "rgb(255, 255, 255) 0px 0px 0px 4px"
+   }
+  ],
+  "dialog": {
+   "border": "0px solid",
+   "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0)",
+   "bg": "rgb(255, 255, 255)",
+   "outline": "none"
+  },
+  "dialogFocus": {
+   "tag": "INPUT",
+   "txt": "",
+   "outline": "solid 2px rgb(76, 29, 139) off2px",
+   "shadow": "rgb(255, 255, 255) 0px 0px 0px 4px"
+  },
+  "editorSticky": [
+   "s z10 top117 h124 DIV.sticky.-top-6",
+   "s zauto top273 h688 ASIDE.flex.min-w-0"
+  ],
+  "tabs": [
+   "Englishdefault|sel=true|bb=0px rgb(217, 220, 226)|bg=rgba(0, 0, 0, 0)|o=none",
+   "ΕλληνικάComple|sel=false|bb=0px rgb(217, 220, 226)|bg=rgba(0, 0, 0, 0)|o=none",
+   "Italiano2 of 5|sel=false|bb=0px rgb(217, 220, 226)|bg=rgba(0, 0, 0, 0)|o=none"
+  ],
+  "anims": []
+ },
+ "forced": {
+  "url": "http://localhost:5173/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois",
+  "icons": [
+   "18x18 Actions for Parthenon Frieze – North Side",
+   "18x18 Actions for East Pediment Fragments",
+   "18x18 Actions for South Metope XXXI: Centaur and Lapith",
+   "18x18 Actions for Dionysos, Hestia and Aphrodite",
+   "18x18 Actions for The Horsemen of the Panathenaic Procession",
+   "18x18 Actions for Moschophoros (The Calf-Bearer)",
+   "18x18 Actions for Rampin Rider",
+   "18x18 Actions for Archaic Pediment: Herakles and the Hydra",
+   "18x18 Actions for Typhon, the Three-Bodied Daemon",
+   "18x18 Actions for Hekatompedon Pediment Lions",
+   "18x18 Actions for Peplos Kore",
+   "18x18 Actions for Chian Kore (Kore 675)"
+  ],
+  "focus": [
+   {
+    "tag": "A",
+    "txt": "Skip to content",
+    "outline": "solid 2px rgb(55, 0, 110) off2px",
+    "shadow": "none"
+   },
+   {
+    "tag": "A",
+    "txt": "UNICHE, all projects",
+    "outline": "solid 2px rgb(55, 0, 110) off2px",
+    "shadow": "none"
+   },
+   {
+    "tag": "BUTTON",
+    "txt": "UX Audit – Populated. Sw",
+    "outline": "solid 2px rgb(55, 0, 110) off2px",
+    "shadow": "none"
+   },
+   {
+    "tag": "BUTTON",
+    "txt": "PAP. Admin, account menu",
+    "outline": "solid 2px rgb(55, 0, 110) off2px",
+    "shadow": "none"
+   },
+   {
+    "tag": "A",
+    "txt": "Dashboard",
+    "outline": "solid 2px rgb(55, 0, 110) off2px",
+    "shadow": "none"
+   },
+   {
+    "tag": "A",
+    "txt": "Places",
+    "outline": "solid 2px rgb(55, 0, 110) off2px",
+    "shadow": "none"
+   },
+   {
+    "tag": "A",
+    "txt": "Points of Interest",
+    "outline": "solid 2px rgb(55, 0, 110) off-2px",
+    "shadow": "none"
+   },
+   {
+    "tag": "A",
+    "txt": "Routes",
+    "outline": "solid 2px rgb(55, 0, 110) off2px",
+    "shadow": "none"
+   },
+   {
+    "tag": "A",
+    "txt": "Guides",
+    "outline": "solid 2px rgb(55, 0, 110) off2px",
+    "shadow": "none"
+   },
+   {
+    "tag": "A",
+    "txt": "Events",
+    "outline": "solid 2px rgb(55, 0, 110) off2px",
+    "shadow": "none"
+   },
+   {
+    "tag": "A",
+    "txt": "Categories",
+    "outline": "solid 2px rgb(55, 0, 110) off2px",
+    "shadow": "none"
+   },
+   {
+    "tag": "A",
+    "txt": "Maps & Floor Plans",
+    "outline": "solid 2px rgb(55, 0, 110) off2px",
+    "shadow": "none"
+   },
+   {
+    "tag": "A",
+    "txt": "Media",
+    "outline": "solid 2px rgb(55, 0, 110) off2px",
+    "shadow": "none"
+   },
+   {
+    "tag": "A",
+    "txt": "Overview",
+    "outline": "solid 2px rgb(55, 0, 110) off2px",
+    "shadow": "none"
+   }
+  ],
+  "dialog": {
+   "border": "0px solid",
+   "shadow": "none",
+   "bg": "rgb(255, 255, 255)",
+   "outline": "none"
+  },
+  "dialogFocus": {
+   "tag": "INPUT",
+   "txt": "",
+   "outline": "solid 2px rgb(55, 0, 110) off2px",
+   "shadow": "none"
+  },
+  "editorSticky": [
+   "s z10 top117 h124 DIV.sticky.-top-6",
+   "s zauto top273 h688 ASIDE.flex.min-w-0"
+  ],
+  "tabs": [
+   "Englishdefault|sel=true|bb=2px rgb(55, 0, 110)|bg=rgba(255, 255, 255, 0)|o=none",
+   "ΕλληνικάComple|sel=false|bb=1px rgb(0, 0, 0)|bg=rgba(255, 255, 255, 0)|o=none",
+   "Italiano2 of 5|sel=false|bb=1px rgb(0, 0, 0)|bg=rgba(255, 255, 255, 0)|o=none"
+  ],
+  "anims": []
+ },
+ "reduced": {
+  "url": "http://localhost:5173/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois",
+  "icons": [
+   "18x18 Actions for Parthenon Frieze – North Side",
+   "18x18 Actions for East Pediment Fragments",
+   "18x18 Actions for South Metope XXXI: Centaur and Lapith",
+   "18x18 Actions for Dionysos, Hestia and Aphrodite",
+   "18x18 Actions for The Horsemen of the Panathenaic Procession",
+   "18x18 Actions for Moschophoros (The Calf-Bearer)",
+   "18x18 Actions for Rampin Rider",
+   "18x18 Actions for Archaic Pediment: Herakles and the Hydra",
+   "18x18 Actions for Typhon, the Three-Bodied Daemon",
+   "18x18 Actions for Hekatompedon Pediment Lions",
+   "18x18 Actions for Peplos Kore",
+   "18x18 Actions for Chian Kore (Kore 675)"
+  ],
+  "focus": [
+   {
+    "tag": "A",
+    "txt": "Skip to content",
+    "outline": "solid 3px rgb(76, 29, 139) off0px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0"
+   },
+   {
+    "tag": "A",
+    "txt": "UNICHE, all projects",
+    "outline": "solid 2px rgb(76, 29, 139) off2px",
+    "shadow": "rgb(255, 255, 255) 0px 0px 0px 4px"
+   },
+   {
+    "tag": "BUTTON",
+    "txt": "UX Audit – PopulatedApp:",
+    "outline": "solid 2px rgb(76, 29, 139) off2px",
+    "shadow": "rgb(255, 255, 255) 0px 0px 0px 4px"
+   },
+   {
+    "tag": "BUTTON",
+    "txt": "PAP. Admin, account menu",
+    "outline": "solid 3px rgb(17, 24, 39) off0px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px"
+   },
+   {
+    "tag": "A",
+    "txt": "Dashboard",
+    "outline": "solid 2px rgb(76, 29, 139) off2px",
+    "shadow": "rgb(255, 255, 255) 0px 0px 0px 4px"
+   },
+   {
+    "tag": "A",
+    "txt": "Places",
+    "outline": "solid 2px rgb(76, 29, 139) off2px",
+    "shadow": "rgb(255, 255, 255) 0px 0px 0px 4px"
+   },
+   {
+    "tag": "A",
+    "txt": "Points of Interest",
+    "outline": "solid 2px rgb(76, 29, 139) off2px",
+    "shadow": "rgb(76, 29, 139) 3px 0px 0px 0px inset"
+   },
+   {
+    "tag": "A",
+    "txt": "Routes",
+    "outline": "solid 2px rgb(76, 29, 139) off2px",
+    "shadow": "rgb(255, 255, 255) 0px 0px 0px 4px"
+   },
+   {
+    "tag": "A",
+    "txt": "Guides",
+    "outline": "solid 2px rgb(76, 29, 139) off2px",
+    "shadow": "rgb(255, 255, 255) 0px 0px 0px 4px"
+   },
+   {
+    "tag": "A",
+    "txt": "Events",
+    "outline": "solid 2px rgb(76, 29, 139) off2px",
+    "shadow": "rgb(255, 255, 255) 0px 0px 0px 4px"
+   },
+   {
+    "tag": "A",
+    "txt": "Categories",
+    "outline": "solid 2px rgb(76, 29, 139) off2px",
+    "shadow": "rgb(255, 255, 255) 0px 0px 0px 4px"
+   },
+   {
+    "tag": "A",
+    "txt": "Maps & Floor Plans",
+    "outline": "solid 2px rgb(76, 29, 139) off2px",
+    "shadow": "rgb(255, 255, 255) 0px 0px 0px 4px"
+   },
+   {
+    "tag": "A",
+    "txt": "Media",
+    "outline": "solid 2px rgb(76, 29, 139) off2px",
+    "shadow": "rgb(255, 255, 255) 0px 0px 0px 4px"
+   },
+   {
+    "tag": "A",
+    "txt": "Overview",
+    "outline": "solid 2px rgb(76, 29, 139) off2px",
+    "shadow": "rgb(255, 255, 255) 0px 0px 0px 4px"
+   }
+  ],
+  "dialog": {
+   "border": "0px solid",
+   "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0)",
+   "bg": "rgb(255, 255, 255)",
+   "outline": "none"
+  },
+  "dialogFocus": {
+   "tag": "INPUT",
+   "txt": "",
+   "outline": "solid 2px rgb(76, 29, 139) off2px",
+   "shadow": "rgb(255, 255, 255) 0px 0px 0px 4px"
+  },
+  "editorSticky": [
+   "s z10 top117 h124 DIV.sticky.-top-6",
+   "s zauto top273 h688 ASIDE.flex.min-w-0"
+  ],
+  "tabs": [
+   "Englishdefault|sel=true|bb=0px rgb(217, 220, 226)|bg=rgba(0, 0, 0, 0)|o=none",
+   "ΕλληνικάComple|sel=false|bb=0px rgb(217, 220, 226)|bg=rgba(0, 0, 0, 0)|o=none",
+   "Italiano2 of 5|sel=false|bb=0px rgb(217, 220, 226)|bg=rgba(0, 0, 0, 0)|o=none"
+  ],
+  "anims": []
+ }
+}

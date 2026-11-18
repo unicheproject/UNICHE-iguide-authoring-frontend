@@ -1,0 +1,146 @@
+[36mvite v8.3.1 [32mbuilding client environment for production...[36m[39m
+transforming...
+
+A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+✓ 2195 modules transformed.
+rendering chunks...
+computing gzip size...
+ux-audit/round-1/implementation/verify/dist/index.html                                        3.33 kB │ gzip:   1.44 kB
+ux-audit/round-1/implementation/verify/dist/assets/uniche-logo-D8A1kLY-.png                  92.14 kB
+ux-audit/round-1/implementation/verify/dist/assets/maplibre-gl-worker-DTh23QKw.js           519.75 kB
+ux-audit/round-1/implementation/verify/dist/assets/TranslationsView-CwI4oWRy.css              0.05 kB │ gzip:   0.07 kB
+ux-audit/round-1/implementation/verify/dist/assets/projectTheme-CyDTyL67.css                  0.18 kB │ gzip:   0.15 kB
+ux-audit/round-1/implementation/verify/dist/assets/SourcePairField-CRRdTbyx.css               0.23 kB │ gzip:   0.17 kB
+ux-audit/round-1/implementation/verify/dist/assets/formFields-CgwIslC8.css                    0.24 kB │ gzip:   0.17 kB
+ux-audit/round-1/implementation/verify/dist/assets/EditorShell-vJLFncpw.css                   0.27 kB │ gzip:   0.19 kB
+ux-audit/round-1/implementation/verify/dist/assets/NavigationView-yWFkWcXN.css                0.32 kB │ gzip:   0.20 kB
+ux-audit/round-1/implementation/verify/dist/assets/navigationMenu-BVIpCnOo.css                0.34 kB │ gzip:   0.22 kB
+ux-audit/round-1/implementation/verify/dist/assets/PoiEditorView-BiAepAU_.css                 0.35 kB │ gzip:   0.24 kB
+ux-audit/round-1/implementation/verify/dist/assets/RouteEditorView-DjEGuo54.css               0.45 kB │ gzip:   0.27 kB
+ux-audit/round-1/implementation/verify/dist/assets/ProjectLayout-C3NxFg_B.css                 0.74 kB │ gzip:   0.36 kB
+ux-audit/round-1/implementation/verify/dist/assets/FloorPlanEditorView-BAgdHv4y.css           1.04 kB │ gzip:   0.44 kB
+ux-audit/round-1/implementation/verify/dist/assets/ListToolbar-9Rx7D-re.css                   1.97 kB │ gzip:   0.55 kB
+ux-audit/round-1/implementation/verify/dist/assets/index-CYN6cncp.css                        59.39 kB │ gzip:  12.88 kB
+ux-audit/round-1/implementation/verify/dist/assets/GeoMapCanvas-KUjAo8TH.css                 86.57 kB │ gzip:  16.84 kB
+ux-audit/round-1/implementation/verify/dist/assets/_plugin-vue_export-helper-BDNMzG2s.js      0.08 kB │ gzip:   0.09 kB
+ux-audit/round-1/implementation/verify/dist/assets/check-BmN9ddCY.js                          0.11 kB │ gzip:   0.12 kB
+ux-audit/round-1/implementation/verify/dist/assets/translationStatus-4mmXN5jZ.js              0.16 kB │ gzip:   0.13 kB
+ux-audit/round-1/implementation/verify/dist/assets/rotate-ccw-NY6VO72D.js                     0.18 kB │ gzip:   0.17 kB
+ux-audit/round-1/implementation/verify/dist/assets/lock-DeojJ9VI.js                           0.19 kB │ gzip:   0.18 kB
+ux-audit/round-1/implementation/verify/dist/assets/currentProject-Cpy5dOup.js                 0.23 kB │ gzip:   0.19 kB
+ux-audit/round-1/implementation/verify/dist/assets/languages-DRe3AJk9.js                      0.24 kB │ gzip:   0.17 kB
+ux-audit/round-1/implementation/verify/dist/assets/arrow-up-Cmvr9Q3S.js                       0.26 kB │ gzip:   0.19 kB
+ux-audit/round-1/implementation/verify/dist/assets/trash-2-CF7IIAVC.js                        0.31 kB │ gzip:   0.20 kB
+ux-audit/round-1/implementation/verify/dist/assets/grip-vertical-D6xKujZQ.js                  0.35 kB │ gzip:   0.18 kB
+ux-audit/round-1/implementation/verify/dist/assets/map-pinned-DwN-1VTM.js                     0.38 kB │ gzip:   0.28 kB
+ux-audit/round-1/implementation/verify/dist/assets/workingCopies-CencKKCR.js                  0.38 kB │ gzip:   0.24 kB
+ux-audit/round-1/implementation/verify/dist/assets/surfaces-CnlvNu31.js                       0.40 kB │ gzip:   0.26 kB
+ux-audit/round-1/implementation/verify/dist/assets/eye-off-CGS1aLhA.js                        0.41 kB │ gzip:   0.26 kB
+ux-audit/round-1/implementation/verify/dist/assets/mountain-DYw9SuKT.js                       0.45 kB │ gzip:   0.27 kB
+ux-audit/round-1/implementation/verify/dist/assets/SectionTabs-CPTvrzt-.js                    0.50 kB │ gzip:   0.33 kB
+ux-audit/round-1/implementation/verify/dist/assets/useProjectLanguages-BlQBQKEK.js            0.50 kB │ gzip:   0.33 kB
+ux-audit/round-1/implementation/verify/dist/assets/CategoryIcon-CGrezENA.js                   0.53 kB │ gzip:   0.37 kB
+ux-audit/round-1/implementation/verify/dist/assets/replace-Cmf77A0D.js                        0.59 kB │ gzip:   0.33 kB
+ux-audit/round-1/implementation/verify/dist/assets/qr-code-CadNQpu_.js                        0.72 kB │ gzip:   0.34 kB
+ux-audit/round-1/implementation/verify/dist/assets/MapsTabs-_vXMCJPL.js                       0.79 kB │ gzip:   0.44 kB
+ux-audit/round-1/implementation/verify/dist/assets/overview-BPOBwXOV.js                       0.81 kB │ gzip:   0.41 kB
+ux-audit/round-1/implementation/verify/dist/assets/eventDates-DZQzjT7S.js                     0.84 kB │ gzip:   0.47 kB
+ux-audit/round-1/implementation/verify/dist/assets/templates-Dixl2T2e.js                      0.95 kB │ gzip:   0.61 kB
+ux-audit/round-1/implementation/verify/dist/assets/HelpHint-DdtjgzHk.js                       0.95 kB │ gzip:   0.59 kB
+ux-audit/round-1/implementation/verify/dist/assets/SectionView-BIMg2unh.js                    0.97 kB │ gzip:   0.60 kB
+ux-audit/round-1/implementation/verify/dist/assets/Select-mGT-sCow.js                         0.97 kB │ gzip:   0.62 kB
+ux-audit/round-1/implementation/verify/dist/assets/LinkTabs-C84YMOYy.js                       1.01 kB │ gzip:   0.61 kB
+ux-audit/round-1/implementation/verify/dist/assets/placeTree-BDnkKNaz.js                      1.01 kB │ gzip:   0.59 kB
+ux-audit/round-1/implementation/verify/dist/assets/Textarea-C97OBTD-.js                       1.07 kB │ gzip:   0.64 kB
+ux-audit/round-1/implementation/verify/dist/assets/FormErrorSummary-DxSQ1QOL.js               1.07 kB │ gzip:   0.65 kB
+ux-audit/round-1/implementation/verify/dist/assets/FormField-DW9tnno4.js                      1.13 kB │ gzip:   0.66 kB
+ux-audit/round-1/implementation/verify/dist/assets/navigation-DFBzelRX.js                     1.14 kB │ gzip:   0.52 kB
+ux-audit/round-1/implementation/verify/dist/assets/languageCatalogue-CcPPcTIq.js              1.14 kB │ gzip:   0.40 kB
+ux-audit/round-1/implementation/verify/dist/assets/coordinates-Dqw6q3wp.js                    1.27 kB │ gzip:   0.67 kB
+ux-audit/round-1/implementation/verify/dist/assets/TriggerChips-DjyzPl5d.js                   1.38 kB │ gzip:   0.82 kB
+ux-audit/round-1/implementation/verify/dist/assets/useCategoryFilter-RBG_k0VI.js              1.46 kB │ gzip:   0.84 kB
+ux-audit/round-1/implementation/verify/dist/assets/Checkbox-BGqdfi7z.js                       1.49 kB │ gzip:   0.84 kB
+ux-audit/round-1/implementation/verify/dist/assets/Switch-YMCLowLf.js                         1.52 kB │ gzip:   0.83 kB
+ux-audit/round-1/implementation/verify/dist/assets/Alert-BR_mEwmA.js                          1.78 kB │ gzip:   0.89 kB
+ux-audit/round-1/implementation/verify/dist/assets/floorPlans-CLLyurcI.js                     1.95 kB │ gzip:   0.79 kB
+ux-audit/round-1/implementation/verify/dist/assets/pois-YpJxKBgm.js                           1.95 kB │ gzip:   0.95 kB
+ux-audit/round-1/implementation/verify/dist/assets/undoRemove-DdnKRq_F.js                     1.96 kB │ gzip:   1.09 kB
+ux-audit/round-1/implementation/verify/dist/assets/preview-R0GwEAEZ.js                        1.97 kB │ gzip:   0.86 kB
+ux-audit/round-1/implementation/verify/dist/assets/AssetThumb-B9DNtj3x.js                     2.68 kB │ gzip:   1.28 kB
+ux-audit/round-1/implementation/verify/dist/assets/useReorder-Bfm383vs.js                     2.90 kB │ gzip:   1.41 kB
+ux-audit/round-1/implementation/verify/dist/assets/routes-taGhePKP.js                         3.00 kB │ gzip:   1.38 kB
+ux-audit/round-1/implementation/verify/dist/assets/ReorderControls-D1EZPDsS.js                3.04 kB │ gzip:   1.36 kB
+ux-audit/round-1/implementation/verify/dist/assets/events-DlNEVvKL.js                         3.30 kB │ gzip:   1.47 kB
+ux-audit/round-1/implementation/verify/dist/assets/SourcePairField-DbP2BMNY.js                3.56 kB │ gzip:   1.49 kB
+ux-audit/round-1/implementation/verify/dist/assets/places-[33m[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+DQUGJYLr.js                         3.59 kB │ gzip:   1.62 kB
+ux-audit/round-1/implementation/verify/dist/assets/categories-Bg2_C3A6.js                     3.86 kB │ gzip:   1.82 kB
+ux-audit/round-1/implementation/verify/dist/assets/readiness-KuE74ozP.js                      3.97 kB │ gzip:   1.90 kB
+ux-audit/round-1/implementation/verify/dist/assets/guides-BK7-_u8t.js                         4.23 kB │ gzip:   1.67 kB
+ux-audit/round-1/implementation/verify/dist/assets/NewFloorPlanDialog-D7iYLGhv.js             4.35 kB │ gzip:   2.00 kB
+ux-audit/round-1/implementation/verify/dist/assets/PreviewPane-Cr-ondRs.js                    4.43 kB │ gzip:   2.01 kB
+ux-audit/round-1/implementation/verify/dist/assets/maps-_lHmTkV4.js                           4.75 kB │ gzip:   2.10 kB
+ux-audit/round-1/implementation/verify/dist/assets/assets-CN8Y7ShU.js                         4.89 kB │ gzip:   2.17 kB
+ux-audit/round-1/implementation/verify/dist/assets/OverviewView-BRKzldEV.js                   5.77 kB │ gzip:   2.44 kB
+ux-audit/round-1/implementation/verify/dist/assets/MapsView-Dbaj-RVq.js                       5.91 kB │ gzip:   2.70 kB
+ux-audit/round-1/implementation/verify/dist/assets/triggers-MtYKTUx8.js                       6.18 kB │ gzip:   2.40 kB
+ux-audit/round-1/implementation/verify/dist/assets/ResourcePickerDialog-BfW4tm5g.js           6.36 kB │ gzip:   2.60 kB
+ux-audit/round-1/implementation/verify/dist/assets/FormDialog-BMAfcR5j.js                     6.48 kB │ gzip:   2.97 kB
+ux-audit/round-1/implementation/verify/dist/assets/FloorPlansView-CCang7xN.js                 6.76 kB │ gzip:   2.97 kB
+ux-audit/round-1/implementation/verify/dist/assets/LanguagesView-DYaeKeOX.js                  6.87 kB │ gzip:   2.64 kB
+ux-audit/round-1/implementation/verify/dist/assets/SurfacesView-CrmlK8Wl.js                   7.29 kB │ gzip:   3.15 kB
+ux-audit/round-1/implementation/verify/dist/assets/AppPreviewView-wwdpC6aX.js                 7.93 kB │ gzip:   3.24 kB
+ux-audit/round-1/implementation/verify/dist/assets/NewMapDialog-BOH6xYON.js                   8.19 kB │ gzip:   3.24 kB
+ux-audit/round-1/implementation/verify/dist/assets/sections-DVKmhb73.js                       9.14 kB │ gzip:   3.98 kB
+ux-audit/round-1/implementation/verify/dist/assets/formFields-BTBRl6Hq.js                     9.18 kB │ gzip:   3.55 kB
+ux-audit/round-1/implementation/verify/dist/assets/GuidesView-D1kOh5L_.js                     9.30 kB │ gzip:   3.88 kB
+ux-audit/round-1/implementation/verify/dist/assets/EventsView-dF3iPPFF.js                     9.99 kB │ gzip:   4.16 kB
+ux-audit/round-1/implementation/verify/dist/assets/ProjectLayout-NHRy_QCr.js                 10.11 kB │ gzip:   4.53 kB
+ux-audit/round-1/implementation/verify/dist/assets/UploadLimits-Fd-C_1cL.js                  10.57 kB │ gzip:   4.11 kB
+ux-audit/round-1/implementation/verify/dist/assets/activationHandoff-CARM-hKu.js             10.74 kB │ gzip:   4.39 kB
+ux-audit/round-1/implementation/verify/dist/assets/RoutesView-D7ZLOs5Q.js                    11.57 kB │ gzip:   4.73 kB
+ux-audit/round-1/implementation/verify/dist/assets/listRows-BM3KCquK.js                      12.06 kB │ gzip:   4.80 kB
+ux-audit/round-1/implementation/verify/dist/assets/PoisView-Dpz5MosB.js                      12.71 kB │ gzip:   4.89 kB
+ux-audit/round-1/implementation/verify/dist/assets/AssetPickerDialog-2f11keRB.js             12.86 kB │ gzip:   4.74 kB
+ux-audit/round-1/implementation/verify/dist/assets/AssetEditorView-Cyna9FnF.js               13.03 kB │ gzip:   5.36 kB
+ux-audit/round-1/implementation/verify/dist/assets/CategoryEditorView-D-ty6xO5.js            13.30 kB │ gzip:   5.08 kB
+ux-audit/round-1/implementation/verify/dist/assets/PlacesView-ByICJaPl.js                    13.59 kB │ gzip:   5.51 kB
+ux-audit/round-1/implementation/verify/dist/assets/CategoriesView-DrPFZW8Z.js                14.79 kB │ gzip:   5.72 kB
+ux-audit/round-1/implementation/verify/dist/assets/PreviewView-z-xU10pJ.js                   15.09 kB │ gzip:   5.46 kB
+ux-aud[33m[33m[PLUGIN_TIMINGS] [0mJavaScript callbacks ran for 21.4s of this 24.1s build (89%).
+The slowest callbacks, timed inside each callback (the wait before a callback starts is excluded, the time it awaits is included):
+  - plugin vite:build-html transform (64%, 15.5s, 1 call)
+  - plugin vite:css-post transform (9%, 2.2s, 19 calls)
+Additional callback time came from the callbacks below and from callbacks under 1s.
+2 callbacks are listed without a time. Their calls overlapped, so the time inside one call includes work from other calls. To find their cost, profile the build with `node --cpu-prof`:
+  - plugin vite:css transform (19 calls)
+  - plugin vite:vue transform (321 calls)
+See https://rolldown.rs/reference/InputOptions.checks#bundlertimings for more details.
+[39m
+it/round-1/implementation/verify/dist/assets/FloorPlanEditorView-DoOVH13T.js           15.46 kB │ gzip:   5.73 kB
+ux-audit/round-1/implementation/verify/dist/assets/DashboardView-BICt07Kq.js                 19.67 kB │ gzip:   6.75 kB
+ux-audit/round-1/implementation/verify/dist/assets/ListToolbar-L21OKVxN.js                   19.71 kB │ gzip:   6.92 kB
+ux-audit/round-1/implementation/verify/dist/assets/PoiEditorView-WQqnQ1Bt.js                 20.11 kB │ gzip:   7.48 kB
+ux-audit/round-1/implementation/verify/dist/assets/NavigationView-D8tfMwJn.js                20.22 kB │ gzip:   7.33 kB
+ux-audit/round-1/implementation/verify/dist/assets/MediaView-BXahMCps.js                     21.32 kB │ gzip:   7.82 kB
+ux-audit/round-1/implementation/verify/dist/assets/projectTheme-C_WnJGev.js                  21.64 kB │ gzip:   8.47 kB
+ux-audit/round-1/implementation/verify/dist/assets/PlaceEditorView-CYdWvtmQ.js               23.05 kB │ gzip:   7.99 kB
+ux-audit/round-1/implementation/verify/dist/assets/MapEditorView-DoEs8d_K.js                 24.69 kB │ gzip:   7.82 kB
+ux-audit/round-1/implementation/verify/dist/assets/navigationMenu-ByEkzaqA.js                25.50 kB │ gzip:   7.20 kB
+ux-audit/round-1/implementation/verify/dist/assets/GuideEditorView-DWkfRSbC.js               26.43 kB │ gzip:   9.44 kB
+ux-audit/round-1/implementation/verify/dist/assets/EventEditorView-B29Ct2A3.js               26.89 kB │ gzip:   9.45 kB
+ux-audit/round-1/implementation/verify/dist/assets/RouteEditorView-BsK3GaZh.js               29.68 kB │ gzip:  10.40 kB
+ux-audit/round-1/implementation/verify/dist/assets/TriggersCard-B1N_5NrJ.js                  30.08 kB │ gzip:   8.94 kB
+ux-audit/round-1/implementation/verify/dist/assets/CreateProjectView-Bs0siby7.js             33.59 kB │ gzip:  10.50 kB
+ux-audit/round-1/implementation/verify/dist/assets/TranslationsView-DpE1laqj.js              50.38 kB │ gzip:  15.91 kB
+ux-audit/round-1/implementation/verify/dist/assets/EditorShell-tCkKhcll.js                   62.12 kB │ gzip:  19.35 kB
+ux-audit/round-1/implementation/verify/dist/assets/api-Q1QLpxjX.js                          155.00 kB │ gzip:  55.43 kB
+ux-audit/round-1/implementation/verify/dist/assets/index-DLkonjZU.js                        186.48 kB │ gzip:  58.80 kB
+ux-audit/round-1/implementation/verify/dist/assets/GeoMapCanvas-LJU7l--U.js               1,226.11 kB │ gzip: 337.36 kB
+
+[32m✓ built in 24.11s[39m
+exit 0

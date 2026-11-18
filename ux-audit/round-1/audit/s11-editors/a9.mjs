@@ -1,0 +1,23 @@
+import { start, goP, log, dump, state, focused } from "./lib.mjs";
+import { addStops } from "./lib2.mjs";
+const s = await start("1440"); const { page } = s;
+const U = "http://localhost:5173" + state().routeUrl;
+await page.goto(U); await page.waitForTimeout(2000);
+await addStops(page, ["Bravo","Charlie","Delta","Echo"]);
+await page.getByRole("button", { name: "Hiking" }).click();
+await page.getByRole("button", { name: "Moderate" }).click();
+await page.getByLabel(/route total/i).fill("95");
+await page.getByLabel(/distance/i).fill("2400.5");
+await page.waitForTimeout(500);
+await page.reload(); await page.waitForTimeout(2500);
+log("beforeunload dialogs?");
+await s.shot("route-restore-banner");
+log("restore text:", await page.evaluate(()=>[...document.querySelectorAll("[role=status],[role=alert],[role=region]")].map(e=>e.innerText.slice(0,200))));
+await page.getByRole("button", { name: /restore/i }).first().click().catch(()=>log("no restore btn")); await page.waitForTimeout(800);
+// save with decimals
+await page.getByRole("button", { name: /^save/i }).first().click(); await page.waitForTimeout(1800);
+await page.evaluate(()=>document.querySelector("main")?.scrollTo(0,0));
+await s.shot("route-save-422-or-ok");
+log("alerts:", await page.evaluate(()=>[...document.querySelectorAll("[role=alert],[role=status]")].map(e=>e.innerText.slice(0,250))));
+log("focus", await focused(page));
+await s.browser.close();

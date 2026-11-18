@@ -1,0 +1,31 @@
+import { open, go, shot, POP, axe, t, focusDesc } from "./lib.mjs";
+const F = "ux-audit/round-2/audit/s13-media/fixtures/";
+const vp = "1440";
+const { browser, page } = await open("admin", { viewport: vp });
+await go(page, `/projects/${POP}/pois/546c5177-effd-49c8-acae-85d751f89bbe`); await page.getByRole("heading",{level:1}).first().waitFor(); await page.waitForTimeout(2500);
+await page.getByRole("button",{name:/Add primary image/}).first().click(); await page.waitForTimeout(1200);
+await page.keyboard.type("klep"); await page.waitForTimeout(800);
+const dlg = page.locator("[role=dialog]").last();
+console.log("search klep:", (await dlg.innerText()).replace(/\n+/g," | ").slice(280,600));
+await page.getByRole("button",{name:/^List/}).click(); await page.waitForTimeout(500);
+console.log("focus after List toggle", await focusDesc(page));
+await shot(page,"picker__list-search",vp);
+await page.locator("#picker-search").fill("");
+await page.getByRole("button",{name:/^Draft$/}).click(); await page.waitForTimeout(700);
+await page.locator("#picker-search").fill("s13"); await page.waitForTimeout(700);
+console.log("draft s13:", (await dlg.innerText()).replace(/\n+/g," | ").slice(280,900));
+await shot(page,"picker__draft-list",vp);
+// select a DRAFT image without alt: cue
+const row = dlg.getByRole("button",{name:/s13 alpha/}).first(); await row.click(); await page.waitForTimeout(400);
+console.log("status:", await dlg.locator("[role=status]").allInnerTexts());
+await shot(page,"picker__selected-no-alt",vp);
+await page.keyboard.press("Escape"); await page.waitForTimeout(500);
+console.log("dialogs after esc", await page.locator("[role=dialog]").count());
+// Upload from picker, cancel mid flight
+await page.getByRole("button",{name:/Add primary image/}).first().click(); await page.waitForTimeout(1000);
+await page.route(/\/assets$/, async r => { if (r.request().method()==="POST") { await new Promise(x=>setTimeout(x,6000)); } return r.continue(); });
+await page.locator("[role=dialog]").last().locator("input[type=file]").setInputFiles([F+"UX-R2-s13 eta.png", F+"UX-R2-s13 theta.jpg"]); await page.waitForTimeout(1500);
+await shot(page,"picker__upload-in-flight",vp);
+console.log("in flight:", (await page.locator("[role=dialog]").last().innerText()).replace(/\n+/g," | ").slice(0,700));
+const cancelBtn = page.getByRole("button",{name:/^Cancel/}); console.log("cancel buttons", await cancelBtn.evaluateAll(es=>es.map(e=>e.getAttribute("aria-label")||e.textContent.trim())));
+await browser.close();

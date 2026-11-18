@@ -1,0 +1,15 @@
+import { readFileSync } from "node:fs";
+import { createRequire } from "node:module";
+import { open, go } from "../../../tools/session.mjs";
+export const seed = JSON.parse(readFileSync(new URL("../../../tools/seed.json", import.meta.url), "utf8"));
+export const rec = JSON.parse(readFileSync(new URL("./records.json", import.meta.url), "utf8"));
+export const P = seed.projects.populated.id;
+export const SH = new URL("./shots/", import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1");
+export { open, go };
+const require = createRequire(new URL("../../../../package.json", import.meta.url));
+export const { default: AxeBuilder } = require("@axe-core/playwright");
+export const ready = async (page, ms=1800) => { await page.waitForLoadState("networkidle").catch(()=>{}); await page.locator("main h1").first().waitFor({timeout:20000}).catch(()=>{}); await page.waitForTimeout(ms); };
+export const shot = async (page, name, full=true) => page.screenshot({ path: SH + name + ".png", fullPage: full });
+export const axe = async (page, name) => { const r = await new AxeBuilder({page}).withTags(["wcag2a","wcag2aa","wcag21a","wcag21aa"]).analyze(); console.log("AXE", name, r.violations.length ? r.violations.map(v=>`${v.id}(${v.impact}) x${v.nodes.length}: ${v.nodes[0].target}`) : "clean"); };
+export const H = (page) => page.evaluate(() => { const m=document.querySelector("main"); const s=[...document.querySelectorAll("*")].find(e=>{const c=getComputedStyle(e);return (c.overflowY==="auto"||c.overflowY==="scroll")&&e.scrollHeight>e.clientHeight+50&&e.clientHeight>300}); return { doc: document.documentElement.scrollHeight, scrollEl: s?`${s.tagName}.${s.className.toString().slice(0,40)} ${s.scrollHeight}/${s.clientHeight}`:null, mainH: m?.scrollHeight }; });
+export const tall = async (page, name) => { const vp = page.viewportSize(); const hh = await page.evaluate(()=>{const m=document.querySelector("main"); return m? m.scrollHeight + (window.innerHeight - m.clientHeight) : document.documentElement.scrollHeight}); await page.setViewportSize({width:vp.width,height:Math.min(hh+10,6000)}); await page.waitForTimeout(500); await page.screenshot({path:SH+name+".png"}); await page.setViewportSize(vp); await page.waitForTimeout(300); return hh; };

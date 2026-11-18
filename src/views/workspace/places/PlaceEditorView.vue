@@ -1,11 +1,19 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from "vue";
+import EditorSection from "@/components/editor/EditorSection.vue";
 import EditorShell from "@/components/editor/EditorShell.vue";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { FormField } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
+import { listPois, poiTitle, type Poi } from "@/platform/pois";
 import TranslationsPanel, { type TextFieldGroup, type TextFieldMeta } from "@/components/editor/TranslationsPanel.vue";
 import TriggersCard from "@/components/editor/TriggersCard.vue";
 import MediaSlots, { type MediaSlot } from "@/components/media/MediaSlots.vue";
-import { listTargetTriggers, saveWithTriggers, triggerToForm, type Trigger, type TriggerForm } from "@/platform/triggers";
+import { checkTriggers, describeTriggerPath, listTargetTriggers, saveWithTriggers, reconcileTriggers, triggerToForm, type PartialTriggers, type Trigger, type TriggerForm } from "@/platform/triggers";
 import { SLUG_PATTERN } from "@/lib/format";
+import { problemText } from "@/lib/problemText";
 import {
   changePlaceStatus,
   fetchPlaceReferences,
@@ -38,7 +46,9 @@ import { referenceLink } from "@/workspace/referenceLinks";
 import { heroBlock, mediaBlocks, previewLanguages, textBlocks, textIn, type PreviewBlock, type PreviewModel } from "@/workspace/preview";
 import { filledFields, translationStatus } from "@/workspace/translationStatus";
 import { useProjectLanguages } from "@/workspace/useProjectLanguages";
-import { useResourceEditor } from "@/workspace/useResourceEditor";
+import { partialSentence, useResourceEditor } from "@/workspace/useResourceEditor";
+import FilteredSelect from "@/components/editor/FilteredSelect.vue";
+import OtherSettings from "@/components/editor/OtherSettings.vue";
 import { placeTypeLabel, settingForType } from "./placeTree";
 import NewFloorPlanDialog from "../maps/NewFloorPlanDialog.vue";
 import NewMapDialog from "../maps/NewMapDialog.vue";
@@ -61,8 +71,8 @@ type TextKey = keyof PlaceTranslation;
 
 const TEXT_META: Record<TextKey, TextFieldMeta> = {
   title: { label: "Title", multiline: false },
-  summary: { label: "Summary", multiline: true, helper: "One or two sentences shown in lists and cards." },
-  description: { label: "Description", multiline: true },
+  summary: { label: "Summary", multiline: true, half: true, helper: "One or two sentences shown in lists and cards." },
+  description: { label: "Description", multiline: true, half: true },
   visitorInformation: { label: "Visitor information", multiline: true, helper: "Opening hours, tickets, how to get there." },
   accessibilityInformation: { label: "Accessibility information", multiline: true, helper: "Step-free access, surfaces, seating, assistance." },
 };
@@ -85,6 +95,8 @@ const MEDIA_SLOTS: MediaSlot[] = [
 
 // Other Places, for the "Inside" choice.
 const allPlaces = ref<Place[]>([]);
+// Points of interest, for the "Inside this place" card.
+const allPois = ref<Poi[]>([]);
 // The media library: the media slots' names and previews, and the new floor plan's image choice.
 const libraryAssets = ref<Asset[]>([]);
 
@@ -102,6 +114,18 @@ const form = reactive({
 const subPlace = ref(false);
 // The triggers as last loaded or saved; the form is reset from them with the Place.
 const savedTriggers = ref<Trigger[]>([]);
+
+/** What the last save stored of the trigger rows, kept for `onPartialSave` (the editor calls it right after). */
+let lastPartial: PartialTriggers | null = null;
+/**
+ * A save that stored the place but not every trigger row says so in one sentence once the editor has shown its own
+ * summary (a refused row's fields are linked there); the rows stay in the form for another try (C2-73).
+ */
+function sayPartial(notice: PartialTriggers) {
+  lastPartial = notice;
+  if (notice.validation) return;
+  setTimeout(() => editor.reportPartial(partialSentence("place", notice.names), notice.requestId), 0);
+}
 
 /** The editable state from the form, for a DRAFT save and a working copy alike. */
 function input(place: Place): Omit<UpdatePlaceInput, "version"> {
@@ -126,21 +150,35 @@ const editor = useResourceEditor<Place>({
   languages,
   defaultLanguage,
   async load() {
-    const [place, places, triggers, library] = await Promise.all([
+    const [place, places, triggers, library, pois] = await Promise.all([
       fetchPlace(projectId.value, props.placeId),
       listPlaces(projectId.value),
       listTargetTriggers(projectId.value, "PLACE", props.placeId),
       listAssets(projectId.value),
+      listPois(projectId.value),
     ]);
+    allPois.value = pois;
     allPlaces.value = places;
     libraryAssets.value = library;
     savedTriggers.value = triggers;
     return place;
   },
+  // C3-20: the saved rows become the saved triggers (marked saved, never re-sent); only the failed rows stay as typed.
+  onPartialSave() {
+    if (!lastPartial) return;
+    form.triggers = reconcileTriggers(form.triggers, lastPartial);
+    savedTriggers.value = lastPartial.triggers;
+    lastPartial = null;
+  },
   async save(place, version) {
     // Triggers are rows of their own and do not move the Place's version: saved first, put back when it is refused.
-    const { saved, triggers } = await saveWithTriggers(projectId.value, "PLACE", place.id, form.triggers, () =>
-      updatePlace(projectId.value, place.id, { version, ...input(place) }),
+    const { saved, triggers } = await saveWithTriggers(
+      projectId.value,
+      "PLACE",
+      place.id,
+      form.triggers,
+      () => updatePlace(projectId.value, place.id, { version, ...input(place) }),
+      { partial: true, onPartial: sayPartial },
     );
     savedTriggers.value = triggers;
     allPlaces.value = allPlaces.value.map((p) => (p.id === saved.id ? saved : p));
@@ -179,10 +217,11 @@ const editor = useResourceEditor<Place>({
     const found: Record<string, string> = {};
     if (!SLUG_PATTERN.test(form.slug)) found.slug = "Use lowercase Latin letters, digits, and single hyphens.";
     if (subPlace.value && !form.parentPlaceId) found.parentPlaceId = "Choose the parent place, or make it a top-level place.";
+    checkTriggers(form.triggers, found);
     return found;
   },
   describePath: (path) =>
-    /^media\[/.test(path) ? "Media" : /^triggers\[/.test(path) ? "How visitors reach it" : describeTranslationPath(path, languages.value, TEXT_META) ?? FIELD_NAMES[path] ?? path,
+    /^media\[/.test(path) ? "Media" : (describeTriggerPath(path, form.triggers) ?? describeTranslationPath(path, languages.value, TEXT_META) ?? FIELD_NAMES[path] ?? path),
 });
 
 const heading = computed(() => (editor.resource ? placeTitle(editor.resource, null, defaultLanguage.value) : "Place"));
@@ -336,15 +375,28 @@ const preview = computed<PreviewModel | null>(() => {
   return { kindLabel: "Place", language, fallbackName, title: textIn(form.translations, "title", codes), blocks };
 });
 
-async function changeLink(id: string) {
+/**
+ * What the last link change did, for the line under the select: the link is stored the moment it is chosen (not with Save),
+ * so the line says so and offers Undo while the previous choice can still be restored (C3-34).
+ */
+const linkNotice = ref<{ text: string; undoTo: string | null } | null>(null);
+
+/** Links the chosen map or floor plan now. `undo` restores the previous choice and offers nothing further. */
+async function changeLink(id: string, undo = false) {
+  const previous = linkedId.value;
+  const label = savedSetting.value === "INDOOR" ? "floor plan" : "map";
   linking.value = true;
   try {
     link.value = await setSpatialLink(projectId.value, props.placeId, savedSetting.value === "INDOOR" ? { mapId: null, floorPlanId: id || null } : { mapId: id || null, floorPlanId: null });
     await loadSpatial();
-    showToast(id ? "Linked" : "Unlinked", id ? "The place page shows it now." : "The place no longer shows a map or floor plan.");
+    const name = (savedSetting.value === "INDOOR" ? floorPlans.value : maps.value).find((x) => x.id === id)?.internalName;
+    linkNotice.value = undo
+      ? { text: id ? `Link restored to “${name}”.` : `Link removed again: no ${label}.`, undoTo: null }
+      : { text: id ? `Linked to “${name}”.` : `Unlinked: no ${label}.`, undoTo: previous };
   } catch (e) {
     if (!(e instanceof ApiError)) throw e;
-    showToast("The link was not changed", e.platformUnavailable ? "The UNICHE platform is not reachable." : Object.values(e.fieldMessages()).join(" ") || e.message, "error");
+    linkNotice.value = null;
+    showToast("The link was not changed", e.platformUnavailable ? problemText(e.status, e.code).body : Object.values(e.fieldMessages()).join(" ") || e.message, "error");
   } finally {
     linking.value = false;
   }
@@ -484,6 +536,29 @@ watch(linkedMap, (m, before) => {
 });
 
 
+/** What sits inside this Place: its child Places and the points of interest placed in it, none of them archived. */
+const children = computed(() => ({
+  places: allPlaces.value.filter((p) => p.parentPlaceId === props.placeId && p.status !== "ARCHIVED"),
+  pois: allPois.value.filter((p) => p.placeId === props.placeId && p.status !== "ARCHIVED"),
+}));
+const INSIDE_LIMIT = 6;
+
+/** One line of what Place setup still needs, so a new place says what to do next (C2-67). */
+const setupHint = computed(() => {
+  if (!editor.resource || editor.resource.status === "ARCHIVED" || linkedId.value) return undefined;
+  return savedSetting.value === "INDOOR" ? "Link a floor plan so points of interest can be placed inside it." : "Link a map so visitors see where this place is.";
+});
+const setupState = computed(() => (linkedId.value ? undefined : savedSetting.value === "INDOOR" ? "No floor plan linked" : "No map linked"));
+const textsState = computed(() => {
+  const gaps = translationRows.value.filter((r) => r.filled < r.total);
+  if (!gaps.length) return "Complete";
+  return gaps.length === 1 ? `${gaps[0].language.displayName} incomplete` : `${gaps.length} languages incomplete`;
+});
+const railSections = computed(() => [{ id: "texts", label: "Texts", state: textsState.value }]);
+/** A language other than the default is being translated: the language-independent cards fold away (C2-55). */
+const otherFolded = computed(() => !!editor.activeLanguage && editor.activeLanguage !== defaultLanguage.value);
+const detailsCount = computed(() => `${[form.internalName].filter((v) => v.trim()).length + (form.featured ? 1 : 0)} of 2 set`);
+
 // The Translations panel counts the fields the content list counts for its completion dots.
 const translationRows = computed(() => translationStatus(languages.value, PLACE_TEXT_FIELDS.length, (code) => filledFields(form.translations[code], PLACE_TEXT_FIELDS)));
 </script>
@@ -501,211 +576,186 @@ const translationRows = computed(() => translationStatus(languages.value, PLACE_
     :pending="languagesLoading"
     :translations="translationRows"
     :preview="preview"
+    :sections="railSections"
   >
-    <TranslationsPanel
-      v-model:active-language="editor.activeLanguage"
-      :project-id="projectId"
-      :languages="languages"
-      :texts="form.translations"
-      :groups="GROUPS"
-      :meta="TEXT_META"
-      :readonly="!editor.editable"
-      :error-languages="editor.languagesWithErrors"
-      :field-error="editor.fieldError"
-      title-required-hint="Required in the default language before the place can be activated."
-    />
+    <div id="texts" class="scroll-mt-4">
+      <TranslationsPanel
+        v-model:active-language="editor.activeLanguage"
+        :project-id="projectId"
+        :languages="languages"
+        :texts="form.translations"
+        :groups="GROUPS"
+        :meta="TEXT_META"
+        :readonly="!editor.editable"
+        :error-languages="editor.languagesWithErrors"
+        :field-error="editor.fieldError"
+        title-required-hint="Required in the default language before the place can be activated."
+      />
+    </div>
 
-    <MediaSlots
-      :project-id="projectId"
-      :slots="MEDIA_SLOTS"
-      :media="form.media"
-      :assets="libraryAssets"
-      :languages="languages"
-      :default-language="defaultLanguage"
-      :readonly="!editor.editable"
-      :field-error="editor.fieldError"
-      @uploaded="libraryAssets.unshift($event)"
-    />
-
-    <TriggersCard
-      :triggers="form.triggers"
-      :readonly="!editor.editable"
-      :field-error="editor.fieldError"
-      :position="{ latitude: numberText(editor.resource?.latitude), longitude: numberText(editor.resource?.longitude) }"
-      position-label="Use the place's position"
-    />
-
-    <section class="overflow-hidden rounded-lg border bg-card" aria-labelledby="place-setup-heading">
-      <div class="flex flex-wrap items-baseline gap-2 border-b px-5 py-3.5">
-        <h2 id="place-setup-heading" class="text-[11px] font-extrabold uppercase tracking-[0.09em] text-muted-foreground">Place setup</h2>
-        <span v-if="linkedMap" class="text-xs text-muted-foreground">{{ linkedMap.internalName }} · as visitors open it</span>
-      </div>
-      <div class="flex flex-col gap-4 px-5 py-[18px]">
-        <div class="flex flex-col gap-2" role="group" aria-labelledby="setup-level-label">
-          <span id="setup-level-label" class="small-label">1 · Level</span>
-          <div class="grid max-w-[560px] grid-cols-2 gap-2.5">
-            <button
+    <OtherSettings :folded="otherFolded" :section-ids="['setup', 'media', 'triggers', 'details']" summary="Place setup, Media, How visitors reach it, Details">
+      <EditorSection id="setup" title="Place setup" :state="setupState" :description="setupHint">
+        <fieldset class="m-0 flex min-w-0 flex-col gap-2 border-0 p-0">
+          <legend class="mb-1 p-0 text-sm font-semibold text-ink-2">Level</legend>
+          <div class="grid max-w-xl gap-2 sm:grid-cols-2">
+            <label
               v-for="level in ([[false, 'Top-level place', 'Stands on its own'], [true, 'Sub-place', 'Sits inside another place']] as const)"
               :key="String(level[0])"
-              type="button"
-              :aria-pressed="subPlace === level[0]"
-              :disabled="!editor.editable || (level[0] && !parentChoices.length)"
-              class="flex flex-col gap-1 rounded-lg border-[1.5px] px-3.5 py-3 text-left disabled:opacity-50"
-              :class="subPlace === level[0] ? 'border-primary bg-[#f5f0fb]' : 'border-gray-200 bg-white hover:border-primary'"
-              @click="chooseLevel(level[0])"
+              class="flex min-h-control cursor-pointer items-start gap-3 rounded-md border px-3 py-2.5"
+              :class="[subPlace === level[0] ? 'border-primary bg-accent' : 'border-input bg-card hover:bg-surface-hover', (!editor.editable || (level[0] && !parentChoices.length)) && 'cursor-not-allowed opacity-70']"
             >
-              <span class="text-[13px] font-bold">
-                <span v-if="subPlace === level[0]" aria-hidden="true" class="text-primary">✓ </span>{{ level[1] }}
-              </span>
-              <span class="text-xs text-muted-foreground">{{ level[2] }}</span>
-            </button>
+              <input
+                type="radio"
+                name="place-level"
+                class="mt-1 size-4 accent-primary"
+                :checked="subPlace === level[0]"
+                :disabled="!editor.editable || (level[0] && !parentChoices.length)"
+                @change="chooseLevel(level[0])"
+              />
+              <span class="flex flex-col"><span class="text-sm font-semibold">{{ level[1] }}</span><span class="text-xs text-muted-foreground">{{ level[2] }}</span></span>
+            </label>
           </div>
-          <template v-if="subPlace">
-            <label for="f-parent" class="small-label">Parent place</label>
-            <select
-              id="f-parent"
-              v-model="form.parentPlaceId"
-              :disabled="!editor.editable"
-              class="field-input max-w-[560px]"
-              :aria-invalid="editor.fieldError('parentPlaceId') ? 'true' : undefined"
-              :aria-describedby="editor.fieldError('parentPlaceId') ? 'err-PlaceEditorView-1' : undefined"
-              :class="{ invalid: editor.fieldError('parentPlaceId') }"
-            >
-              <option value="" disabled>Choose the parent place…</option>
-              <option v-for="o in parentChoices" :key="o.id" :value="o.id">{{ o.label }}</option>
-            </select>
-            <span v-if="editor.fieldError('parentPlaceId')" id="err-PlaceEditorView-1" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("parentPlaceId") }}</span>
-          </template>
-        </div>
+        </fieldset>
+        <FormField v-if="subPlace" id="f-parent" label="Parent place" :error="editor.fieldError('parentPlaceId')" class="max-w-xl" v-slot="f">
+          <FilteredSelect :id="f.id" v-model="form.parentPlaceId" :options="parentChoices" empty-label="Choose the parent place…" filter-label="Filter places" :disabled="!editor.editable" :aria-describedby="f.describedBy" :invalid="f.invalid" />
+        </FormField>
 
-        <div class="flex flex-col gap-1.5">
-          <label for="f-link" class="small-label">2 · {{ savedSetting === "INDOOR" ? "Floor plan" : "Map" }}</label>
-          <select
-            id="f-link"
-            :value="linkedId"
+        <div class="grid items-start gap-4 md:grid-cols-2">
+        <FormField id="f-type" label="Type" :error="settingError" v-slot="f">
+          <Select :id="f.id" v-model="form.type" :disabled="!editor.editable" :aria-describedby="[f.describedBy, 'f-type-help'].filter(Boolean).join(' ')" :invalid="f.invalid">
+            <option v-for="t in typeChoices" :key="t" :value="t">{{ placeTypeLabel(t) }}</option>
+          </Select>
+          <span id="f-type-help" class="text-xs text-muted-foreground">
+            <template v-if="settingLocked">
+              To make it a {{ savedSetting === "INDOOR" ? "site or area" : "building, floor, or room" }}, unlink the {{ savedSetting === "INDOOR" ? "floor plan" : "map" }} first.
+            </template>
+            <template v-else>Buildings, floors and rooms are indoors and use a floor plan; the other types are outdoors and use a map.</template>
+          </span>
+        </FormField>
+
+        <FormField id="f-link" :label="savedSetting === 'INDOOR' ? 'Floor plan' : 'Map'" v-slot="f">
+          <Select
+            :id="f.id"
+            :model-value="linkedId"
             :disabled="linking || settingChanged || !editor.resource || editor.resource.status === 'ARCHIVED'"
-            class="field-input max-w-[520px]"
-            @change="changeLink(($event.target as HTMLSelectElement).value)"
+            :aria-describedby="f.describedBy ? `${f.describedBy} f-link-note` : 'f-link-note'"
+            @update:model-value="changeLink(String($event ?? ''))"
           >
             <option value="">{{ savedSetting === "INDOOR" ? "No floor plan" : "No map" }}</option>
             <option v-for="o in linkOptions" :key="o.id" :value="o.id">{{ o.label }}</option>
-          </select>
-          <span v-if="settingChanged" class="text-xs text-[#855400]">
-            A {{ placeTypeLabel(form.type).toLowerCase() }} uses a {{ chosenSetting === "INDOOR" ? "floor plan" : "map" }}: save first, then link one.
+          </Select>
+          <span id="f-link-note" class="text-xs" :class="settingChanged ? 'font-medium text-warning' : 'text-muted-foreground'">
+            <template v-if="settingChanged">
+              A {{ placeTypeLabel(form.type).toLowerCase() }} uses a {{ chosenSetting === "INDOOR" ? "floor plan" : "map" }}: save first, then link one.
+            </template>
+            <template v-else>{{ linkNote }} <span class="font-semibold text-ink-2">Saved immediately, not with Save.</span></template>
           </span>
-          <span v-else class="text-xs text-muted-foreground">{{ linkNote }}</span>
-          <div v-if="editor.resource && !settingChanged" class="flex flex-wrap gap-3">
-            <RouterLink
-              v-if="linkedId"
-              :to="savedSetting === 'INDOOR' ? { name: 'floor-plan-editor', params: { projectId, planId: linkedId } } : { name: 'map-editor', params: { projectId, mapId: linkedId } }"
-              class="text-[11px] font-bold text-primary no-underline"
-            >
+          <span role="status" class="flex flex-wrap items-center gap-x-2 text-xs text-ink-2" data-link-notice>
+            <template v-if="linkNotice">
+              {{ linkNotice.text }}
+              <Button v-if="linkNotice.undoTo !== null" variant="link" size="sm" type="button" :disabled="linking" @click="changeLink(linkNotice.undoTo, true)">Undo<span class="sr-only"> the link change</span></Button>
+            </template>
+          </span>
+        </FormField>
+        </div>
+        <div v-if="editor.resource && !settingChanged" class="flex flex-wrap items-center gap-2">
+          <Button v-if="linkedId" variant="secondary" size="sm" as-child>
+            <RouterLink :to="savedSetting === 'INDOOR' ? { name: 'floor-plan-editor', params: { projectId, planId: linkedId } } : { name: 'map-editor', params: { projectId, mapId: linkedId } }">
               Open {{ savedSetting === "INDOOR" ? "floor plan" : "map" }}
             </RouterLink>
-            <button v-else type="button" class="text-[11px] font-bold text-primary" @click="startNewLink">
-              New {{ savedSetting === "INDOOR" ? "floor plan" : "map" }}
-            </button>
+          </Button>
+          <Button v-else-if="editor.editable" variant="secondary" size="sm" type="button" @click="startNewLink">New {{ savedSetting === "INDOOR" ? "floor plan" : "map" }}</Button>
+          <span v-if="linkedId && savedSetting === 'INDOOR'" class="text-xs text-muted-foreground">Points inside are placed on the floor plan by their x and y position, there.</span>
+        </div>
+
+        <div v-if="linkedMap" class="flex flex-col gap-2">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="min-w-0 flex-1 text-sm text-muted-foreground">
+              {{
+                editingArea
+                  ? linkedMap.status === "ACTIVE"
+                    ? "Drag the corners or the centre handle. The new area waits in the map's pending changes until you apply it."
+                    : "Drag the corners or the centre handle. Visitors see only the area inside."
+                  : pendingMap
+                    ? "Pending changes: visitors still see the map as it was until you apply them."
+                    : areaEditable
+                      ? `${linkedMap.internalName}: visitors see only this area.`
+                      : "This map is archived: restore it in the map editor to change its area."
+              }}
+            </span>
+            <template v-if="editingArea">
+              <Button variant="secondary" size="sm" type="button" :disabled="savingArea" @click="cancelAreaEdit">Cancel</Button>
+              <Button size="sm" type="button" :loading="savingArea" @click="saveArea">Save map area</Button>
+            </template>
+            <template v-else-if="areaEditable">
+              <Button variant="secondary" size="sm" type="button" @click="startAreaEdit">Edit map area</Button>
+              <Button v-if="pendingMap" size="sm" type="button" :loading="applyingMap" @click="applyMap">Apply map changes</Button>
+            </template>
+          </div>
+          <GeoMapCanvas
+            ref="mapCanvas"
+            :key="linkedMap.id"
+            :view="linkedMapView"
+            :bounds="editingArea ? areaDraft : linkedMapBounds"
+            :edit-bounds="editingArea"
+            :markers="linkedMapMarkers"
+            limit-to-bounds
+            height="220px"
+            :label="`Map ${linkedMap.internalName}`"
+            @bounds-change="areaDraft = $event"
+          />
+        </div>
+
+        <div v-if="children.places.length || children.pois.length" class="flex flex-col gap-2 border-t border-border pt-4" data-inside>
+          <h3 class="text-sm font-semibold text-ink-2">Inside this place</h3>
+          <div v-if="children.places.length" class="text-sm">
+            <span class="text-muted-foreground">{{ children.places.length }} {{ children.places.length === 1 ? "place" : "places" }}: </span>
+            <template v-for="(c, n) in children.places.slice(0, INSIDE_LIMIT)" :key="c.id">
+              <RouterLink :to="{ name: 'place-editor', params: { projectId, placeId: c.id } }">{{ placeTitle(c, null, defaultLanguage) }}</RouterLink><span v-if="n < Math.min(children.places.length, INSIDE_LIMIT) - 1">, </span>
+            </template>
+            <span v-if="children.places.length > INSIDE_LIMIT" class="text-muted-foreground"> and {{ children.places.length - INSIDE_LIMIT }} more</span>
+          </div>
+          <div v-if="children.pois.length" class="text-sm">
+            <span class="text-muted-foreground">{{ children.pois.length }} {{ children.pois.length === 1 ? "point of interest" : "points of interest" }}: </span>
+            <template v-for="(c, n) in children.pois.slice(0, INSIDE_LIMIT)" :key="c.id">
+              <RouterLink :to="{ name: 'poi-editor', params: { projectId, poiId: c.id } }">{{ poiTitle(c, defaultLanguage) }}</RouterLink><span v-if="n < Math.min(children.pois.length, INSIDE_LIMIT) - 1">, </span>
+            </template>
+            <span v-if="children.pois.length > INSIDE_LIMIT" class="text-muted-foreground"> and {{ children.pois.length - INSIDE_LIMIT }} more</span>
           </div>
         </div>
-      </div>
-      <div v-if="linkedMap" class="flex flex-col gap-2 px-3 pb-3">
-        <div class="flex flex-wrap items-center gap-2 px-2">
-          <span class="flex-1 text-xs text-muted-foreground">
-            {{
-              editingArea
-                ? linkedMap.status === "ACTIVE"
-                  ? "Drag the corners or the centre handle. The new area waits in the map's pending changes until you apply it."
-                  : "Drag the corners or the centre handle. Visitors see only the area inside."
-                : pendingMap
-                  ? "Pending changes: visitors still see the map as it was until you apply them."
-                  : areaEditable
-                    ? "Visitors see only this area."
-                    : "This map is archived: restore it in the map editor to change its area."
-            }}
-          </span>
-          <template v-if="editingArea">
-            <button type="button" class="dialog-secondary" :disabled="savingArea" @click="cancelAreaEdit">Cancel</button>
-            <button type="button" class="dialog-primary bg-primary" :disabled="savingArea" @click="saveArea">
-              {{ savingArea ? "Saving…" : "Save map area" }}
-            </button>
-          </template>
-          <template v-else-if="areaEditable">
-            <button type="button" class="dialog-secondary" @click="startAreaEdit">Edit map area</button>
-            <button v-if="pendingMap" type="button" class="dialog-primary bg-primary" :disabled="applyingMap" @click="applyMap">
-              {{ applyingMap ? "Applying…" : "Apply map changes" }}
-            </button>
-          </template>
-        </div>
-        <GeoMapCanvas
-          ref="mapCanvas"
-          :key="linkedMap.id"
-          :view="linkedMapView"
-          :bounds="editingArea ? areaDraft : linkedMapBounds"
-          :edit-bounds="editingArea"
-          :markers="linkedMapMarkers"
-          limit-to-bounds
-          height="360px"
-          :label="`Map ${linkedMap.internalName}`"
-          @bounds-change="areaDraft = $event"
-        />
-      </div>
-    </section>
+      </EditorSection>
 
-    <section class="overflow-hidden rounded-lg border bg-card">
-      <div class="border-b px-5 py-3.5">
-        <h2 class="text-[11px] font-extrabold uppercase tracking-[0.09em] text-muted-foreground">Details</h2>
-      </div>
-      <div class="flex flex-col gap-3.5 px-5 py-[18px]">
-        <div class="flex flex-col gap-1.5">
-          <label for="f-type" class="small-label">Type</label>
-          <select
-            id="f-type"
-            v-model="form.type"
-            :disabled="!editor.editable"
-            class="field-input max-w-[420px]"
-            :class="{ invalid: settingError }"
-            :aria-invalid="settingError ? 'true' : undefined"
-            aria-describedby="f-type-help"
-          >
-            <option v-for="t in typeChoices" :key="t" :value="t">{{ placeTypeLabel(t) }}</option>
-          </select>
-          <span v-if="settingError" id="f-type-help" class="text-xs font-semibold text-destructive">⚠ {{ settingError }}</span>
-          <span v-else-if="settingLocked" id="f-type-help" class="text-xs text-muted-foreground">
-            To make it a {{ savedSetting === "INDOOR" ? "site or area" : "building, floor, or room" }}, unlink the
-            {{ savedSetting === "INDOOR" ? "floor plan" : "map" }} in Place setup first.
-          </span>
-          <span v-else id="f-type-help" class="text-xs text-muted-foreground">
-            Buildings, floors, and rooms use a floor plan; the other types use a geographic map.
-          </span>
-        </div>
-        <div class="flex flex-col gap-1.5">
-          <label for="f-slug" class="small-label">Slug</label>
-          <input
-            id="f-slug"
-            v-model="form.slug"
-            :readonly="!editor.editable"
-            spellcheck="false"
-            class="field-input font-mono text-[13px]"
-            :class="{ invalid: editor.fieldError('slug') }"
-            aria-describedby="f-slug-help"
-          />
-          <span v-if="editor.fieldError('slug')" id="f-slug-help" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("slug") }}</span>
-          <span v-else id="f-slug-help" class="text-xs text-muted-foreground">
-            The place's address in the app and its QR target. Changing it breaks printed QR codes.
-          </span>
-        </div>
-        <div class="flex flex-col gap-1.5">
-          <label for="f-internal" class="small-label">Internal name</label>
-          <input id="f-internal" v-model="form.internalName" :readonly="!editor.editable" class="field-input" aria-describedby="f-internal-help" />
-          <span id="f-internal-help" class="text-xs text-muted-foreground">Only authors see it, for example an inventory number.</span>
-        </div>
-        <label class="flex items-center gap-2.5 text-[13px] font-semibold">
-          <input v-model="form.featured" type="checkbox" :disabled="!editor.editable" class="h-4 w-4 accent-primary" />
-          Featured: highlighted in the visitor app's lists
-        </label>
-      </div>
-    </section>
+      <MediaSlots
+        :project-id="projectId"
+        :slots="MEDIA_SLOTS"
+        :media="form.media"
+        :assets="libraryAssets"
+        :languages="languages"
+        :default-language="defaultLanguage"
+        :readonly="!editor.editable"
+        :field-error="editor.fieldError"
+        :item-status="editor.resource?.status"
+        @uploaded="libraryAssets.unshift($event)"
+      />
 
+      <TriggersCard
+        :triggers="form.triggers"
+        :readonly="!editor.editable"
+        :field-error="editor.fieldError"
+        :position="{ latitude: numberText(editor.resource?.latitude), longitude: numberText(editor.resource?.longitude) }"
+        position-label="Use the place's position"
+      />
+
+      <EditorSection id="details" title="Details" collapsible :default-open="false" :count="detailsCount">
+        <FormField id="f-slug" label="Slug" hint="Part of the place's web address and its QR target. Changing it breaks printed QR codes." :error="editor.fieldError('slug')" class="max-w-xl" v-slot="f">
+          <Input :id="f.id" v-model="form.slug" :readonly="!editor.editable" spellcheck="false" class="font-mono text-compact" :aria-describedby="f.describedBy" :invalid="f.invalid" />
+        </FormField>
+        <FormField id="f-internal" label="Internal name" hint="Only authors see it, for example an inventory number." class="max-w-xl" v-slot="f">
+          <Input :id="f.id" v-model="form.internalName" :readonly="!editor.editable" :aria-describedby="f.describedBy" />
+        </FormField>
+        <Checkbox v-model="form.featured" :disabled="!editor.editable" description="Highlighted in the visitor app's lists.">Featured</Checkbox>
+      </EditorSection>
+    </OtherSettings>
   </EditorShell>
 
   <NewMapDialog

@@ -1,0 +1,18 @@
+import { open, go } from "../../../tools/session.mjs";
+import { shot } from "./lib.mjs";
+const ID="600c4311-3e81-4235-91b0-5b3e336918fc";
+const { browser, page } = await open("admin", { viewport: "1440" });
+await go(page, "/projects/new?resume="+ID);
+await page.waitForTimeout(1500);
+const c = page.getByRole("button",{name:/Continue/});
+await c.hover(); await page.waitForTimeout(700);
+await shot(page, "wizard-2__continue-disabled-hover__1440");
+console.log("hover tooltip:", await page.evaluate(()=>[...document.querySelectorAll("[role=tooltip]")].map(t=>t.innerText)), "describedby", await c.getAttribute("aria-describedby"), "title", await c.getAttribute("title"));
+await page.locator("label", {hasText:"Outdoor trail"}).click();
+await page.waitForTimeout(800);
+await c.click();
+await page.waitForTimeout(1500);
+await shot(page, "wizard-3__first-view__1440", true);
+console.log("STEP3 TEXT\n", await page.evaluate(()=>document.querySelector("form").innerText));
+console.log("focus", await page.evaluate(()=>document.activeElement?.tagName+" "+document.activeElement?.id));
+await browser.close();

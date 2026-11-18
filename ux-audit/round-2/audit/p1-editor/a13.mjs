@@ -1,0 +1,16 @@
+import { open, go, shot, P, settle } from "./lib.mjs";
+const { browser, page } = await open("curator", { viewport: "1440" });
+await go(page, `/projects/${P}/pois?q=UX-R2-p1-editor`);
+await page.getByRole("heading", { level: 1 }).first().waitFor(); await settle(page,1500);
+console.log("URL", page.url(), "search value", await page.getByLabel("Search",{exact:true}).inputValue().catch(()=>"?"));
+await shot(page,"pois-list__search-r2__1440");
+console.log((await page.locator("main").innerText()).split("Actions")[1]?.slice(0,900));
+const row=page.locator("tr,li,[role=row]").filter({hasText:"Kore Corridor"}).first();
+await row.getByRole("button",{name:/actions|more|menu/i}).click(); await settle(page,400);
+await shot(page,"pois-list__row-menu__1440");
+console.log("MENU:", await page.getByRole("menu").innerText());
+await page.getByRole("menuitem",{name:/^Activate/}).click(); await settle(page,1000);
+await shot(page,"pois-list__row-activate-confirm__1440");
+console.log("DIALOG:", await page.getByRole("dialog").innerText());
+await page.getByRole("dialog").getByRole("button",{name:/^Activate$/}).click(); const tt=Date.now(); await page.waitForFunction(()=>!document.querySelector("[role=dialog]"),null,{timeout:30000}); console.log("activate ms",Date.now()-tt); await settle(page,800); await shot(page,"pois-list__after-row-activate__1440"); console.log("focus",await page.evaluate(()=>document.activeElement?.outerHTML.slice(0,90))); console.log("TOASTS", await page.evaluate(()=>[...document.querySelectorAll("[role=status],[aria-live]")].map(e=>e.textContent.trim().slice(0,150)).filter(Boolean)));
+await browser.close();

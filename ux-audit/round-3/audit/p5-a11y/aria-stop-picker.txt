@@ -1,0 +1,226 @@
+- dialog "Add stops":
+  - heading "Add stops" [level=2]
+  - button "Close dialog"
+  - text: Search
+  - searchbox "Search"
+  - text: Status
+  - combobox "Status":
+    - option "Active and draft" [selected]
+    - option "Active only"
+    - option "Draft only"
+  - text: Place
+  - combobox "Place":
+    - option "All places" [selected]
+    - option "Acropolis Museum"
+    - option "Acropolis of Athens"
+    - option "Ancient Agora of Athens"
+    - option "Athens Historic Centre"
+    - option "Excavation Hall of the Slopes"
+    - option "First Floor – Archaic Gallery"
+    - option "Ground Floor – Slopes Level"
+    - option "Parthenon Gallery"
+    - option "Propylaea and Temple of Athena Nike"
+    - option "Room of the Korai"
+    - option "Stoa of Attalos Museum"
+    - option "Theatre of Dionysus"
+    - option "UX-R2-s10 Place"
+    - option "UX-s10-poi-place Κήπος Ωδείου – Odeon Garden with a deliberately long name to test wrapping"
+  - paragraph: 97 items
+  - list:
+    - listitem:
+      - button "Acropolis View Terrace Acropolis Museum Active"
+    - listitem:
+      - button "Altar of the Twelve Gods Ancient Agora of Athens Draft"
+    - listitem:
+      - button "Ancient Agora Entrance and Ticket Office Ancient Agora of Athens Active"
+    - listitem:
+      - button "Antenor Kore Room of the Korai Draft"
+    - listitem:
+      - 'button "Archaic Pediment: Herakles and the Hydra Code 109 · First Floor – Archaic Gallery Draft"'
+    - listitem:
+      - button "Bath Complex Floor Mosaic Code 118 · Excavation Hall of the Slopes Active"
+    - listitem:
+      - button "Bema of Phaedrus Theatre of Dionysus Active"
+    - listitem:
+      - button "Chalkotheke Acropolis of Athens Draft"
+    - listitem:
+      - button "Chian Kore (Kore 675) Room of the Korai Active"
+    - listitem:
+      - button "Choragic Monument of Thrasyllos – Cave Shrine Above the Theatre with the Statue of Dionysus Later Installed Within the Arch Theatre of Dionysus Draft"
+    - listitem:
+      - button "Church of the Holy Apostles of Solaki (c. 1000 AD), an Eleventh-Century Byzantine Cross-in-Square Church Restored by the American School in the 1950s Ancient Agora of Athens Active"
+    - listitem:
+      - button "Classical Household Pottery Excavation Hall of the Slopes Draft"
+    - listitem:
+      - button "Dionysos, Hestia and Aphrodite Parthenon Gallery Active"
+    - listitem:
+      - button "East Pediment Fragments Parthenon Gallery Active"
+    - listitem:
+      - button "edited! Code P5-001 Draft"
+    - listitem:
+      - button "Erechtheion and the Porch of the Caryatids Acropolis of Athens Active"
+    - listitem:
+      - button "Excavated Athenian Neighbourhood Excavation Hall of the Slopes Active"
+    - listitem:
+      - button "Foundations of the Old Temple of Athena Code 130 · Acropolis of Athens Draft"
+    - listitem:
+      - button "Hekatompedon Pediment Lions First Floor – Archaic Gallery Active"
+    - listitem:
+      - button "Klepsydra Water Clock Stoa of Attalos Museum Active"
+    - listitem:
+      - button "Kleroterion Allotment Machine Stoa of Attalos Museum Draft"
+    - listitem:
+      - button "Kore of Euthydikos Code 115 · Room of the Korai Active"
+    - listitem:
+      - button "Moschophoros (The Calf-Bearer) First Floor – Archaic Gallery Active"
+    - listitem:
+      - button "Museum Café – Terrace Restaurant Acropolis Museum Active"
+    - listitem:
+      - button "Museum Shop Code 121 · Ground Floor – Slopes Level Active"
+    - listitem:
+      - button "Ostraka and the Ostracism Vote Code 142 · Stoa of Attalos Museum Active"
+    - listitem:
+      - button "Parthenon (Temple of Athena Parthenos) Acropolis of Athens Active"
+    - listitem:
+      - button "Parthenon Frieze – North Side Parthenon Gallery Active"
+    - listitem:
+      - button "Peplos Kore Code 112 · Room of the Korai Active"
+    - listitem:
+      - button "Propylaea Monumental Gateway Propylaea and Temple of Athena Nike Active"
+    - listitem:
+      - button "Rampin Rider First Floor – Archaic Gallery Active"
+    - listitem:
+      - button "Reception and Information Desk, Ticket Collection Point, Audio Guide Rental and Accessibility Assistance Counter (Ground Floor, Main Entrance) Ground Floor – Slopes Level Active"
+    - listitem:
+      - 'button "South Metope XXXI: Centaur and Lapith Code 103 · Parthenon Gallery Active"'
+    - listitem:
+      - button "Stoa of Attalos (Facade) Ancient Agora of Athens Active"
+    - listitem:
+      - button "Temple of Athena Nike Code 127 · Propylaea and Temple of Athena Nike Active"
+    - listitem:
+      - button "Temple of Hephaestus Code 136 · Ancient Agora of Athens Active"
+    - listitem:
+      - 'button "Temporary Exhibitions Hall: “The Acropolis Through the Eyes of Travellers, Antiquarians and Photographers from the Seventeenth Century to Today” Code 124 · Acropolis Museum Draft"'
+    - listitem:
+      - button "The Horsemen of the Panathenaic Procession Parthenon Gallery Draft"
+    - listitem:
+      - button "Theatre of Dionysus Eleuthereus – Orchestra Code 133 · Theatre of Dionysus Active"
+    - listitem:
+      - button "Tholos Code 139 · Ancient Agora of Athens Active"
+    - listitem:
+      - button "Typhon, the Three-Bodied Daemon First Floor – Archaic Gallery Active"
+    - listitem:
+      - button "UX-p1-editor Alpha Kouros Parthenon Gallery Active"
+    - listitem:
+      - button "UX-p1-editor Beta Theatre of Dionysus Active"
+    - listitem:
+      - button "UX-p1-editor Delta Theatre of Dionysus Active"
+    - listitem:
+      - button "UX-p1-editor Gamma Active"
+    - listitem:
+      - button "UX-p3-translator Ακρόπολη POI Athens Historic Centre Draft"
+    - listitem:
+      - button "UX-P3a Test Marble Head Draft"
+    - listitem:
+      - button "UX-P4 active point Active"
+    - listitem:
+      - button "UX-P4 draft point Draft"
+    - listitem:
+      - button "UX-P4 pending point Active"
+    - listitem:
+      - button "UX-p4-kiosk POI one Draft"
+    - listitem:
+      - button "UX-p5-a11y Beta Draft"
+    - listitem:
+      - button "UX-p6-edge dup pois Draft"
+    - listitem:
+      - button "UX-p6-edge POI A slow save Draft"
+    - listitem:
+      - button "UX-p6-edge POI B from A Draft"
+    - listitem:
+      - button "UX-p6-edge POI C applied once Active"
+    - listitem:
+      - button "UX-R2-p1-editor Amphora Room Parthenon Gallery Active"
+    - listitem:
+      - button "UX-R2-p1-editor Kore Corridor Code R2-K · Acropolis Museum Active"
+    - listitem:
+      - button "UX-R2-p1-editor Στοά Θέατρο Long Greek Title Αρχαίο Code R2-B · Theatre of Dionysus Active"
+    - listitem:
+      - button "UX-R2-p3 Active Kouros Hall Active"
+    - listitem:
+      - button "UX-R2-p3 Stoa of Attalos Gallery Draft"
+    - listitem:
+      - button "UX-R2-P4 Empty POI Draft"
+    - listitem:
+      - button "UX-R2-p4 Tablet POI Draft"
+    - listitem:
+      - button "UX-R2-P4s Active POI Active"
+    - listitem:
+      - button "UX-R2-P4s Draft POI with a very long title that has to wrap to two lines in the header and grow in the field Draft"
+    - listitem:
+      - button "UX-R2-p5 Keyboard POI Code R2P5-077863 Draft"
+    - listitem:
+      - button "UX-R2-p6 Double submit POI Draft"
+    - listitem:
+      - button "UX-R2-p6 POI Alpha Draft"
+    - listitem:
+      - button "UX-R2-p6 POI Delta Draft"
+    - listitem:
+      - button "UX-R2-p6 POI Gamma (theirs) Active"
+    - listitem:
+      - button "UX-R2-s10 POI A UX-R2-s10 Place Active"
+    - listitem:
+      - 'button "UX-R2-s10 POI B: Temporary Exhibitions Hall, “The Acropolis Through the Eyes of Travellers, Antiquarians and Photographers from the Seventeenth Century to Today” Draft"'
+    - listitem:
+      - button "UX-R2-s11 POI Alpha Active"
+    - listitem:
+      - button "UX-R2-s11 POI Bravo Active"
+    - listitem:
+      - button "UX-R2-s11 POI Charlie Active"
+    - listitem:
+      - button "UX-R2-s11 POI Delta Active"
+    - listitem:
+      - button "UX-R2-s11 POI Echo Draft"
+    - listitem:
+      - button "UX-R2-s11 POI Foxtrot Draft"
+    - listitem:
+      - button "UX-R2-verify Empty POI saved Draft"
+    - listitem:
+      - button "UX-R2-W0B Draft stop POI Draft"
+    - listitem:
+      - button "UX-R2-W0B Draft stop POI Draft"
+    - listitem:
+      - button "UX-R2-W0B Draft stop POI Draft"
+    - listitem:
+      - button "UX-R2-W0B QR point of interest Active"
+    - listitem:
+      - button "UX-R3-p1-editor Alpha POI Parthenon Gallery Active"
+    - listitem:
+      - button "UX-R3-p1-editor Beta POI Acropolis Museum Active"
+    - listitem:
+      - button "UX-R3-p1-editor Γάμμα POI – ένα εξαιρετικά μακρύ όνομα για δοκιμή περικοπής στη λίστα και στην κεφαλίδα του επεξεργαστή (עברית ערבית) Parthenon Gallery Active"
+    - listitem:
+      - button "UX-R3-p3 Poi Παρθενώνας test Draft"
+    - listitem:
+      - button "UX-R3-p5 POI A – Parthenon test Draft"
+    - listitem:
+      - button "UX-s10-poi-place Garden Bench UX-s10-poi-place Κήπος Ωδείου – Odeon Garden with a deliberately long name to test wrapping Draft"
+    - listitem:
+      - button "UX-s10-poi-place Odeon Mosaic Floor Ψηφιδωτό Parthenon Gallery Active"
+    - listitem:
+      - button "UX-s11-editors Stop Alpha Acropolis of Athens Active"
+    - listitem:
+      - button "UX-s11-editors Stop Bravo Acropolis of Athens Active"
+    - listitem:
+      - button "UX-s11-editors Stop Charlie Acropolis of Athens Active"
+    - listitem:
+      - button "UX-s11-editors Stop Delta Acropolis of Athens Active"
+    - listitem:
+      - button "UX-s11-editors Stop Echo, a deliberately long point of interest title to test truncation in the stop rows of the route editor Acropolis of Athens Draft"
+    - listitem:
+      - button "UX-s11-editors Stop Foxtrot (no coordinates) Acropolis of Athens Draft"
+    - listitem:
+      - button "UX-W0.2 point Active"
+  - paragraph: Stops are ordered as you add them. At least one stop must be an active point of interest before the route can be activated. Draft points of interest can be added, but visitors do not see them until they are active.
+  - contentinfo:
+    - button "Done"

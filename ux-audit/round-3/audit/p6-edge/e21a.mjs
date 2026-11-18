@@ -1,0 +1,12 @@
+import * as H from "./h.mjs";
+import { join } from "node:path";
+const { browser, page } = await H.session();
+await H.go(page, H.P("/media")); await H.sleep(1500);
+await page.getByRole("button", { name: /Upload files/ }).first().click(); await H.sleep(600);
+const dlg = page.getByRole("dialog");
+await page.route((u)=>u.pathname.includes("/iguide/api/"), async (r) => { if (r.request().method() === "POST") await H.sleep(5000); return r.continue(); });
+await dlg.locator("input[type=file]").setInputFiles([9,10,11,12].map(i=>join(H.here,"files",`ux-r3-p6-img${i}.png`))); await H.sleep(800);
+console.log(await dlg.innerText());
+console.log(await dlg.getByRole("button").evaluateAll(els=>els.map(e=>e.getAttribute("aria-label")+"|"+e.textContent.trim())));
+await H.shot(page, "upload__debug__1440");
+await browser.close();

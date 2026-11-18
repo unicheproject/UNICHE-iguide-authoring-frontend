@@ -1,0 +1,47 @@
+{
+ "vp": "1440",
+ "topEmpty": 88,
+ "limits": "Accepted formats and largest file\nType\tFormats\tLargest file\nImage\tJPG, PNG, WebP, GIF, SVG, AVIF\t20 MB\nAudio\tMP3, WAV, M4A, OGG, FLAC\t50 MB\nVideo\tMP4, WebM, MOV\t200 MB\nDocument\tPDF\t20 MB\n3D model\tGLB, GLTF\t100 MB\nAny upload\tEvery type above\t200 MB",
+ "topRows": 88,
+ "afterCancelQueued": {
+  "tag": "BUTTON",
+  "label": "Retry, UX-R3-P7a hold 3.png",
+  "inDialog": true
+ },
+ "afterCancelRemaining": {
+  "tag": "BUTTON",
+  "label": "Retry, UX-R3-P7a hold 3.png",
+  "inDialog": true
+ },
+ "tabAfter": {
+  "tag": "BUTTON",
+  "label": "Close",
+  "inDialog": true
+ },
+ "afterRetryStart": {
+  "tag": "BUTTON",
+  "label": "Retry, UX-R3-P7a hold 2.png",
+  "inDialog": true
+ },
+ "afterRetryDone": {
+  "tag": "BUTTON",
+  "label": "Retry, UX-R3-P7a hold 2.png",
+  "inDialog": true
+ },
+ "summary": "1 of 3 uploaded",
+ "held": {
+  "h": 17,
+  "w": 125
+ },
+ "topHeld": 88,
+ "describe": {
+  "invalid": "true",
+  "describedText": [
+   "What the image shows and why it is here, in one or two sentences. Do not begin with “image of”.",
+   "Alternative text must not begin with an image prefix."
+  ],
+  "tryAgain": false,
+  "alerts": 1,
+  "hint": true
+ }
+}

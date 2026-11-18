@@ -1,5 +1,6 @@
 import { forceTokenRefresh, getAccessToken, platformConfig, sessionExpired } from "./auth";
 import { connection, markOffline, markOnline } from "@/stores/connection";
+import { fieldSentence, problemText } from "@/lib/problemText";
 
 /**
  * Client for the authoring API. Every request carries the user's bearer token, which the backend
@@ -211,7 +212,7 @@ async function send(path: string, options: RequestOptions): Promise<Response> {
     throw new ApiError(
       0,
       "NETWORK_ERROR",
-      "The iGuide backend could not be reached. Check that it is running; nothing was changed.",
+      problemText(0, "NETWORK_ERROR").body,
       null,
       [],
     );
@@ -272,7 +273,7 @@ async function sendUpload(
     };
     xhr.onerror = () => {
       markOffline();
-      reject(new ApiError(0, "NETWORK_ERROR", "The iGuide backend could not be reached. Check that it is running; nothing was uploaded.", null, []));
+      reject(new ApiError(0, "NETWORK_ERROR", "The CMS could not reach its server. Check your connection and try again. Nothing was uploaded.", null, []));
     };
     xhr.onabort = () => reject(new DOMException("Upload cancelled", "AbortError"));
     signal?.addEventListener("abort", () => xhr.abort());
@@ -301,39 +302,31 @@ async function toApiError(response: Response): Promise<ApiError> {
     str(body.code) ??
     (type?.startsWith(PROBLEM_TYPE_PREFIX) ? type.slice(PROBLEM_TYPE_PREFIX.length) : type && !type.includes(":") ? type : null) ??
     `HTTP_${response.status}`;
-  const message = str(body.detail) ?? str(body.title) ?? str(body.message) ?? defaultMessage(response.status);
+  // The server's `detail`, `title` and `message` can hold stack traces, user names or the rejected value: they are kept in
+  // `body` for code that reads specific fields, and never become the error's text (D-087). The sentence is chosen by
+  // status and code.
+  const message = problemText(response.status, code).body;
   const requestId =
     str(body.requestId) ?? response.headers.get("X-UNICHE-Request-Id") ?? response.headers.get("X-Request-Id");
+  // Field messages are shown at their field only for a 422; for any other status the code chooses a fixed sentence.
   const fieldErrors: FieldError[] = Array.isArray(body.errors)
     ? body.errors.flatMap((e) => {
         const item = e as { path?: unknown; code?: unknown; message?: unknown };
         const text = str(item.message);
-        return text ? [{ path: str(item.path) ?? "", code: str(item.code) ?? "", message: text }] : [];
+        if (!text) return [];
+        const fieldCode = str(item.code) ?? "";
+        return [{ path: str(item.path) ?? "", code: fieldCode, message: response.status === 422 ? text : fieldSentence(fieldCode) }];
       })
     : [];
-  const details = Array.isArray(body.details)
-    ? body.details.filter((d): d is string => typeof d === "string")
-    : fieldErrors.map((e) => (e.path ? `${e.path}: ${e.message}` : e.message));
+  const details =
+    response.status === 422 && Array.isArray(body.details)
+      ? body.details.filter((d): d is string => typeof d === "string")
+      : fieldErrors.map((e) => (e.path ? `${e.path}: ${e.message}` : e.message));
   return new ApiError(response.status, code, message, requestId, details, body, fieldErrors.length ? fieldErrors : undefined);
 }
 
 function str(value: unknown): string | null {
   return typeof value === "string" && value ? value : null;
-}
-
-function defaultMessage(status: number): string {
-  switch (status) {
-    case 403:
-      return "The UNICHE Catalogue does not allow this operation.";
-    case 404:
-      return "Not found.";
-    case 502:
-    case 503:
-    case 504:
-      return "The UNICHE platform is not reachable.";
-    default:
-      return `The request failed with status ${status}.`;
-  }
 }
 
 /**

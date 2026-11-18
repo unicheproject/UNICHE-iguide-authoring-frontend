@@ -1,0 +1,29 @@
+{
+ "err401": " || f6b5/preview",
+ "err403": "Preview |  | The runtime rendered with your unpublished content, per surface and language. Preview never changes what visitors see. |  | OPEN IN NEW TAB | The preview could not be loaded |  | Forced 403 |  | TRY AGAIN || f6b5/preview",
+ "err404": "Preview |  | The runtime rendered with your unpublished content, per surface and language. Preview never changes what visitors see. |  | OPEN IN NEW TAB | The preview could not be loaded |  | Forced 404 |  | TRY AGAIN || f6b5/preview",
+ "err502": "Preview |  | The runtime rendered with your unpublished content, per surface and language. Preview never changes what visitors see. |  | OPEN IN NEW TAB | The UNICHE platform is not reachable |  | Forced 502 |  | TRY AGAIN || f6b5/preview",
+ "err503": "Preview |  | The runtime rendered with your unpublished content, per surface and language. Preview never changes what visitors see. |  | OPEN IN NEW TAB | The UNICHE platform is not reachable |  | Forced 503 |  | TRY AGAIN || f6b5/preview",
+ "tryAgain": 1,
+ "recovered": 1,
+ "loading": [],
+ "noteAfterSurface": true,
+ "afterLive": "← | ☰ | Point of interest | SEARCH | EN ▾ | Opened by QR code frieze-101 | Parthenon Frieze – North Side | Visit 5 min |  | A closer look ",
+ "workingTitle": [
+  "Parthenon Frieze – North Side"
+ ],
+ "selectFocus": {
+  "outline": "none 3px",
+  "shadow": "none",
+  "border": "rgb(76, 29, 139)"
+ },
+ "beaconWeb": true,
+ "liveOptsCount": 7,
+ "zoomScrollW": 640,
+ "zoomDlg": {
+  "x": 16,
+  "y": 16,
+  "width": 560,
+  "height": 328
+ }
+}

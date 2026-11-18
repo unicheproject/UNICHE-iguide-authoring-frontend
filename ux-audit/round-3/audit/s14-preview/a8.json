@@ -1,0 +1,45 @@
+[
+ [
+  "before",
+  {
+   "scale": "0.775",
+   "w": 992,
+   "url": "",
+   "checked": false
+  }
+ ],
+ [
+  "afterRealClick",
+  {
+   "scale": "0.775",
+   "w": 992,
+   "url": "?surface=WEB&lang=en&mode=WORKING&real=1",
+   "checked": true
+  }
+ ],
+ [
+  "kbd",
+  [
+   "SELECT:np-surface",
+   "SELECT:np-lang",
+   "SELECT:np-mode",
+   "INPUT:",
+   "BUTTON:UX Audit – Populated",
+   "BUTTON:Home",
+   "BUTTON:Places",
+   "BUTTON:Points of interest",
+   "BUTTON:Routes"
+  ]
+ ],
+ [
+  "popup",
+  {
+   "url": "http://localhost:5173/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/app-preview?surface=KIOSK&lang=en&mode=WORKING&orientation=landscape",
+   "frame": {
+    "w": 992,
+    "h": 1766,
+    "scale": "0.919"
+   }
+  }
+ ]
+]

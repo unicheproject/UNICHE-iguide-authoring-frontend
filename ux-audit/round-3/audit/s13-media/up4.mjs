@@ -1,0 +1,31 @@
+import { open, go, P, shot, settle } from "./h.mjs";
+const vp = "1440";
+const { browser, page } = await open("admin", { viewport: vp, reducedMotion: "reduce" });
+const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==", "base64");
+await go(page, `/projects/${P}/media`); await settle(page);
+await page.getByRole("button", { name: "Upload files" }).first().click(); await page.waitForTimeout(500);
+let fail = true;
+await page.route(/\/projects\/[^/]+\/assets$/, async (route) => {
+  if (route.request().method() !== "POST") return route.fallback();
+  await new Promise(r => setTimeout(r, 1500));
+  if (fail) return route.fulfill({ status: 500, contentType: "application/problem+json", body: JSON.stringify({ title: "SECRET", status: 500, detail: "boom NPE", code: "INTERNAL", requestId: "req-s13-up" }) });
+  return route.fallback();
+});
+await page.locator("input[type=file]").setInputFiles([{ name: "UX-R3-s13 retry2.png", mimeType: "image/png", buffer: png }]);
+await page.waitForTimeout(500);
+console.log("RM anims", await page.evaluate(() => document.getAnimations().map(a => `${a.animationName ?? ""}|${a.effect?.getTiming().duration}|${a.effect?.getTiming().iterations}`)));
+await shot(page, `upload__progress-reducedmotion__${vp}`);
+await page.waitForTimeout(2200);
+await shot(page, `upload__failed-500__${vp}`);
+console.log("failed", await page.evaluate(() => document.querySelector("[role=dialog] ul[aria-label=Files]").innerText.replace(/\n+/g, " | ")));
+console.log("log", await page.evaluate(() => document.querySelector("[role=log]")?.textContent));
+fail = false;
+await page.getByRole("button", { name: /Retry/ }).first().click(); await page.waitForTimeout(2500);
+console.log("after", await page.evaluate(() => document.querySelector("[role=dialog] ul[aria-label=Files]").innerText.replace(/\n+/g, " | ")));
+console.log("focus", await page.evaluate(() => document.activeElement.tagName + " " + (document.activeElement.getAttribute("aria-label")||document.activeElement.textContent).trim().slice(0, 30)));
+// duplicate: same bytes again
+await page.locator("input[type=file]").setInputFiles([{ name: "UX-R3-s13 retry2-copy.png", mimeType: "image/png", buffer: png }]);
+await page.waitForTimeout(2500);
+await shot(page, `upload__duplicate-held__${vp}`);
+console.log("dup", await page.evaluate(() => document.querySelector("[role=dialog] ul[aria-label=Files]").innerText.replace(/\n+/g, " | ")));
+await browser.close();

@@ -1,0 +1,46 @@
+import { open, go } from "../../../tools/session.mjs";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const P = "6958c18f-60d2-4140-a524-5a43f8a2f6b5";
+const { browser, page } = await open("admin", { viewport: process.argv[2] ?? "1440" });
+await go(page, `/projects/${P}/media`);
+await page.waitForSelector("[data-media-count]", { timeout: 30000 });
+await page.waitForTimeout(1500);
+const active = () => page.evaluate(() => { const a = document.activeElement; return a ? `${a.tagName}${a.id ? "#" + a.id : ""} "${(a.getAttribute("aria-label") || a.textContent || "").trim().slice(0, 40)}"` : null; });
+const log = {};
+await page.getByRole("button", { name: "Upload files" }).first().click();
+await page.waitForTimeout(600);
+log.dialogOpen = await active();
+await page.screenshot({ path: "after/upload-open.png" });
+await page.locator("input[type=file]").setInputFiles([
+  { name: "UX-R2-P7a-one.exe", mimeType: "application/x-msdownload", buffer: Buffer.from("MZ1") },
+  { name: "UX-R2-P7a-two.exe", mimeType: "application/x-msdownload", buffer: Buffer.from("MZ22") },
+]);
+await page.waitForTimeout(1500);
+await page.screenshot({ path: "after/upload-held.png" });
+log.names = await page.locator("[role=dialog] button").evaluateAll((bs) => bs.map((b) => `${b.textContent.trim()}|${b.getAttribute("aria-label")}`));
+log.details = await page.locator("[role=dialog] details").count();
+log.logSrOnly = await page.locator("[role=log]").evaluate((e) => getComputedStyle(e).position);
+await page.getByRole("button", { name: "Skip, UX-R2-P7a-one.exe" }).click();
+await page.waitForTimeout(300);
+log.afterSkip = await active();
+await page.screenshot({ path: "after/upload-skipped.png" });
+await page.getByRole("button", { name: "Undo skip, UX-R2-P7a-one.exe" }).click();
+await page.waitForTimeout(300);
+log.afterUndo = await active();
+await page.getByRole("button", { name: "Upload anyway, UX-R2-P7a-one.exe" }).click();
+await page.waitForTimeout(300);
+log.afterAnyway1 = await active();
+await page.getByRole("button", { name: "Skip, UX-R2-P7a-two.exe" }).click().catch(() => {});
+await page.waitForTimeout(2500);
+log.afterSkip2 = await active();
+await page.screenshot({ path: "after/upload-done.png" });
+log.rows = await page.locator("[role=dialog] ul[aria-label=Files] li").allInnerTexts();
+const { AxeBuilder } = require("@axe-core/playwright");
+const ax = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
+log.axe = ax.violations.map((v) => `${v.id}:${v.impact}:${v.nodes.length}`);
+await page.getByRole("button", { name: "Close", exact: true }).last().click();
+await page.waitForTimeout(500);
+log.afterClose = await active();
+console.log(JSON.stringify(log, null, 1));
+await browser.close();

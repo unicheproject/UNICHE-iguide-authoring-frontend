@@ -1,0 +1,20 @@
+1440 default tab structural visible: 0
+1440 el tab structural controls visible outside the fold: []
+1440 fold button 1
+1440 after open, in fold: 25
+1440 axe el []
+1024 default tab structural visible: 0
+1024 el tab structural controls visible outside the fold: []
+1024 fold button 1
+1024 after open, in fold: 25
+1024 axe el []
+768 default tab structural visible: 0
+768 el tab structural controls visible outside the fold: []
+768 fold button 1
+768 after open, in fold: 25
+768 axe el []
+zoom200 default tab structural visible: 0
+zoom200 el tab structural controls visible outside the fold: []
+zoom200 fold button 1
+zoom200 after open, in fold: 25
+zoom200 axe el []

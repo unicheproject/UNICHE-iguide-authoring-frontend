@@ -1,0 +1,16 @@
+[save 422] Control+s -> div[alert] "The point of interest was not savedLatitude: Latitude out of" 256,173,736,129  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) | live=["Saving…","Unsaved changes","Title too long (forced)","Latitude out of range (forced)"]
+summary {"text":"The point of interest was not saved\n\nLatitude: Latitude out of range (forced)\nTitle (English): Title too long (forced)\n\nRequest id req-r3-p5-save422","links":["Latitude: Latitude out of range (forced)","Title (English): Title too long (forced)"]}
+link 0 -> input "e.g. 37.9715" 281,438,335,40  solid 2px rgb(76, 29, 139) off 2px 
+link 1 -> textarea "UX-R3-p5 POI A – Parthenon test!" 281,339,686,40  solid 2px rgb(76, 29, 139) off 2px 
+AXE {"label":"poi-editor-422","url":"http://localhost:5173/projects/PID/pois/e51249c1-755b-42d5-9a20-5912046ea9c9","counts":{},"v":[]}
+[save 503] Control+s -> div[alert] "The point of interest was not savedThe platform is busy or d" 256,173,736,125  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) | live=["Saving…","Unsaved changes"]
+503 summary/alert ["The point of interest was not saved\n\nThe platform is busy or down for maintenance. Nothing was changed. Try again in a few minutes. Your cha",""] secret false
+offline live [{"t":9501,"role":"alert","text":"You are offline. Changes are disabled; what is loaded stays readable, and unsaved changes stay in the form. Check again","why":"add"}] banner ["You are offline. Changes are disabled; what is loaded stays readable, and unsaved changes stay in the form.\n\nCheck again","Unsaved changes","The point of interest was not saved\n\nThe platform is busy or down for maintenance. Nothing was changed. Try again in a f"]
+[save offline] Control+s -> div[alert] "The point of interest was not savedThe platform is busy or d" 256,173,736,125  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) | live=["You are offline. Your changes are kept in this browser until you are back online."]
+[switcher] Enter -> input "Search projects" 268,67,390,40  solid 2px rgb(76, 29, 139) off 2px | live=["Unsaved changes"]
+[choose other project] Enter -> h2 "Leave without saving?" 521,350,354,26  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) | live=["1 of 28 projects shown"]
+leave confirm Leave without saving?
+
+You have unsaved changes to this point of interest. They stay in this browser as a draft: you can restore them when you open it again, but nobody else sees them and visitors nev h2 "Leave without saving?" 521,350,354,26  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px)
+[esc leave confirm] Escape -> h1 "UX-R3-p5 POI A – Parthenon test" 256,132,334,26  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) | live=["Dashboard loaded"]
+after esc http://localhost:5173/projects/PID/pois/e51249c1-755b-42d5-9a20-5912046ea9c9 {"title":"Dashboard · UX Audit – Empty B · iGuide CMS","h1":"UX-R3-p5 POI A – Parthenon test","ae":"H1"}

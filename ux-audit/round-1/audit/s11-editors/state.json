@@ -1,0 +1,32 @@
+{
+ "pois": [
+  {
+   "t": "UX-s11-editors Stop Alpha",
+   "id": "0441df15-a2ed-47d3-a079-d6766c9a2344"
+  },
+  {
+   "t": "UX-s11-editors Stop Bravo",
+   "id": "374543ed-5944-47db-abec-25a4473a247d"
+  },
+  {
+   "t": "UX-s11-editors Stop Charlie",
+   "id": "cbdb1c84-d4ba-4652-8a96-b551050f6998"
+  },
+  {
+   "t": "UX-s11-editors Stop Delta",
+   "id": "1eaa52d4-7801-4a6b-8bf3-5a884a2a218c"
+  },
+  {
+   "t": "UX-s11-editors Stop Echo, a deliberately long point of interest title to test truncation in the stop rows of the route editor",
+   "id": "35437a74-ebb5-4b39-9cf9-4631439b6974"
+  },
+  {
+   "t": "UX-s11-editors Stop Foxtrot (no coordinates)",
+   "id": "d0734cb5-07fa-4449-b9d1-5c534edac72a"
+  }
+ ],
+ "routeUrl": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/routes/00b39d11-892e-44fc-ad0d-05f7b4282790",
+ "guideUrl": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/guides/ceaccdfb-a99c-4481-851c-c228082e2456",
+ "eventUrl": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/events/ab85156e-3be8-4f25-9557-7f807d8049cb",
+ "catUrl": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/categories/6fa0e204-d987-4761-9cd0-b79bc3bc980f"
+}

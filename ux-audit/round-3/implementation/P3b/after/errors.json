@@ -1,0 +1,76 @@
+{
+ "guides@1440": {
+  "active": "H1:Guides",
+  "body": "Guides Entries with text and an optional story: reading pieces, products, businesses, archive items New guide The platform is busy The platform is busy or down for maintenance. Nothing was changed. Tr",
+  "reqIdRows": 1
+ },
+ "events@1440": {
+  "active": "H1:Events",
+  "body": "Events Dated happenings visitors can plan around New event The platform is busy The platform is busy or down for maintenance. Nothing was changed. Try again in a few minutes. Try again Request id req-",
+  "reqIdRows": 1
+ },
+ "categories@1440": {
+  "active": "H1:Categories",
+  "body": "Categories Taxonomy used to group and filter content New category The platform is busy The platform is busy or down for maintenance. Nothing was changed. Try again in a few minutes. Try again Request ",
+  "reqIdRows": 1
+ },
+ "guides-triggers-503": {
+  "rows": 27,
+  "notice": [
+   "Triggers could not be loadedThe list is complete. Trigger chips are left out. The platform is busy or down for maintenance. Nothing was changed. Try again in a "
+  ],
+  "chipsText": true
+ },
+ "events-triggers-503": {
+  "rows": 27,
+  "notice": [
+   "Triggers could not be loadedThe list is complete. Trigger chips are left out. The platform is busy or down for maintenance. Nothing was changed. Try again in a "
+  ],
+  "chipsText": true
+ },
+ "guides@1024": {
+  "active": "H1:Guides",
+  "body": "Guides Entries with text and an optional story: reading pieces, products, businesses, archive items New guide The platform is busy The platform is busy or down for maintenance. Nothing was changed. Tr",
+  "reqIdRows": 1
+ },
+ "events@1024": {
+  "active": "H1:Events",
+  "body": "Events Dated happenings visitors can plan around New event The platform is busy The platform is busy or down for maintenance. Nothing was changed. Try again in a few minutes. Try again Request id req-",
+  "reqIdRows": 1
+ },
+ "categories@1024": {
+  "active": "H1:Categories",
+  "body": "Categories Taxonomy used to group and filter content New category The platform is busy The platform is busy or down for maintenance. Nothing was changed. Try again in a few minutes. Try again Request ",
+  "reqIdRows": 1
+ },
+ "guides@768": {
+  "active": "H1:Guides",
+  "body": "Guides Entries with text and an optional story: reading pieces, products, businesses, archive items New guide The platform is busy The platform is busy or down for maintenance. Nothing was changed. Tr",
+  "reqIdRows": 1
+ },
+ "events@768": {
+  "active": "H1:Events",
+  "body": "Events Dated happenings visitors can plan around New event The platform is busy The platform is busy or down for maintenance. Nothing was changed. Try again in a few minutes. Try again Request id req-",
+  "reqIdRows": 1
+ },
+ "categories@768": {
+  "active": "H1:Categories",
+  "body": "Categories Taxonomy used to group and filter content New category The platform is busy The platform is busy or down for maintenance. Nothing was changed. Try again in a few minutes. Try again Request ",
+  "reqIdRows": 1
+ },
+ "guides@zoom200": {
+  "active": "H1:Guides",
+  "body": "Guides Entries with text and an optional story: reading pieces, products, businesses, archive items New guide The platform is busy The platform is busy or down for maintenance. Nothing was changed. Tr",
+  "reqIdRows": 1
+ },
+ "events@zoom200": {
+  "active": "H1:Events",
+  "body": "Events Dated happenings visitors can plan around New event The platform is busy The platform is busy or down for maintenance. Nothing was changed. Try again in a few minutes. Try again Request id req-",
+  "reqIdRows": 1
+ },
+ "categories@zoom200": {
+  "active": "H1:Categories",
+  "body": "Categories Taxonomy used to group and filter content New category The platform is busy The platform is busy or down for maintenance. Nothing was changed. Try again in a few minutes. Try again Request ",
+  "reqIdRows": 1
+ }
+}

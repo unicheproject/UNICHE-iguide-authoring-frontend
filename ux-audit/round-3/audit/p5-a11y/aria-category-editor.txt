@@ -1,0 +1,137 @@
+- main:
+  - navigation "Breadcrumb":
+    - list:
+      - listitem:
+        - link "Categories":
+          - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/categories
+      - listitem: UX-R3-p5 Category
+  - heading "UX-R3-p5 Category" [level=1]
+  - text: Draft
+  - status
+  - 'button "3 warnings, nothing blocks in this category: show what needs attention"'
+  - button "Save No unsaved changes to save" [disabled]
+  - button "More actions"
+  - heading "Texts" [level=2]
+  - tablist "Language":
+    - tab "English default 1 of 2" [selected]
+    - tab "Ελληνικά Missing"
+    - tab "Italiano Missing"
+  - tabpanel "English default 1 of 2":
+    - text: Name
+    - paragraph: Required in the default language before the category can be activated.
+    - textbox "Name": UX-R3-p5 Category
+    - text: Description
+    - paragraph: Optional. Shown on the category's own page in the visitor app.
+    - textbox "Description"
+  - region "Category setup":
+    - heading "Category setup" [level=2]
+    - group "Applies to":
+      - text: Applies to
+      - radio "Points of Interest" [checked]
+      - text: Points of Interest
+      - radio "Routes"
+      - text: Routes
+    - paragraph: Which kind of content can be put in this category. It is fixed once something uses it.
+    - group "Level":
+      - text: Level
+      - radio "Top-level" [checked]
+      - text: Top-level
+      - radio "Subcategory"
+      - text: Subcategory
+    - paragraph: "Categories have two levels at most: a category and its subcategories."
+    - group "Icon":
+      - text: Icon
+      - radio "None" [checked]
+      - text: None
+      - radio "Monument"
+      - text: Monument
+      - radio "Museum"
+      - text: Museum
+      - radio "Sculpture"
+      - text: Sculpture
+      - radio "Pottery"
+      - text: Pottery
+      - radio "Church"
+      - text: Church
+      - radio "Castle"
+      - text: Castle
+      - radio "Nature"
+      - text: Nature
+      - radio "Mountain"
+      - text: Mountain
+      - radio "Beach"
+      - text: Beach
+      - radio "Viewpoint"
+      - text: Viewpoint
+      - radio "Food"
+      - text: Food
+      - radio "Shop"
+      - text: Shop
+      - radio "Info"
+      - text: Info
+      - radio "Photo"
+      - text: Photo
+      - radio "Water"
+      - text: Water
+      - radio "Harbour"
+      - text: Harbour
+      - radio "Industry"
+      - text: Industry
+      - radio "Trail"
+      - text: Trail
+      - radio "Family"
+      - text: Family
+      - radio "Bike"
+      - text: Bike
+      - paragraph: "Chosen: None. Marks the category on maps, filters and lists in the visitor app."
+  - region "Details Code set":
+    - heading "Details Code set" [level=2]:
+      - button "Details Code set"
+  - complementary "About this item":
+    - region "Status":
+      - heading "Status" [level=2]
+      - text: Draft
+      - paragraph: Only authors see it. Activate it once the default-language name is set.
+      - button "Activate"
+      - term: Kind
+      - definition: Points of Interest
+      - term: Revision
+      - definition: Not saved yet
+      - term: Updated
+      - definition: 17 Nov 2026, 11:17
+      - term: Created
+      - definition: 17 Nov 2026, 11:17
+    - region "Before you activate":
+      - heading "Before you activate" [level=2]
+      - paragraph: 3 warnings, nothing blocks.
+      - paragraph: 3 warnings, nothing blocks
+      - heading "Texts (3)" [level=3]
+      - list:
+        - listitem:
+          - 'button "Warning: English: 1 text missing"'
+        - listitem:
+          - 'button "Warning: Ελληνικά: 2 texts missing"'
+        - listitem:
+          - 'button "Warning: Italiano: 2 texts missing"'
+    - navigation "On this page":
+      - heading "On this page" [level=2]
+      - list:
+        - listitem:
+          - link "Category setup":
+            - /url: "#setup"
+        - listitem:
+          - link "Details Code set":
+            - /url: "#details"
+    - region "Translations":
+      - heading "Translations" [level=2]
+      - 'button "Next missing: English"'
+      - list:
+        - listitem:
+          - button "English default editing 1 of 2"
+        - listitem:
+          - button "Ελληνικά Missing"
+        - listitem:
+          - button "Italiano Missing"
+    - region "Used in (0)":
+      - heading "Used in (0)" [level=2]
+      - paragraph: Not used anywhere yet.

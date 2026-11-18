@@ -1,0 +1,14 @@
+import { open, go, PID, shot, listReady } from "./lib.mjs";
+const { browser, page } = await open("curator", { viewport: "1440" });
+await go(page, `/projects/${PID}/media`); 
+await page.waitForFunction(() => /Needs attention/.test(document.querySelector("main")?.innerText ?? ""), null, {timeout:40000}).catch(()=>{});
+await page.waitForTimeout(2500);
+console.log((await page.locator("main").innerText()).replace(/\n+/g," | ").slice(0,900));
+await shot(page, "media__default");
+const t0=Date.now();
+await page.getByLabel("Needs translation").check().catch(e=>console.log("no toggle", e.message.slice(0,80)));
+await page.waitForTimeout(1200);
+console.log(page.url());
+const sels = await page.locator("main select").all();
+for (const s of sels) console.log(await s.evaluate(e => [...e.options].map(o=>o.text).join("/")+" ="+e.value));
+await browser.close();

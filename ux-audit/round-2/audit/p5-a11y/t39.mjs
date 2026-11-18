@@ -1,0 +1,13 @@
+import * as L from "./lib.mjs";
+const { page, browser } = await L.open("curator", { viewport: "1440" });
+const k = page.keyboard;
+await L.nav(page, L.P("/maps"), 1000);
+const href = await page.locator('main a[href*="/maps/"]').first().getAttribute("href");
+await L.nav(page, href, 2500);
+await L.watchLive(page);
+L.log("t39", "map editor title", await page.title(), "focus", await L.focus(page));
+await L.shot(page, "map-editor__existing__1440", true);
+L.log("t39", "headings", await page.evaluate(() => [...document.querySelectorAll("h1,h2,h3")].map((h) => h.tagName + " " + h.textContent.trim().slice(0, 40))));
+await page.evaluate(() => document.querySelector("h1")?.focus());
+const t = await L.tabs(page, 40); L.log("t39", "tabs", t.map((x, i) => i + 1 + ": " + x));
+await browser.close();

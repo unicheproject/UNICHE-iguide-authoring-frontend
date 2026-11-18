@@ -1,0 +1,17 @@
+import { open, go } from "../../../tools/session.mjs"; import {P,shotp,log,rects} from "./lib.mjs"; import {coarse,small} from "./tlib.mjs";
+const vp=process.argv[2]||"1024"; const mode=process.argv[3]||"touch";
+const { browser, page } = await open("admin",{viewport:vp,touch:true}); await coarse(page);
+await go(page,`/projects/${P}/floor-plans/d40864d1-684a-466f-819d-68fa651b7146`); await page.waitForTimeout(3500);
+const planBox=()=>page.evaluate(()=>{const c=[...document.querySelectorAll("main img")].find(i=>i.naturalWidth>1000);const b=c.getBoundingClientRect();return {x:b.x,y:b.y,w:b.width,h:b.height}});
+const vals=()=>page.evaluate(()=>[...document.querySelectorAll("main input[inputmode=decimal],main input[type=number],main input")].filter(i=>/Across|Down/.test(i.labels?.[0]?.textContent||i.getAttribute("aria-label")||"")).map(i=>i.value).slice(0,12));
+log("before vals",await vals());
+const place=page.getByRole("button",{name:/Place The Horsemen/}).first(); await place.scrollIntoViewIfNeeded(); await place.tap(); await page.waitForTimeout(700);
+await page.evaluate(()=>{const c=[...document.querySelectorAll("main img")].find(i=>i.naturalWidth>1000);c.scrollIntoView({block:"start"});document.querySelector("main").scrollTop-=120}); await page.waitForTimeout(400);
+const pb=await planBox(); const tx=pb.x+pb.w*0.62, ty=Math.min(pb.y+pb.h*0.2,400);
+log("tap at",Math.round(tx),Math.round(ty),"plan",pb);
+await page.touchscreen.tap(tx,ty); await page.waitForTimeout(900);
+log("status",await page.evaluate(()=>[...document.querySelectorAll("[role=status]")].map(e=>e.textContent.trim().slice(0,140)).filter(Boolean)));
+log("after vals",await vals(),"banner",(await page.locator("main").innerText()).match(/Working Copy\.[^\n]*/)?.[0]);
+log("armed still?",await page.getByText(/Tap the plan to place/).count(),"counts",(await page.locator("main").innerText()).match(/\d+ placed, \d+ not placed/)?.[0]);
+await page.screenshot({path:shotp(`fp-editor__tap-empty-area__${vp}-touch`)});
+await browser.close();

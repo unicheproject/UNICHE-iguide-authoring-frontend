@@ -1,0 +1,14 @@
+import { open, go, shot, E, text } from "./lib.mjs";
+const { browser, page } = await open("curator", { viewport: "1440" });
+await go(page, `/projects/${E}/places`); await page.waitForTimeout(2000);
+await page.getByRole("button", { name: "NEW PLACE" }).first().click();
+const d = page.getByRole("dialog");
+await d.getByText("Top-level place").click();
+await page.waitForTimeout(500);
+await shot(page, "emp__place-create-level-chosen__1440", false);
+console.log(await d.innerText());
+await page.getByRole("button", { name: /create place/i }).click();
+await page.waitForTimeout(3000);
+await shot(page, "emp__place-create-after-submit__1440", false);
+console.log(page.url()); console.log(await page.locator("body").innerText().then(t=>t.slice(0,1500)));
+await browser.close();

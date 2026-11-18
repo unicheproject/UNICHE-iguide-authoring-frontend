@@ -1,0 +1,17 @@
+import { createRequire } from "node:module";
+import { open, go } from "../../../tools/session.mjs";
+const require = createRequire("C:/Users/mirto/IdeaProjects/iguide/uniche_iguide_frontend/package.json");
+const { default: AxeBuilder } = require("@axe-core/playwright");
+const P = "6958c18f-60d2-4140-a524-5a43f8a2f6b5", A = "07927651-be7a-44e9-85eb-843d8ed219f7";
+const { browser, page } = await open("admin", { viewport: "1440" });
+const run = async (n) => { const r = await new AxeBuilder({ page }).withTags(["wcag2a","wcag2aa","wcag21a","wcag21aa"]).analyze(); console.log(n, r.violations.map(v=>v.impact+" "+v.id+" x"+v.nodes.length+" "+v.nodes[0].target)); };
+await go(page, `/projects/${P}/preview?trigger=432c66f3-86b0-4a49-836b-e575f41fa19a`); await page.waitForSelector("[data-preview-toolbar]"); await page.waitForTimeout(1500); await run("preview fired");
+await page.getByRole("button",{name:/Interact/}).click(); await page.waitForTimeout(300); await run("preview interacting");
+await page.getByRole("tab",{name:"Web",exact:true}).click(); await page.getByRole("tab",{name:"Ελληνικά"}).click(); await page.waitForTimeout(800);
+console.log("greek missing:", await page.locator("details summary").allInnerTexts(), await page.locator("details a").allInnerTexts());
+await page.screenshot({path:"after/preview-greek-1440.png"});
+await go(page, `/projects/${P}/pois/${A}`); await page.waitForSelector("[data-sticky-bar]"); await page.waitForTimeout(1500);
+await page.getByRole("button",{name:"Preview in app"}).first().click(); await page.waitForTimeout(1000); await run("editor panel");
+await go(page, `/projects/${P}/app-preview/nothing`); await page.waitForTimeout(1500); console.log("subpath title:", await page.title());
+await go(page, `/projects/${P}/app-preview?surface=KIOSK`); await page.waitForTimeout(2500); await page.screenshot({path:"after/newtab-kiosk-1440.png"}); await run("newtab");
+await browser.close();

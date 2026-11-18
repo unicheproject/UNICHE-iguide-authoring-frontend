@@ -1,0 +1,17 @@
+kiosk landscape {"scale":"0.733","w":1408,"htmlLang":"en","text":"nglish Ελληνικά Italiano Content Working Live Open at real size Shown at 73 % (Fit width).","title":"Kiosk, English, Working content · Preview · UX Audit – Populated · iGuide CMS"}
+web real=1 {"scale":"1.000","w":1280,"htmlLang":"en","text":"glish Ελληνικά Italiano Content Working Live Open at real size Shown at real size (100 %).","title":"Web, English, Working content · Preview · UX Audit – Populated · iGuide CMS"}
+web fit {"scale":"1.000","w":1280,"htmlLang":"en","text":"glish Ελληνικά Italiano Content Working Live Open at real size Shown at real size (100 %).","title":"Web, English, Working content · Preview · UX Audit – Populated · iGuide CMS"}
+echo check: <script> in body text? false ["Shown at real size (100 %).","The surface in the link is not known (Web, Mobile or Kiosk). Showing Web.\n\nThe content in the link is not known (Working or Live). Showing Working.\n\nThe language in the link is not a language of this Project. Showing English.","The QR code in the link matches no code in this Project. It may have been removed, or the link was mistyped.",""]
+lang=el {"scale":"1.000","w":390,"htmlLang":"el","text":"glish Ελληνικά Italiano Content Working Live Open at real size Shown at real size (100 %).","title":"Mobile, Ελληνικά, Working content · Preview · UX Audit – Populated · iGuide CMS"}
+axe []
+preview lang=<script> script text: false
+tab url surface=KIOSK&lang=en&mode=WORKING&orientation=landscape&real=1
+kiosk landscape {"scale":"0.733","w":1408,"htmlLang":"en","text":"nglish Ελληνικά Italiano Content Working Live Open at real size Shown at 73 % (Fit width).","title":"Kiosk, English, Working content · Preview · UX Audit – Populated · iGuide CMS"}
+web real=1 {"scale":"1.000","w":1280,"htmlLang":"en","text":"glish Ελληνικά Italiano Content Working Live Open at real size Shown at real size (100 %).","title":"Web, English, Working content · Preview · UX Audit – Populated · iGuide CMS"}
+web fit {"scale":"1.000","w":1280,"htmlLang":"en","text":"glish Ελληνικά Italiano Content Working Live Open at real size Shown at real size (100 %).","title":"Web, English, Working content · Preview · UX Audit – Populated · iGuide CMS"}
+echo check: <script> in body text? false ["Shown at real size (100 %).","The surface in the link is not known (Web, Mobile or Kiosk). Showing Web.\n\nThe content in the link is not known (Working or Live). Showing Working.\n\nThe language in the link is not a language of this Project. Showing English.","The QR code in the link matches no code in this Project. It may have been removed, or the link was mistyped.",""]
+lang=el {"scale":"1.000","w":390,"htmlLang":"el","text":"glish Ελληνικά Italiano Content Working Live Open at real size Shown at real size (100 %).","title":"Mobile, Ελληνικά, Working content · Preview · UX Audit – Populated · iGuide CMS"}
+axe []
+preview lang=<script> script text: false
+tab url surface=KIOSK&lang=en&mode=WORKING&orientation=landscape&real=1
+tab state {"scale":"1.000","w":1920}

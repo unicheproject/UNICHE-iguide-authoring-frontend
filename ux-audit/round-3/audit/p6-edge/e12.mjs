@@ -1,0 +1,18 @@
+import * as H from "./h.mjs";
+const log = H.LOG("e12");
+const { browser, page } = await H.session();
+const api = (u) => u.pathname.includes("/iguide/api/");
+await H.go(page, H.P("/pois/" + H.ids.poi2)); await H.sleep(1500);
+await page.getByRole("button", { name: "Activate", exact: true }).first().click(); await H.sleep(900);
+log("activate dialog", { text: (await page.getByRole("dialog").innerText()).replace(/\s+/g," "), focus: await H.AE(page) });
+await H.shot(page, "poi-editor__activate-dialog__1440");
+let n = 0;
+await page.route(api, async (r) => { if (r.request().method() === "POST" && /\/status$/.test(new URL(r.request().url()).pathname)) { n++; await H.sleep(3000); } return r.continue(); });
+const confirm = page.getByRole("dialog").getByRole("button", { name: /^Activate/ }).last();
+await confirm.click(); await confirm.click({ force: true }).catch(()=>{}); await page.keyboard.press("Enter");
+await H.sleep(1000); log("activating", { n, btns: await page.getByRole("dialog").getByRole("button").allInnerTexts().catch(()=>[]) });
+await H.shot(page, "poi-editor__activating__1440");
+await H.sleep(4500);
+log("activated", { n, msgs: await H.msgs(page), focus: await H.AE(page), live: (await H.live(page)).map(x=>x.text) });
+await H.shot(page, "poi-editor__activated__1440");
+await browser.close();

@@ -1,0 +1,23 @@
+import { open, go, P, shot, settle } from "./h.mjs";
+const { browser, page } = await open("admin", { viewport: "1440" });
+const foc = () => page.evaluate(() => document.activeElement.tagName + ":" + (document.activeElement.getAttribute("aria-label")||document.activeElement.innerText||"").slice(0,50));
+await go(page, `/projects/${P}/pois?q=UX-R3-s9`); await settle(page, 1800);
+await page.getByRole("radio", { name: /Archived/ }).check({ force: true });
+await settle(page, 1200);
+console.log("url", await page.evaluate(()=>location.search), "rows", await page.locator("main table tbody tr").count());
+const tr = page.locator("main table tbody tr").first();
+await tr.locator("button[aria-label^='Actions for']").focus(); await page.keyboard.press("Enter"); await settle(page, 300);
+console.log("archived menu:", await page.evaluate(() => [...document.querySelectorAll("[role=menuitem]")].map(i => i.innerText.trim() + (i.getAttribute("aria-disabled")==="true"?" [disabled]":""))), "focus", await foc());
+await shot(page, "pois__archived-rowmenu__1440");
+await page.getByRole("menuitem", { name: /Restore/ }).click(); await settle(page, 800);
+console.log("restore dialog:", await page.evaluate(() => [...document.querySelectorAll("[role=dialog],[role=alertdialog]")].map(d => d.innerText.replace(/\n+/g, " | "))));
+await shot(page, "pois__restore-confirm__1440");
+await page.keyboard.press("Escape"); await settle(page, 400);
+console.log("focus after esc", await foc());
+// segment keyboard
+await page.getByRole("radio", { name: /Not archived/ }).focus();
+console.log("focus seg", await foc());
+await page.keyboard.press("ArrowRight"); await settle(page, 500);
+console.log("after ArrowRight", await foc(), await page.evaluate(()=>location.search));
+await page.keyboard.press("Tab"); console.log("Tab ->", await foc());
+await browser.close();

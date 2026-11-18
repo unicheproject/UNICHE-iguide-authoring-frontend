@@ -1,0 +1,1772 @@
+{
+ "pop-1440": {
+  "vw": 1440,
+  "docW": 1440,
+  "main": {
+   "x": 232,
+   "y": 56,
+   "r": 1440,
+   "w": 1208,
+   "h": 844
+  },
+  "h1": {
+   "x": 256,
+   "y": 83,
+   "r": 368.9,
+   "w": 112.9,
+   "h": 26
+  },
+  "secs": [
+   {
+    "id": "status-title",
+    "x": 256,
+    "y": 161,
+    "r": 1036,
+    "w": 780,
+    "h": 191,
+    "pad": "20px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Ready to go live, with 104 warnings"
+    }
+   },
+   {
+    "id": "pending-title",
+    "x": 256,
+    "y": 372,
+    "r": 1036,
+    "w": 780,
+    "h": 553.1,
+    "pad": "0px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Waiting for you to apply"
+    }
+   },
+   {
+    "id": "warnings-title",
+    "x": 256,
+    "y": 945.1,
+    "r": 1036,
+    "w": 780,
+    "h": 444.4,
+    "pad": "0px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Warnings (104)"
+    }
+   },
+   {
+    "id": "counts-title",
+    "x": 1056,
+    "y": 161,
+    "r": 1416,
+    "w": 360,
+    "h": 525.4,
+    "pad": "0px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Content"
+    }
+   }
+  ],
+  "det": [
+   {
+    "x": 257,
+    "y": 1017.5,
+    "r": 1035,
+    "w": 778,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 257,
+    "y": 1070.5,
+    "r": 1035,
+    "w": 778,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 257,
+    "y": 1123.5,
+    "r": 1035,
+    "w": 778,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 257,
+    "y": 1176.5,
+    "r": 1035,
+    "w": 778,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 257,
+    "y": 1229.5,
+    "r": 1035,
+    "w": 778,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 257,
+    "y": 1282.5,
+    "r": 1035,
+    "w": 778,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 257,
+    "y": 1335.5,
+    "r": 1035,
+    "w": 778,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 1056,
+    "y": 706.4,
+    "r": 1416,
+    "w": 360,
+    "h": 48.4,
+    "cls": "details"
+   }
+  ]
+ },
+ "draftsB-1440": {
+  "vw": 1440,
+  "docW": 1440,
+  "main": {
+   "x": 232,
+   "y": 56,
+   "r": 1440,
+   "w": 1208,
+   "h": 844
+  },
+  "h1": {
+   "x": 256,
+   "y": 83,
+   "r": 368.9,
+   "w": 112.9,
+   "h": 26
+  },
+  "secs": [
+   {
+    "id": "guide-title",
+    "x": 256,
+    "y": 161,
+    "r": 1024,
+    "w": 768,
+    "h": 469.4,
+    "pad": "20px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Get your visitor app started"
+    }
+   },
+   {
+    "id": "status-title",
+    "x": 256,
+    "y": 650.4,
+    "r": 1036,
+    "w": 780,
+    "h": 149,
+    "pad": "20px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Nothing is live yet"
+    }
+   },
+   {
+    "id": "warnings-title",
+    "x": 256,
+    "y": 819.4,
+    "r": 1036,
+    "w": 780,
+    "h": 126.4,
+    "pad": "0px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Warnings (1)"
+    }
+   },
+   {
+    "id": "counts-title",
+    "x": 1056,
+    "y": 650.4,
+    "r": 1416,
+    "w": 360,
+    "h": 525.4,
+    "pad": "0px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Content"
+    }
+   }
+  ],
+  "det": [
+   {
+    "x": 257,
+    "y": 891.8,
+    "r": 1035,
+    "w": 778,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 1056,
+    "y": 1195.8,
+    "r": 1416,
+    "w": 360,
+    "h": 48.4,
+    "cls": "details"
+   }
+  ]
+ },
+ "trail-1440": {
+  "vw": 1440,
+  "docW": 1440,
+  "main": {
+   "x": 232,
+   "y": 56,
+   "r": 1440,
+   "w": 1208,
+   "h": 844
+  },
+  "h1": {
+   "x": 256,
+   "y": 83,
+   "r": 368.9,
+   "w": 112.9,
+   "h": 26
+  },
+  "secs": [
+   {
+    "id": "guide-title",
+    "x": 256,
+    "y": 161,
+    "r": 1024,
+    "w": 768,
+    "h": 469.4,
+    "pad": "20px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Get your visitor app started"
+    }
+   },
+   {
+    "id": "status-title",
+    "x": 256,
+    "y": 650.4,
+    "r": 1036,
+    "w": 780,
+    "h": 149,
+    "pad": "20px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Nothing is live yet"
+    }
+   },
+   {
+    "id": "warnings-title",
+    "x": 256,
+    "y": 819.4,
+    "r": 1036,
+    "w": 780,
+    "h": 126.4,
+    "pad": "0px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Warnings (1)"
+    }
+   },
+   {
+    "id": "counts-title",
+    "x": 1056,
+    "y": 650.4,
+    "r": 1416,
+    "w": 360,
+    "h": 525.4,
+    "pad": "0px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Content"
+    }
+   }
+  ],
+  "det": [
+   {
+    "x": 257,
+    "y": 891.8,
+    "r": 1035,
+    "w": 778,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 1056,
+    "y": 1195.8,
+    "r": 1416,
+    "w": 360,
+    "h": 48.4,
+    "cls": "details"
+   }
+  ]
+ },
+ "pop-1280": {
+  "vw": 1280,
+  "docW": 1280,
+  "main": {
+   "x": 232,
+   "y": 56,
+   "r": 1280,
+   "w": 1048,
+   "h": 664
+  },
+  "h1": {
+   "x": 256,
+   "y": 83,
+   "r": 368.9,
+   "w": 112.9,
+   "h": 26
+  },
+  "secs": [
+   {
+    "id": "status-title",
+    "x": 256,
+    "y": 161,
+    "r": 876,
+    "w": 620,
+    "h": 191,
+    "pad": "20px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Ready to go live, with 104 warnings"
+    }
+   },
+   {
+    "id": "pending-title",
+    "x": 256,
+    "y": 372,
+    "r": 876,
+    "w": 620,
+    "h": 616.1,
+    "pad": "0px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Waiting for you to apply"
+    }
+   },
+   {
+    "id": "warnings-title",
+    "x": 256,
+    "y": 1008.1,
+    "r": 876,
+    "w": 620,
+    "h": 465.4,
+    "pad": "0px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Warnings (104)"
+    }
+   },
+   {
+    "id": "counts-title",
+    "x": 896,
+    "y": 161,
+    "r": 1256,
+    "w": 360,
+    "h": 525.4,
+    "pad": "0px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Content"
+    }
+   }
+  ],
+  "det": [
+   {
+    "x": 257,
+    "y": 1101.5,
+    "r": 875,
+    "w": 618,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 257,
+    "y": 1154.5,
+    "r": 875,
+    "w": 618,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 257,
+    "y": 1207.5,
+    "r": 875,
+    "w": 618,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 257,
+    "y": 1260.5,
+    "r": 875,
+    "w": 618,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 257,
+    "y": 1313.5,
+    "r": 875,
+    "w": 618,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 257,
+    "y": 1366.5,
+    "r": 875,
+    "w": 618,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 257,
+    "y": 1419.5,
+    "r": 875,
+    "w": 618,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 896,
+    "y": 706.4,
+    "r": 1256,
+    "w": 360,
+    "h": 48.4,
+    "cls": "details"
+   }
+  ]
+ },
+ "draftsB-1280": {
+  "vw": 1280,
+  "docW": 1280,
+  "main": {
+   "x": 232,
+   "y": 56,
+   "r": 1280,
+   "w": 1048,
+   "h": 664
+  },
+  "h1": {
+   "x": 256,
+   "y": 83,
+   "r": 368.9,
+   "w": 112.9,
+   "h": 26
+  },
+  "secs": [
+   {
+    "id": "guide-title",
+    "x": 256,
+    "y": 161,
+    "r": 1024,
+    "w": 768,
+    "h": 469.4,
+    "pad": "20px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Get your visitor app started"
+    }
+   },
+   {
+    "id": "status-title",
+    "x": 256,
+    "y": 650.4,
+    "r": 876,
+    "w": 620,
+    "h": 149,
+    "pad": "20px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Nothing is live yet"
+    }
+   },
+   {
+    "id": "warnings-title",
+    "x": 256,
+    "y": 819.4,
+    "r": 876,
+    "w": 620,
+    "h": 147.4,
+    "pad": "0px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Warnings (1)"
+    }
+   },
+   {
+    "id": "counts-title",
+    "x": 896,
+    "y": 650.4,
+    "r": 1256,
+    "w": 360,
+    "h": 525.4,
+    "pad": "0px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Content"
+    }
+   }
+  ],
+  "det": [
+   {
+    "x": 257,
+    "y": 912.8,
+    "r": 875,
+    "w": 618,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 896,
+    "y": 1195.8,
+    "r": 1256,
+    "w": 360,
+    "h": 48.4,
+    "cls": "details"
+   }
+  ]
+ },
+ "trail-1280": {
+  "vw": 1280,
+  "docW": 1280,
+  "main": {
+   "x": 232,
+   "y": 56,
+   "r": 1280,
+   "w": 1048,
+   "h": 664
+  },
+  "h1": {
+   "x": 256,
+   "y": 83,
+   "r": 368.9,
+   "w": 112.9,
+   "h": 26
+  },
+  "secs": [
+   {
+    "id": "guide-title",
+    "x": 256,
+    "y": 161,
+    "r": 1024,
+    "w": 768,
+    "h": 469.4,
+    "pad": "20px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Get your visitor app started"
+    }
+   },
+   {
+    "id": "status-title",
+    "x": 256,
+    "y": 650.4,
+    "r": 876,
+    "w": 620,
+    "h": 149,
+    "pad": "20px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Nothing is live yet"
+    }
+   },
+   {
+    "id": "warnings-title",
+    "x": 256,
+    "y": 819.4,
+    "r": 876,
+    "w": 620,
+    "h": 147.4,
+    "pad": "0px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Warnings (1)"
+    }
+   },
+   {
+    "id": "counts-title",
+    "x": 896,
+    "y": 650.4,
+    "r": 1256,
+    "w": 360,
+    "h": 525.4,
+    "pad": "0px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Content"
+    }
+   }
+  ],
+  "det": [
+   {
+    "x": 257,
+    "y": 912.8,
+    "r": 875,
+    "w": 618,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 896,
+    "y": 1195.8,
+    "r": 1256,
+    "w": 360,
+    "h": 48.4,
+    "cls": "details"
+   }
+  ]
+ },
+ "pop-1024": {
+  "vw": 1024,
+  "docW": 1024,
+  "main": {
+   "x": 0,
+   "y": 56,
+   "r": 1024,
+   "w": 1024,
+   "h": 712
+  },
+  "h1": {
+   "x": 16,
+   "y": 83,
+   "r": 128.9,
+   "w": 112.9,
+   "h": 26
+  },
+  "secs": [
+   {
+    "id": "status-title",
+    "x": 16,
+    "y": 161,
+    "r": 1008,
+    "w": 992,
+    "h": 191,
+    "pad": "20px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Ready to go live, with 104 warnings"
+    }
+   },
+   {
+    "id": "pending-title",
+    "x": 16,
+    "y": 917.4,
+    "r": 1008,
+    "w": 992,
+    "h": 532.1,
+    "pad": "0px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Waiting for you to apply"
+    }
+   },
+   {
+    "id": "warnings-title",
+    "x": 16,
+    "y": 1469.5,
+    "r": 1008,
+    "w": 992,
+    "h": 444.4,
+    "pad": "0px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Warnings (104)"
+    }
+   },
+   {
+    "id": "counts-title",
+    "x": 16,
+    "y": 372,
+    "r": 1008,
+    "w": 992,
+    "h": 525.4,
+    "pad": "0px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Content"
+    }
+   }
+  ],
+  "det": [
+   {
+    "x": 17,
+    "y": 1541.9,
+    "r": 1007,
+    "w": 990,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 17,
+    "y": 1594.9,
+    "r": 1007,
+    "w": 990,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 17,
+    "y": 1647.9,
+    "r": 1007,
+    "w": 990,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 17,
+    "y": 1700.9,
+    "r": 1007,
+    "w": 990,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 17,
+    "y": 1753.9,
+    "r": 1007,
+    "w": 990,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 17,
+    "y": 1806.9,
+    "r": 1007,
+    "w": 990,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 17,
+    "y": 1859.9,
+    "r": 1007,
+    "w": 990,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 16,
+    "y": 1933.9,
+    "r": 1008,
+    "w": 992,
+    "h": 48.4,
+    "cls": "details"
+   }
+  ]
+ },
+ "draftsB-1024": {
+  "vw": 1024,
+  "docW": 1024,
+  "main": {
+   "x": 0,
+   "y": 56,
+   "r": 1024,
+   "w": 1024,
+   "h": 712
+  },
+  "h1": {
+   "x": 16,
+   "y": 83,
+   "r": 128.9,
+   "w": 112.9,
+   "h": 26
+  },
+  "secs": [
+   {
+    "id": "guide-title",
+    "x": 16,
+    "y": 161,
+    "r": 784,
+    "w": 768,
+    "h": 469.4,
+    "pad": "20px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Get your visitor app started"
+    }
+   },
+   {
+    "id": "status-title",
+    "x": 16,
+    "y": 650.4,
+    "r": 1008,
+    "w": 992,
+    "h": 149,
+    "pad": "20px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Nothing is live yet"
+    }
+   },
+   {
+    "id": "warnings-title",
+    "x": 16,
+    "y": 1364.8,
+    "r": 1008,
+    "w": 992,
+    "h": 126.4,
+    "pad": "0px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Warnings (1)"
+    }
+   },
+   {
+    "id": "counts-title",
+    "x": 16,
+    "y": 819.4,
+    "r": 1008,
+    "w": 992,
+    "h": 525.4,
+    "pad": "0px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Content"
+    }
+   }
+  ],
+  "det": [
+   {
+    "x": 17,
+    "y": 1437.2,
+    "r": 1007,
+    "w": 990,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 16,
+    "y": 1511.2,
+    "r": 1008,
+    "w": 992,
+    "h": 48.4,
+    "cls": "details"
+   }
+  ]
+ },
+ "trail-1024": {
+  "vw": 1024,
+  "docW": 1024,
+  "main": {
+   "x": 0,
+   "y": 56,
+   "r": 1024,
+   "w": 1024,
+   "h": 712
+  },
+  "h1": {
+   "x": 16,
+   "y": 83,
+   "r": 128.9,
+   "w": 112.9,
+   "h": 26
+  },
+  "secs": [
+   {
+    "id": "guide-title",
+    "x": 16,
+    "y": 161,
+    "r": 784,
+    "w": 768,
+    "h": 469.4,
+    "pad": "20px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Get your visitor app started"
+    }
+   },
+   {
+    "id": "status-title",
+    "x": 16,
+    "y": 650.4,
+    "r": 1008,
+    "w": 992,
+    "h": 149,
+    "pad": "20px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Nothing is live yet"
+    }
+   },
+   {
+    "id": "warnings-title",
+    "x": 16,
+    "y": 1364.8,
+    "r": 1008,
+    "w": 992,
+    "h": 126.4,
+    "pad": "0px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Warnings (1)"
+    }
+   },
+   {
+    "id": "counts-title",
+    "x": 16,
+    "y": 819.4,
+    "r": 1008,
+    "w": 992,
+    "h": 525.4,
+    "pad": "0px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Content"
+    }
+   }
+  ],
+  "det": [
+   {
+    "x": 17,
+    "y": 1437.2,
+    "r": 1007,
+    "w": 990,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 16,
+    "y": 1511.2,
+    "r": 1008,
+    "w": 992,
+    "h": 48.4,
+    "cls": "details"
+   }
+  ]
+ },
+ "pop-768": {
+  "vw": 768,
+  "docW": 768,
+  "main": {
+   "x": 0,
+   "y": 56,
+   "r": 768,
+   "w": 768,
+   "h": 968
+  },
+  "h1": {
+   "x": 16,
+   "y": 83,
+   "r": 128.9,
+   "w": 112.9,
+   "h": 26
+  },
+  "secs": [
+   {
+    "id": "status-title",
+    "x": 16,
+    "y": 161,
+    "r": 752,
+    "w": 736,
+    "h": 191,
+    "pad": "20px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Ready to go live, with 104 warnings"
+    }
+   },
+   {
+    "id": "pending-title",
+    "x": 16,
+    "y": 917.4,
+    "r": 752,
+    "w": 736,
+    "h": 553.1,
+    "pad": "0px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Waiting for you to apply"
+    }
+   },
+   {
+    "id": "warnings-title",
+    "x": 16,
+    "y": 1490.5,
+    "r": 752,
+    "w": 736,
+    "h": 444.4,
+    "pad": "0px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Warnings (104)"
+    }
+   },
+   {
+    "id": "counts-title",
+    "x": 16,
+    "y": 372,
+    "r": 752,
+    "w": 736,
+    "h": 525.4,
+    "pad": "0px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Content"
+    }
+   }
+  ],
+  "det": [
+   {
+    "x": 17,
+    "y": 1562.9,
+    "r": 751,
+    "w": 734,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 17,
+    "y": 1615.9,
+    "r": 751,
+    "w": 734,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 17,
+    "y": 1668.9,
+    "r": 751,
+    "w": 734,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 17,
+    "y": 1721.9,
+    "r": 751,
+    "w": 734,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 17,
+    "y": 1774.9,
+    "r": 751,
+    "w": 734,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 17,
+    "y": 1827.9,
+    "r": 751,
+    "w": 734,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 17,
+    "y": 1880.9,
+    "r": 751,
+    "w": 734,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 16,
+    "y": 1954.9,
+    "r": 752,
+    "w": 736,
+    "h": 48.4,
+    "cls": "details"
+   }
+  ]
+ },
+ "draftsB-768": {
+  "vw": 768,
+  "docW": 768,
+  "main": {
+   "x": 0,
+   "y": 56,
+   "r": 768,
+   "w": 768,
+   "h": 968
+  },
+  "h1": {
+   "x": 16,
+   "y": 83,
+   "r": 128.9,
+   "w": 112.9,
+   "h": 26
+  },
+  "secs": [
+   {
+    "id": "guide-title",
+    "x": 16,
+    "y": 161,
+    "r": 752,
+    "w": 736,
+    "h": 469.4,
+    "pad": "20px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Get your visitor app started"
+    }
+   },
+   {
+    "id": "status-title",
+    "x": 16,
+    "y": 650.4,
+    "r": 752,
+    "w": 736,
+    "h": 149,
+    "pad": "20px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Nothing is live yet"
+    }
+   },
+   {
+    "id": "warnings-title",
+    "x": 16,
+    "y": 1364.8,
+    "r": 752,
+    "w": 736,
+    "h": 126.4,
+    "pad": "0px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Warnings (1)"
+    }
+   },
+   {
+    "id": "counts-title",
+    "x": 16,
+    "y": 819.4,
+    "r": 752,
+    "w": 736,
+    "h": 525.4,
+    "pad": "0px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Content"
+    }
+   }
+  ],
+  "det": [
+   {
+    "x": 17,
+    "y": 1437.2,
+    "r": 751,
+    "w": 734,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 16,
+    "y": 1511.2,
+    "r": 752,
+    "w": 736,
+    "h": 48.4,
+    "cls": "details"
+   }
+  ]
+ },
+ "trail-768": {
+  "vw": 768,
+  "docW": 768,
+  "main": {
+   "x": 0,
+   "y": 56,
+   "r": 768,
+   "w": 768,
+   "h": 968
+  },
+  "h1": {
+   "x": 16,
+   "y": 83,
+   "r": 128.9,
+   "w": 112.9,
+   "h": 26
+  },
+  "secs": [
+   {
+    "id": "guide-title",
+    "x": 16,
+    "y": 161,
+    "r": 752,
+    "w": 736,
+    "h": 469.4,
+    "pad": "20px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Get your visitor app started"
+    }
+   },
+   {
+    "id": "status-title",
+    "x": 16,
+    "y": 650.4,
+    "r": 752,
+    "w": 736,
+    "h": 149,
+    "pad": "20px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Nothing is live yet"
+    }
+   },
+   {
+    "id": "warnings-title",
+    "x": 16,
+    "y": 1364.8,
+    "r": 752,
+    "w": 736,
+    "h": 126.4,
+    "pad": "0px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Warnings (1)"
+    }
+   },
+   {
+    "id": "counts-title",
+    "x": 16,
+    "y": 819.4,
+    "r": 752,
+    "w": 736,
+    "h": 525.4,
+    "pad": "0px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Content"
+    }
+   }
+  ],
+  "det": [
+   {
+    "x": 17,
+    "y": 1437.2,
+    "r": 751,
+    "w": 734,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 16,
+    "y": 1511.2,
+    "r": 752,
+    "w": 736,
+    "h": 48.4,
+    "cls": "details"
+   }
+  ]
+ },
+ "pop-zoom200": {
+  "vw": 640,
+  "docW": 640,
+  "main": {
+   "x": 0,
+   "y": 56,
+   "r": 640,
+   "w": 640,
+   "h": 304
+  },
+  "h1": {
+   "x": 16,
+   "y": 83,
+   "r": 128.9,
+   "w": 112.9,
+   "h": 26
+  },
+  "secs": [
+   {
+    "id": "status-title",
+    "x": 16,
+    "y": 161,
+    "r": 624,
+    "w": 608,
+    "h": 191,
+    "pad": "20px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Ready to go live, with 104 warnings"
+    }
+   },
+   {
+    "id": "pending-title",
+    "x": 16,
+    "y": 917.4,
+    "r": 624,
+    "w": 608,
+    "h": 616.1,
+    "pad": "0px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Waiting for you to apply"
+    }
+   },
+   {
+    "id": "warnings-title",
+    "x": 16,
+    "y": 1553.5,
+    "r": 624,
+    "w": 608,
+    "h": 465.4,
+    "pad": "0px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Warnings (104)"
+    }
+   },
+   {
+    "id": "counts-title",
+    "x": 16,
+    "y": 372,
+    "r": 624,
+    "w": 608,
+    "h": 525.4,
+    "pad": "0px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Content"
+    }
+   }
+  ],
+  "det": [
+   {
+    "x": 17,
+    "y": 1646.9,
+    "r": 623,
+    "w": 606,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 17,
+    "y": 1699.9,
+    "r": 623,
+    "w": 606,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 17,
+    "y": 1752.9,
+    "r": 623,
+    "w": 606,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 17,
+    "y": 1805.9,
+    "r": 623,
+    "w": 606,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 17,
+    "y": 1858.9,
+    "r": 623,
+    "w": 606,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 17,
+    "y": 1911.9,
+    "r": 623,
+    "w": 606,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 17,
+    "y": 1964.9,
+    "r": 623,
+    "w": 606,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 16,
+    "y": 2038.9,
+    "r": 624,
+    "w": 608,
+    "h": 48.4,
+    "cls": "details"
+   }
+  ]
+ },
+ "draftsB-zoom200": {
+  "vw": 640,
+  "docW": 640,
+  "main": {
+   "x": 0,
+   "y": 56,
+   "r": 640,
+   "w": 640,
+   "h": 304
+  },
+  "h1": {
+   "x": 16,
+   "y": 83,
+   "r": 128.9,
+   "w": 112.9,
+   "h": 26
+  },
+  "secs": [
+   {
+    "id": "guide-title",
+    "x": 16,
+    "y": 161,
+    "r": 624,
+    "w": 608,
+    "h": 490.4,
+    "pad": "20px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Get your visitor app started"
+    }
+   },
+   {
+    "id": "status-title",
+    "x": 16,
+    "y": 671.4,
+    "r": 624,
+    "w": 608,
+    "h": 149,
+    "pad": "20px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Nothing is live yet"
+    }
+   },
+   {
+    "id": "warnings-title",
+    "x": 16,
+    "y": 1385.8,
+    "r": 624,
+    "w": 608,
+    "h": 147.4,
+    "pad": "0px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Warnings (1)"
+    }
+   },
+   {
+    "id": "counts-title",
+    "x": 16,
+    "y": 840.4,
+    "r": 624,
+    "w": 608,
+    "h": 525.4,
+    "pad": "0px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Content"
+    }
+   }
+  ],
+  "det": [
+   {
+    "x": 17,
+    "y": 1479.2,
+    "r": 623,
+    "w": 606,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 16,
+    "y": 1553.2,
+    "r": 624,
+    "w": 608,
+    "h": 48.4,
+    "cls": "details"
+   }
+  ]
+ },
+ "trail-zoom200": {
+  "vw": 640,
+  "docW": 640,
+  "main": {
+   "x": 0,
+   "y": 56,
+   "r": 640,
+   "w": 640,
+   "h": 304
+  },
+  "h1": {
+   "x": 16,
+   "y": 83,
+   "r": 128.9,
+   "w": 112.9,
+   "h": 26
+  },
+  "secs": [
+   {
+    "id": "guide-title",
+    "x": 16,
+    "y": 161,
+    "r": 624,
+    "w": 608,
+    "h": 490.4,
+    "pad": "20px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Get your visitor app started"
+    }
+   },
+   {
+    "id": "status-title",
+    "x": 16,
+    "y": 671.4,
+    "r": 624,
+    "w": 608,
+    "h": 149,
+    "pad": "20px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Nothing is live yet"
+    }
+   },
+   {
+    "id": "warnings-title",
+    "x": 16,
+    "y": 1385.8,
+    "r": 624,
+    "w": 608,
+    "h": 147.4,
+    "pad": "0px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Warnings (1)"
+    }
+   },
+   {
+    "id": "counts-title",
+    "x": 16,
+    "y": 840.4,
+    "r": 624,
+    "w": 608,
+    "h": 525.4,
+    "pad": "0px",
+    "radius": "12px",
+    "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0",
+    "h2": {
+     "fs": "16px",
+     "fw": "700",
+     "txt": "Content"
+    }
+   }
+  ],
+  "det": [
+   {
+    "x": 17,
+    "y": 1479.2,
+    "r": 623,
+    "w": 606,
+    "h": 53,
+    "cls": "details"
+   },
+   {
+    "x": 16,
+    "y": 1553.2,
+    "r": 624,
+    "w": 608,
+    "h": 48.4,
+    "cls": "details"
+   }
+  ]
+ }
+}

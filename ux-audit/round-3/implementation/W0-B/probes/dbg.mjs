@@ -1,0 +1,10 @@
+import { session, go, P, ids, shot, sleep } from "./h.mjs";
+const { browser, page } = await session({ viewport: "1440" });
+page.on("console", (m) => { if (m.type() === "error") console.log("console.error", m.text().slice(0, 300)); });
+page.on("pageerror", (e) => console.log("pageerror", e.message.slice(0, 300)));
+await go(page, P(`/pois/${ids.poi2}`));
+await sleep(3000);
+console.log(page.url());
+await shot(page, "dbg");
+console.log((await page.evaluate(() => document.body.innerText)).slice(0, 500));
+await browser.close();

@@ -1,0 +1,20 @@
+import { open, go, P, shot, settle } from "./h.mjs";
+const { browser, page } = await open("admin", { viewport: "1440" });
+const foc = () => page.evaluate(() => document.activeElement.tagName + ":" + (document.activeElement.getAttribute("aria-label")||document.activeElement.innerText||"").slice(0,40).replace(/\n/g," "));
+const live = () => page.evaluate(() => [...document.querySelectorAll("[aria-live],[role=status],[role=alert]")].map(e => `${e.getAttribute("role")||""}/${e.getAttribute("aria-live")||""}:${(e.textContent||"").trim().slice(0,100)}`).filter(s=>!/:$/.test(s)));
+const menu = async (tr, item) => { await tr.locator("button[aria-label^='Actions for']").focus(); await page.keyboard.press("Enter"); await settle(page, 300); await page.getByRole("menuitem", { name: item }).click(); await settle(page, 900); };
+await go(page, `/projects/${P}/events?q=UX-R3-s9`); await settle(page, 1800);
+await menu(page.locator("main table tbody tr").first(), /^Archive/);
+await page.getByRole("button", { name: /^Archive$/ }).last().click(); await settle(page, 1200);
+console.log("archived; focus", await foc());
+await page.getByRole("button", { name: /^Undo/ }).click(); await settle(page, 1500);
+console.log("after Undo: focus", await foc(), "rows", await page.locator("main table tbody tr").count(), "live", JSON.stringify(await live()));
+await shot(page, "events__after-undo__1440");
+// archive again then restore from archived
+await menu(page.locator("main table tbody tr").first(), /^Archive/);
+await page.getByRole("button", { name: /^Archive$/ }).last().click(); await settle(page, 1200);
+await page.getByRole("radio", { name: /Archived/ }).check({ force: true }); await settle(page, 1200);
+await menu(page.locator("main table tbody tr").first(), /Restore/);
+console.log("after restore: focus", await foc(), "rows", await page.locator("main table tbody tr").count(), "live", JSON.stringify(await live()));
+await shot(page, "events__after-restore__1440");
+await browser.close();

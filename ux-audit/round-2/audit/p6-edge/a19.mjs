@@ -1,0 +1,23 @@
+import { open, go, P, ids, shot, settle, alerts, focused, main } from "./lib.mjs";
+const I = ids(); const PP = `/projects/${P}`;
+const { browser, page } = await open("curator", { viewport: "1440" });
+await go(page, `${PP}/pois/${I.poiC}`); await settle(page, 1200);
+await page.evaluate(() => window.scrollTo(0, 0));
+await page.screenshot({ path: "ux-audit/round-2/audit/p6-edge/shots/poi-editor__referenced-active__1440.png" });
+const dl = page.locator("main").getByText("Used by").first();
+console.log(await page.locator("aside, [class*=side]").first().innerText().catch(()=>"?"));
+console.log("links in used-in:", await page.evaluate(() => [...document.querySelectorAll("a")].filter(a => /Route/.test(a.textContent)).map(a => a.textContent.trim() + " -> " + a.getAttribute("href"))));
+// focus the disabled button via keyboard
+await page.getByRole("button", { name: /^Deactivate/ }).first().focus();
+console.log("focus works on disabled?", await focused(page));
+await page.getByRole("button", { name: "More actions" }).click(); await page.waitForTimeout(500);
+const arch = page.getByRole("menuitem", { name: /archive/i });
+console.log("archive item:", await arch.evaluate(e => e.outerHTML.slice(0, 300)));
+await shot(page, "poi-editor__more-menu-referenced");
+await arch.click({ force: true }); await page.waitForTimeout(1500);
+console.log("ARCHIVE dialog:", (await page.locator("[role=dialog]").first().innerText().catch(() => "(none)")).replace(/\n+/g, " | ").slice(0, 700));
+await shot(page, "poi-archive__referenced-dialog");
+await page.getByRole("button", { name: /^Archive$/ }).last().click().catch(()=>{}); await page.waitForTimeout(2500);
+console.log("after archive confirm:", (await page.locator("[role=dialog]").first().innerText().catch(() => "(none)")).replace(/\n+/g, " | ").slice(0, 700), JSON.stringify(await alerts(page)).slice(0,400));
+await shot(page, "poi-archive__refused");
+await browser.close();

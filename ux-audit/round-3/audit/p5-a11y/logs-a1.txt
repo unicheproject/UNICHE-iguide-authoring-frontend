@@ -1,0 +1,20 @@
+home tab: a "Skip to content" 12,12,142,40  solid 2px rgb(76, 29, 139) off 2px
+home tab: a "UNICHE, all projects" 24,15,123,26  solid 2px rgb(76, 29, 139) off 2px
+home tab: button "Choose a project" 255,8,352,40  solid 2px rgb(76, 29, 139) off 2px
+home tab: button "PAP. Admin, account menu" 1299,8,117,40  solid 2px rgb(76, 29, 139) off 2px
+home tab: a "Create Project" 943,80,161,40  solid 2px rgb(76, 29, 139) off 2px
+home tab: input "Search projects" 336,176,768,40  solid 2px rgb(76, 29, 139) off 2px
+switcher focus button "Choose a project" 255,8,352,40  solid 2px rgb(76, 29, 139) off 2px
+[switcher open] Enter -> input "Search projects" 268,67,390,40  solid 2px rgb(76, 29, 139) off 2px | live=[]
+dialog {"name":"Switch project","modal":null,"rect":{"x":255,"y":54,"width":416,"height":772,"top":54,"right":671,"bottom":826,"left":255}}
+typed input "Search projects" 268,67,390,40  solid 2px rgb(76, 29, 139) off 2px [{"t":3961,"role":"status","text":"1 of 27 projects shown","why":"add"}]
+[arrow] ArrowDown -> a "UX Audit – PopulatedApp: Draftux-audit-populatedMulti-region" 256,149,414,81  solid 2px rgb(76, 29, 139) off 2px | live=[]
+[arrow2] ArrowDown -> a "UX Audit – PopulatedApp: Draftux-audit-populatedMulti-region" 256,149,414,81  solid 2px rgb(76, 29, 139) off 2px | live=[]
+[arrowup] ArrowUp -> input "Search projects" 268,67,390,40  solid 2px rgb(76, 29, 139) off 2px | live=[]
+aria-activedescendant etc ["A null null UX Audit – PopulatedApp: Draftux-audit-populatedMu","A null null Create Project"]
+[esc] Escape -> button "Choose a project" 255,8,352,40  solid 2px rgb(76, 29, 139) off 2px | live=[]
+[reopen] Enter -> input "Search projects" 268,67,390,40  solid 2px rgb(76, 29, 139) off 2px | live=[]
+[arrow] ArrowDown -> a "UX Audit – PopulatedApp: Draftux-audit-populatedMulti-region" 256,149,414,81  solid 2px rgb(76, 29, 139) off 2px | live=["1 of 27 projects shown"]
+[choose] Enter -> h1 "Dashboard" 256,80,113,26  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) | live=["Dashboard loaded"]
+after switch http://localhost:5173/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5 {"title":"Dashboard · UX Audit – Populated · iGuide CMS","h1":"Dashboard","ae":"H1"} {"tag":"h1","role":null,"name":"Dashboard","body":false,"visible":true,"rect":[256,80,113,26],"outline":"none 3px rgb(17, 24, 39) off 2px","shadow":"rgb(255, 255, 255) 0px 0px 0px 4px"}
+live all []

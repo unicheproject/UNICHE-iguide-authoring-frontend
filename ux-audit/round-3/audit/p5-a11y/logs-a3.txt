@@ -1,0 +1,32 @@
+AXE {"label":"poi-list-default","url":"http://localhost:5173/projects/PID/pois","counts":{},"v":[]}
+[slash from h1] / -> input "Search title, slug, code or trigger" 273,164,553,40  solid 2px rgb(76, 29, 139) off 2px | live=[]
+search typed [{"t":10702,"role":"status","text":"2 of 93 points of interest","why":"add"}]
+slash in input value: Parthenon/
+[{"t":12419,"role":"status","text":"93 of 93 points of interest","why":"add"}]
+after search -> input "NOT_ARCHIVED" 852,184,1,1  solid 2px rgb(76, 29, 139) off 2px {"outlineW":"2px","off":"2px","style":"solid","ringVsOutside":9.53,"ringVsOwnBg":9.53,"bg":"239,233,248","ring":"rgb(76, 29, 139)"}
+[segment] ArrowRight -> input "ACTIVE" 871,184,1,1  solid 2px rgb(76, 29, 139) off 2px | live=["55 of 55 points of interest"]
+[segment] ArrowRight -> input "DRAFT" 964,184,1,1  solid 2px rgb(76, 29, 139) off 2px | live=["38 of 38 points of interest"]
+[segment] ArrowLeft -> input "ACTIVE" 871,184,1,1  solid 2px rgb(76, 29, 139) off 2px | live=["55 of 55 points of interest"]
+[segment] End -> input "ACTIVE" 871,84,1,1  solid 2px rgb(76, 29, 139) off 2px | live=[]
+[segment] Home -> input "ACTIVE" 871,184,1,1  solid 2px rgb(76, 29, 139) off 2px | live=[]
+segment snapshot <fieldset class="min-w-0"><legend class="sr-only">Status</legend><div class="inline-flex max-w-full flex-wrap rounded-md border border-input bg-card p-0.5"><label class="relative inline-flex min-h-8 cursor-pointer items-center gap-1.5 rounded-sm px-3 text-sm transition-ui duration-1 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary [@media(pointer:coarse)]:min-h-11 font-medium text-ink-2 hover:bg-surface-hover"><input type="radio" name="v-8" class="sr-only" value="NOT_ARCHIVED" style=""><!--v-if--> Not archive
+next button "Filters and sort" 1177,164,103,40  solid 2px rgb(76, 29, 139) off 2px
+[open filters] Enter -> select "All languagesEnglishΕλληνικάItaliano" 912,248,350,40  solid 2px rgb(76, 29, 139) off 2px | live=[]
+popover {"role":"dialog","name":null,"html":"<div trapfocus=\"false\" disableoutsidepointerevents=\"false\" id=\"radix-vue-popover-content-v-10\" data-state=\"open\" role=\"dialog\" data-dismissable-layer=\"\" tabindex=\"-1\" class=\"z-popover max-w-[calc(100v"}
+ filters tab 0 select "Manual orderTitleStatusUpdatedTranslations" 912,325,144,40  solid 2px rgb(76, 29, 139) off 2px {"outlineW":"2px","off":"2px","style":"solid","ringVsOutside":11.32,"ringVsOwnBg":11.32,"bg":"255,255,255","ring":"rgb(76, 29, 139)"}
+ filters tab 1 input "on" 912,391,20,20  solid 2px rgb(76, 29, 139) off 2px {"outlineW":"2px","off":"2px","style":"solid","ringVsOutside":11.32,"ringVsOwnBg":11.32,"bg":"255,255,255","ring":"rgb(76, 29, 139)"}
+ filters tab 2 input "on" 912,439,20,20  solid 2px rgb(76, 29, 139) off 2px {"outlineW":"2px","off":"2px","style":"solid","ringVsOutside":11.32,"ringVsOwnBg":11.32,"bg":"255,255,255","ring":"rgb(76, 29, 139)"}
+ filters tab 3 select "All categoriesIn no categoryMonuments and TemplesMonuments a" 984,485,278,40  solid 2px rgb(76, 29, 139) off 2px {"outlineW":"2px","off":"2px","style":"solid","ringVsOutside":11.32,"ringVsOwnBg":11.32,"bg":"255,255,255","ring":"rgb(76, 29, 139)"}
+ filters tab 4 input "on" 912,539,20,20  solid 2px rgb(76, 29, 139) off 2px {"outlineW":"2px","off":"2px","style":"solid","ringVsOutside":11.32,"ringVsOwnBg":11.32,"bg":"255,255,255","ring":"rgb(76, 29, 139)"}
+ filters tab 5 select "All languagesEnglishΕλληνικάItaliano" 912,248,350,40  solid 2px rgb(76, 29, 139) off 2px {"outlineW":"2px","off":"2px","style":"solid","ringVsOutside":11.32,"ringVsOwnBg":11.32,"bg":"255,255,255","ring":"rgb(76, 29, 139)"}
+ filters tab 6 select "Manual orderTitleStatusUpdatedTranslations" 912,325,144,40  solid 2px rgb(76, 29, 139) off 2px {"outlineW":"2px","off":"2px","style":"solid","ringVsOutside":11.32,"ringVsOwnBg":11.32,"bg":"255,255,255","ring":"rgb(76, 29, 139)"}
+ filters tab 7 input "on" 912,391,20,20  solid 2px rgb(76, 29, 139) off 2px {"outlineW":"2px","off":"2px","style":"solid","ringVsOutside":11.32,"ringVsOwnBg":11.32,"bg":"255,255,255","ring":"rgb(76, 29, 139)"}
+ filters tab 8 input "on" 912,439,20,20  solid 2px rgb(76, 29, 139) off 2px {"outlineW":"2px","off":"2px","style":"solid","ringVsOutside":11.32,"ringVsOwnBg":11.32,"bg":"255,255,255","ring":"rgb(76, 29, 139)"}
+ filters tab 9 select "All categoriesIn no categoryMonuments and TemplesMonuments a" 984,485,278,40  solid 2px rgb(76, 29, 139) off 2px {"outlineW":"2px","off":"2px","style":"solid","ringVsOutside":11.32,"ringVsOwnBg":11.32,"bg":"255,255,255","ring":"rgb(76, 29, 139)"}
+ filters tab 10 input "on" 912,539,20,20  solid 2px rgb(76, 29, 139) off 2px {"outlineW":"2px","off":"2px","style":"solid","ringVsOutside":11.32,"ringVsOwnBg":11.32,"bg":"255,255,255","ring":"rgb(76, 29, 139)"}
+ filters tab 11 select "All languagesEnglishΕλληνικάItaliano" 912,248,350,40  solid 2px rgb(76, 29, 139) off 2px {"outlineW":"2px","off":"2px","style":"solid","ringVsOutside":11.32,"ringVsOwnBg":11.32,"bg":"255,255,255","ring":"rgb(76, 29, 139)"}
+ filters tab 12 select "Manual orderTitleStatusUpdatedTranslations" 912,325,144,40  solid 2px rgb(76, 29, 139) off 2px {"outlineW":"2px","off":"2px","style":"solid","ringVsOutside":11.32,"ringVsOwnBg":11.32,"bg":"255,255,255","ring":"rgb(76, 29, 139)"}
+ filters tab 13 input "on" 912,391,20,20  solid 2px rgb(76, 29, 139) off 2px {"outlineW":"2px","off":"2px","style":"solid","ringVsOutside":11.32,"ringVsOwnBg":11.32,"bg":"255,255,255","ring":"rgb(76, 29, 139)"}
+AXE {"label":"poi-filters-open","url":"http://localhost:5173/projects/PID/pois?status=ACTIVE","counts":{},"v":[]}
+[esc filters] Escape -> button "Filters and sort" 1177,164,103,40  solid 2px rgb(76, 29, 139) off 2px | live=[]
+ring on Filters btn {"outlineW":"2px","off":"2px","style":"solid","ringVsOutside":11.32,"ringVsOwnBg":11.32,"bg":"255,255,255","ring":"rgb(76, 29, 139)"}

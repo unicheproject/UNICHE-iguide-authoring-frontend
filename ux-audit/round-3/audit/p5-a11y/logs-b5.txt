@@ -1,0 +1,22 @@
+[lat 95 blur] Tab -> input "e.g. 23.7257" 632,764,335,40  solid 2px rgb(76, 29, 139) off 2px | live=["1 of 97 points of interest","UX-R3-p5 POI A – Parthenon test loaded","Unsaved changes","A latitude is between -90 and 90.","Latitude: A latitude is between -90 and 90."]
+lat err {"desc":"A latitude is between -90 and 90.","id":"f-lat"}
+[lng blur] Tab -> button "Edit position on the map" 281,442,229,32  solid 2px rgb(76, 29, 139) off 2px | live=["Enter a longitude too, or clear the latitude.","Longitude: Enter a longitude too, or clear the latitude."]
+values 37.9715 23.7257
+map region []
+[set pos open] Enter -> button "Hide the map" 281,442,149,32  solid 2px rgb(76, 29, 139) off 2px | live=[]
+dlg no dialog (inline map?)
+tab order in map region:
+0 a "Skip map" 281,519,83,29  solid 2px rgb(76, 29, 139) off 2px 
+1 div[group] "Site map: pin position. Arrow keys move the pin, Plus and Mi" 281,519,686,220  solid 2px rgb(76, 29, 139) off 2px 
+2 button "Nearby points of interest (60)" 281,764,236,40  solid 2px rgb(76, 29, 139) off 2px 
+3 button "Add Primary image (recommended)" 319,442,157,32  solid 2px rgb(76, 29, 139) off 2px 
+4 button "Add Video" 483,442,91,32  solid 2px rgb(76, 29, 139) off 2px 
+5 button "Add Gallery" 583,442,100,32  solid 2px rgb(76, 29, 139) off 2px 
+6 button "Add 3D model" 691,442,120,32  solid 2px rgb(76, 29, 139) off 2px 
+7 button "English: choose audio narration" 294,530,104,32  solid 2px rgb(76, 29, 139) off 2px 
+8 button "Ελληνικά: choose audio narration" 406,530,111,32  solid 2px rgb(76, 29, 139) off 2px 
+9 button "Italiano: choose audio narration" 525,530,104,32  solid 2px rgb(76, 29, 139) off 2px 
+10 button "All languages: choose audio narration" 637,530,148,32  solid 2px rgb(76, 29, 139) off 2px 
+11 button "Add Beacon (Bluetooth)" 281,729,104,32  solid 2px rgb(76, 29, 139) off 2px 
+12 button "Add Geo-proximity" 393,729,153,32  solid 2px rgb(76, 29, 139) off 2px 
+13 button "Add QR code" 554,729,111,32  solid 2px rgb(76, 29, 139) off 2px 

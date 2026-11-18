@@ -1,0 +1,11 @@
+import { open, go, shot, POP, axe, t, focusDesc } from "./lib.mjs";
+const F = "ux-audit/round-2/audit/s13-media/fixtures/";
+const vp = "1440";
+const { browser, page } = await open("admin", { viewport: vp });
+await go(page, `/projects/${POP}/media/6cd2aef3-e6b4-4adf-a2bf-7f4121090093`); await page.getByRole("heading",{level:1}).first().waitFor(); await page.waitForTimeout(2000);
+await page.locator("input[type=file]").setInputFiles(F+"UX-R2-s13 theta.jpg"); await page.waitForTimeout(3500);
+console.log("after replace (png->jpg)", (await page.locator("[role=alert],[role=status]").allInnerTexts()).filter(x=>x.trim()), (await t(page,"main")).match(/File\n[\s\S]{0,260}/)?.[0].replace(/\n+/g," | "));
+await shot(page,"asset-editor__after-replace",vp);
+await go(page, `/projects/${POP}/media`); await page.waitForTimeout(3000);
+console.log("bottom controls:", await page.evaluate(()=>[...document.querySelectorAll("main button")].map(b=>b.textContent.trim()).slice(-6)));
+await browser.close();

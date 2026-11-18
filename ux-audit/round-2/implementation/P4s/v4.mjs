@@ -1,0 +1,47 @@
+import { open, go } from "../../../tools/session.mjs";
+import { call, closeAll, ensure } from "../../../tools/lib.mjs";
+const P = "6958c18f-60d2-4140-a524-5a43f8a2f6b5";
+const D = "4e03e8e8-7d90-46bb-a3b0-4aab41d67135";
+const A = "07927651-be7a-44e9-85eb-843d8ed219f7";
+const vp = process.argv[2] ?? "1280";
+const { browser, page } = await open("admin", { viewport: vp });
+const log = (...a) => console.log(...a);
+const ypos = () => page.evaluate(() => Math.round(document.querySelector("[data-path='translations.en.summary']").getBoundingClientRect().top));
+await go(page, `/projects/${P}/pois/${A}`);
+await page.waitForSelector("[data-sticky-bar]", { timeout: 30000 }); await page.waitForTimeout(2000);
+const y0 = await ypos();
+await page.getByLabel(/^summary$/i).first().fill("Edited summary B " + Date.now());
+await page.waitForTimeout(500);
+log("dirty header h", await page.evaluate(() => Math.round(document.querySelector(".editor-header").getBoundingClientRect().height)), "shift", (await ypos()) - y0);
+await page.route("**/working-copy", (r) => r.request().method() === "PUT" ? r.fulfill({ status: 503, contentType: "application/problem+json", body: JSON.stringify({ status: 503, code: "SERVICE_UNAVAILABLE", requestId: "req-test-503" }) }) : r.continue());
+await page.getByRole("button", { name: /^Save draft$/ }).first().click();
+await page.waitForTimeout(1200);
+log("503 shift", (await ypos()) - y0, "focus summary", await page.evaluate(() => document.activeElement?.hasAttribute("data-error-summary")), await page.evaluate(() => document.querySelector("[data-error-summary]")?.innerText.replace(/\s+/g, " ")));
+await page.screenshot({ path: `after/save-503-${vp}.png` });
+await page.unroute("**/working-copy");
+// real save
+await page.getByRole("button", { name: /^Save draft$/ }).first().click();
+await page.waitForTimeout(2000);
+log("after save: state line", await page.evaluate(() => document.querySelector(".editor-header [role=status]")?.textContent), "toasts:", await page.evaluate(() => [...document.querySelectorAll("[data-toast], .toast")].length), "summary gone:", await page.locator("[data-error-summary]").count() === 0, "active el:", await page.evaluate(() => document.activeElement?.textContent?.trim().slice(0, 30)));
+// apply confirm
+await page.getByRole("button", { name: /^Apply changes$/ }).first().click();
+await page.waitForTimeout(600);
+log("apply confirm:", await page.evaluate(() => document.querySelector("[role=dialog]")?.innerText.replace(/\s+/g, " ")));
+await page.screenshot({ path: `after/apply-confirm-${vp}.png` });
+await page.getByRole("dialog").getByRole("button", { name: /^Apply changes$/ }).click();
+await page.waitForTimeout(2500);
+log("after apply focus:", await page.evaluate(() => document.activeElement?.id || document.activeElement?.tagName), "revision:", await page.evaluate(() => document.querySelector("#status-card-heading")?.closest("section")?.innerText.replace(/\s+/g, " ")));
+// 409: change via API after loading, then save from UI
+await go(page, `/projects/${P}/pois/${D}`);
+await page.waitForSelector("[data-sticky-bar]", { timeout: 30000 }); await page.waitForTimeout(1500);
+await page.getByLabel(/^summary$/i).first().fill("Mine summary");
+const desc = page.getByLabel(/^description$/i).first(); await desc.fill("Mine description");
+await ensure("admin");
+const cur = await call("admin", "GET", `/projects/${P}/pois/${D}`);
+await call("admin", "PUT", `/projects/${P}/pois/${D}`, { ...cur, translations: { ...cur.translations, en: { ...cur.translations.en, summary: "Theirs summary", description: "Theirs untouched change" } } });
+await page.getByRole("button", { name: /^Save$/ }).first().click();
+await page.waitForTimeout(2500);
+log("409 dialog:", await page.evaluate(() => document.querySelector("[role=dialog]")?.innerText.replace(/\s+/g, " ")));
+await page.screenshot({ path: `after/conflict-${vp}.png` });
+await closeAll();
+await browser.close();

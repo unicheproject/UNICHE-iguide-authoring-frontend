@@ -1,0 +1,26 @@
+import { open, go, rec, P, shot, ready, axe, tall } from "./h.mjs";
+const S="ux-audit/round-2/audit/s11-editors/shots/";
+const { browser, page } = await open("curator", { viewport: "1440" });
+const errs=[]; page.on("pageerror",e=>errs.push(e.message));
+await go(page, `/projects/${P}/routes/${rec.route}`); await ready(page,1200);
+await page.getByRole("button",{name:"Add stops"}).click(); await page.waitForTimeout(600);
+const dlg = page.getByRole("dialog");
+await dlg.locator("#pick-search").fill("UX-R2-s11"); await page.waitForTimeout(500);
+const opts = dlg.getByRole("button",{name:/UX-R2-s11 POI/});
+console.log("opts", await opts.count(), await opts.first().evaluate(e=>e.outerHTML.slice(0,300)));
+await opts.nth(0).click(); await page.waitForTimeout(400);
+await page.screenshot({path:S+"route-picker__one-added__1440.png"});
+console.log("live:", await page.evaluate(()=>[...document.querySelectorAll("[aria-live]")].map(e=>e.textContent.trim().slice(0,100))));
+// keyboard: focus list, arrow + enter
+await dlg.locator("#pick-search").focus(); await page.keyboard.press("ArrowDown"); await page.keyboard.press("Enter");
+await page.waitForTimeout(300);
+console.log("after kb focus:", await page.evaluate(()=>document.activeElement?.outerHTML.slice(0,160)));
+await opts.nth(2).click(); await opts.nth(3).click(); await opts.nth(4).click(); await opts.nth(5).click();
+console.log("done label:", await dlg.getByRole("button",{name:/Done/}).innerText());
+await page.screenshot({path:S+"route-picker__six-added__1440.png"});
+await page.keyboard.press("Escape"); await page.waitForTimeout(500);
+console.log("after Esc dialog:", await page.getByRole("dialog").count(), "focus:", await page.evaluate(()=>document.activeElement?.outerHTML.slice(0,120)));
+await shot(page,"route-editor__stops-unsaved__1440");
+console.log(await tall(page,"route-editor__stops-tall__1440"));
+console.log(errs);
+await browser.close();

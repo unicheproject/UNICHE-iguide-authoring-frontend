@@ -1,0 +1,5 @@
+1440 default tab structural visible: 23
+1440 el tab structural controls visible outside the fold: []
+1440 fold button 1
+1440 after open, in fold: 25
+1440 axe el []

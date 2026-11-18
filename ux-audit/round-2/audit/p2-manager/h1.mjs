@@ -1,0 +1,11 @@
+import { fresh, uiSignIn, shot, text, CMS } from "./lib.mjs";
+const { browser, page } = await fresh("1440");
+await uiSignIn(page, "curator", "1440", () => {});
+await page.waitForTimeout(6000);
+console.log("after 6s url has code?", /code=/.test(page.url()), page.url().slice(0,60));
+console.log("history len", await page.evaluate(()=>history.length));
+await page.reload(); await page.waitForTimeout(5000);
+console.log("after reload:", page.url().slice(0,70), await page.title());
+await shot(page, "signin__reload-on-code-url", "1440", false);
+console.log((await page.evaluate(()=>document.body.innerText)).slice(0,300).replace(/\n+/g," | "));
+await browser.close();

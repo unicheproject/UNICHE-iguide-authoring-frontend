@@ -1,0 +1,5 @@
+gap before add 1
+gap after add 1
+count 0: 0 weeks adds no dates. Enter a number from 1 to 52.
+count empty: Enter the number of weeks, from 1 to 52.
+until 31 Nov: November 2026 has 30 days. | Correct the last day to repeat on first.

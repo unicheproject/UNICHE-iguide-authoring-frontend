@@ -1,0 +1,31 @@
+import {open,go,P,shot,btns,hdr,fillBasics} from "./lib.mjs";
+const { browser, page } = await open("admin",{viewport:"1440"});
+const U=P+"/pois/d2e48820-a468-4539-9f62-545eed5b06a6";
+await go(page, U);
+await page.waitForTimeout(1500);
+await fillBasics(page,"Alpha");
+await shot(page,"poi-editor__alpha-filled-dirty__1440");
+console.log("dirty hdr:",await hdr(page));
+const t=Date.now();
+await page.locator("#f-title").click();
+await page.keyboard.press("Control+s");
+let last="";
+const seen=[];
+for(let i=0;i<200;i++){const h=await hdr(page); if(h!==last){seen.push([Date.now()-t,h]);last=h;} if(!/Saving/.test(h)&&i>2)break; await page.waitForTimeout(50);}
+console.log(JSON.stringify(seen,null,1));
+await page.waitForTimeout(800);
+console.log("after hdr:",await hdr(page));
+console.log("live:",await page.evaluate(()=>[...document.querySelectorAll("[aria-live]")].map(e=>e.getAttribute("aria-live")+":"+e.innerText.trim().slice(0,100))));
+await shot(page,"poi-editor__alpha-saved__1440");
+console.log(await page.evaluate(()=>[...document.querySelectorAll("main dt, main dd")].map(e=>e.innerText).join("|")));
+// Activate
+const t2=Date.now();
+await page.getByRole("button",{name:/^Activate/}).first().click();
+await page.waitForSelector("[role=dialog]");
+console.log("confirm open ms",Date.now()-t2);
+await page.waitForTimeout(500);
+await shot(page,"poi-activate-confirm__alpha__1440");
+console.log((await page.evaluate(()=>document.querySelector("[role=dialog]").innerText)));
+console.log(await btns(page,"[role=dialog]"));
+console.log("focus:",await page.evaluate(()=>document.activeElement.tagName+":"+document.activeElement.innerText.slice(0,40)));
+await browser.close();

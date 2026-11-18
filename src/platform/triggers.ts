@@ -1,4 +1,7 @@
-import { ApiError, apiBlob, apiRequest } from "./api";
+import { coordinateError, parseDecimal } from "@/components/map/coordinates";
+import { runIndependentWrites, type IndependentWrite } from "@/workspace/useResourceEditor";
+import { problemText } from "@/lib/problemText";
+import { ApiError, PartlySavedError, apiBlob, apiRequest } from "./api";
 import type { ResourceStatus } from "./places";
 import type { SurfaceName } from "./surfaces";
 
@@ -67,6 +70,11 @@ export interface TriggerForm {
   /** As last saved: the code the backend's QR image encodes, and its runtime URL; null for a new row. */
   savedCode: string | null;
   runtimeUrl: string | null;
+  /**
+   * Why the last save could not store this row, in one sentence; set when a save stored the Resource but not this row
+   * (C3-20), cleared when the row is edited or saved. The row shows it inline and stays open until then.
+   */
+  problem: string | null;
 }
 
 interface Page<T> {
@@ -96,6 +104,7 @@ export function blankTrigger(type: TriggerType, defaults: Partial<TriggerForm> =
     surfaces: null,
     savedCode: null,
     runtimeUrl: null,
+    problem: null,
     ...defaults,
   };
 }
@@ -162,7 +171,8 @@ export function groupTriggersByTarget(triggers: Trigger[] | null, type: TriggerT
   return byTarget;
 }
 
-const num = (value: string) => (value.trim() === "" ? null : Number.isNaN(Number(value)) ? value.trim() : Number(value));
+/** A number as typed (a decimal comma is fine); text that is not a number is passed on so the platform names the field. */
+const num = (value: string) => (value.trim() === "" ? null : (parseDecimal(value) ?? value.trim()));
 
 function bodyOf(form: TriggerForm): {
   code: string | null;
@@ -200,21 +210,88 @@ function typeBody(form: TriggerForm): { code: string | null; configuration: Reco
   }
 }
 
+const DUPLICATE_BEACON = "Another way of reaching an item already uses this UUID with this Major and Minor. Change one of them.";
+const DUPLICATE_CODE = "This code is already used by another item in this Project. Choose another or leave it empty.";
+
 /** Re-reports an error at the row that caused it: `code` → `triggers[2].code`, `configuration.uuid` → `triggers[2].uuid`. */
-function atRow(e: unknown, index: number): unknown {
+function atRow(e: unknown, index: number | null): unknown {
   if (!(e instanceof ApiError)) return e;
+  const row = index === null ? "triggers" : `triggers[${index}]`;
+  // A code or beacon that another item already uses is a field error of the row, said once and never as "Another point of
+  // interest already uses this qr code 1, code" (C3-20): the editor's generic duplicate sentence does not fit a row.
+  if (e.code === "DUPLICATE_VALUE") {
+    const field = e.details.some((d) => /^(?:configuration\.)?(?:uuid|major|minor)/.test(d)) ? "uuid" : "code";
+    return new ApiError(422, "VALIDATION_ERROR", e.message, e.requestId, [`${row}.${field}: ${field === "uuid" ? DUPLICATE_BEACON : DUPLICATE_CODE}`], e.body);
+  }
   const details = e.details.map((d) => {
     const m = /^(?:configuration\.)?(code|supportedSurfaces|uuid|major|minor|proximityMeters|cooldownSeconds|latitude|longitude|radiusMeters): (.*)$/.exec(d);
-    return m ? `triggers[${index}].${m[1]}: ${m[2]}` : `triggers[${index}]: ${d.replace(/^[^:]*: /, "")}`;
+    return m ? `${row}.${m[1]}: ${m[2]}` : `${row}: ${d.replace(/^[^:]*: /, "")}`;
   });
-  if (!details.length) details.push(`triggers[${index}]: ${e.message}`);
+  if (!details.length) details.push(`${row}: ${e.message}`);
   return new ApiError(e.status, e.code, e.message, e.requestId, details, e.body);
+}
+
+/** The short name of a row among its siblings: "Beacon 1", "QR code 2", numbered per type (C2-60). */
+export function triggerRowName(forms: TriggerForm[], form: TriggerForm): string {
+  const names: Record<TriggerType, string> = { BEACON: "Beacon", GEO_PROXIMITY: "Geo-proximity", QR_CODE: "QR code" };
+  return `${names[form.type]} ${forms.filter((x) => x.type === form.type).indexOf(form) + 1}`;
+}
+
+const TRIGGER_FIELD_NAMES: Record<string, string> = {
+  uuid: "UUID",
+  major: "Major",
+  minor: "Minor",
+  proximityMeters: "Distance",
+  cooldownSeconds: "Wait",
+  latitude: "Latitude",
+  longitude: "Longitude",
+  radiusMeters: "Radius",
+  code: "Code",
+  supportedSurfaces: "Runs on",
+};
+
+/** "Beacon 1, UUID" for the error path `triggers[0].uuid`; null for any other path. For the editor's `describePath`. */
+export function describeTriggerPath(path: string, forms: TriggerForm[]): string | null {
+  const m = /^triggers\[(\d+)\](?:\.(\w+))?$/.exec(path);
+  if (!m) return null;
+  const form = forms[Number(m[1])];
+  if (!form) return "How visitors reach it";
+  return m[2] ? `${triggerRowName(forms, form)}, ${TRIGGER_FIELD_NAMES[m[2]] ?? m[2]}` : triggerRowName(forms, form);
+}
+
+/** One trigger row that could not be written, for the partial-failure sentence. */
+export interface TriggerFailure {
+  /** The row's place in the form; null for a removed row that could not be archived. */
+  index: number | null;
+  /** What the row is called in a sentence: "Beacon 1". */
+  name: string;
+  /** The error, with its paths already rewritten to `triggers[i].field`. */
+  error: ApiError;
+  /** The row's key in the form; null for a removed row. */
+  key: string | null;
+}
+
+/** One sentence for a row that failed, chosen by status and code; the server's words are never shown (D-087). */
+export function rowFailureText(error: ApiError): string {
+  if (error.status === 422 || error.status === 400) {
+    return Object.values(error.fieldMessages())[0] ?? "Check the fields of this row.";
+  }
+  return problemText(error.status, error.code).body.replace(/\s*Nothing was changed\.?/g, "").trim();
+}
+
+/** One error out of several: the first one's status and code, every row's field messages. */
+function mergeErrors(errors: ApiError[]): ApiError {
+  if (errors.length === 1) return errors[0];
+  const [first] = errors;
+  return new ApiError(first.status, first.code, first.message, first.requestId, errors.flatMap((e) => e.details), first.body);
 }
 
 /**
  * Makes the Resource's triggers exactly `desired`: new rows are created and activated (a trigger
  * opens its target only when both are ACTIVE), changed rows updated, removed rows archived, so a printed
- * QR code still lands on the Resource (`11` §9).
+ * QR code still lands on the Resource (`11` §9). The rows are independent, so the removals run together, then the
+ * creations and updates run together (C2-73); a row that fails never stops the others. Resolves with the rows that
+ * failed, empty when all worked; the caller decides whether that stops the save.
  */
 export async function syncTriggers(
   projectId: string,
@@ -222,58 +299,123 @@ export async function syncTriggers(
   id: string,
   desired: TriggerForm[],
   current?: Trigger[],
-): Promise<Trigger[]> {
+): Promise<{ triggers: Trigger[]; failed: TriggerFailure[]; ids: Record<string, string> }> {
   current ??= await listTargetTriggers(projectId, type, id);
   // A new row identical to a trigger nobody kept is that trigger: a save that failed half-way created it.
   const unclaimed = current.filter((t) => !desired.some((d) => d.id === t.id));
-  desired = desired.map((d) => {
+  const adopted = desired.map((d) => {
     if (d.id) return d;
     const body = JSON.stringify(bodyOf(d));
     const match = unclaimed.findIndex((t) => t.triggerType === d.type
       && (d.type === "QR_CODE" && !d.code.trim() ? true : JSON.stringify(bodyOf(triggerToForm(t))) === body));
     return match < 0 ? d : { ...d, id: unclaimed.splice(match, 1)[0].id };
   });
-  const kept = new Set(desired.flatMap((d) => (d.id ? [d.id] : [])));
+  const kept = new Set(adopted.flatMap((d) => (d.id ? [d.id] : [])));
+  const failed: TriggerFailure[] = [];
+  // The id each row has after this save, by row key: its own, the one it was adopted with, or the one just created.
+  const ids: Record<string, string> = {};
+  adopted.forEach((d) => {
+    if (d.id) ids[d.key] = d.id;
+  });
+  const collect = (rows: Map<IndependentWrite, { index: number | null; name: string }>) => async (writes: IndependentWrite[]) => {
+    for (const { write, error } of await runIndependentWrites(writes)) {
+      const row = rows.get(write)!;
+      failed.push({ ...row, key: row.index === null ? null : desired[row.index].key, error: atRow(error, row.index) as ApiError });
+    }
+  };
+
+  const removals = new Map<IndependentWrite, { index: number | null; name: string }>();
   for (const old of current.filter((t) => !kept.has(t.id))) {
-    await apiRequest(`${base(projectId)}/${encodeURIComponent(old.id)}/status`, {
-      method: "POST",
-      body: { targetStatus: "ARCHIVED", version: old.version },
-    });
+    removals.set(
+      {
+        label: "the removed way of reaching it",
+        run: () => apiRequest(`${base(projectId)}/${encodeURIComponent(old.id)}/status`, { method: "POST", body: { targetStatus: "ARCHIVED", version: old.version } }),
+      },
+      { index: null, name: "A removed way of reaching it" },
+    );
   }
-  for (const [index, form] of desired.entries()) {
+  await collect(removals)([...removals.keys()]);
+
+  const upserts = new Map<IndependentWrite, { index: number | null; name: string }>();
+  adopted.forEach((form, index) => {
     const body = bodyOf(form);
-    try {
+    const name = triggerRowName(desired, desired[index]);
+    const run = async () => {
       if (!form.id) {
-        const created = await apiRequest<Trigger>(base(projectId), {
-          method: "POST",
-          body: { targetResourceType: type, targetResourceId: id, triggerType: form.type, ...body },
-        });
+        let created: Trigger;
+        try {
+          created = await apiRequest<Trigger>(base(projectId), {
+            method: "POST",
+            body: { targetResourceType: type, targetResourceId: id, triggerType: form.type, ...body },
+          });
+        } catch (e) {
+          // The code is already in use: by this very item (an earlier save stored it) it is that row, saved; by another
+          // item it is a refusal at the row (C3-20).
+          if (!(e instanceof ApiError) || e.code !== "DUPLICATE_VALUE") throw e;
+          const wanted = JSON.stringify(body);
+          const own = (await listTargetTriggers(projectId, type, id)).find((t) => t.triggerType === form.type && JSON.stringify(bodyOf(triggerToForm(t))) === wanted);
+          if (!own) throw e;
+          ids[form.key] = own.id;
+          return;
+        }
+        ids[form.key] = created.id;
         await apiRequest(`${base(projectId)}/${encodeURIComponent(created.id)}/status`, {
           method: "POST",
           body: { targetStatus: "ACTIVE", version: created.version },
         });
-        continue;
+        return;
       }
       const before = current.find((t) => t.id === form.id);
       // An emptied QR code keeps its code: printed codes must go on working.
       const wanted = before && form.type === "QR_CODE" && !body.code ? { ...body, code: before.code } : body;
+      let version = before?.version ?? 0;
       if (before && JSON.stringify(bodyOf(triggerToForm(before))) !== JSON.stringify(wanted)) {
-        await apiRequest(`${base(projectId)}/${encodeURIComponent(form.id)}`, {
+        version = (await apiRequest<Trigger>(`${base(projectId)}/${encodeURIComponent(form.id)}`, {
           method: "PUT",
           body: { version: before.version, ...wanted },
-        });
+        })).version;
       }
-    } catch (e) {
-      throw atRow(e, index);
-    }
-  }
-  return listTargetTriggers(projectId, type, id);
+      // A row an earlier, half-finished save created but did not activate is activated now: it opens its target only then.
+      if (before?.status === "DRAFT") {
+        await apiRequest(`${base(projectId)}/${encodeURIComponent(form.id)}/status`, { method: "POST", body: { targetStatus: "ACTIVE", version } });
+      }
+    };
+    upserts.set({ label: name, run }, { index, name });
+  });
+  await collect(upserts)([...upserts.keys()]);
+  return { triggers: await listTargetTriggers(projectId, type, id), failed, ids };
+}
+
+/**
+ * The card's rows after a save that stored the Resource but not every row (C3-20): a row that was saved becomes the
+ * saved trigger (same row key, so its place, focus and open state stay), a row that failed stays as typed with its
+ * sentence in `problem`, so the next save sends only the failed rows. Rows that were removed are not in the form.
+ */
+export function reconcileTriggers(forms: TriggerForm[], notice: PartialTriggers): TriggerForm[] {
+  const failedKeys = new Map(notice.rows.map((r) => [r.key, r.sentence]));
+  return forms.map((form) => {
+    const problem = failedKeys.get(form.key);
+    const id = notice.ids[form.key] ?? form.id;
+    if (problem !== undefined) return { ...form, id, problem };
+    const saved = id ? notice.triggers.find((t) => t.id === id) : undefined;
+    return saved ? { ...triggerToForm(saved), key: form.key } : form;
+  });
+}
+
+/** "Beacon 1 and QR code 2": the rows that failed, for `partialSentence`. */
+function failedNames(failed: TriggerFailure[]): string[] {
+  return [...new Set(failed.map((f) => f.name))];
 }
 
 /**
  * Saves the triggers, then the Resource through `saveResource`. The triggers go first, so a refused trigger stops
  * the save; when the rest is refused, the triggers are put back as they were, so a save that failed changed
  * nothing (DECISIONS.md D-044). Putting them back is best effort: when it fails too, the next save repairs them.
+ *
+ * With `partial` the Resource is saved even when some rows were refused (they are independent of it, C2-73): the
+ * result then throws a `PartlySavedError` that carries the saved Resource and the rows' field errors, so the editor
+ * keeps the form dirty for a retry. The caller names what failed with {@link partialNotice}. Without it (a working
+ * copy, whose editor cannot take a partial result) any refused row stops the save and is put back.
  */
 export async function saveWithTriggers<R>(
   projectId: string,
@@ -281,15 +423,44 @@ export async function saveWithTriggers<R>(
   id: string,
   desired: TriggerForm[],
   saveResource: () => Promise<R>,
+  options: { partial?: boolean; onPartial?: (notice: PartialTriggers) => void } = {},
 ): Promise<{ saved: R; triggers: Trigger[] }> {
   const before = await listTargetTriggers(projectId, type, id);
+  let saved: R;
+  let synced: { triggers: Trigger[]; failed: TriggerFailure[]; ids: Record<string, string> };
   try {
-    const triggers = await syncTriggers(projectId, type, id, desired, before);
-    return { saved: await saveResource(), triggers };
+    synced = await syncTriggers(projectId, type, id, desired, before);
+    if (synced.failed.length && !options.partial) throw mergeErrors(synced.failed.map((f) => f.error));
+    saved = await saveResource();
   } catch (e) {
     await restoreTriggers(projectId, type, id, before).catch(() => undefined);
     throw e;
   }
+  if (synced.failed.length) {
+    options.onPartial?.({
+      names: failedNames(synced.failed),
+      requestId: synced.failed[0].error.requestId,
+      validation: synced.failed.every((f) => f.error.status === 422 || f.error.status === 400),
+      triggers: synced.triggers,
+      ids: synced.ids,
+      rows: synced.failed.flatMap((f) => (f.key ? [{ key: f.key, sentence: rowFailureText(f.error) }] : [])),
+    });
+    throw new PartlySavedError(saved, mergeErrors(synced.failed.map((f) => f.error)));
+  }
+  return { saved, triggers: synced.triggers };
+}
+
+/** What a partial save leaves to say: the rows that were refused, and whether the platform named their fields. */
+export interface PartialTriggers {
+  names: string[];
+  requestId: string | null;
+  /** True when every refusal is a validation error shown at its field; the editor's own summary is then enough. */
+  validation: boolean;
+  /** The Resource's triggers as stored after the save, and the id each form row (by key) has now. */
+  triggers: Trigger[];
+  ids: Record<string, string>;
+  /** The rows that failed, by form key, with their sentence. */
+  rows: { key: string; sentence: string }[];
 }
 
 const settingsOf = (t: Trigger) =>
@@ -331,9 +502,9 @@ export const TRIGGER_LABELS: Record<TriggerType, string> = {
 
 /** The colour of a trigger type's chip, in the editor card and in the lists alike. */
 export const TRIGGER_CHIP_CLASS: Record<TriggerType, string> = {
-  BEACON: "bg-[#e3ecf7] text-[#1f4e8c]",
-  GEO_PROXIMITY: "bg-[#e1f3ea] text-[#17643f]",
-  QR_CODE: "bg-[#ececef] text-[#374151]",
+  BEACON: "bg-info-tint text-info",
+  GEO_PROXIMITY: "bg-success-tint text-success",
+  QR_CODE: "bg-muted text-ink-2",
 };
 
 /** A trigger in a few characters for a list chip: "QR · K7F2A9QX", "Beacon · 12/3", "Geo · 30 m". */
@@ -347,4 +518,63 @@ export function triggerLabel(trigger: Trigger): string {
     case "GEO_PROXIMITY":
       return c.radiusMeters !== undefined ? `Geo · ${text(c.radiusMeters)} m` : "Geo";
   }
+}
+
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** Why `text` is not a whole number from `min` to `max`, or null (empty text is allowed: the platform says what is required). */
+function wholeError(text: string, label: string, min: number, max: number): string | null {
+  if (!text.trim()) return null;
+  return /^\d+$/.test(text.trim()) && Number(text) >= min && Number(text) <= max ? null : `${label} is a whole number from ${min} to ${max}.`;
+}
+
+/** Why `text` is not a number above zero, or null when it is empty or fine. */
+function positiveError(text: string, label: string): string | null {
+  if (!text.trim()) return null;
+  const value = parseDecimal(text);
+  return value !== null && value > 0 ? null : `${label} is a number above 0.`;
+}
+
+/** Why `text` is not a whole number from `min` to `max`; an empty text is "Enter …" when the field is required. */
+function requiredWhole(text: string, label: string, min: number, max: number, required: boolean): string | null {
+  if (!text.trim()) return required ? `Enter the ${label.toLowerCase()}.` : null;
+  return wholeError(text, label, min, max);
+}
+
+/**
+ * Why a geo-proximity coordinate is not acceptable as typed, or null. Used on leaving the field (C2-69): an empty field is
+ * not an error while the other one is empty too, so a new row is not red before the author starts.
+ */
+export function triggerCoordinateError(form: TriggerForm, axis: "latitude" | "longitude"): string | null {
+  const own = form[axis].trim();
+  const other = (axis === "latitude" ? form.longitude : form.latitude).trim();
+  if (!own) return other ? `Enter a ${axis} too, or clear the ${axis === "latitude" ? "longitude" : "latitude"}.` : null;
+  return coordinateError(own, axis);
+}
+
+/**
+ * Client-side check of the card's rows, in the editor's error map under `triggers[i].field`, so a typo shows at its field
+ * before anything is sent and never reaches the platform as a non-number. A beacon needs its UUID, Major and Minor and a
+ * geo-proximity area its latitude, longitude and radius: an empty row is named here, field by field, and never sent (C2-60).
+ */
+export function checkTriggers(forms: TriggerForm[], found: Record<string, string>): void {
+  forms.forEach((t, i) => {
+    const put = (field: string, message: string | null) => {
+      if (message) found[`triggers[${i}].${field}`] = message;
+    };
+    if (t.type === "BEACON") {
+      if (!t.uuid.trim()) put("uuid", "Enter the beacon's UUID.");
+      else if (!UUID_PATTERN.test(t.uuid.trim())) put("uuid", "A beacon UUID looks like e2c56db5-dffb-48d2-b060-d0f5a71096e0.");
+      put("major", requiredWhole(t.major, "Major", 0, 65535, true));
+      put("minor", requiredWhole(t.minor, "Minor", 0, 65535, true));
+      put("proximityMeters", positiveError(t.proximityMeters, "Distance"));
+      put("cooldownSeconds", wholeError(t.cooldownSeconds, "Wait", 0, 86400));
+    } else if (t.type === "GEO_PROXIMITY") {
+      put("latitude", coordinateError(t.latitude, "latitude"));
+      put("longitude", coordinateError(t.longitude, "longitude"));
+      if (!t.radiusMeters.trim()) put("radiusMeters", "Enter the radius in metres.");
+      else put("radiusMeters", positiveError(t.radiusMeters, "Radius"));
+      put("cooldownSeconds", wholeError(t.cooldownSeconds, "Wait", 0, 86400));
+    }
+  });
 }

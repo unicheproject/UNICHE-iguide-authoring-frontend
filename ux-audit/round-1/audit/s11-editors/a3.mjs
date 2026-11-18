@@ -1,0 +1,26 @@
+import { start, goP, log, dump, save, focused } from "./lib.mjs";
+const s = await start("1440"); const { page } = s;
+await goP(page, "/routes");
+await page.getByRole("button", { name: /new route/i }).first().click();
+await page.waitForTimeout(500);
+// submit empty
+await page.getByRole("button", { name: /create route/i }).click();
+await page.waitForTimeout(500);
+await s.shot("route-create__empty-submit");
+log("EMPTY:", await dump(page, "[role=dialog]"));
+await page.keyboard.press("Escape"); await page.waitForTimeout(300);
+log("after esc dialog count", await page.locator("[role=dialog]").count(), await focused(page));
+await page.getByRole("button", { name: /new route/i }).first().click();
+await page.locator("[role=dialog]").getByText("Outdoor", {exact:true}).click();
+await page.getByLabel(/title/i).fill("UX-s11-editors Route");
+await page.waitForTimeout(300);
+await s.shot("route-create__filled");
+log("slug", await page.getByLabel(/slug/i).inputValue());
+await page.getByRole("button", { name: /create route/i }).click();
+await page.waitForURL(/routes\/[0-9a-f-]+/, { timeout: 20000 });
+await page.waitForTimeout(1500);
+log(page.url());
+save({ routeUrl: page.url().replace(/^https?:\/\/[^/]+/, "") });
+await s.shot("route-editor__new-draft", true);
+log(await dump(page));
+await s.browser.close();

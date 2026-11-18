@@ -1,0 +1,13 @@
+import { open, shot, text, axe, settle, CMS } from "./lib.mjs";
+const { browser, page } = await open("admin", { viewport: "1440" });
+page.on("console", m => console.log("console", m.type(), m.text().slice(0,200)));
+page.on("pageerror", e => console.log("pageerror", e.message.slice(0,200)));
+let hit = 0;
+await page.route(/config\.ts/, async r => { hit++; const resp = await r.fetch(); let b = await resp.text(); b = b.replace("injected.AUDIENCE || env.VITE_AUDIENCE", "undefined"); r.fulfill({ response: resp, body: b }); });
+await page.goto(CMS + "/"); await settle(page, 4000);
+console.log("hit", hit, JSON.stringify(await text(page)));
+console.log("alerts", await page.locator("[role=alert]").count(), "h1", await page.locator("h1").allInnerTexts(), "axe", await axe(page));
+console.log("focus", await page.evaluate(()=>document.activeElement?.tagName+" "+(document.activeElement?.innerText||"").slice(0,40)));
+await shot(page, `config-error__1440`);
+await page.setViewportSize({width:640,height:360}); await shot(page, `config-error__zoom200`);
+await browser.close();

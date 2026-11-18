@@ -1,0 +1,41 @@
+import { open, go, P, shot, settle } from "./h.mjs";
+const { browser, page } = await open("admin", { viewport: "1440" });
+const foc = () => page.evaluate(() => document.activeElement.tagName + ":" + (document.activeElement.getAttribute("aria-label")||document.activeElement.innerText||"").slice(0,50).replace(/\n/g," "));
+const live = () => page.evaluate(() => [...document.querySelectorAll("[aria-live],[role=status],[role=alert]")].map(e => `${e.getAttribute("role")||""}/${e.getAttribute("aria-live")||""}:${(e.textContent||"").trim().slice(0,100)}`).filter(s=>!/:$/.test(s)));
+const order = () => page.evaluate(() => [...document.querySelectorAll("main table tbody tr")].map(t => t.querySelector("td:nth-child(2) a")?.textContent.trim().slice(0, 28)));
+const mine = () => page.locator("main table tbody tr").filter({ hasText: "UX-R3-s9 Guide" }).first();
+await go(page, `/projects/${P}/guides`); await settle(page, 2000);
+let o = await order(); console.log("before idx", o.findIndex(x => /UX-R3-s9 Guide/.test(x)), "of", o.length);
+const kebab = () => mine().locator("button[aria-label^='Actions for']");
+await kebab().scrollIntoViewIfNeeded();
+await kebab().focus(); await page.keyboard.press("Enter"); await settle(page, 300);
+await page.getByRole("menuitem", { name: /^Move up/ }).click();
+await settle(page, 120); await shot(page, "guides__move-up-120ms__1440");
+await settle(page, 900);
+o = await order(); console.log("after Move up idx", o.findIndex(x => /UX-R3-s9 Guide/.test(x)), "focus", await foc(), "live", JSON.stringify(await live()));
+const hl = await page.evaluate(() => { const tr=[...document.querySelectorAll("main table tbody tr")].find(t=>/UX-R3-s9 Guide/.test(t.innerText)); const cs=getComputedStyle(tr); return { bg: cs.backgroundColor, anims: document.getAnimations().length, cls: tr.className }; });
+console.log("row highlight:", JSON.stringify(hl));
+await shot(page, "guides__move-up-after__1440");
+// toast?
+console.log("toasts:", await page.evaluate(() => [...document.querySelectorAll("ol li, [data-sonner-toast]")].map(e=>e.innerText.replace(/\n+/g," | ").slice(0,100))));
+// Move down to restore, using Move to position dialog
+await kebab().focus(); await page.keyboard.press("Enter"); await settle(page, 300);
+await page.getByRole("menuitem", { name: /Move to position/ }).click(); await settle(page, 500);
+console.log("position dialog:", await page.evaluate(() => { const d=document.querySelector("[role=dialog]"); return { text: d.innerText.replace(/\n+/g," | "), focus: document.activeElement.tagName+":"+(document.activeElement.labels?.[0]?.innerText||""), val: document.activeElement.value, min: document.activeElement.min, max: document.activeElement.max, type: document.activeElement.type }; }));
+await shot(page, "guides__move-position-dialog__1440");
+const inp = page.locator("[role=dialog] input").first();
+await inp.fill("0"); await page.locator("[role=dialog] button", { hasText: /^Move/ }).last().click(); await settle(page, 600);
+console.log("pos 0 error:", await page.evaluate(() => ({ alerts: [...document.querySelectorAll("[role=dialog] [role=alert]")].map(a=>a.innerText), invalid: document.activeElement.getAttribute("aria-invalid"), desc: document.activeElement.getAttribute("aria-describedby"), dlg: !!document.querySelector("[role=dialog]") })));
+await shot(page, "guides__move-position-error__1440");
+await inp.fill("999"); await page.locator("[role=dialog] button", { hasText: /^Move/ }).last().click(); await settle(page, 600);
+console.log("pos 999:", await page.evaluate(() => ({ alerts: [...document.querySelectorAll("[role=dialog] [role=alert]")].map(a=>a.innerText), dlg: !!document.querySelector("[role=dialog]") })));
+await inp.fill(String(o.length)); await page.locator("[role=dialog] button", { hasText: /^Move/ }).last().click(); await settle(page, 1200);
+o = await order(); console.log("after set position idx", o.findIndex(x => /UX-R3-s9 Guide/.test(x)), "focus", await foc(), "live", JSON.stringify(await live()));
+// Move to top and bottom
+await kebab().focus(); await page.keyboard.press("Enter"); await settle(page, 300);
+await page.getByRole("menuitem", { name: /^Move to top/ }).click(); await settle(page, 1200);
+o = await order(); console.log("after top idx", o.findIndex(x => /UX-R3-s9 Guide/.test(x)), "focus", await foc());
+await mine().locator("button[aria-label^='Actions for']").focus(); await page.keyboard.press("Enter"); await settle(page, 300);
+await page.getByRole("menuitem", { name: /^Move to bottom/ }).click(); await settle(page, 1200);
+o = await order(); console.log("after bottom idx", o.findIndex(x => /UX-R3-s9 Guide/.test(x)), "focus", await foc(), "live", JSON.stringify(await live()));
+await browser.close();

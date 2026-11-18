@@ -1,0 +1,53 @@
+- link "Skip to content":
+  - /url: "#main"
+- banner:
+  - link "UNICHE, all projects":
+    - /url: /
+  - text: iGuide CMS
+  - 'button "UX Audit – Populated App: Draft . Switch project"'
+  - button "P. Admin , account menu"
+- navigation "Primary":
+  - link "Dashboard":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5
+  - paragraph: Content
+  - link "Places":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/places
+  - link "Points of Interest":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois
+  - link "Routes":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/routes
+  - link "Guides":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/guides
+  - link "Events":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/events
+  - link "Categories":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/categories
+  - link "Maps & Floor Plans":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/maps
+  - separator
+  - link "Media":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/media
+  - paragraph: Visitor app
+  - link "Overview":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/overview
+  - link "App settings":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/app-settings
+  - link "Pages":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pages
+  - link "Navigation":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/navigation
+  - link "Translations":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/translations
+  - link "Preview":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/preview
+  - link "Launch":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/launch
+  - paragraph: Project
+  - link "Audit log":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/audit-log
+- main:
+  - heading "Dashboard" [level=1]
+  - paragraph: UX Audit – Populated · Test Museum
+  - status: Loading dashboard
+- status: Dashboard loaded
+- alert

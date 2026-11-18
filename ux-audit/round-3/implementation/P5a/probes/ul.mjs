@@ -1,0 +1,15 @@
+import { session, go, P, ids, LOG, sleep, AFTER } from "./h.mjs";
+const log = LOG("kb");
+const { browser, page } = await session({ viewport: process.argv[2] ?? "1440", touch: process.argv[3] === "touch" });
+await go(page, P(`/routes/${ids.routeEmpty}`));
+await page.getByRole("button", { name: "Add stops" }).waitFor(); await sleep(1200);
+await page.getByRole("button", { name: "Add stops" }).click(); await sleep(400);
+const dlg = page.getByRole("dialog", { name: "Add stops" });
+await dlg.getByRole("searchbox").fill("P5b"); await sleep(300);
+await dlg.locator("ul li button:not([aria-disabled=true])").first().click();
+await dlg.getByRole("button", { name: /^Done/ }).click(); await sleep(600);
+const links = await page.evaluate(() => [...document.querySelectorAll("#stops ul li a")].map((a) => { const r = a.getBoundingClientRect(); return { t: a.textContent.trim().slice(0, 30), w: Math.round(r.width), h: Math.round(r.height) }; }));
+log(process.argv[2] ?? "1440", process.argv[3] ?? "", "unplaced link boxes", links);
+await page.evaluate(() => document.getElementById("stops").scrollIntoView()); await sleep(400);
+await page.screenshot({ path: AFTER + `/route-unplaced-${process.argv[2] ?? "1440"}.png` });
+await browser.close();

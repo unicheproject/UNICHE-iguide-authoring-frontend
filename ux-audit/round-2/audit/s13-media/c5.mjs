@@ -1,0 +1,15 @@
+import { open, go, shot, POP, axe, t, focusDesc } from "./lib.mjs";
+const vp = process.argv[2] ?? "1440";
+const { browser, page } = await open("admin", { viewport: vp });
+await go(page, `/projects/${POP}/pois/546c5177-effd-49c8-acae-85d751f89bbe`); await page.getByRole("heading",{level:1}).first().waitFor(); await page.waitForTimeout(2500);
+const btn = page.getByRole("button",{name:/Add primary image|Replace primary|Change/}).first();
+console.log("opener:", await btn.innerText());
+await btn.click(); await page.waitForTimeout(1500);
+const dlg = page.locator("[role=dialog]").last();
+console.log("focus", await focusDesc(page));
+console.log((await dlg.innerText()).replace(/\n+/g," | ").slice(0,900));
+const sel = await page.evaluate(()=>{const d=[...document.querySelectorAll("[role=dialog]")].pop(); const r=d.getBoundingClientRect(); return {h:Math.round(r.height), vh:innerHeight, tiles:d.querySelectorAll("[role=listbox] > *, [role=option], ul li").length, radios:[...d.querySelectorAll("[aria-pressed=true],[aria-checked=true],[aria-selected=true]")].map(e=>e.textContent.trim().slice(0,30))}});
+console.log(JSON.stringify(sel));
+await shot(page,"picker__open-poi",vp);
+await axe(page,"picker");
+await browser.close();

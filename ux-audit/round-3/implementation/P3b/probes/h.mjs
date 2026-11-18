@@ -1,0 +1,13 @@
+import { open, go, bearer, API, CMS } from "../../../../tools/session.mjs";
+import { writeFileSync, mkdirSync } from "node:fs";
+export { open, go, bearer, API, CMS };
+export const P = "6958c18f-60d2-4140-a524-5a43f8a2f6b5";
+export const PHASE = process.env.PHASE ?? "after";
+export const ROOT = "ux-audit/round-3/implementation/P3b/";
+export const OUT = ROOT + (PHASE === "before" ? "before/" : "after/");
+mkdirSync(OUT, { recursive: true });
+export const KINDS = ["guides", "events", "categories"];
+export const settle = (page, ms = 1200) => page.waitForTimeout(ms);
+export const shot = (page, n, opts = {}) => page.screenshot({ path: OUT + n + ".png", ...opts }).catch((e) => console.log("shotfail", n, e.message));
+export const save = (name, obj) => writeFileSync(OUT + name + ".json", JSON.stringify(obj, null, 1));
+export const focusDesc = (page) => page.evaluate(() => { const e = document.activeElement; const r = e.getBoundingClientRect(); return { tag: e.tagName, id: e.id, label: (e.getAttribute("aria-label") || e.textContent || "").trim().slice(0, 40), top: Math.round(r.top), bottom: Math.round(r.bottom), inViewport: r.top >= 0 && r.bottom <= innerHeight }; });

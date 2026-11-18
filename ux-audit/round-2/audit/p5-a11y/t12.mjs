@@ -1,0 +1,33 @@
+import * as L from "./lib.mjs";
+const { page, browser } = await L.open("curator", { viewport: "1440" });
+const k = page.keyboard;
+const POI = "35d91cba-d64a-43ce-9773-1e472226d028";
+await L.nav(page, L.P("/pois/" + POI), 1500);
+await L.watchLive(page);
+const lat = page.getByRole("textbox", { name: "Latitude" }), lng = page.getByRole("textbox", { name: "Longitude" });
+L.log("t12", "lat placeholder/value", await lat.evaluate((e) => ({ v: e.value, ph: e.placeholder, inputmode: e.inputMode, ac: e.autocomplete })));
+await lat.focus(); await k.type("999"); await lng.focus(); await page.waitForTimeout(500);
+L.log("t12", "lat=999: invalid", await lat.getAttribute("aria-invalid"), "desc", await lat.evaluate((e) => (e.getAttribute("aria-describedby") ?? "").split(" ").map((i) => document.getElementById(i)?.textContent)), "live", (await L.liveLog(page)).slice(-2));
+await L.shot(page, "poi-editor__lat-invalid__1440");
+await lat.fill(""); await lat.focus(); await k.type("abc"); await lng.focus(); await page.waitForTimeout(400);
+L.log("t12", "lat=abc invalid", await lat.getAttribute("aria-invalid"), await page.locator("[id*=lat][id*=error], [role=alert]").allTextContents());
+await lat.fill(""); await lat.focus(); await k.type("37,9715"); await lng.focus(); await k.type("23.7257"); await page.waitForTimeout(600);
+L.log("t12", "valid pos: lat", await lat.inputValue(), "live", (await L.liveLog(page)).slice(-3));
+L.log("t12", "status text", await page.locator("text=/pin|position|coordinates/i").allTextContents());
+await L.shot(page, "poi-editor__placed-by-coordinates__1440");
+// find the draggable pin via keyboard
+await lng.focus();
+const seq = []; for (let i = 0; i < 4; i++) { await k.press("Tab"); seq.push(await L.focus(page)); } L.log("t12", "after lng tabs", seq);
+const grp = page.locator("[role=group][aria-label*='Site map']").first();
+L.log("t12", "group aria-label", await grp.getAttribute("aria-label"));
+L.log("t12", "pin elements", await page.evaluate(() => [...document.querySelectorAll(".picker [role=img], .picker [aria-roledescription], .picker [role=slider], .picker button")].map((e) => e.tagName + "|" + e.getAttribute("role") + "|" + (e.getAttribute("aria-label") || "") + "|tab=" + e.getAttribute("tabindex"))).catch(() => "n/a"));
+// Arrow keys on group
+await grp.focus(); L.log("t12", "group focus", await L.focus(page));
+const before = await lat.inputValue();
+for (let i = 0; i < 3; i++) await k.press("ArrowUp"); await page.waitForTimeout(300);
+L.log("t12", "ArrowUp x3: lat before/after", before, await lat.inputValue(), "live", (await L.liveLog(page)).slice(-2));
+await k.press("Shift+ArrowRight"); L.log("t12", "Shift+Right lng", await lng.inputValue(), (await L.liveLog(page)).slice(-1));
+await L.shot(page, "poi-editor__pin-arrowed__1440");
+await k.press("Control+s"); await page.waitForTimeout(2500);
+L.log("t12", "saved: live", (await L.liveLog(page)).slice(-3), "focus", await L.focus(page));
+await browser.close();

@@ -1,0 +1,17 @@
+import { start, goEd, P, tall } from "./common.mjs";
+const s = await start("1440"); const { page } = s;
+await goEd(page, "/places");
+await page.getByRole("button", { name: /new place/i }).first().click(); await page.waitForTimeout(300);
+await page.getByRole("button", { name: /top-level place/i }).click(); await page.waitForTimeout(300);
+const d = page.getByRole("dialog");
+await d.getByRole("textbox").first().fill("UX-s10-poi-place Κήπος Ωδείου – Odeon Garden with a deliberately long name to test wrapping");
+await page.waitForTimeout(300);
+console.log("slug:", await d.getByRole("textbox").nth(1).inputValue());
+await s.shot("create-place__typed");
+await d.getByRole("button", { name: /create place/i }).click();
+await page.waitForURL(/places\/[0-9a-f-]{36}/, { timeout: 15000 }).catch(()=>{});
+await page.locator("main h1").first().waitFor().catch(()=>{}); await page.waitForTimeout(1500);
+console.log("url", page.url());
+await s.shot("place-new__after-create__top");
+await tall(s, "place-new-draft");
+await s.browser.close();

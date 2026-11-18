@@ -1,0 +1,15 @@
+[activate open] Enter -> h2 "Activate UX-R3-p5 POI A – Parthenon test?" 457,254,482,26  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) | live=["1 of 97 points of interest","UX-R3-p5 POI A – Parthenon test loaded"]
+dlg {"role":"dialog","name":"Activate UX-R3-p5 POI A – Parthenon test?","text":"Activate UX-R3-p5 POI A – Parthenon test?\n\nUX-R3-p5 POI A – Parthenon test goes from draft to active. Visitors will see this point of interest on their next refresh of the app (3 warnings, nothing blocks). You can deactivate it again at any time; it then returns to draft.\n\n3 warnings, nothing blocks.\n\n3 warnings, nothing blocks\n\nTexts (3)\nWarning: English: 4 texts missing\nWarning: Ελληνικά: 5 texts missing\nWarning: Italiano: 5 texts missing\nReview in editor\nCancel\nActivate"}
+tabs:
+0 button "Close dialog" 951,254,40,40  solid 2px rgb(76, 29, 139) off 2px 
+1 button "Review in editor" 457,553,143,32  solid 2px rgb(76, 29, 139) off 2px 
+2 button "Cancel" 799,610,83,40  solid 2px rgb(76, 29, 139) off 2px 
+3 button "Activate" 890,610,93,40  solid 2px rgb(255, 255, 255) off 2px LOWRING 1
+4 button "Close dialog" 951,254,40,40  solid 2px rgb(76, 29, 139) off 2px 
+5 button "Review in editor" 457,553,143,32  solid 2px rgb(76, 29, 139) off 2px 
+AXE {"label":"poi-activate-dialog","url":"http://localhost:5173/projects/PID/pois/e51249c1-755b-42d5-9a20-5912046ea9c9","counts":{},"v":[]}
+[esc] Escape -> button "Activate" 1033,296,310,40  solid 2px rgb(255, 255, 255) off 2px | live=[]
+Activate regained? Activate
+review btn count 1
+[review in editor] Enter -> button[tab] "Englishdefault1 of 5" 256,211,135,52  solid 2px rgb(76, 29, 139) off 2px | live=[]
+after review {"w":2,"off":2,"style":"solid","ring":"rgb(76, 29, 139)","ringOnWrapper":false,"vsOutside":10.37,"bg":"244,245,247","clipped":"DIV.flex min-w-0 flex-1 overflow-x-auto L4,T4,B4","obscured":null,"offscreen":false,"rect":[256,211,135,52]} {"title":"UX-R3-p5 POI A – Parthenon test · UX Audit – Populated · iGuide CMS","h1":"UX-R3-p5 POI A – Parthenon test","ae":"BUTTON#tab-en"}

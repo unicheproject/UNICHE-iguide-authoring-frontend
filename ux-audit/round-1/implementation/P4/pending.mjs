@@ -1,0 +1,12 @@
+import { readFileSync } from "node:fs";
+import { open, go } from "../../../tools/session.mjs";
+const seed = JSON.parse(readFileSync(new URL("../../../tools/seed.json", import.meta.url), "utf8"));
+const rec = JSON.parse(readFileSync(new URL("./records.json", import.meta.url), "utf8"));
+const { browser, page } = await open("curator", { viewport: "1440" });
+await go(page, `/projects/${seed.projects.populated.id}/pois/${rec.pending}`);
+await page.waitForTimeout(3000);
+await page.locator("#f-summary").fill("UX-P4 pending summary, edited in a working copy.");
+await page.getByRole("button", { name: /^Save draft$/ }).click();
+await page.waitForTimeout(3000);
+console.log(await page.locator("[data-working-copy-banner]").textContent());
+await browser.close();

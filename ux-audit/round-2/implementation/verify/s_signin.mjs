@@ -1,0 +1,12 @@
+import { createRequire } from "node:module";
+import { CMS, axe, here, settle } from "./lib.mjs";
+import { join } from "node:path";
+const require = createRequire(join(here, "..", "..", "..", "..", "package.json"));
+const { chromium } = require("@playwright/test");
+const browser = await chromium.launch(); const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } }); const page = await ctx.newPage();
+const errs = []; page.on("pageerror", (e) => errs.push(e.message)); page.on("console", (m) => m.type() === "error" && errs.push(m.text().slice(0, 200)));
+await page.goto(CMS + "/"); await settle(page, 2000);
+console.log("title", await page.title(), "| h1", await page.locator("h1").first().textContent().catch(()=>null), "| url", page.url().replace(CMS,""));
+console.log("viol", JSON.stringify(await axe(page)), "errs", JSON.stringify(errs));
+await page.screenshot({ path: join(here, "shots", "1440-signin-fresh.png") });
+await browser.close();

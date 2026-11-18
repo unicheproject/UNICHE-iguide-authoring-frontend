@@ -1,26 +1,34 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from "vue";
-import ReorderControls from "@/components/ReorderControls.vue";
-import { saveOrder } from "@/platform/ordering";
-import { dropLineClass, useReorder } from "@/workspace/useReorder";
 import { useRouter } from "vue-router";
+import ListEmpty from "@/components/list/ListEmpty.vue";
+import ListFooter from "@/components/list/ListFooter.vue";
+import ListTable, { type ListColumn } from "@/components/list/ListTable.vue";
+import ListToolbar from "@/components/list/ListToolbar.vue";
+import RowMenu from "@/components/list/RowMenu.vue";
+import { matchesStatus, statusCounts, useListQuery, useResultAnnouncer, useScrollRestore } from "@/components/list/useListQuery";
+import PageFrame from "@/components/PageFrame.vue";
 import PageHead from "@/components/PageHead.vue";
 import StatusChip from "@/components/StatusChip.vue";
-import SectionTabs from "@/components/SectionTabs.vue";
-import StatusChangeDialog from "@/components/StatusChangeDialog.vue";
+import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { focusSuccessor } from "@/lib/focus";
 import { formatDate } from "@/lib/format";
 import { ApiError } from "@/platform/api";
 import { listAssets, type Asset } from "@/platform/assets";
 import { changeFloorPlanStatus, fetchFloorPlanReferences, listFloorPlans, type FloorPlan } from "@/platform/floorPlans";
+import { saveOrder } from "@/platform/ordering";
 import { listPlaces, placeTitle, type Place } from "@/platform/places";
-import type { ResourceReference } from "@/platform/references";
 import { showToast } from "@/stores/toast";
 import { useCurrentProject } from "@/workspace/currentProject";
-import { referenceLink } from "@/workspace/referenceLinks";
 import { findSection } from "@/workspace/sections";
 import { useProjectLanguages } from "@/workspace/useProjectLanguages";
-import { useStatusActions } from "@/workspace/useStatusActions";
+import { useReorder } from "@/workspace/useReorder";
+import LifecycleDialogs from "../LifecycleDialogs.vue";
+import { sortByQuery } from "../listRows";
+import { fold } from "@/lib/utils";
+import { useListLifecycle } from "../useListLifecycle";
+import MapsTabs from "./MapsTabs.vue";
 import NewFloorPlanDialog from "./NewFloorPlanDialog.vue";
 
 const section = findSection("floor-plans")!;
@@ -35,6 +43,13 @@ const assets = ref<Asset[]>([]);
 const loading = ref(true);
 const loadError = ref<ApiError | null>(null);
 let controller: AbortController | null = null;
+const errorCard = ref<InstanceType<typeof Alert> | null>(null);
+
+/** "Try again": focus moves off the error card before it goes, to the page heading (D-103). */
+function retry() {
+  focusSuccessor(errorCard.value?.$el as HTMLElement | undefined, ["main h1"]);
+  void load();
+}
 
 async function load() {
   controller?.abort();
@@ -65,112 +80,117 @@ const placeName = (id: string | null) => {
   const p = id ? places.value.find((x) => x.id === id) : undefined;
   return p ? placeTitle(p, null, defaultLanguage.value) : null;
 };
-function meta(f: FloorPlan): string {
-  const place = placeName(f.placeId);
-  const size = f.width && f.height ? ` · ${f.width} × ${f.height} px` : "";
-  const placements = f.positions.length === 1 ? "1 placement" : `${f.positions.length} placements`;
-  return `${place ? `Place: ${place} · ` : ""}${placements}${size}`;
-}
 
-const actions = useStatusActions<FloorPlan>({
-  items: plans,
-  kind: "floor plan",
-  title: (f) => f.internalName,
-  change: (f, target) => changeFloorPlanStatus(projectId.value, f.id, target, f.version),
-  reload: load,
-  open: (f) => void router.push({ name: "floor-plan-editor", params: { projectId: projectId.value, planId: f.id } }),
+const editorRoute = (f: FloorPlan) => ({ name: "floor-plan-editor", params: { projectId: projectId.value, planId: f.id } });
+
+const query = useListQuery();
+/** Plans of one Place in the order of its floor switcher (spec 12 section 3, D-017); the position is shown in the Place column. */
+function orderInPlace(f: FloorPlan): string | null {
+  if (!f.placeId) return null;
+  const siblings = plans.value.filter((p) => p.placeId === f.placeId && p.status !== "ARCHIVED").sort((a, b) => a.sortOrder - b.sortOrder);
+  const index = siblings.findIndex((p) => p.id === f.id);
+  return index < 0 ? null : `Floor ${index + 1} of ${siblings.length} in this Place`;
+}
+const rows = computed(() => {
+  const q = fold(query.q.value.trim());
+  const found = plans.value.filter((f) => matchesStatus(f, query.status.value) && (!query.pending.value || f.hasWorkingCopy) && (!q || fold(`${f.internalName} ${placeName(f.placeId) ?? ""}`).includes(q)));
+  return sortByQuery(found, query, (f) => ({ title: f.internalName, status: f.status, updated: f.updatedAt, translations: 0, sortOrder: f.sortOrder }));
 });
-const { pendingId, confirm, confirmCopy } = actions;
-const toReference = (r: ResourceReference) => referenceLink(projectId.value, r);
-
-const creating = ref(false);
-function onCreated(f: FloorPlan) {
-  creating.value = false;
-  showToast("Floor plan created", `${f.internalName}. Place Points of Interest on it.`);
-  void router.push({ name: "floor-plan-editor", params: { projectId: projectId.value, planId: f.id } });
-}
-// The floor plans of one Place in the order of its floor switcher (spec 12 section 3, DECISIONS.md D-017); plans
-// without a Place reorder among themselves.
+const lifecycle = useListLifecycle<FloorPlan>({
+  items: plans,
+  projectId,
+  noun: "floor plan",
+  referenceType: "FLOOR_PLAN",
+  title: (f) => f.internalName,
+  changeStatus: changeFloorPlanStatus,
+  fetchReferences: fetchFloorPlanReferences,
+  editorRoute,
+  reload: load,
+});
+// The floor plans of one Place reorder among themselves; plans without a Place among themselves.
 const reorder = useReorder<FloorPlan>({
   items: plans,
   siblingKey: (plan) => plan.placeId,
   save: (ids) => saveOrder(projectId.value, "floor-plans", ids),
   title: (plan) => plan.internalName,
-  canReorder: computed(() => true),
+  canReorder: query.canReorder,
+  visible: (f) => matchesStatus(f, query.status.value),
   reload: load,
 });
-const ordered = computed(() => [...plans.value].sort((a, b) => a.sortOrder - b.sortOrder));
+const ready = computed(() => !loading.value);
+useScrollRestore(ready);
+useResultAnnouncer(computed(() => rows.value.length), computed(() => plans.value.length), ready);
+
+const columns: ListColumn[] = [
+  { key: "title", label: "Name", sortKey: "title", class: "w-[34%]" },
+  { key: "place", label: "Linked Place" },
+  { key: "placed", label: "Placed", class: "w-40" },
+  { key: "status", label: "Status", sortKey: "status", class: "w-44" },
+];
+const SORTS = [
+  { value: "manual", label: "Manual order" },
+  { value: "title", label: "Name" },
+  { value: "status", label: "Status" },
+  { value: "updated", label: "Updated" },
+];
+
+const creating = ref(false);
+function onCreated(f: FloorPlan) {
+  creating.value = false;
+  showToast("Floor plan created", `${f.internalName}. Place Points of Interest on it.`);
+  void router.push(editorRoute(f));
+}
+function onSelect(f: FloorPlan, key: string) {
+  if (key === "restore-order") query.restoreManualOrder();
+  else lifecycle.onSelect(f, key);
+}
 </script>
 
 <template>
-  <main class="relative min-w-0 flex-1 overflow-y-auto px-4 pb-16 pt-6 md:px-7">
-    <PageHead :title="section.title" :subtitle="section.subtitle">
+  <PageFrame>
+    <PageHead :title="section.title" :subtitle="section.subtitle" section="floor-plans">
       <template #actions>
-        <Button variant="brand" @click="creating = true">New floor plan</Button>
+        <Button @click="creating = true">New floor plan</Button>
       </template>
     </PageHead>
-    <SectionTabs :project-id="projectId" section="floor-plans" />
+    <MapsTabs :project-id="projectId" section="floor-plans" :plans-count="loading || loadError ? null : plans.filter((f) => f.status !== 'ARCHIVED').length" />
 
-    <div v-if="loadError" role="alert" class="max-w-[640px] rounded-lg border border-l-[3px] border-l-destructive bg-card px-[18px] py-4">
-      <strong class="block text-[13px] font-bold text-destructive">The floor plans could not be loaded</strong>
-      <p class="mt-1 text-[13px] text-gray-700">{{ loadError.message }}</p>
-      <Button variant="outline" size="sm" class="mt-3" @click="load">Try again</Button>
-    </div>
+    <Alert v-if="loadError" ref="errorCard" tone="danger" title="The floor plans could not be loaded" :request-id="loadError.requestId">
+      {{ loadError.message }}
+      <template #actions><Button variant="secondary" size="sm" @click="retry">Try again</Button></template>
+    </Alert>
 
-    <div v-else class="overflow-hidden rounded-lg border bg-card shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-      <p class="sr-only" aria-live="polite">{{ reorder.announcement }}</p>
-      <div v-if="loading" class="animate-skeleton" role="status" aria-busy="true" aria-label="Loading floor plans">
-        <div v-for="n in 2" :key="n" class="border-b border-gray-100 px-[18px] py-4"><div class="h-[13px] w-1/3 rounded bg-[#e2e3e7]"></div></div>
-      </div>
-      <ul v-else-if="plans.length">
-        <li
-          v-for="m in ordered"
-          :key="m.id"
-          class="flex flex-wrap items-center gap-3 border-b border-gray-100 px-[18px] py-3.5 last:border-b-0 hover:bg-muted"
-          :class="dropLineClass(reorder.dropLine(m))"
-          @dragover="reorder.dragOver(m, $event)"
-          @drop="reorder.drop(m, $event)"
-        >
-          <ReorderControls :reorder="reorder" :item="m" :title="m.internalName" />
-          <div class="min-w-[min(100%,260px)] flex-1">
-            <RouterLink :to="{ name: 'floor-plan-editor', params: { projectId, planId: m.id } }" class="text-[13px] font-semibold text-foreground no-underline hover:underline">
-              {{ m.internalName }}
-            </RouterLink>
-            <div class="mt-[3px] text-[11px] text-gray-500">{{ meta(m) }} · {{ formatDate(m.updatedAt) }}</div>
-          </div>
-          <StatusChip :status="m.status" />
-          <StatusChip
-            v-if="m.hasWorkingCopy"
-            status="PENDING"
-            label="Pending changes"
-            title="Has pending changes that visitors do not see yet"
-          />
-          <RouterLink :to="{ name: 'floor-plan-editor', params: { projectId, planId: m.id } }" class="text-[10px] font-bold uppercase tracking-[0.06em] text-primary no-underline">Open</RouterLink>
-          <button
-            type="button"
-            class="rounded-full border bg-muted px-[13px] py-1.5 text-[10px] font-bold uppercase tracking-[0.06em] text-gray-700 disabled:opacity-50"
-            :disabled="pendingId === m.id"
-            @click="actions.onToggle(m)"
-          >
-            {{ actions.toggleLabel(m) }}
-          </button>
-          <button
-            v-if="m.status !== 'ARCHIVED'"
-            type="button"
-            class="text-[10px] font-bold uppercase tracking-[0.06em] text-destructive disabled:opacity-50"
-            :disabled="pendingId === m.id"
-            @click="actions.ask(m, 'ARCHIVED')"
-          >
-            Archive
-          </button>
-        </li>
-      </ul>
-      <div v-else class="px-6 py-12 text-center">
-        <p class="mx-auto mb-[18px] max-w-[440px] text-[13px] text-muted-foreground">
-          No indoor plan has been uploaded. Add one to place Resources on a floor image.
-        </p>
-        <Button variant="brand" @click="creating = true">New floor plan</Button>
-      </div>
+    <div v-else class="rounded-lg border border-border bg-card shadow-1">
+      <template v-if="loading || plans.length">
+        <ListToolbar :query="query" :counts="statusCounts(plans)" :languages="[]" :show-missing="false" search-placeholder="Search plan or Place names" :sort-options="SORTS" />
+        <ListTable :columns="columns" :rows="rows" :loading="loading" :query="query" :reorder="reorder" :row-label="(f) => f.internalName" label="Floor plans" openable @open="(f) => router.push(editorRoute(f))">
+          <template #cell-title="{ row }">
+            <RouterLink :to="editorRoute(row)" class="font-semibold no-underline hover:underline" :class="row.status === 'ARCHIVED' ? 'text-muted-foreground' : 'text-foreground'">{{ row.internalName }}</RouterLink>
+            <p class="text-compact text-muted-foreground">Updated {{ formatDate(row.updatedAt) }}<template v-if="row.width && row.height"> · {{ row.width }} × {{ row.height }} px</template></p>
+          </template>
+          <template #cell-place="{ row }">
+            <p class="text-sm font-medium">{{ placeName(row.placeId) ?? "Not linked to a Place" }}</p>
+            <p v-if="orderInPlace(row)" class="text-compact text-muted-foreground">{{ orderInPlace(row) }}</p>
+          </template>
+          <template #cell-placed="{ row }">
+            <p class="text-sm font-medium">{{ row.positions.length }} placed</p>
+          </template>
+          <template #cell-status="{ row }">
+            <div class="flex flex-wrap gap-1">
+              <StatusChip :status="row.status" />
+              <StatusChip v-if="row.hasWorkingCopy" status="PENDING" label="Pending changes" title="Has pending changes that visitors do not see yet" />
+            </div>
+          </template>
+          <template #menu="{ row }">
+            <RowMenu :title="row.internalName" :actions="lifecycle.actionsFor(row)" :reorder="reorder" :item="row" :reorder-reason="query.reorderReason.value" @select="(key) => onSelect(row, key)" />
+          </template>
+        </ListTable>
+      </template>
+      <ListEmpty v-if="!loading && !rows.length" noun="floor plans" empty-title="No floor plans yet" :filtered="plans.length > 0" :filters="query.chips([], [])" @clear="query.clear()">
+        A floor plan is an indoor image, one per floor, on which you place Points of Interest. Upload or pick an image to start.
+        <template #actions><Button @click="creating = true">New floor plan</Button></template>
+      </ListEmpty>
+      <ListFooter v-if="plans.length" :shown="rows.length" :total="plans.length" noun="floor plans" :filtered="query.isFiltered.value" @clear="query.clear()" />
     </div>
 
     <NewFloorPlanDialog
@@ -184,19 +204,6 @@ const ordered = computed(() => [...plans.value].sort((a, b) => a.sortOrder - b.s
       @created="onCreated"
       @uploaded="assets.unshift($event)"
     />
-
-    <StatusChangeDialog
-      v-if="confirm && confirmCopy"
-      :heading="confirmCopy.heading"
-      :body="confirm.target === 'ARCHIVED' ? 'An archived floor plan leaves the visitor app and its Place stops showing it. Restoring it makes it a draft again.' : confirmCopy.body"
-      :action-label="confirmCopy.action"
-      :danger="confirm.target === 'ARCHIVED'"
-      :busy="pendingId === confirm.item.id"
-      :load-references="() => fetchFloorPlanReferences(projectId, confirm!.item.id)"
-      :blocked-by="confirm.blockedBy ?? null"
-      :link-for="toReference"
-      @close="actions.cancel()"
-      @confirm="actions.transition(confirm.item, confirm.target)"
-    />
-  </main>
+    <LifecycleDialogs :lifecycle="lifecycle" />
+  </PageFrame>
 </template>

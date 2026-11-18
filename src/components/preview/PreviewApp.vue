@@ -8,6 +8,7 @@
  * bar or a burger menu on mobile, tiles or a header menu on a kiosk's Home. The parent sets the theme's CSS
  * variables; the menu's labels follow the previewed language (`strings.ts`).
  */
+import { ArrowLeft, ChevronDown, Menu } from "lucide-vue-next";
 import { computed, ref, watch } from "vue";
 import type { Trigger } from "@/platform/triggers";
 import { previewHas, type PreviewData } from "@/workspace/previewData";
@@ -15,7 +16,7 @@ import { cardImage, modelFor, summaryOf, titleMissing, titleOf, type PreviewCont
 import type { PreviewMenuItem, PreviewTarget } from "@/workspace/preview";
 import type { PreviewTheme } from "@/workspace/projectTheme";
 import ResourceContent from "./ResourceContent.vue";
-import { previewStrings } from "./strings";
+import { previewStrings, word } from "./strings";
 import type { Surface } from "./surfaces";
 
 const props = defineProps<{
@@ -30,6 +31,11 @@ const props = defineProps<{
   menu?: PreviewMenuItem[];
   /** The FOOTER links. */
   footer?: PreviewMenuItem[];
+  /**
+   * The app is the whole page (the new tab): real headings and landmarks. Inside the CMS the stand-in has neither, so it
+   * adds no `h1`, no `header` and no `nav` to the author's page (D-082, C1-81).
+   */
+  semantic?: boolean;
 }>();
 
 type Kind = PreviewTarget["type"];
@@ -40,6 +46,8 @@ type Screen =
   | { kind: "search" };
 
 const t = computed(() => previewStrings(props.language));
+/** The tag of a landmark or heading: the real element on a page of its own, a plain `div` inside the CMS. */
+const tag = (name: "header" | "nav" | "h1" | "h2") => (props.semantic ? name : "div");
 const KINDS = computed<{ type: Kind; label: string }[]>(() => [
   { type: "PLACE", label: t.value.places },
   { type: "POI", label: t.value.pois },
@@ -165,26 +173,35 @@ const screenTitle = computed(() => {
   const s = screen.value;
   if (s.kind === "list") return kindLabel(s.type);
   if (s.kind === "search") return t.value.search;
-  if (s.kind === "detail") return detail.value?.kindLabel ?? "";
+  if (s.kind === "detail") return word(t.value, detail.value?.kindLabel ?? "");
   return props.appName;
 });
 
 /** A trigger reaching the app, as the runtime's trigger handler would receive it (`12` §3 Preview). */
 function fire(trigger: Trigger) {
+  // A new trigger replaces what the last one left on screen (its "Opened by" note, its suggestion), so the picture never
+  // mixes two triggers (C3-69).
+  clearNotes();
   // Trigger targets and preview targets name the kinds alike (DECISIONS.md D-018).
   const target: PreviewTarget = { type: trigger.targetResourceType, id: trigger.targetResourceId };
   if (!previewHas(props.data, target)) {
-    suggestion.value = { target, text: "What this trigger opens is not shown in this mode." };
+    suggestion.value = { target, text: t.value.notShownInMode };
     return;
   }
   if (trigger.triggerType === "QR_CODE") {
     suggestion.value = null;
-    open(target, `Opened by QR code ${trigger.code}`);
+    open(target, t.value.openedByQr(String(trigger.code)));
   } else {
-    suggestion.value = { target, text: `Nearby: ${titleOf(ctx.value, target)}` };
+    suggestion.value = { target, text: t.value.nearby(titleOf(ctx.value, target)) };
   }
 }
-defineExpose({ fire, home: () => go({ kind: "home" }, true) });
+/** Drops what the last trigger left on screen: the suggestion bar and the "Opened by QR code" note. */
+function clearNotes() {
+  suggestion.value = null;
+  const last = stack.value[stack.value.length - 1];
+  if (last.kind === "detail" && last.note) stack.value = [...stack.value.slice(0, -1), { ...last, note: undefined }];
+}
+defineExpose({ fire, clearNotes, home: () => go({ kind: "home" }, true) });
 
 // A detail whose Resource left the mode (Live hides drafts) falls back to Home.
 watch(
@@ -198,14 +215,14 @@ watch(
 <template>
   <div class="relative flex h-full min-h-0 flex-col">
     <!-- Shell: the PRIMARY Navigation, or a default menu while it has no items. -->
-    <header class="flex items-center gap-[1em] bg-[var(--t-primary)] px-[1.4em] py-[0.9em] text-[var(--t-on-primary)]">
-      <button v-if="stack.length > 1" type="button" class="text-[1.2em]" :aria-label="t.back" @click="back">←</button>
-      <button v-if="mobile && shell.mobileMenu === 'BURGER'" type="button" class="text-[1.2em]" :aria-label="t.menu" :aria-expanded="menuOpen" @click="menuOpen = !menuOpen">☰</button>
+    <component :is="tag('header')" class="stand-in-header flex items-center gap-[1em] bg-[var(--t-primary)] px-[1.4em] py-[0.9em] text-[var(--t-on-primary)]">
+      <button v-if="stack.length > 1" type="button" class="text-[1.2em]" :aria-label="t.back" @click="back"><ArrowLeft class="size-[1em] rtl:-scale-x-100" aria-hidden="true" /></button>
+      <button v-if="mobile && shell.mobileMenu === 'BURGER'" type="button" class="text-[1.2em]" :aria-label="t.menu" :aria-expanded="menuOpen" @click="menuOpen = !menuOpen"><Menu class="size-[1em]" aria-hidden="true" /></button>
       <button type="button" class="flex min-w-0 items-center gap-[0.5em]" @click="go({ kind: 'home' }, true)">
         <img v-if="logo" :src="logo" alt="" class="h-[1.6em] w-auto flex-none object-contain" />
         <span class="truncate text-[1.15em] font-bold [font-family:var(--t-heading)]">{{ mobile ? screenTitle : appName }}</span>
       </button>
-      <nav v-if="!mobile && !tiles" class="ml-auto flex items-center gap-[1.2em] text-[0.9em]">
+      <component :is="tag('nav')" v-if="!mobile && !tiles" :aria-label="semantic ? t.menu : undefined" class="ml-auto flex items-center gap-[1.2em] text-[0.9em]">
         <button
           type="button"
           :class="screen.kind === 'home' ? 'underline underline-offset-4 font-bold' : 'opacity-85'"
@@ -220,11 +237,11 @@ watch(
             :aria-expanded="e.children.length ? openGroup === e.key : undefined"
             @click="choose(e)"
           >
-            {{ e.label }}<span v-if="e.children.length" aria-hidden="true"> ▾</span>
+            {{ e.label }}<ChevronDown v-if="e.children.length" class="ml-[0.2em] inline size-[1em]" aria-hidden="true" />
           </button>
           <div
             v-if="openGroup === e.key"
-            class="absolute right-0 top-[calc(100%+0.6em)] z-10 flex min-w-[12em] flex-col rounded-[var(--t-radius)] bg-[var(--t-bg)] py-[0.3em] text-[var(--t-text)] shadow-lg"
+            class="absolute right-0 top-[calc(100%+0.6em)] z-raised flex min-w-[12em] flex-col rounded-[var(--t-radius)] bg-[var(--t-bg)] py-[0.3em] text-[var(--t-text)] shadow-lg"
           >
             <button
               v-for="c in e.children"
@@ -238,7 +255,7 @@ watch(
             </button>
           </div>
         </div>
-      </nav>
+      </component>
       <button
         v-if="shell.search === 'HEADER'"
         type="button"
@@ -254,12 +271,12 @@ watch(
         :class="{ 'ml-auto': shell.search !== 'HEADER' && (mobile || tiles) }"
         :title="t.language"
       >
-        {{ language ?? "—" }} ▾
+        {{ language ?? "—" }}<ChevronDown class="ml-[0.2em] inline size-[1em]" aria-hidden="true" />
       </span>
-    </header>
+    </component>
 
     <!-- The burger menu (`04` §11 `mobileMenu`). -->
-    <nav v-if="mobile && menuOpen" class="absolute inset-x-0 top-[3.2em] z-10 flex flex-col bg-[var(--t-bg)] shadow-lg">
+    <component :is="tag('nav')" v-if="mobile && menuOpen" :aria-label="semantic ? t.menu : undefined" class="absolute inset-x-0 top-[3.2em] z-raised flex flex-col bg-[var(--t-bg)] shadow-lg">
       <button type="button" class="border-b border-[var(--t-border)] px-[1.4em] py-[0.9em] text-start font-semibold" @click="go({ kind: 'home' }, true)">{{ t.home }}</button>
       <template v-for="e in entries" :key="e.key">
         <button
@@ -283,10 +300,10 @@ watch(
           {{ c.label }}
         </button>
       </template>
-    </nav>
+    </component>
 
     <!-- A heading chosen in the bottom bar opens its entries above it. -->
-    <nav v-if="mobile && shell.mobileMenu === 'BOTTOM_BAR' && groupEntries.length" class="absolute inset-x-0 bottom-[3.1em] z-10 flex flex-col bg-[var(--t-bg)] shadow-lg">
+    <div v-if="mobile && shell.mobileMenu === 'BOTTOM_BAR' && groupEntries.length" class="absolute inset-x-0 bottom-[3.1em] z-raised flex flex-col bg-[var(--t-bg)] shadow-lg">
       <button
         v-for="c in groupEntries"
         :key="c.key"
@@ -296,7 +313,7 @@ watch(
       >
         {{ c.label }}
       </button>
-    </nav>
+    </div>
 
     <div v-if="suggestion" class="flex items-center gap-[0.8em] bg-[var(--t-tint)] px-[1.4em] py-[0.6em] text-[0.9em]">
       <span class="text-[var(--t-accent)]">◎</span>
@@ -307,15 +324,15 @@ watch(
         class="font-bold text-[var(--t-accent)]"
         @click="open(suggestion.target); suggestion = null"
       >
-        Open
+        {{ t.open }}
       </button>
-      <button type="button" aria-label="Dismiss" class="text-[var(--t-muted)]" @click="suggestion = null">×</button>
+      <button type="button" :aria-label="t.dismiss" class="text-[var(--t-muted)]" @click="suggestion = null">×</button>
     </div>
 
     <div ref="scroller" class="min-h-0 flex-1 overflow-y-auto">
       <!-- Home -->
       <div v-if="screen.kind === 'home'" :class="wide ? 'mx-auto max-w-[60em] px-[2em] py-[1.6em]' : 'px-[1.1em] py-[1.1em]'" class="flex flex-col gap-[calc(1.6em*var(--t-space))]">
-        <h1 class="text-[1.9em] font-bold [font-family:var(--t-heading)]">{{ appName }}</h1>
+        <component :is="tag('h1')" class="text-[1.9em] font-bold [font-family:var(--t-heading)]">{{ appName }}</component>
         <p v-if="!KINDS.some((k) => idsOf(k.type).length)" class="text-[var(--t-muted)]">{{ t.nothingInMode }}</p>
         <div v-if="tiles" class="grid grid-cols-3 gap-[0.8em]">
           <button
@@ -329,7 +346,7 @@ watch(
           </button>
         </div>
         <section v-if="featured.length">
-          <h2 class="mb-[0.6em] text-[0.8em] font-extrabold uppercase tracking-[0.08em] text-[var(--t-accent)]">{{ t.highlights }}</h2>
+          <component :is="tag('h2')" class="mb-[0.6em] text-[0.8em] font-extrabold uppercase tracking-[0.08em] text-[var(--t-accent)]">{{ t.highlights }}</component>
           <div class="grid gap-[0.8em]" :class="wide ? 'grid-cols-3' : 'grid-cols-1'">
             <button v-for="c in featured.map(card)" :key="c.target.id" type="button" class="card" @click="open(c.target)">
               <img v-if="c.image" :src="c.image" alt="" class="mb-[0.5em] aspect-[16/9] w-full rounded-[calc(var(--t-radius)*0.7)] object-cover" />
@@ -341,7 +358,7 @@ watch(
         <template v-for="k in KINDS" :key="k.type">
           <section v-if="idsOf(k.type).length">
             <div class="mb-[0.6em] flex items-baseline">
-              <h2 class="text-[0.8em] font-extrabold uppercase tracking-[0.08em] text-[var(--t-accent)]">{{ k.label }}</h2>
+              <component :is="tag('h2')" class="text-[0.8em] font-extrabold uppercase tracking-[0.08em] text-[var(--t-accent)]">{{ k.label }}</component>
               <button type="button" class="ml-auto text-[0.8em] font-bold text-[var(--t-accent)]" @click="go({ kind: 'list', type: k.type })">{{ t.seeAll }}</button>
             </div>
             <div class="grid gap-[0.8em]" :class="wide ? 'grid-cols-4' : 'grid-cols-2'">
@@ -363,7 +380,7 @@ watch(
 
       <!-- A list per kind -->
       <div v-else-if="screen.kind === 'list'" :class="wide ? 'mx-auto max-w-[60em] px-[2em] py-[1.6em]' : 'px-[1.1em] py-[1.1em]'" class="flex flex-col gap-[1em]">
-        <h1 v-if="!mobile" class="text-[1.7em] font-extrabold [font-family:var(--t-heading)]">{{ screenTitle }}</h1>
+        <component :is="tag('h1')" v-if="!mobile" class="text-[1.7em] font-extrabold [font-family:var(--t-heading)]">{{ screenTitle }}</component>
         <p v-if="!idsOf(screen.type).length" class="text-[var(--t-muted)]">{{ t.nothingYet }}</p>
         <div class="grid gap-[0.8em]" :class="wide ? 'grid-cols-3' : 'grid-cols-1'">
           <button
@@ -392,23 +409,23 @@ watch(
 
       <!-- Detail -->
       <template v-else-if="screen.kind === 'detail'">
-        <div v-if="screen.note" class="bg-[#e1f3ea] px-[1.4em] py-[0.5em] text-[0.8em] font-semibold text-[#17643f]">{{ screen.note }}</div>
-        <ResourceContent v-if="detail" :model="detail" :wide="wide" navigable @open="open($event)" />
+        <div v-if="screen.note" class="bg-success-tint px-[1.4em] py-[0.5em] text-[0.8em] font-semibold text-success">{{ screen.note }}</div>
+        <ResourceContent v-if="detail" :model="detail" :wide="wide" :semantic="semantic" navigable @open="open($event)" />
       </template>
     </div>
 
     <!-- The FOOTER links (`03` §13). -->
-    <nav v-if="footerEntries.length" class="flex flex-wrap justify-center gap-x-[1.2em] gap-y-[0.3em] border-t border-[var(--t-border)] px-[1em] py-[0.6em] text-[0.8em] text-[var(--t-muted)]">
+    <div v-if="footerEntries.length" class="flex flex-wrap justify-center gap-x-[1.2em] gap-y-[0.3em] border-t border-[var(--t-border)] px-[1em] py-[0.6em] text-[0.8em] text-[var(--t-muted)]">
       <button v-for="e in footerEntries" :key="e.key" type="button" class="underline underline-offset-2" @click="choose(e)">{{ e.label }}</button>
-    </nav>
+    </div>
 
     <!-- The language switcher in the footer (`04` §11 `languageSwitcher`). -->
     <div v-if="shell.languageSwitcher === 'FOOTER'" class="flex justify-center border-t border-[var(--t-border)] py-[0.5em] text-[0.75em] font-bold uppercase text-[var(--t-muted)]">
-      {{ t.language }}: {{ language ?? "—" }} ▾
+      {{ t.language }}: {{ language ?? "—" }}<ChevronDown class="ml-[0.2em] inline size-[1em]" aria-hidden="true" />
     </div>
 
     <!-- On mobile the menu is a bottom bar, unless the shell asks for a burger. -->
-    <nav v-if="mobile && shell.mobileMenu === 'BOTTOM_BAR'" class="flex bg-[var(--t-primary)] text-[0.62em] font-semibold text-[var(--t-on-primary)]">
+    <component :is="tag('nav')" v-if="mobile && shell.mobileMenu === 'BOTTOM_BAR'" :aria-label="semantic ? t.menu : undefined" class="flex bg-[var(--t-primary)] text-[0.62em] font-semibold text-[var(--t-on-primary)]">
       <button type="button" class="min-w-0 flex-1 truncate px-[0.3em] py-[1em]" :class="screen.kind === 'home' ? 'font-extrabold underline underline-offset-4' : 'opacity-85'" @click="go({ kind: 'home' }, true)">{{ t.home }}</button>
       <button
         v-for="e in entries"
@@ -421,11 +438,20 @@ watch(
       >
         {{ e.label }}
       </button>
-    </nav>
+    </component>
   </div>
 </template>
 
 <style scoped>
+/* The shell bar is drawn in the Project's primary colour, whatever it is: the focus ring takes the bar's own text colour,
+   which the theme keeps readable on it (C3-04). The open menu below it is a light surface and keeps the CMS ring. */
+.stand-in-header :focus-visible {
+  outline: 2px solid var(--t-on-primary);
+  outline-offset: 2px;
+}
+.stand-in-header .absolute :focus-visible {
+  outline-color: hsl(var(--ring));
+}
 .card {
   display: block;
   width: 100%;
@@ -439,7 +465,7 @@ watch(
   border-color: var(--t-primary);
 }
 .missing {
-  outline: 2px dashed #dc2626;
+  outline: 2px dashed hsl(var(--destructive));
   outline-offset: 2px;
 }
 </style>

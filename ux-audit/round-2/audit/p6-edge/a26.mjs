@@ -1,0 +1,13 @@
+import { open, go, P, ids, shot, settle, alerts, focused, main, problem, AP } from "./lib.mjs";
+const PP = `/projects/${P}`;
+const { browser, page } = await open("curator", { viewport: "1440" });
+await go(page, `${PP}/floor-plans`); await settle(page, 1500);
+console.log("FP LIST:", (await page.locator("main").innerText()).replace(/\n+/g," | ").slice(0,300));
+const first = page.locator("main a[href*='floor-plans/']").first();
+const href = await first.getAttribute("href"); console.log(href);
+await page.route(AP, (r) => r.request().method() !== "GET" ? r.fulfill(problem(500, "INTERNAL_ERROR")) : r.continue());
+await go(page, href); await settle(page, 2500);
+await page.evaluate(() => localStorage.clear());
+console.log("FIELDS", await page.evaluate(() => [...document.querySelectorAll("input,select,textarea")].filter(e => e.offsetParent).map(e => `${e.id||e.name}:${e.type}:${(e.labels?.[0]?.textContent||e.getAttribute("aria-label")||"").trim().slice(0,30)}=${e.value.slice(0,20)}`).join(" ; ")));
+await shot(page, "floorplan-editor__baseline", "1440", false);
+await browser.close();

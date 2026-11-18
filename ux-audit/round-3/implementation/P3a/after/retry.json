@@ -1,0 +1,24 @@
+{
+ "pois-retry": {
+  "focus": {
+   "tag": "H1",
+   "id": "",
+   "label": "Points of Interest",
+   "top": 80,
+   "bottom": 106,
+   "inViewport": true
+  },
+  "noticeGone": true
+ },
+ "routes-retry": {
+  "focus": {
+   "tag": "H1",
+   "id": "",
+   "label": "Routes",
+   "top": 80,
+   "bottom": 106,
+   "inViewport": true
+  },
+  "noticeGone": true
+ }
+}

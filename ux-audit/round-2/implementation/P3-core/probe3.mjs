@@ -1,0 +1,18 @@
+import { open, go } from "../../../tools/session.mjs";
+const P = "6958c18f-60d2-4140-a524-5a43f8a2f6b5";
+const { browser, page } = await open("admin", { viewport: "1440" });
+page.on("console", (m) => { if (m.text().startsWith("DBG")) console.log(m.text()); });
+await go(page, `/projects/${P}/pois`); await page.waitForTimeout(4000);
+await page.evaluate(() => (document.getElementById("main").scrollTop = 3000)); await page.waitForTimeout(300);
+console.log("scrollTop", await page.evaluate(() => document.getElementById("main").scrollTop));
+const href = await page.evaluate(() => { const main = document.getElementById("main"); const mr = main.getBoundingClientRect(); const a = [...document.querySelectorAll("tbody tr a[href]")].find((x) => { const r = x.getBoundingClientRect(); return r.top > mr.top + 250 && r.bottom < mr.bottom - 50; }); a.dataset.pick = "1"; return a.getAttribute("href"); });
+console.log("href", href);
+await page.locator('a[data-pick="1"]').click(); await page.waitForTimeout(2000);
+console.log("url", page.url());
+console.log("hist", await page.evaluate(() => JSON.stringify({ forward: history.state?.forward, back: history.state?.back })));
+await page.goBack(); await page.waitForTimeout(2500);
+console.log("hist2", await page.evaluate(() => JSON.stringify({ forward: history.state?.forward, back: history.state?.back })));
+console.log(await page.evaluate(() => JSON.stringify(window.__dbg)));
+const back = await page.evaluate(() => ({ top: document.getElementById("main").scrollTop, active: document.activeElement?.textContent?.trim()?.slice(0, 40), tag: document.activeElement?.tagName, url: location.href }));
+console.log("back", JSON.stringify(back));
+await browser.close();

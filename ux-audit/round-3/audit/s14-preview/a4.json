@@ -1,0 +1,227 @@
+[
+ [
+  "tabOrder",
+  [
+   "BUTTON:Open in new tab",
+   "BUTTON/tab:Web[true]",
+   "BUTTON/tab:English[true]",
+   "BUTTON/tab:Working[true]",
+   "INPUT:Filter triggers",
+   "SELECT:Choose a trigger…QR code, Parthenon Frie",
+   "BUTTON:FireChoose a trigger first.",
+   "A:Skip preview",
+   "BUTTON/tab:Fit width[true]",
+   "BUTTON:Interact with the preview",
+   "BODY:Skip to content  iGuide CMS UX Audit – P",
+   "A:Skip to content",
+   "A:UNICHE, all projects",
+   "BUTTON:UX Audit – PopulatedApp: Draft. Switch p",
+   "BUTTON:PAP. Admin, account menu",
+   "A:Dashboard",
+   "A:Places",
+   "A:Points of Interest",
+   "A:Routes",
+   "A:Guides",
+   "A:Events",
+   "A:Categories"
+  ]
+ ],
+ [
+  "ring",
+  {
+   "out": "rgb(76, 29, 139) solid 2px",
+   "off": "2px",
+   "boxShadow": "rgba(255, 255, 255, 0.31) 0px 0px 0px 1.23288px",
+   "tlOverflow": "auto",
+   "pOverflow": "visible",
+   "gap": {
+    "L": 53.5625,
+    "T": 0,
+    "B": -1
+   },
+   "sh": 40,
+   "ch": 39
+  }
+ ],
+ [
+  "helpHints",
+  []
+ ],
+ [
+  "webOptions",
+  "54 [[\"\",\"Choose a trigger…\",\"\"],[\"0e570ab5-c25a-456f-8c1c-02e3b1a41cd7\",\"QR code, Parthenon Frieze – North Side\",\"QR codes\"],[\"0524b13b-b753-464f-835b-4543a74e6f49\",\"QR code, East Pediment Fragments\",\"QR codes\"],[\"ef4c2fff-efe2-4fed-ae53-6ca32365c26a\",\"QR code, Moschophoros (The Calf-Bearer)\",\"QR codes\"]]"
+ ],
+ [
+  "fireDisabled",
+  {
+   "dis": false,
+   "aria": "true",
+   "desc": "v-15",
+   "t": "FireChoose a trigger first."
+  }
+ ],
+ [
+  "chip",
+  [
+   "Fired: QR code, Parthenon Frieze – North Side",
+   "Fired: QR code, Parthenon Frieze – North Side"
+  ]
+ ],
+ [
+  "focusAfterFire",
+  {
+   "tag": "BUTTON",
+   "role": null,
+   "name": "Fire",
+   "id": "",
+   "y": 226,
+   "sel": null
+  }
+ ],
+ [
+  "focusAfterReset",
+  {
+   "tag": "SELECT",
+   "role": null,
+   "name": "Choose a trigger…QR code, Parthenon Frie",
+   "id": "fire-trigger",
+   "y": 226,
+   "sel": null
+  }
+ ],
+ [
+  "chipGone",
+  0
+ ],
+ [
+  "mobileOptions",
+  54
+ ],
+ [
+  "notes",
+  ""
+ ],
+ [
+  "afterInteract",
+  {
+   "tag": "BUTTON",
+   "role": null,
+   "name": "Stop interacting with the preview",
+   "id": "",
+   "y": 289,
+   "sel": null
+  }
+ ],
+ [
+  "afterEsc1",
+  {
+   "tag": "BUTTON",
+   "role": null,
+   "name": "Interact with the preview",
+   "id": "",
+   "y": 289,
+   "sel": null
+  }
+ ],
+ [
+  "pressed",
+  "false"
+ ],
+ [
+  "skipFound",
+  6
+ ],
+ [
+  "afterSkip",
+  {
+   "tag": "DIV",
+   "role": null,
+   "name": "End of preview",
+   "id": "preview-end-v-17",
+   "y": 305,
+   "sel": null
+  }
+ ],
+ [
+  "afterSkipTab",
+  {
+   "tag": "BODY",
+   "role": null,
+   "name": "Skip to content  iGuide CMS UX Audit – P",
+   "id": "",
+   "y": 0,
+   "sel": null
+  }
+ ],
+ [
+  "anims",
+  [
+   [
+    "CSSTransition",
+    "border-bottom-color",
+    120,
+    "-mb-px inline-flex min-h-control items-center gap-"
+   ],
+   [
+    "CSSTransition",
+    "border-left-color",
+    120,
+    "-mb-px inline-flex min-h-control items-center gap-"
+   ],
+   [
+    "CSSTransition",
+    "border-right-color",
+    120,
+    "-mb-px inline-flex min-h-control items-center gap-"
+   ],
+   [
+    "CSSTransition",
+    "border-top-color",
+    120,
+    "-mb-px inline-flex min-h-control items-center gap-"
+   ],
+   [
+    "CSSTransition",
+    "color",
+    120,
+    "-mb-px inline-flex min-h-control items-center gap-"
+   ],
+   [
+    "CSSTransition",
+    "border-bottom-color",
+    120,
+    "-mb-px inline-flex min-h-control items-center gap-"
+   ],
+   [
+    "CSSTransition",
+    "border-left-color",
+    120,
+    "-mb-px inline-flex min-h-control items-center gap-"
+   ],
+   [
+    "CSSTransition",
+    "border-right-color",
+    120,
+    "-mb-px inline-flex min-h-control items-center gap-"
+   ],
+   [
+    "CSSTransition",
+    "border-top-color",
+    120,
+    "-mb-px inline-flex min-h-control items-center gap-"
+   ],
+   [
+    "CSSTransition",
+    "color",
+    120,
+    "-mb-px inline-flex min-h-control items-center gap-"
+   ],
+   [
+    "CSSTransition",
+    "background-color",
+    120,
+    "inline-flex items-center justify-center gap-2 whit"
+   ]
+  ]
+ ]
+]

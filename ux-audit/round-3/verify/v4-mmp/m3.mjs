@@ -1,0 +1,30 @@
+import { go, shot, POP, run, log, start, axe, box, focusDesc } from "./lib.mjs";
+const vp = process.argv[2] || "1440"; const touch = process.argv[3] === "touch";
+const MAP = "9fda753d-4d8e-4fba-9760-f300253e2060";
+await run(async () => {
+  const { browser, page } = await start(vp, { touch });
+  log("=== M3 map editor zoom/legend/tilefail", vp, touch ? "touch" : "mouse");
+  await go(page, `/projects/${POP}/maps/${MAP}`); await page.waitForTimeout(4000);
+  log("route polylines drawn", await page.evaluate(() => document.querySelectorAll(".leaflet-overlay-pane path").length), "pins", await page.evaluate(() => document.querySelectorAll(".leaflet-marker-icon").length));
+  await page.evaluate(() => { window.__log = []; new MutationObserver((ms) => { for (const m of ms) { const t = (m.target.nodeType === 3 ? m.target.parentElement : m.target); const live = t.closest?.("[aria-live],[role=status],[role=alert]"); if (live) window.__log.push((live.getAttribute("role") || live.getAttribute("aria-live")) + ":" + live.textContent.trim().slice(0, 60)); } }).observe(document.body, { childList: true, characterData: true, subtree: true }); });
+  await page.evaluate(() => document.querySelector(".geo-map, .leaflet-container").scrollIntoView({ block: "center" }));
+  await page.locator(".leaflet-control-zoom-in").click(); await page.waitForTimeout(1200);
+  await page.locator(".leaflet-control-zoom-in").click(); await page.waitForTimeout(1200);
+  log("zoom log (2 clicks)", await page.evaluate(() => window.__log));
+  await page.evaluate(() => { window.__log.length = 0; });
+  await page.locator(".leaflet-container").focus(); await page.keyboard.press("-"); await page.waitForTimeout(1200);
+  log("zoom log (key -)", await page.evaluate(() => window.__log));
+  // tile failure
+  await page.route(/tiles\.openfreemap\.org/, r => r.abort());
+  await go(page, `/projects/${POP}/maps/${MAP}`); await page.waitForTimeout(7000);
+  const card = await page.evaluate(() => { const c = [...document.querySelectorAll("[role=alert],[role=status]")].find(e => /map|tile|background/i.test(e.textContent)); if (!c) return null; const b = c.getBoundingClientRect(); const m = document.querySelector(".leaflet-container").getBoundingClientRect(); return { text: c.textContent.trim().slice(0, 200), y: Math.round(b.y), h: Math.round(b.height), mapY: Math.round(m.y), mapB: Math.round(m.bottom), inside: b.y >= m.y - 1 && b.bottom <= m.bottom + 1 }; });
+  log("tile card", card);
+  await page.locator(".leaflet-container").scrollIntoViewIfNeeded();
+  await shot(page, "map-editor__tiles-blocked", vp);
+  await page.unroute(/tiles\.openfreemap\.org/);
+  const retry = page.getByRole("button", { name: /Try again/ }); log("retry count", await retry.count());
+  await retry.focus(); await page.keyboard.press("Enter"); await page.waitForTimeout(3000);
+  log("focus after retry", await focusDesc(page));
+  await shot(page, "map-editor__after-retry", vp);
+  await browser.close();
+});

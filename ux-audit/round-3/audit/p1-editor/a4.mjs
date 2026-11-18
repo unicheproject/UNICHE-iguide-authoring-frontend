@@ -1,0 +1,10 @@
+import {open,go,P,shot,btns} from "./lib.mjs";
+const { browser, page } = await open("admin",{viewport:"1440"});
+await go(page, P+"/pois/d2e48820-a468-4539-9f62-545eed5b06a6");
+await page.waitForTimeout(1500);
+await page.getByRole("button",{name:/Add\s*Primary image/}).click();
+await page.waitForTimeout(1500);
+await shot(page,"asset-picker__image__1440");
+console.log(await btns(page,"[role=dialog]"));
+console.log((await page.evaluate(()=>document.querySelector("[role=dialog]")?.innerText||"")).slice(0,1500));
+await browser.close();

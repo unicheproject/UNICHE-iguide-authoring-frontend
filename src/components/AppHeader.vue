@@ -1,114 +1,81 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { onClickOutside, onKeyStroke } from "@vueuse/core";
+/**
+ * The application header (D-073): 56 px, one row at every width. Left to right: the menu button (below 1100 px, inside
+ * a Project), the UNICHE logo (a bundled asset, 26 px high, linking to the Project list with a 44 px hit area, D-106), "iGuide CMS", the Project switcher, and
+ * the user menu. "Manage members" links to the Platform Portal when one is configured and is absent otherwise; there is
+ * no "Help" until it has a destination (Q-016).
+ */
+import { ExternalLink, LogOut, Menu } from "lucide-vue-next";
+import { computed } from "vue";
+import { useRoute } from "vue-router";
+import logoUrl from "@/assets/uniche-logo.png";
 import ProjectSwitcher from "@/components/ProjectSwitcher.vue";
-import { logout, session } from "@/platform/auth";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { logout, platformConfig, session } from "@/platform/auth";
+import { navDrawer, setNavDrawer } from "@/stores/navDrawer";
 
-const menuOpen = ref(false);
-const menuRoot = ref<HTMLElement | null>(null);
-
-onClickOutside(menuRoot, () => {
-  menuOpen.value = false;
-});
-onKeyStroke("Escape", () => {
-  menuOpen.value = false;
-});
-
-// Placeholders: "Manage members" will open the Catalogue's own membership screen for the current
-// Project (02-uniche-auth-tenancy.md section 14); "Help" has no destination yet.
-function openManageMembers() {}
-function openHelp() {}
+const route = useRoute();
+const inProject = computed(() => typeof route.params.projectId === "string" && route.name !== "project-create");
+const portalUrl = platformConfig().portalUrl;
 </script>
 
 <template>
-  <!-- Wraps at narrow widths and high zoom instead of widening the page (WCAG 1.4.10, D-054). -->
-  <header class="flex min-h-[60px] flex-none flex-wrap items-center gap-x-[18px] gap-y-2 border-b bg-card px-4 py-2.5 md:px-5">
-    <img
-      src="https://uniche-eccch.eu/static/assets/images/uniche-logo-transparent-header.png"
-      alt="UNICHE"
-      class="block h-[26px] w-auto"
-    />
-    <span
-      class="whitespace-nowrap border-l pl-4 text-[11px] font-extrabold uppercase tracking-[0.16em] text-primary"
+  <header class="relative z-sticky flex h-header flex-none items-center gap-3 border-b border-border bg-card px-4 nav:px-6">
+    <button
+      v-if="inProject"
+      id="nav-toggle"
+      type="button"
+      class="inline-flex size-11 flex-none items-center justify-center rounded-md text-foreground hover:bg-surface-hover nav:hidden"
+      aria-controls="workspace-nav"
+      :aria-expanded="navDrawer.open"
+      aria-label="Menu"
+      @click="setNavDrawer(!navDrawer.open)"
     >
+      <Menu class="size-5" aria-hidden="true" />
+    </button>
+    <RouterLink v-if="session.status === 'authenticated'" :to="{ name: 'home' }" class="hit-44 flex flex-none items-center rounded-sm" aria-label="UNICHE, all projects">
+      <img :src="logoUrl" alt="" width="122" height="26" class="block h-logo w-auto" />
+    </RouterLink>
+    <img v-else :src="logoUrl" alt="UNICHE" width="122" height="26" class="block h-logo w-auto flex-none" />
+    <span class="hidden flex-none whitespace-nowrap border-l border-border pl-3 text-xs font-semibold text-muted-foreground md:inline">
       iGuide CMS
     </span>
 
-    <!-- Below 768 pixels the switcher takes its own row under the brand and the avatar, keeping the fixed header low (D-062). -->
-    <ProjectSwitcher v-if="session.status === 'authenticated'" class="max-md:order-last max-md:ml-0 max-md:basis-full" />
+    <ProjectSwitcher v-if="session.status === 'authenticated'" class="min-w-0" />
 
-    <div v-if="session.user" class="ml-auto flex flex-wrap items-center gap-x-[18px] gap-y-1">
-      <button
-        type="button"
-        class="hidden whitespace-nowrap text-xs font-semibold text-primary hover:text-highlight hover:underline md:inline"
-        @click="openManageMembers"
-      >
-        Manage members <span aria-hidden="true">↗</span>
-      </button>
-      <button
-        type="button"
-        class="hidden whitespace-nowrap text-xs font-semibold text-muted-foreground hover:text-highlight hover:underline md:inline"
-        @click="openHelp"
-      >
-        Help
-      </button>
-
-      <div ref="menuRoot" class="relative">
-        <button
-          type="button"
-          class="flex items-center gap-2 rounded-lg px-1.5 py-1 hover:bg-accent"
-          aria-haspopup="menu"
-          :aria-expanded="menuOpen"
-          @click="menuOpen = !menuOpen"
-        >
-          <span
-            class="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-primary text-[10px] font-extrabold text-primary-foreground"
-            aria-hidden="true"
+    <div v-if="session.user" class="ml-auto flex flex-none items-center">
+      <DropdownMenu>
+        <DropdownMenuTrigger as-child>
+          <button
+            type="button"
+            class="flex min-h-control items-center gap-2 rounded-md px-1.5 hover:bg-surface-hover"
           >
-            {{ session.user.initials }}
-          </span>
-          <span class="sr-only whitespace-nowrap text-xs font-semibold md:not-sr-only">{{ session.user.shortName }}</span>
-        </button>
-
-        <div
-          v-if="menuOpen"
-          role="menu"
-          class="absolute right-0 top-[calc(100%+8px)] z-[80] w-64 overflow-hidden rounded-[10px] border bg-card shadow-[0_18px_44px_rgba(3,7,18,0.18)]"
-        >
-          <div class="border-b px-3.5 py-3">
-            <span class="block text-xs font-bold">{{ session.user.displayName }}</span>
-            <span v-if="session.user.email" class="block break-all text-[11px] text-muted-foreground">
-              {{ session.user.email }}
+            <span class="flex size-8 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground" aria-hidden="true">
+              {{ session.user.initials }}
             </span>
-            <span class="mt-1 block text-[10px] text-muted-foreground">Signed in with your UNICHE account</span>
+            <span class="whitespace-nowrap text-sm font-semibold max-md:sr-only">{{ session.user.shortName }}</span>
+            <span class="sr-only">, account menu</span>
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent class="w-64">
+          <div class="px-3 py-2">
+            <span class="block text-sm font-semibold">{{ session.user.displayName }}</span>
+            <span v-if="session.user.email" class="block break-all text-xs text-muted-foreground">{{ session.user.email }}</span>
+            <span class="mt-1 block text-xs text-muted-foreground">Signed in with your UNICHE account</span>
           </div>
-          <!-- On a small screen "Manage members" and "Help" live here instead of in the bar. -->
-          <button
-            type="button"
-            role="menuitem"
-            class="w-full border-b px-3.5 py-3 text-left text-xs font-semibold text-primary hover:bg-accent md:hidden"
-            @click="menuOpen = false; openManageMembers()"
-          >
-            Manage members <span aria-hidden="true">↗</span>
-          </button>
-          <button
-            type="button"
-            role="menuitem"
-            class="w-full border-b px-3.5 py-3 text-left text-xs font-semibold text-foreground hover:bg-accent md:hidden"
-            @click="menuOpen = false; openHelp()"
-          >
-            Help
-          </button>
-          <button
-            type="button"
-            role="menuitem"
-            class="w-full px-3.5 py-3 text-left text-xs font-bold text-primary hover:bg-accent"
-            @click="logout()"
-          >
-            Sign out
-          </button>
-        </div>
-      </div>
+          <DropdownMenuSeparator />
+          <template v-if="portalUrl && inProject">
+            <DropdownMenuLabel>Project</DropdownMenuLabel>
+            <DropdownMenuItem as-child>
+              <a :href="portalUrl" target="_blank" rel="noopener">
+                <ExternalLink aria-hidden="true" />Manage members<span class="sr-only"> (opens the UNICHE Platform Portal in a new tab)</span>
+              </a>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </template>
+          <DropdownMenuItem @select="logout()"><LogOut aria-hidden="true" />Sign out</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   </header>
 </template>

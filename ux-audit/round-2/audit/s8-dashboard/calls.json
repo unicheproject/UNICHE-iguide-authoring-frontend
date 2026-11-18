@@ -1,0 +1,537 @@
+[
+ {
+  "u": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/settings",
+  "s": 200,
+  "b": "{\"applicationStatus\":\"DRAFT\",\"contentRevision\":166,\"timezone\":null,\"featureConfiguration\":{\"MAPS\":true,\"PAGES\":true,\"EVENTS\":true,\"GUIDES\":true,\"ROUTES\":true,\"SEARCH\":true,\"FEEDBACK\":true,\"FLOOR_PLANS\":true,\"QR_TRIGGERS\":true,\"OFFLINE_CONTENT\":true,\"POI_EXPLORATION\":true,\"LOCATION_TRIGGERS\":true},\"capabilities\":[\"PAGES\",\"POI_EXPLORATION\",\"ROUTES\",\"GUIDES\",\"MAPS\",\"FLOOR_PLANS\",\"EVENTS\",\"SEARCH\",\"OFFLINE_CONTENT\",\"LOCATION_TRIGGERS\",\"QR_TRIGGERS\",\"FEEDBACK\"],\"version\":0,\"updatedAt\":\"2026-11-12T11:28:32.889720Z\"}"
+ },
+ {
+  "u": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois?size=1&status=ACTIVE",
+  "s": 200,
+  "b": "{\"content\":[{\"id\":\"546c5177-effd-49c8-acae-85d751f89bbe\",\"projectId\":\"6958c18f-60d2-4140-a524-5a43f8a2f6b5\",\"placeId\":\"0551e49d-4b18-43dd-8219-edf8d219e76d\",\"slug\":\"parthenon-frieze-north-side\",\"code\":null,\"status\":\"ACTIVE\",\"internalName\":\"frieze\",\"latitude\":37.968840,\"longitude\":23.728660,\"estimatedVisitMinutes\":5,\"featured\":false,\"sortOrder\":1,\"archivedAt\":null,\"createdAt\":\"2026-11-12T11:29:18.436815Z\",\"updatedAt\":\"2026-11-12T11:29:19.940323Z\",\"version\":2,\"hasWorkingCopy\":true,\"workingCopyUpdatedAt\":\"2026-11-12T11:29:20.307628Z\",\"translations\":{\"el\":{\"title\":\"Ζωφόρος του Παρθενώνα – Βόρεια Π"
+ },
+ {
+  "u": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/places?size=1&status=ACTIVE",
+  "s": 200,
+  "b": "{\"content\":[{\"id\":\"9ce7037d-d9bd-4450-812c-3fee540bf71b\",\"projectId\":\"6958c18f-60d2-4140-a524-5a43f8a2f6b5\",\"parentPlaceId\":null,\"slug\":\"athens-historic-centre\",\"type\":\"DESTINATION\",\"environment\":\"OUTDOOR\",\"status\":\"ACTIVE\",\"internalName\":\"Athens Historic Centre\",\"latitude\":37.971500,\"longitude\":23.725700,\"featured\":false,\"sortOrder\":1,\"archivedAt\":null,\"createdAt\":\"2026-11-12T11:29:12.733713Z\",\"updatedAt\":\"2026-11-12T11:29:13.129414Z\",\"version\":2,\"hasWorkingCopy\":false,\"workingCopyUpdatedAt\":null,\"translations\":{\"el\":{\"title\":\"Ιστορικό Κέντρο Αθήνας\",\"summary\":\"Ιστορικό Κέντρο Αθήνας: τι να δ"
+ },
+ {
+  "u": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois?size=1&status=DRAFT",
+  "s": 200,
+  "b": "{\"content\":[{\"id\":\"35d91cba-d64a-43ce-9773-1e472226d028\",\"projectId\":\"6958c18f-60d2-4140-a524-5a43f8a2f6b5\",\"placeId\":null,\"slug\":\"ux-r2-p5-keyboard-poi\",\"code\":\"R2P5-077863\",\"status\":\"DRAFT\",\"internalName\":null,\"latitude\":37.972130,\"longitude\":23.727400,\"estimatedVisitMinutes\":null,\"featured\":false,\"sortOrder\":2,\"archivedAt\":null,\"createdAt\":\"2026-11-13T13:37:58.372571Z\",\"updatedAt\":\"2026-11-13T13:40:40.251174Z\",\"version\":2,\"hasWorkingCopy\":false,\"workingCopyUpdatedAt\":null,\"translations\":{\"el\":{\"title\":null,\"summary\":null,\"description\":null,\"instructions\":null,\"accessibilityInformation\":null"
+ },
+ {
+  "u": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/places?size=1&status=DRAFT",
+  "s": 200,
+  "b": "{\"content\":[{\"id\":\"6558fe35-209a-4e49-a92f-f785eb839756\",\"projectId\":\"6958c18f-60d2-4140-a524-5a43f8a2f6b5\",\"parentPlaceId\":\"e5932358-078d-4872-a903-8b726793b9d5\",\"slug\":\"ground-floor-slopes-level\",\"type\":\"FLOOR\",\"environment\":\"INDOOR\",\"status\":\"DRAFT\",\"internalName\":\"Ground Floor – Slopes Level\",\"latitude\":37.968400,\"longitude\":23.728600,\"featured\":false,\"sortOrder\":3,\"archivedAt\":null,\"createdAt\":\"2026-11-12T11:29:13.918213Z\",\"updatedAt\":\"2026-11-12T11:29:14.082071Z\",\"version\":1,\"hasWorkingCopy\":false,\"workingCopyUpdatedAt\":null,\"translations\":{\"el\":{\"title\":\"Ισόγειο – Επίπεδο Πλαγιών\",\"summ"
+ },
+ {
+  "u": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/routes?size=1&status=ACTIVE",
+  "s": 200,
+  "b": "{\"content\":[{\"id\":\"9743e460-8351-4897-8ee5-eecc13fcbf19\",\"projectId\":\"6958c18f-60d2-4140-a524-5a43f8a2f6b5\",\"slug\":\"acropolis-highlights-classical-walk\",\"status\":\"ACTIVE\",\"type\":\"OUTDOOR\",\"travelMode\":\"WALKING\",\"difficulty\":\"EASY\",\"estimatedDurationMinutes\":90,\"distanceMeters\":1600,\"computedDistanceMeters\":1248,\"loop\":false,\"internalName\":\"acro\",\"featured\":true,\"sortOrder\":1,\"archivedAt\":null,\"createdAt\":\"2026-11-12T11:30:02.058957Z\",\"updatedAt\":\"2026-11-12T11:30:04.286847Z\",\"version\":9,\"hasWorkingCopy\":false,\"workingCopyUpdatedAt\":null,\"translations\":{\"el\":{\"title\":\"Κορυφαία της Ακρόπολης – Κ"
+ },
+ {
+  "u": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/routes?size=1&status=DRAFT",
+  "s": 200,
+  "b": "{\"content\":[{\"id\":\"e415a909-58aa-433d-b16b-fd735896979c\",\"projectId\":\"6958c18f-60d2-4140-a524-5a43f8a2f6b5\",\"slug\":\"ancient-agora-archaeological-loop\",\"status\":\"DRAFT\",\"type\":\"OUTDOOR\",\"travelMode\":\"WALKING\",\"difficulty\":\"MODERATE\",\"estimatedDurationMinutes\":120,\"distanceMeters\":2400,\"computedDistanceMeters\":420,\"loop\":true,\"internalName\":\"agora\",\"featured\":false,\"sortOrder\":3,\"archivedAt\":null,\"createdAt\":\"2026-11-12T11:30:07.117671Z\",\"updatedAt\":\"2026-11-12T11:30:08.075787Z\",\"version\":6,\"hasWorkingCopy\":false,\"workingCopyUpdatedAt\":null,\"translations\":{\"el\":{\"title\":\"Αρχαιολογικός Κύκλος της"
+ },
+ {
+  "u": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/guides?size=1&status=ACTIVE",
+  "s": 200,
+  "b": "{\"content\":[{\"id\":\"bcc7d2be-50ef-46cb-85e2-ced86c6559a3\",\"projectId\":\"6958c18f-60d2-4140-a524-5a43f8a2f6b5\",\"slug\":\"the-story-of-the-parthenon-from-temple-to-monument\",\"status\":\"ACTIVE\",\"internalName\":\"parthenon\",\"estimatedReadingMinutes\":14,\"featured\":true,\"sortOrder\":1,\"archivedAt\":null,\"createdAt\":\"2026-11-12T11:30:22.611060Z\",\"updatedAt\":\"2026-11-12T11:30:26.647530Z\",\"version\":20,\"hasWorkingCopy\":true,\"workingCopyUpdatedAt\":\"2026-11-12T11:30:27.005784Z\",\"translations\":{\"el\":{\"title\":\"Η Ιστορία του Παρθενώνα: Από Ναός σε Μνημείο\",\"summary\":\"Μια εκτενής αφήγηση: Η Ιστορία του Παρθενώνα: Από "
+ },
+ {
+  "u": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/guides?size=1&status=DRAFT",
+  "s": 200,
+  "b": "{\"content\":[{\"id\":\"35bc2737-7b97-44fd-bdb4-85f3fb65846c\",\"projectId\":\"6958c18f-60d2-4140-a524-5a43f8a2f6b5\",\"slug\":\"everyday-life-in-the-ancient-agora\",\"status\":\"DRAFT\",\"internalName\":\"agora\",\"estimatedReadingMinutes\":9,\"featured\":false,\"sortOrder\":3,\"archivedAt\":null,\"createdAt\":\"2026-11-12T11:30:30.864191Z\",\"updatedAt\":\"2026-11-12T11:30:33.010696Z\",\"version\":15,\"hasWorkingCopy\":false,\"workingCopyUpdatedAt\":null,\"translations\":{\"el\":{\"title\":\"Η Καθημερινή Ζωή στην Αρχαία Αγορά\",\"summary\":\"Μια εκτενής αφήγηση: Η Καθημερινή Ζωή στην Αρχαία Αγορά.\"},\"en\":{\"title\":\"Everyday Life in the Ancient Ag"
+ },
+ {
+  "u": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/events?size=1&status=ACTIVE",
+  "s": 200,
+  "b": "{\"content\":[{\"id\":\"6e8462e3-a8b5-4f4b-a625-6140c1fd117e\",\"projectId\":\"6958c18f-60d2-4140-a524-5a43f8a2f6b5\",\"slug\":\"full-moon-night-at-the-acropolis\",\"status\":\"ACTIVE\",\"placeId\":\"615cf675-15a6-42cc-9ce8-24ec217f44ce\",\"poiId\":\"e2905a9e-2c6a-49a3-89f6-5639c94ee9fe\",\"routeId\":null,\"bookingUrl\":\"https://tickets.example.org/ux-audit/fullmoon\",\"internalName\":\"fullmoon\",\"featured\":true,\"sortOrder\":1,\"archivedAt\":null,\"createdAt\":\"2026-11-12T11:30:13.251683Z\",\"updatedAt\":\"2026-11-12T11:30:14.713707Z\",\"version\":6,\"hasWorkingCopy\":false,\"workingCopyUpdatedAt\":null,\"translations\":{\"el\":{\"title\":\"Βράδυ Πα"
+ },
+ {
+  "u": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/settings",
+  "s": 200,
+  "b": "{\"applicationStatus\":\"DRAFT\",\"contentRevision\":166,\"timezone\":null,\"featureConfiguration\":{\"MAPS\":true,\"PAGES\":true,\"EVENTS\":true,\"GUIDES\":true,\"ROUTES\":true,\"SEARCH\":true,\"FEEDBACK\":true,\"FLOOR_PLANS\":true,\"QR_TRIGGERS\":true,\"OFFLINE_CONTENT\":true,\"POI_EXPLORATION\":true,\"LOCATION_TRIGGERS\":true},\"capabilities\":[\"PAGES\",\"POI_EXPLORATION\",\"ROUTES\",\"GUIDES\",\"MAPS\",\"FLOOR_PLANS\",\"EVENTS\",\"SEARCH\",\"OFFLINE_CONTENT\",\"LOCATION_TRIGGERS\",\"QR_TRIGGERS\",\"FEEDBACK\"],\"version\":0,\"updatedAt\":\"2026-11-12T11:28:32.889720Z\"}"
+ },
+ {
+  "u": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/events?size=1&status=DRAFT",
+  "s": 200,
+  "b": "{\"content\":[{\"id\":\"baaa64b3-8ed8-4369-94bd-471c4980e289\",\"projectId\":\"6958c18f-60d2-4140-a524-5a43f8a2f6b5\",\"slug\":\"agora-archaeology-lecture-series\",\"status\":\"DRAFT\",\"placeId\":\"765727b3-e9c4-45e0-8bd1-15becd016d35\",\"poiId\":null,\"routeId\":null,\"bookingUrl\":\"https://tickets.example.org/ux-audit/lectures\",\"internalName\":\"lectures\",\"featured\":false,\"sortOrder\":5,\"archivedAt\":null,\"createdAt\":\"2026-11-12T11:30:19.206504Z\",\"updatedAt\":\"2026-11-12T11:30:19.369918Z\",\"version\":1,\"hasWorkingCopy\":false,\"workingCopyUpdatedAt\":null,\"translations\":{\"el\":{\"title\":\"Κύκλος Διαλέξεων Αρχαιολογίας στην Αρχαία "
+ },
+ {
+  "u": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/categories?size=1&status=ACTIVE",
+  "s": 200,
+  "b": "{\"content\":[{\"id\":\"79aaf581-d009-4294-a11b-bf5a8fa980f3\",\"projectId\":\"6958c18f-60d2-4140-a524-5a43f8a2f6b5\",\"code\":\"monuments-and-temples\",\"status\":\"ACTIVE\",\"scope\":\"POI\",\"parentCategoryId\":null,\"icon\":\"monument\",\"sortOrder\":1,\"archivedAt\":null,\"createdAt\":\"2026-11-12T11:29:07.860070Z\",\"updatedAt\":\"2026-11-12T11:29:08.286625Z\",\"version\":2,\"hasWorkingCopy\":false,\"workingCopyUpdatedAt\":null,\"translations\":{\"el\":{\"name\":\"Μνημεία και Ναοί\",\"description\":\"Μνημεία και Ναοί στο δείγμα περιεχομένου του iGuide.\"},\"en\":{\"name\":\"Monuments and Temples\",\"description\":\"Monuments and Temples in the iGuide sa"
+ },
+ {
+  "u": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/categories?size=1&status=DRAFT",
+  "s": 200,
+  "b": "{\"content\":[{\"id\":\"c11f0fc7-3e7f-4a83-bbc9-8c50d6bd948f\",\"projectId\":\"6958c18f-60d2-4140-a524-5a43f8a2f6b5\",\"code\":\"ux-p3-translator-category\",\"status\":\"DRAFT\",\"scope\":\"POI\",\"parentCategoryId\":null,\"icon\":null,\"sortOrder\":12,\"archivedAt\":null,\"createdAt\":\"2026-11-12T11:41:36.706318Z\",\"updatedAt\":\"2026-11-12T11:47:19.815483Z\",\"version\":1,\"hasWorkingCopy\":false,\"workingCopyUpdatedAt\":null,\"translations\":{\"el\":{\"name\":\"Δοκιμαστικό κείμενο στα ελληνικά 0\",\"description\":\"Δοκιμαστικό κείμενο στα ελληνικά 1\"},\"en\":{\"name\":\"UX-p3-translator categorie\",\"description\":\"English text 1\"},\"it\":{\"name\":\"Test"
+ },
+ {
+  "u": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/assets?size=1&status=ACTIVE",
+  "s": 200,
+  "b": "{\"content\":[{\"id\":\"373b104b-6e93-4bec-bb00-39deabcdef8c\",\"projectId\":\"6958c18f-60d2-4140-a524-5a43f8a2f6b5\",\"type\":\"IMAGE\",\"status\":\"ACTIVE\",\"internalName\":\"UX-s13-media portrait.png\",\"decorative\":false,\"originalFilename\":\"UX-s13-media portrait.png\",\"mimeType\":\"image/png\",\"sizeBytes\":1468271,\"checksum\":\"68d19a2e8e92c00eabb8d230718de7bf3f88ab7b6cfc69a463e23fb64eea828e\",\"width\":900,\"height\":1600,\"durationSeconds\":null,\"archivedAt\":null,\"createdAt\":\"2026-11-12T12:34:53.144433Z\",\"updatedAt\":\"2026-11-12T12:37:08.222173Z\",\"version\":2,\"hasWorkingCopy\":false,\"url\":\"http://localhost:9000/iguide-assets/"
+ },
+ {
+  "u": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/assets?size=1&status=DRAFT",
+  "s": 200,
+  "b": "{\"content\":[{\"id\":\"539676dd-6d61-4636-af0e-e017257b7a04\",\"projectId\":\"6958c18f-60d2-4140-a524-5a43f8a2f6b5\",\"type\":\"IMAGE\",\"status\":\"DRAFT\",\"internalName\":\"UX-R2-p6 base asset\",\"decorative\":false,\"originalFilename\":\"UX-R2-p6 base.png\",\"mimeType\":\"image/png\",\"sizeBytes\":123002,\"checksum\":\"432590bed3782fbf4442aad4a6e92d3f8583279eb8995c96416d417bc1f82e67\",\"width\":400,\"height\":300,\"durationSeconds\":null,\"archivedAt\":null,\"createdAt\":\"2026-11-13T13:50:55.617446Z\",\"updatedAt\":\"2026-11-13T13:50:55.617446Z\",\"version\":0,\"hasWorkingCopy\":false,\"url\":\"http://localhost:9000/iguide-assets/projects/6958c18f"
+ },
+ {
+  "u": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/maps?size=1&status=ACTIVE",
+  "s": 200,
+  "b": "{\"content\":[{\"id\":\"6e8b821a-63ca-48b7-93a2-2c53090dcd82\",\"projectId\":\"6958c18f-60d2-4140-a524-5a43f8a2f6b5\",\"placeId\":\"b887ed0a-88ed-4bf6-8eb6-6b1516e89b7f\",\"status\":\"ACTIVE\",\"internalName\":\"Ancient Agora – site map\",\"initialLatitude\":37.975400,\"initialLongitude\":23.721600,\"initialZoom\":17.00,\"minLatitude\":37.973000,\"minLongitude\":23.717000,\"maxLatitude\":37.978000,\"maxLongitude\":23.725000,\"visibility\":{\"POI\":{\"visible\":true,\"hiddenCategoryIds\":[]},\"ROUTE\":{\"visible\":true,\"hiddenCategoryIds\":[]}},\"visitorFilterEnabled\":true,\"area\":\"Ancient Agora\",\"osmId\":null,\"archivedAt\":null,\"createdAt\":\"2026"
+ },
+ {
+  "u": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/maps?size=1&status=DRAFT",
+  "s": 200,
+  "b": "{\"content\":[{\"id\":\"83d673e3-6736-49bc-b938-dc93798e776d\",\"projectId\":\"6958c18f-60d2-4140-a524-5a43f8a2f6b5\",\"placeId\":\"4921ed1e-8223-44a7-885e-f507e1597bcb\",\"status\":\"DRAFT\",\"internalName\":\"UX-P4 map\",\"initialLatitude\":37.971500,\"initialLongitude\":23.725700,\"initialZoom\":16.00,\"minLatitude\":37.968000,\"minLongitude\":23.720000,\"maxLatitude\":37.975000,\"maxLongitude\":23.731000,\"visibility\":{\"POI\":{\"visible\":true,\"hiddenCategoryIds\":[]},\"ROUTE\":{\"visible\":true,\"hiddenCategoryIds\":[]}},\"visitorFilterEnabled\":true,\"area\":\"Acropolis\",\"osmId\":null,\"archivedAt\":null,\"createdAt\":\"2026-11-13T08:10:23.4487"
+ },
+ {
+  "u": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/floor-plans?size=1&status=ACTIVE",
+  "s": 200,
+  "b": "{\"content\":[{\"id\":\"d40864d1-684a-466f-819d-68fa651b7146\",\"projectId\":\"6958c18f-60d2-4140-a524-5a43f8a2f6b5\",\"placeId\":\"0551e49d-4b18-43dd-8219-edf8d219e76d\",\"assetId\":\"a391eb1d-231c-4c7e-9ad8-6120aff2f06b\",\"status\":\"ACTIVE\",\"internalName\":\"Acropolis Museum – Parthenon Gallery plan\",\"width\":1600,\"height\":1100,\"coordinateSystem\":\"NORMALIZED\",\"sortOrder\":1,\"archivedAt\":null,\"createdAt\":\"2026-11-12T11:30:42.232374Z\",\"updatedAt\":\"2026-11-12T11:30:43.203551Z\",\"version\":1,\"hasWorkingCopy\":false,\"workingCopyUpdatedAt\":null}],\"page\":0,\"size\":1,\"totalElements\":3,\"totalPages\":3}"
+ },
+ {
+  "u": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/floor-plans?size=1&status=DRAFT",
+  "s": 200,
+  "b": "{\"content\":[{\"id\":\"fef09ea8-f347-4742-8a34-cffc3ee87328\",\"projectId\":\"6958c18f-60d2-4140-a524-5a43f8a2f6b5\",\"placeId\":null,\"assetId\":\"2bd18982-b3ee-4eca-bc14-a2d2f45fc4fc\",\"status\":\"DRAFT\",\"internalName\":\"UX-p5-a11y Plan\",\"width\":10,\"height\":10,\"coordinateSystem\":\"NORMALIZED\",\"sortOrder\":3,\"archivedAt\":null,\"createdAt\":\"2026-11-12T12:05:53.799862Z\",\"updatedAt\":\"2026-11-12T12:05:53.799862Z\",\"version\":0,\"hasWorkingCopy\":false,\"workingCopyUpdatedAt\":null}],\"page\":0,\"size\":1,\"totalElements\":3,\"totalPages\":3}"
+ },
+ {
+  "u": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/places?pending=true&size=10",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":10,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois?pending=true&size=10",
+  "s": 200,
+  "b": "{\"content\":[{\"id\":\"546c5177-effd-49c8-acae-85d751f89bbe\",\"projectId\":\"6958c18f-60d2-4140-a524-5a43f8a2f6b5\",\"placeId\":\"0551e49d-4b18-43dd-8219-edf8d219e76d\",\"slug\":\"parthenon-frieze-north-side\",\"code\":null,\"status\":\"ACTIVE\",\"internalName\":\"frieze\",\"latitude\":37.968840,\"longitude\":23.728660,\"estimatedVisitMinutes\":5,\"featured\":false,\"sortOrder\":1,\"archivedAt\":null,\"createdAt\":\"2026-11-12T11:29:18.436815Z\",\"updatedAt\":\"2026-11-12T11:29:19.940323Z\",\"version\":2,\"hasWorkingCopy\":true,\"workingCopyUpdatedAt\":\"2026-11-12T11:29:20.307628Z\",\"translations\":{\"el\":{\"title\":\"Ζωφόρος του Παρθενώνα – Βόρεια Π"
+ },
+ {
+  "u": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/routes?pending=true&size=10",
+  "s": 200,
+  "b": "{\"content\":[{\"id\":\"d73250f8-85ff-44ae-a758-e269d1b8e5dc\",\"projectId\":\"6958c18f-60d2-4140-a524-5a43f8a2f6b5\",\"slug\":\"family-trail-myths-and-monsters\",\"status\":\"ACTIVE\",\"type\":\"INDOOR\",\"travelMode\":\"WALKING\",\"difficulty\":\"EASY\",\"estimatedDurationMinutes\":45,\"distanceMeters\":500,\"computedDistanceMeters\":287,\"loop\":false,\"internalName\":\"family\",\"featured\":false,\"sortOrder\":4,\"archivedAt\":null,\"createdAt\":\"2026-11-12T11:30:08.619510Z\",\"updatedAt\":\"2026-11-12T11:30:10.153655Z\",\"version\":7,\"hasWorkingCopy\":true,\"workingCopyUpdatedAt\":\"2026-11-12T11:30:10.431111Z\",\"translations\":{\"el\":{\"title\":\"Οικογε"
+ },
+ {
+  "u": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/events?pending=true&size=10",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":10,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/guides?pending=true&size=10",
+  "s": 200,
+  "b": "{\"content\":[{\"id\":\"bcc7d2be-50ef-46cb-85e2-ced86c6559a3\",\"projectId\":\"6958c18f-60d2-4140-a524-5a43f8a2f6b5\",\"slug\":\"the-story-of-the-parthenon-from-temple-to-monument\",\"status\":\"ACTIVE\",\"internalName\":\"parthenon\",\"estimatedReadingMinutes\":14,\"featured\":true,\"sortOrder\":1,\"archivedAt\":null,\"createdAt\":\"2026-11-12T11:30:22.611060Z\",\"updatedAt\":\"2026-11-12T11:30:26.647530Z\",\"version\":20,\"hasWorkingCopy\":true,\"workingCopyUpdatedAt\":\"2026-11-12T11:30:27.005784Z\",\"translations\":{\"el\":{\"title\":\"Η Ιστορία του Παρθενώνα: Από Ναός σε Μνημείο\",\"summary\":\"Μια εκτενής αφήγηση: Η Ιστορία του Παρθενώνα: Από "
+ },
+ {
+  "u": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/categories?pending=true&size=10",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":10,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/readiness",
+  "s": 200,
+  "b": "{\"activatable\":true,\"blocking\":[],\"warnings\":[{\"resourceType\":\"PLACE\",\"resourceId\":\"e5932358-078d-4872-a903-8b726793b9d5\",\"title\":\"Acropolis Museum\",\"languageCode\":\"it\",\"path\":\"translations.it.accessibilityInformation\",\"code\":\"MISSING_ACCESSIBILITY_INFORMATION\"},{\"resourceType\":\"PLACE\",\"resourceId\":\"e5932358-078d-4872-a903-8b726793b9d5\",\"title\":\"Acropolis Museum\",\"languageCode\":\"it\",\"path\":\"translations.it.description\",\"code\":\"MISSING_TRANSLATION\"},{\"resourceType\":\"PLACE\",\"resourceId\":\"e5932358-078d-4872-a903-8b726793b9d5\",\"title\":\"Acropolis Museum\",\"languageCode\":\"it\",\"path\":\"translations.it."
+ },
+ {
+  "u": "/projects/f56e8c75-94af-4c87-88c8-06cba46240a1/settings",
+  "s": 200,
+  "b": "{\"applicationStatus\":\"DRAFT\",\"contentRevision\":0,\"timezone\":null,\"featureConfiguration\":{\"MAPS\":true,\"PAGES\":true,\"EVENTS\":true,\"GUIDES\":true,\"ROUTES\":true,\"SEARCH\":true,\"FEEDBACK\":true,\"FLOOR_PLANS\":true,\"QR_TRIGGERS\":true,\"OFFLINE_CONTENT\":true,\"POI_EXPLORATION\":true,\"LOCATION_TRIGGERS\":true},\"capabilities\":[\"PAGES\",\"POI_EXPLORATION\",\"ROUTES\",\"GUIDES\",\"MAPS\",\"FLOOR_PLANS\",\"EVENTS\",\"SEARCH\",\"OFFLINE_CONTENT\",\"LOCATION_TRIGGERS\",\"QR_TRIGGERS\",\"FEEDBACK\"],\"version\":0,\"updatedAt\":\"2026-11-13T13:31:17.701051Z\"}"
+ },
+ {
+  "u": "/projects/f56e8c75-94af-4c87-88c8-06cba46240a1/places?size=1&status=ACTIVE",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/f56e8c75-94af-4c87-88c8-06cba46240a1/places?size=1&status=DRAFT",
+  "s": 200,
+  "b": "{\"content\":[{\"id\":\"5dd57bb9-0d62-4dee-bc18-83ec9dfc76bd\",\"projectId\":\"f56e8c75-94af-4c87-88c8-06cba46240a1\",\"parentPlaceId\":null,\"slug\":\"ux-r2-p2-first-place\",\"type\":\"AREA\",\"environment\":\"OUTDOOR\",\"status\":\"DRAFT\",\"internalName\":null,\"latitude\":null,\"longitude\":null,\"featured\":false,\"sortOrder\":1,\"archivedAt\":null,\"createdAt\":\"2026-11-13T13:55:17.065857Z\",\"updatedAt\":\"2026-11-13T13:55:17.065857Z\",\"version\":0,\"hasWorkingCopy\":false,\"workingCopyUpdatedAt\":null,\"translations\":{\"en\":{\"title\":\"UX-R2-p2 First Place\",\"summary\":null,\"description\":null,\"visitorInformation\":null,\"accessibilityInformatio"
+ },
+ {
+  "u": "/projects/f56e8c75-94af-4c87-88c8-06cba46240a1/pois?size=1&status=DRAFT",
+  "s": 200,
+  "b": "{\"content\":[{\"id\":\"695d19f2-bf83-4bbf-b138-e1de994fb5bc\",\"projectId\":\"f56e8c75-94af-4c87-88c8-06cba46240a1\",\"placeId\":null,\"slug\":\"ux-r2-p2-first-poi\",\"code\":null,\"status\":\"DRAFT\",\"internalName\":null,\"latitude\":null,\"longitude\":null,\"estimatedVisitMinutes\":null,\"featured\":false,\"sortOrder\":1,\"archivedAt\":null,\"createdAt\":\"2026-11-13T13:55:43.208546Z\",\"updatedAt\":\"2026-11-13T13:55:43.208546Z\",\"version\":0,\"hasWorkingCopy\":false,\"workingCopyUpdatedAt\":null,\"translations\":{\"en\":{\"title\":\"UX-R2-p2 First POI\",\"summary\":null,\"description\":null,\"instructions\":null,\"accessibilityInformation\":null}},\"ca"
+ },
+ {
+  "u": "/projects/f56e8c75-94af-4c87-88c8-06cba46240a1/pois?size=1&status=ACTIVE",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/f56e8c75-94af-4c87-88c8-06cba46240a1/routes?size=1&status=DRAFT",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/f56e8c75-94af-4c87-88c8-06cba46240a1/routes?size=1&status=ACTIVE",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/f56e8c75-94af-4c87-88c8-06cba46240a1/guides?size=1&status=ACTIVE",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/f56e8c75-94af-4c87-88c8-06cba46240a1/guides?size=1&status=DRAFT",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/f56e8c75-94af-4c87-88c8-06cba46240a1/events?size=1&status=ACTIVE",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/f56e8c75-94af-4c87-88c8-06cba46240a1/events?size=1&status=DRAFT",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/f56e8c75-94af-4c87-88c8-06cba46240a1/settings",
+  "s": 200,
+  "b": "{\"applicationStatus\":\"DRAFT\",\"contentRevision\":0,\"timezone\":null,\"featureConfiguration\":{\"MAPS\":true,\"PAGES\":true,\"EVENTS\":true,\"GUIDES\":true,\"ROUTES\":true,\"SEARCH\":true,\"FEEDBACK\":true,\"FLOOR_PLANS\":true,\"QR_TRIGGERS\":true,\"OFFLINE_CONTENT\":true,\"POI_EXPLORATION\":true,\"LOCATION_TRIGGERS\":true},\"capabilities\":[\"PAGES\",\"POI_EXPLORATION\",\"ROUTES\",\"GUIDES\",\"MAPS\",\"FLOOR_PLANS\",\"EVENTS\",\"SEARCH\",\"OFFLINE_CONTENT\",\"LOCATION_TRIGGERS\",\"QR_TRIGGERS\",\"FEEDBACK\"],\"version\":0,\"updatedAt\":\"2026-11-13T13:31:17.701051Z\"}"
+ },
+ {
+  "u": "/projects/f56e8c75-94af-4c87-88c8-06cba46240a1/categories?size=1&status=ACTIVE",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/f56e8c75-94af-4c87-88c8-06cba46240a1/assets?size=1&status=ACTIVE",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/f56e8c75-94af-4c87-88c8-06cba46240a1/maps?size=1&status=DRAFT",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/f56e8c75-94af-4c87-88c8-06cba46240a1/assets?size=1&status=DRAFT",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/f56e8c75-94af-4c87-88c8-06cba46240a1/categories?size=1&status=DRAFT",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/f56e8c75-94af-4c87-88c8-06cba46240a1/floor-plans?size=1&status=ACTIVE",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/f56e8c75-94af-4c87-88c8-06cba46240a1/maps?size=1&status=ACTIVE",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/f56e8c75-94af-4c87-88c8-06cba46240a1/floor-plans?size=1&status=DRAFT",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/f56e8c75-94af-4c87-88c8-06cba46240a1/places?pending=true&size=10",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":10,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/f56e8c75-94af-4c87-88c8-06cba46240a1/pois?pending=true&size=10",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":10,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/f56e8c75-94af-4c87-88c8-06cba46240a1/routes?pending=true&size=10",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":10,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/f56e8c75-94af-4c87-88c8-06cba46240a1/events?pending=true&size=10",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":10,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/f56e8c75-94af-4c87-88c8-06cba46240a1/guides?pending=true&size=10",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":10,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/f56e8c75-94af-4c87-88c8-06cba46240a1/categories?pending=true&size=10",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":10,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/f56e8c75-94af-4c87-88c8-06cba46240a1/readiness",
+  "s": 200,
+  "b": "{\"activatable\":true,\"blocking\":[],\"warnings\":[{\"resourceType\":\"PROJECT\",\"resourceId\":null,\"title\":null,\"languageCode\":null,\"path\":\"surfaces\",\"code\":\"PUBLIC_BASE_URL_MISSING\"}]}"
+ },
+ {
+  "u": "/projects/1d6971ce-6391-4da8-848e-8d7466d25128/settings",
+  "s": 200,
+  "b": "{\"applicationStatus\":\"DRAFT\",\"contentRevision\":0,\"timezone\":null,\"featureConfiguration\":{\"MAPS\":true,\"PAGES\":true,\"EVENTS\":true,\"GUIDES\":true,\"ROUTES\":true,\"SEARCH\":true,\"FEEDBACK\":true,\"FLOOR_PLANS\":true,\"QR_TRIGGERS\":true,\"OFFLINE_CONTENT\":true,\"POI_EXPLORATION\":true,\"LOCATION_TRIGGERS\":true},\"capabilities\":[\"PAGES\",\"POI_EXPLORATION\",\"ROUTES\",\"GUIDES\",\"MAPS\",\"FLOOR_PLANS\",\"EVENTS\",\"SEARCH\",\"OFFLINE_CONTENT\",\"LOCATION_TRIGGERS\",\"QR_TRIGGERS\",\"FEEDBACK\"],\"version\":0,\"updatedAt\":\"2026-11-12T11:54:12.485540Z\"}"
+ },
+ {
+  "u": "/projects/1d6971ce-6391-4da8-848e-8d7466d25128/places?size=1&status=DRAFT",
+  "s": 200,
+  "b": "{\"content\":[{\"id\":\"efade4fe-6287-4c06-834a-f27e4403ab5c\",\"projectId\":\"1d6971ce-6391-4da8-848e-8d7466d25128\",\"parentPlaceId\":null,\"slug\":\"ux-s8-dashboard-place\",\"type\":\"AREA\",\"environment\":\"OUTDOOR\",\"status\":\"DRAFT\",\"internalName\":null,\"latitude\":null,\"longitude\":null,\"featured\":false,\"sortOrder\":1,\"archivedAt\":null,\"createdAt\":\"2026-11-12T12:06:29.423426Z\",\"updatedAt\":\"2026-11-12T12:06:29.423426Z\",\"version\":0,\"hasWorkingCopy\":false,\"workingCopyUpdatedAt\":null,\"translations\":{\"en\":{\"title\":\"UX-s8-dashboard Place\",\"summary\":null,\"description\":null,\"visitorInformation\":null,\"accessibilityInformat"
+ },
+ {
+  "u": "/projects/1d6971ce-6391-4da8-848e-8d7466d25128/pois?size=1&status=ACTIVE",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/1d6971ce-6391-4da8-848e-8d7466d25128/routes?size=1&status=ACTIVE",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/1d6971ce-6391-4da8-848e-8d7466d25128/pois?size=1&status=DRAFT",
+  "s": 200,
+  "b": "{\"content\":[{\"id\":\"20cc51a4-fb06-4ecb-b6db-a3d8ef63a81e\",\"projectId\":\"1d6971ce-6391-4da8-848e-8d7466d25128\",\"placeId\":null,\"slug\":\"ux-s8-dashboard-poi\",\"code\":null,\"status\":\"DRAFT\",\"internalName\":null,\"latitude\":null,\"longitude\":null,\"estimatedVisitMinutes\":null,\"featured\":false,\"sortOrder\":1,\"archivedAt\":null,\"createdAt\":\"2026-11-12T12:08:02.197407Z\",\"updatedAt\":\"2026-11-12T12:08:02.197407Z\",\"version\":0,\"hasWorkingCopy\":false,\"workingCopyUpdatedAt\":null,\"translations\":{\"en\":{\"title\":\"UX-s8-dashboard POI\",\"summary\":null,\"description\":null,\"instructions\":null,\"accessibilityInformation\":null}},\""
+ },
+ {
+  "u": "/projects/1d6971ce-6391-4da8-848e-8d7466d25128/routes?size=1&status=DRAFT",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/1d6971ce-6391-4da8-848e-8d7466d25128/places?size=1&status=ACTIVE",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/1d6971ce-6391-4da8-848e-8d7466d25128/guides?size=1&status=ACTIVE",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/1d6971ce-6391-4da8-848e-8d7466d25128/guides?size=1&status=DRAFT",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/1d6971ce-6391-4da8-848e-8d7466d25128/events?size=1&status=ACTIVE",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/1d6971ce-6391-4da8-848e-8d7466d25128/events?size=1&status=DRAFT",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/1d6971ce-6391-4da8-848e-8d7466d25128/categories?size=1&status=ACTIVE",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/1d6971ce-6391-4da8-848e-8d7466d25128/categories?size=1&status=DRAFT",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/1d6971ce-6391-4da8-848e-8d7466d25128/assets?size=1&status=ACTIVE",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/1d6971ce-6391-4da8-848e-8d7466d25128/assets?size=1&status=DRAFT",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/1d6971ce-6391-4da8-848e-8d7466d25128/maps?size=1&status=DRAFT",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/1d6971ce-6391-4da8-848e-8d7466d25128/floor-plans?size=1&status=ACTIVE",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/1d6971ce-6391-4da8-848e-8d7466d25128/maps?size=1&status=ACTIVE",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/1d6971ce-6391-4da8-848e-8d7466d25128/floor-plans?size=1&status=DRAFT",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/1d6971ce-6391-4da8-848e-8d7466d25128/places?pending=true&size=10",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":10,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/1d6971ce-6391-4da8-848e-8d7466d25128/pois?pending=true&size=10",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":10,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/1d6971ce-6391-4da8-848e-8d7466d25128/routes?pending=true&size=10",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":10,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/1d6971ce-6391-4da8-848e-8d7466d25128/events?pending=true&size=10",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":10,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/1d6971ce-6391-4da8-848e-8d7466d25128/guides?pending=true&size=10",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":10,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/1d6971ce-6391-4da8-848e-8d7466d25128/categories?pending=true&size=10",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":10,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/1d6971ce-6391-4da8-848e-8d7466d25128/settings",
+  "s": 200,
+  "b": "{\"applicationStatus\":\"DRAFT\",\"contentRevision\":0,\"timezone\":null,\"featureConfiguration\":{\"MAPS\":true,\"PAGES\":true,\"EVENTS\":true,\"GUIDES\":true,\"ROUTES\":true,\"SEARCH\":true,\"FEEDBACK\":true,\"FLOOR_PLANS\":true,\"QR_TRIGGERS\":true,\"OFFLINE_CONTENT\":true,\"POI_EXPLORATION\":true,\"LOCATION_TRIGGERS\":true},\"capabilities\":[\"PAGES\",\"POI_EXPLORATION\",\"ROUTES\",\"GUIDES\",\"MAPS\",\"FLOOR_PLANS\",\"EVENTS\",\"SEARCH\",\"OFFLINE_CONTENT\",\"LOCATION_TRIGGERS\",\"QR_TRIGGERS\",\"FEEDBACK\"],\"version\":0,\"updatedAt\":\"2026-11-12T11:54:12.485540Z\"}"
+ },
+ {
+  "u": "/projects/1d6971ce-6391-4da8-848e-8d7466d25128/readiness",
+  "s": 200,
+  "b": "{\"activatable\":true,\"blocking\":[],\"warnings\":[{\"resourceType\":\"PROJECT\",\"resourceId\":null,\"title\":null,\"languageCode\":null,\"path\":\"surfaces\",\"code\":\"PUBLIC_BASE_URL_MISSING\"}]}"
+ },
+ {
+  "u": "/projects/ceee1b24-e7c4-474e-93ba-f77067ed8a72/settings",
+  "s": 200,
+  "b": "{\"applicationStatus\":\"DRAFT\",\"contentRevision\":0,\"timezone\":null,\"featureConfiguration\":{\"MAPS\":true,\"PAGES\":true,\"EVENTS\":true,\"GUIDES\":true,\"ROUTES\":true,\"SEARCH\":true,\"FEEDBACK\":true,\"FLOOR_PLANS\":true,\"QR_TRIGGERS\":true,\"OFFLINE_CONTENT\":true,\"POI_EXPLORATION\":true,\"LOCATION_TRIGGERS\":true},\"capabilities\":[\"PAGES\",\"POI_EXPLORATION\",\"ROUTES\",\"GUIDES\",\"MAPS\",\"FLOOR_PLANS\",\"EVENTS\",\"SEARCH\",\"OFFLINE_CONTENT\",\"LOCATION_TRIGGERS\",\"QR_TRIGGERS\",\"FEEDBACK\"],\"version\":0,\"updatedAt\":\"2026-11-12T14:36:15.588431Z\"}"
+ },
+ {
+  "u": "/projects/ceee1b24-e7c4-474e-93ba-f77067ed8a72/places?size=1&status=ACTIVE",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/ceee1b24-e7c4-474e-93ba-f77067ed8a72/places?size=1&status=DRAFT",
+  "s": 200,
+  "b": "{\"content\":[{\"id\":\"7e189cf7-6eb4-46ce-89c6-fe54270bb8a2\",\"projectId\":\"ceee1b24-e7c4-474e-93ba-f77067ed8a72\",\"parentPlaceId\":null,\"slug\":\"ux-p2-place\",\"type\":\"SITE\",\"environment\":\"OUTDOOR\",\"status\":\"DRAFT\",\"internalName\":null,\"latitude\":null,\"longitude\":null,\"featured\":false,\"sortOrder\":1,\"archivedAt\":null,\"createdAt\":\"2026-11-12T14:47:10.016728Z\",\"updatedAt\":\"2026-11-12T14:47:10.016728Z\",\"version\":0,\"hasWorkingCopy\":false,\"workingCopyUpdatedAt\":null,\"translations\":{\"en\":{\"title\":\"UX-P2 Place\",\"summary\":null,\"description\":null,\"visitorInformation\":null,\"accessibilityInformation\":null}},\"media\":"
+ },
+ {
+  "u": "/projects/ceee1b24-e7c4-474e-93ba-f77067ed8a72/pois?size=1&status=ACTIVE",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/ceee1b24-e7c4-474e-93ba-f77067ed8a72/pois?size=1&status=DRAFT",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/ceee1b24-e7c4-474e-93ba-f77067ed8a72/routes?size=1&status=ACTIVE",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/ceee1b24-e7c4-474e-93ba-f77067ed8a72/routes?size=1&status=DRAFT",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/ceee1b24-e7c4-474e-93ba-f77067ed8a72/guides?size=1&status=ACTIVE",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/ceee1b24-e7c4-474e-93ba-f77067ed8a72/guides?size=1&status=DRAFT",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/ceee1b24-e7c4-474e-93ba-f77067ed8a72/events?size=1&status=ACTIVE",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/ceee1b24-e7c4-474e-93ba-f77067ed8a72/settings",
+  "s": 200,
+  "b": "{\"applicationStatus\":\"DRAFT\",\"contentRevision\":0,\"timezone\":null,\"featureConfiguration\":{\"MAPS\":true,\"PAGES\":true,\"EVENTS\":true,\"GUIDES\":true,\"ROUTES\":true,\"SEARCH\":true,\"FEEDBACK\":true,\"FLOOR_PLANS\":true,\"QR_TRIGGERS\":true,\"OFFLINE_CONTENT\":true,\"POI_EXPLORATION\":true,\"LOCATION_TRIGGERS\":true},\"capabilities\":[\"PAGES\",\"POI_EXPLORATION\",\"ROUTES\",\"GUIDES\",\"MAPS\",\"FLOOR_PLANS\",\"EVENTS\",\"SEARCH\",\"OFFLINE_CONTENT\",\"LOCATION_TRIGGERS\",\"QR_TRIGGERS\",\"FEEDBACK\"],\"version\":0,\"updatedAt\":\"2026-11-12T14:36:15.588431Z\"}"
+ },
+ {
+  "u": "/projects/ceee1b24-e7c4-474e-93ba-f77067ed8a72/events?size=1&status=DRAFT",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/ceee1b24-e7c4-474e-93ba-f77067ed8a72/categories?size=1&status=ACTIVE",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/ceee1b24-e7c4-474e-93ba-f77067ed8a72/assets?size=1&status=ACTIVE",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/ceee1b24-e7c4-474e-93ba-f77067ed8a72/categories?size=1&status=DRAFT",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/ceee1b24-e7c4-474e-93ba-f77067ed8a72/maps?size=1&status=ACTIVE",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/ceee1b24-e7c4-474e-93ba-f77067ed8a72/floor-plans?size=1&status=ACTIVE",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/ceee1b24-e7c4-474e-93ba-f77067ed8a72/assets?size=1&status=DRAFT",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/ceee1b24-e7c4-474e-93ba-f77067ed8a72/maps?size=1&status=DRAFT",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/ceee1b24-e7c4-474e-93ba-f77067ed8a72/floor-plans?size=1&status=DRAFT",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":1,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/ceee1b24-e7c4-474e-93ba-f77067ed8a72/places?pending=true&size=10",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":10,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/ceee1b24-e7c4-474e-93ba-f77067ed8a72/pois?pending=true&size=10",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":10,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/ceee1b24-e7c4-474e-93ba-f77067ed8a72/routes?pending=true&size=10",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":10,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/ceee1b24-e7c4-474e-93ba-f77067ed8a72/guides?pending=true&size=10",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":10,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/ceee1b24-e7c4-474e-93ba-f77067ed8a72/events?pending=true&size=10",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":10,\"totalElements\":0,\"totalPages\":0}"
+ },
+ {
+  "u": "/projects/ceee1b24-e7c4-474e-93ba-f77067ed8a72/categories?pending=true&size=10",
+  "s": 200,
+  "b": "{\"content\":[],\"page\":0,\"size\":10,\"totalElements\":0,\"totalPages\":0}"
+ }
+]

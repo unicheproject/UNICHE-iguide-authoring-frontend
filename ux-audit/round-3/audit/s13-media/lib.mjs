@@ -1,0 +1,22 @@
+import { open, go, P, shot, settle } from "./h.mjs";
+const vp = process.argv[2] ?? "1440";
+const { browser, page } = await open("admin", { viewport: vp });
+const t0 = Date.now();
+await go(page, `/projects/${P}/media`);
+await settle(page);
+const out = { vp, load: Date.now() - t0 };
+out.grid = await page.evaluate(() => {
+  const cards = [...document.querySelectorAll("ul[aria-label='Media files'] > li")];
+  const r = cards.slice(0, 12).map((li) => { const b = li.getBoundingClientRect(); const img = li.querySelector("img,svg,[data-thumb]"); const ib = img?.getBoundingClientRect(); const chips = [...li.querySelectorAll("[class*=chip],[class*=badge]")]; return { x: Math.round(b.x), y: Math.round(b.y), w: Math.round(b.width), h: Math.round(b.height), img: ib && [Math.round(ib.width), Math.round(ib.height)], lastChildBottom: Math.round(li.lastElementChild.getBoundingClientRect().bottom), text: li.innerText.replace(/\n+/g, " | ").slice(0, 160) }; });
+  const xs = [...new Set(cards.map((c) => Math.round(c.getBoundingClientRect().x)))];
+  const gaps = xs.slice(1).map((x, i) => x - xs[i]);
+  return { n: cards.length, cols: xs.length, gaps, sample: r, count: document.querySelector("[data-media-count]")?.textContent.trim(), hscroll: document.documentElement.scrollWidth > innerWidth };
+});
+await shot(page, `lib__grid__${vp}`);
+await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight)); await page.waitForTimeout(400);
+await shot(page, `lib__grid-bottom__${vp}`);
+await go(page, `/projects/${P}/media?view=list`); await settle(page);
+out.list = await page.evaluate(() => { const t = document.querySelector("table"); if (!t) return null; return { cols: [...t.querySelectorAll("thead th")].map((th) => `${th.textContent.trim()}:${Math.round(th.getBoundingClientRect().width)}`), overflow: [...t.querySelectorAll("td")].filter((td) => td.scrollWidth > td.clientWidth + 1).length, rowH: [...t.querySelectorAll("tbody tr")].slice(0, 6).map((r) => Math.round(r.getBoundingClientRect().height)), row0: t.querySelector("tbody tr")?.innerText.replace(/\n+/g, " | ") }; });
+await shot(page, `lib__list__${vp}`);
+out.grid.sample = out.grid.sample.slice(0,6).map(s=>`${s.x},${s.y} ${s.w}x${s.h} img${s.img} / ${s.text.slice(0,70)}`); console.log(JSON.stringify(out));
+await browser.close();

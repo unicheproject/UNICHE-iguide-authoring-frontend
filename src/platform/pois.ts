@@ -1,3 +1,4 @@
+import { coordinateError, parseDecimal } from "@/components/map/coordinates";
 import { apiRequest, completeSave } from "./api";
 import { syncMedia, toMediaBindings, type MediaBinding, type MediaBindingResponse } from "./assets";
 import type { ResourceStatus } from "./places";
@@ -171,4 +172,34 @@ export const POI_CODE_PATTERN = /^[A-Za-z0-9]+(-[A-Za-z0-9]+)*$/;
 /** Resources that still use the Point of Interest; non-empty blocks deactivation and archival. */
 export function fetchPoiReferences(projectId: string, poiId: string): Promise<ResourceReference[]> {
   return apiRequest(`${base(projectId)}/${encodeURIComponent(poiId)}/references`);
+}
+
+/**
+ * Checks a typed position: both or neither, each a number in range, a decimal comma accepted (plan P4). The messages go
+ * into `found` under `latitude` and `longitude`. Nothing here throws, whatever was typed.
+ */
+export function checkPoiPosition(latitude: string, longitude: string, found: Record<string, string>): void {
+  const lat = latitude.trim();
+  const lng = longitude.trim();
+  if (!lat && !lng) return;
+  const latMessage = lat ? coordinateError(lat, "latitude") : "Enter a latitude too, or clear the longitude.";
+  const lngMessage = lng ? coordinateError(lng, "longitude") : "Enter a longitude too, or clear the latitude.";
+  if (latMessage) found.latitude = latMessage;
+  if (lngMessage) found.longitude = lngMessage;
+}
+
+/**
+ * Why one coordinate field is not acceptable as typed, or null, for checking it on leaving the field (C2-69). An empty
+ * field is fine while the other one is empty too; with only one of the two filled it asks for the other.
+ */
+export function coordinateBlurError(axis: "latitude" | "longitude", latitude: string, longitude: string): string | null {
+  const own = (axis === "latitude" ? latitude : longitude).trim();
+  const other = (axis === "latitude" ? longitude : latitude).trim();
+  if (!own) return other ? `Enter a ${axis} too, or clear the ${axis === "latitude" ? "longitude" : "latitude"}.` : null;
+  return coordinateError(own, axis);
+}
+
+/** A coordinate as the API takes it: a number, or null for empty or unreadable text (validation reports the latter). */
+export function coordinateNumber(text: string): number | null {
+  return parseDecimal(text);
 }

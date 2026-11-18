@@ -1,0 +1,131 @@
+- main:
+  - navigation "Breadcrumb":
+    - list:
+      - listitem:
+        - link "Events":
+          - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/events
+      - listitem: UX-R3-p5 Event
+  - heading "UX-R3-p5 Event" [level=1]
+  - text: Draft
+  - status
+  - 'button "3 warnings, nothing blocks in this event: show what needs attention"'
+  - button "Save No unsaved changes to save" [disabled]
+  - button "More actions"
+  - heading "Texts" [level=2]
+  - tablist "Language":
+    - tab "English default 1 of 3" [selected]
+    - tab "Ελληνικά Missing"
+    - tab "Italiano Missing"
+  - tabpanel "English default 1 of 3":
+    - text: Title
+    - paragraph: Required in the default language before the event can be activated.
+    - textbox "Title": UX-R3-p5 Event
+    - text: Summary
+    - paragraph: "Short text shown in lists: what happens and for whom."
+    - textbox "Summary"
+    - text: Description
+    - textbox "Description"
+    - button "Where 0 of 1 filled Hide" [expanded]
+    - text: Location text
+    - paragraph: Where to meet, such as “Main entrance, by the ticket desk”.
+    - textbox "Location text"
+  - region "Dates None yet":
+    - heading "Dates None yet" [level=2]
+    - paragraph: "This Project has no time zone set, so times are in this browser's: Athens time (Europe/Athens)."
+    - paragraph: No dates yet. Add the first date of the event.
+    - button "Add a date"
+  - region "Where and booking":
+    - heading "Where and booking" [level=2]
+    - paragraph: All optional. While the event uses a place, point of interest or route, that item cannot be deactivated or archived.
+    - text: Place
+    - paragraph: Type to search or choose from the list.
+    - combobox "Place": None
+    - text: Point of interest
+    - paragraph: Type to search or choose from the list.
+    - combobox "Point of interest": None
+    - text: Route
+    - paragraph: Type to search or choose from the list.
+    - combobox "Route": None
+    - paragraph: "Drafts are marked and listed last: visitors cannot open them until they are activated."
+    - text: Booking URL
+    - paragraph: Where visitors book or buy tickets. Leave empty when no booking is needed.
+    - textbox "Booking URL":
+      - /placeholder: https://
+  - region "Media 0 of 2 filled · primary image recommended":
+    - heading "Media 0 of 2 filled · primary image recommended" [level=2]
+    - group "Add media":
+      - button "Add Primary image (recommended)"
+      - button "Add Gallery"
+  - region "How visitors reach it Browsing only":
+    - heading "How visitors reach it Browsing only" [level=2]
+    - paragraph: "Visitors browse to it. Add a way to open it in place:"
+    - group "Add a way to reach it":
+      - button "Add Beacon (Bluetooth)"
+      - button "Add Geo-proximity"
+      - button "Add QR code"
+      - button "AR scan target Camera recognition is not part of the first release" [disabled]
+      - button "Why is AR scan target not available?"
+  - region "Details":
+    - heading "Details" [level=2]:
+      - button "Details"
+  - complementary "About this item":
+    - region "Status":
+      - heading "Status" [level=2]
+      - text: Draft
+      - paragraph: Only authors see it. Activate it once the default-language title is set.
+      - button "Activate"
+      - term: Kind
+      - definition: Event
+      - term: Slug
+      - definition: ux-r3-p5-event
+      - term: Revision
+      - definition: Not saved yet
+      - term: Updated
+      - definition: 17 Nov 2026, 11:18
+      - term: Created
+      - definition: 17 Nov 2026, 11:18
+      - paragraph: The slug is part of the item's web address.
+    - button "Preview in app"
+    - region "Before you activate":
+      - heading "Before you activate" [level=2]
+      - paragraph: 3 warnings, nothing blocks.
+      - paragraph: 3 warnings, nothing blocks
+      - heading "Texts (3)" [level=3]
+      - list:
+        - listitem:
+          - 'button "Warning: English: 2 texts missing"'
+        - listitem:
+          - 'button "Warning: Ελληνικά: 3 texts missing"'
+        - listitem:
+          - 'button "Warning: Italiano: 3 texts missing"'
+    - navigation "On this page":
+      - heading "On this page" [level=2]
+      - list:
+        - listitem:
+          - link "Dates None yet":
+            - /url: "#dates"
+        - listitem:
+          - link "Where and booking":
+            - /url: "#where"
+        - listitem:
+          - link "Media Primary image missing":
+            - /url: "#media"
+        - listitem:
+          - link "How visitors reach it Browsing only":
+            - /url: "#triggers"
+        - listitem:
+          - link "Details":
+            - /url: "#details"
+    - region "Translations":
+      - heading "Translations" [level=2]
+      - 'button "Next missing: English"'
+      - list:
+        - listitem:
+          - button "English default editing 1 of 3"
+        - listitem:
+          - button "Ελληνικά Missing"
+        - listitem:
+          - button "Italiano Missing"
+    - region "Used in (0)":
+      - heading "Used in (0)" [level=2]
+      - paragraph: Not used anywhere yet.

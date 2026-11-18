@@ -1,0 +1,32 @@
+import { open, go, base, shot } from "./lib.mjs";
+import { readFileSync } from "node:fs";
+const R = JSON.parse(readFileSync("ux-audit/round-3/audit/p3-translator/records.json","utf8"));
+const A = readFileSync("ux-audit/round-3/audit/p3-translator/asset.txt","utf8").trim();
+const { browser, page } = await open("admin", { viewport: "1440" });
+const dirs = (sel)=>page.evaluate((sel)=>[...document.querySelectorAll(sel)].filter(e=>e.offsetParent).slice(0,12).map(e=>`${e.tagName}${e.id?"#"+e.id:""} dir=${e.getAttribute("dir")} lang=${e.getAttribute("lang")} computed=${getComputedStyle(e).direction} ta=${getComputedStyle(e).textAlign} "${String(typeof e.value==="string"?e.value:(e.innerText||"")).trim().slice(0,28)}"`).join("\n"), sel);
+// Guide: arabic title
+await go(page, R.guides);
+await page.waitForSelector("h1"); await page.waitForTimeout(1800);
+await page.locator("#f-title").fill("UX-R3-p3 Guide مرحبا بالعالم – دليل المتحف");
+await page.locator("textarea[id^=ge-field]").first().fill("פסקה ראשונה בעברית: ברוכים הבאים למוזיאון (2026).");
+await page.getByRole("button",{name:"Save", exact:true}).first().click({timeout:3000}).catch(()=>console.log("already saved"));
+await page.waitForTimeout(2500);
+await shot(page,"guide-editor__rtl-arabic-hebrew__1440",false);
+console.log("GUIDE EDITOR\n"+await dirs("h1, #f-title, textarea[id^=ge-field], input[id^=ge-field], nav[aria-label*=read], [aria-label=Breadcrumb] *"));
+await page.getByRole("tab",{name:/Ελληνικά/}).click();
+await page.waitForTimeout(500);
+console.log("GREEK TAB SOURCE\n"+await dirs("[id$=-source], #f-title"));
+await shot(page,"guide-editor__rtl-source-in-greek-tab__1440");
+// list
+await go(page, base+"/guides");
+await page.waitForSelector("h1"); await page.waitForTimeout(1500);
+const s = page.getByPlaceholder(/Search/).first();
+await s.fill("مرحبا");
+await page.waitForTimeout(1800);
+await shot(page,"guides-list__rtl-search-arabic__1440");
+console.log("LIST (search arabic)\n"+await dirs("input[type=search], input[placeholder*=Search], tbody tr a, tbody tr bdi"));
+console.log("rows", await page.locator("tbody tr").count());
+await s.fill("שלום");
+await page.waitForTimeout(1500);
+console.log("rows hebrew", await page.locator("tbody tr").count());
+await browser.close();

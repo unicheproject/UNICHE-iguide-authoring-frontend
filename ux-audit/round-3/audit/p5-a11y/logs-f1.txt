@@ -1,0 +1,5 @@
+label ring rgb(76, 29, 139) solid 2px | has-focus-visible:true
+event dialog ["BUTTON:Close dialog","INPUT:Title · English(required)","BUTTON:Edit slug","INPUT:Slug","BUTTON:Cancel","BUTTON:Create and open"]
+[create event] Enter -> h1 "UX-R3-p5 Event" 256,132,160,26  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) | live=["Event createdIt is a draft. Add its dates, then activate it.","UX-R3-p5 Event loaded"]
+http://localhost:5173/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/events/2ff0df72-9d2f-4bfe-82d6-c8ac13e3bf3e {"title":"UX-R3-p5 Event · UX Audit – Populated · iGuide CMS","h1":"UX-R3-p5 Event","ae":"H1"}
+headings ["H1 UX-R3-p5 Event","H2 Texts","H2 Dates None yet","H2 Where and booking","H2 Media 0 of 2 filled · primary image reco","H2 How visitors reach it Browsing only","H2 Details","H2 Status","H2 Before you activate","H3 Texts (3)","H2 On this page","H2 Translations","H2 Used in (0)"]

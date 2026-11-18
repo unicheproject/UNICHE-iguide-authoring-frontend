@@ -1,0 +1,10 @@
+import {open,go,P,shot,btns,hdr} from "./lib.mjs";
+const { browser, page } = await open("admin",{viewport:"1440"});
+let t=Date.now();
+await go(page,P+"/media"); await page.waitForSelector("main h1");
+await page.waitForTimeout(1500);
+console.log("media load ms",Date.now()-t);
+await shot(page,"media__grid__1440");
+console.log((await page.evaluate(()=>document.querySelector("main").innerText)).slice(0,1200));
+console.log(await btns(page,"main").then(a=>a.slice(0,40)));
+await browser.close();

@@ -1,0 +1,136 @@
+- main:
+  - navigation "Breadcrumb":
+    - list:
+      - listitem:
+        - link "Guides":
+          - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/guides
+      - listitem: UX-R3-p5 Guide
+  - heading "UX-R3-p5 Guide" [level=1]
+  - text: Draft
+  - status: Unsaved changes
+  - 'button "2 warnings, nothing blocks in this guide: show what needs attention"'
+  - button "Save"
+  - button "More actions"
+  - heading "Texts" [level=2]
+  - tablist "Language":
+    - tab "English default Complete" [selected]
+    - tab "Ελληνικά Missing"
+    - tab "Italiano Missing"
+  - tabpanel "English default Complete":
+    - text: Title
+    - paragraph: Required in the default language before the guide can be activated.
+    - textbox "Title": UX-R3-p5 Guide
+  - region "Story 3":
+    - heading "Story 3" [level=2]
+    - paragraph: Paragraphs, headings, images and references, in the order visitors read them.
+    - paragraph: Added paragraph 3 at position 3.
+    - list:
+      - listitem:
+        - button "Drag handle for paragraph 1"
+        - text: Drag with the mouse, or press the Up and Down arrow keys to move it. Move up, Move down and Position do the same. Position of paragraph 1
+        - combobox "Position of paragraph 1":
+          - option "1" [selected]
+          - option "2"
+          - option "3"
+        - button "Move paragraph 1 up" [disabled]
+        - button "Move paragraph 1 down"
+        - button "Insert after paragraph 1"
+        - button "Remove paragraph 1"
+        - text: Paragraph 1
+        - textbox "Paragraph 1":
+          - /placeholder: Write the paragraph in English
+          - text: First paragraph of the R3 story.
+      - listitem:
+        - group "Level of heading 2":
+          - button "H2 (level 2)" [pressed]
+          - button "H3 (level 3)"
+        - button "Drag handle for heading 2"
+        - text: Drag with the mouse, or press the Up and Down arrow keys to move it. Move up, Move down and Position do the same. Position of heading 2
+        - combobox "Position of heading 2":
+          - option "1"
+          - option "2" [selected]
+          - option "3"
+        - button "Move heading 2 up"
+        - button "Move heading 2 down"
+        - button "Insert after heading 2"
+        - button "Remove heading 2"
+        - text: Heading 2, level 2
+        - textbox "Heading 2, level 2":
+          - /placeholder: Heading in English
+          - text: Heading block
+      - listitem:
+        - button "Drag handle for paragraph 3"
+        - text: Drag with the mouse, or press the Up and Down arrow keys to move it. Move up, Move down and Position do the same. Position of paragraph 3
+        - combobox "Position of paragraph 3":
+          - option "1"
+          - option "2"
+          - option "3" [selected]
+        - button "Move paragraph 3 up"
+        - button "Move paragraph 3 down" [disabled]
+        - button "Insert after paragraph 3"
+        - button "Remove paragraph 3"
+        - text: Paragraph 3
+        - textbox "Paragraph 3":
+          - /placeholder: Write the paragraph in English
+          - text: Second paragraph.
+    - group "Add to the end of the story":
+      - button "Add paragraph"
+      - button "Add heading"
+      - button "Add image"
+      - button "Add reference"
+  - region "Details 1 of 4 set":
+    - heading "Details 1 of 4 set" [level=2]:
+      - button "Details 1 of 4 set"
+  - complementary "About this item":
+    - region "Status":
+      - heading "Status" [level=2]
+      - text: Draft
+      - paragraph: Only authors see it. Activate it once it has a default-language title and a story, every paragraph and heading written in the default language.
+      - button "Save and activate"
+      - term: Kind
+      - definition: Guide
+      - term: Slug
+      - definition: ux-r3-p5-guide
+      - term: Revision
+      - definition: Not saved yet
+      - term: Updated
+      - definition: 17 Nov 2026, 11:16
+      - term: Created
+      - definition: 17 Nov 2026, 11:16
+      - paragraph: The slug is part of the item's web address.
+    - button "Preview in app"
+    - region "Before you activate":
+      - heading "Before you activate" [level=2]
+      - paragraph: 2 warnings, nothing blocks.
+      - paragraph: 2 warnings, nothing blocks
+      - heading "Texts (2)" [level=3]
+      - list:
+        - listitem:
+          - 'button "Warning: Ελληνικά: 2 texts missing"'
+        - listitem:
+          - 'button "Warning: Italiano: 2 texts missing"'
+    - navigation "On this page":
+      - heading "On this page" [level=2]
+      - list:
+        - listitem:
+          - link "Texts":
+            - /url: "#texts"
+        - listitem:
+          - link "Story 3":
+            - /url: "#story"
+        - listitem:
+          - link "Details 1 of 4 set":
+            - /url: "#details"
+    - region "Translations":
+      - heading "Translations" [level=2]
+      - 'button "Next missing: Ελληνικά"'
+      - list:
+        - listitem:
+          - button "English default editing Complete"
+        - listitem:
+          - button "Ελληνικά Missing"
+        - listitem:
+          - button "Italiano Missing"
+    - region "Used in (0)":
+      - heading "Used in (0)" [level=2]
+      - paragraph: Not used anywhere yet.

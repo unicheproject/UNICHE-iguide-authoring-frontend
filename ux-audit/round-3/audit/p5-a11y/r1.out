@@ -1,0 +1,12 @@
+no-preference skeleton-ish anims @250ms: 6 ["CSSAnimation:splash-pulse:DIV.splash-bar dur=1600 iter=Infinity running","CSSAnimation:splash-pulse:DIV.splash-bar dur=1600 iter=Infinity running","CSSAnimation:splash-pulse:DIV.splash-bar dur=1600 iter=Infinity running","CSSAnimation:splash-pulse:DIV.splash-bar dur=1600 iter=Infinity running","CSSAnimation:splash-pulse:DIV.splash-bar dur=1600 iter=Infinity running"]
+no-preference dialog opening anims @60ms: 7 ["CSSTransition:border-bottom-color:INPUT.ui-field dur=120 iter=1 running","CSSTransition:border-left-color:INPUT.ui-field dur=120 iter=1 running","CSSTransition:border-right-color:INPUT.ui-field dur=120 iter=1 running","CSSTransition:border-top-color:INPUT.ui-field dur=120 iter=1 running","CSSTransition:box-shadow:INPUT.ui-field dur=120 iter=1 running","CSSAnimation:ui-fade-in:DIV.fixed inset-0 flex items- dur=180 iter=1 running"]
+no-preference btn transition 0.12s color, background-color, border-color, b
+no-preference scroll-behavior auto
+no-preference saving anims: 1 ["CSSAnimation:ui-spin:svg.[object SVGAnimatedString dur=900 iter=Infinity running"]
+no-preference preview anims: 0 []
+reduce skeleton-ish anims @250ms: 0 []
+reduce dialog opening anims @60ms: 2 ["CSSAnimation:ui-fade-in:DIV.fixed inset-0 flex items- dur=120 iter=1 running","CSSAnimation:ui-fade-in:DIV.flex max-h-[calc(100dvh-2 dur=120 iter=1 running"]
+reduce btn transition 0.001s color, background-color, border-color, b
+reduce scroll-behavior auto
+reduce saving anims: 0 []
+reduce preview anims: 0 []

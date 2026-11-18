@@ -1,0 +1,14 @@
+import { open, go, base, shot } from "./lib.mjs";
+import { readFileSync } from "node:fs";
+const R = JSON.parse(readFileSync("ux-audit/round-3/audit/p3-translator/records.json","utf8"));
+const { browser, page } = await open("admin", { viewport: "1440" });
+await go(page, R.events);
+await page.waitForSelector("h1"); await page.waitForTimeout(1500);
+await page.locator("#f-summary").fill("An English test event summary.");
+await page.locator("#f-description").fill("An English test event description.");
+await page.locator("#f-locationText").fill("Main hall").catch(()=>{});
+await page.locator("#occ-add").click();
+await page.waitForTimeout(800);
+await shot(page,"event-editor__date-added-default__1440",true);
+console.log(await page.evaluate(()=>[...document.querySelectorAll("main input,main select,main fieldset,main legend")].filter(e=>e.offsetParent).map(e=>`${e.tagName} ${e.id}|${e.getAttribute("aria-label")||e.labels?.[0]?.innerText||e.innerText?.slice(0,40)||""}|${e.value||""}|type=${e.type}`).join("\n")));
+await browser.close();

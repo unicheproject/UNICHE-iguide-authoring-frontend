@@ -1,0 +1,9 @@
+state line after save draft: Saved 16:45
+DISCARD activeElement: h2#status-card-heading "Status"
+toast: ["Saved 16:45","Changes discardedThe point of interest is as visitors see it.","Changes discardedThe point of interest is as visitors see it."]
+dialog shown: 1 Your session ended Your unsaved edits are kept in this browser. Sign in again to carry on where you were, or stay on this page to copy something first; changes cannot be saved until you sign in. Stay on this page Sign in again
+state line after dismiss: Not saved: session ended. Sign in again
+Save draft aria-disabled: null primary aria-disabled: null
+header texts: UX-R3-W0B POI wc1 Active Not saved: session ended. Sign in again Sign in again 3 warnings, nothing blocks in this point of interest: show what needs attention Save and apply
+Ctrl+S retried: 2 dialog again: 1
+Saving... anywhere: false

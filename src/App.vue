@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { computed, nextTick, watch } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { computed, watch } from "vue";
+import { useRoute } from "vue-router";
 import AppHeader from "@/components/AppHeader.vue";
 import AppToast from "@/components/AppToast.vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import OfflineBanner from "@/components/OfflineBanner.vue";
+import SessionEndedDialog from "@/components/SessionEndedDialog.vue";
 import SessionErrorView from "@/views/SessionErrorView.vue";
 import SignInView from "@/views/SignInView.vue";
+import { announcements } from "@/lib/announcer";
 import { session } from "@/platform/auth";
 import { loadProjects } from "@/stores/projects";
 
@@ -14,15 +16,8 @@ import { loadProjects } from "@/stores/projects";
 const route = useRoute();
 const bare = computed(() => route.meta.bare === true);
 
-// Only <main> scrolls (D-062), so the router's window scrolling does nothing: a new page starts at its top here.
-// A change of query only (a list filter) keeps the position.
-useRouter().afterEach((to, from) => {
-  if (to.path === from.path) return;
-  void nextTick(() => {
-    document.querySelector("main")?.scrollTo({ top: 0 });
-    window.scrollTo({ top: 0 });
-  });
-});
+// Title, focus on the page heading, the "<page> loaded" announcement and scrolling `<main>` to the top on every route
+// change are done by `lib/routeAnnouncer.ts`, installed in `router.ts`.
 
 /** Skip link target: the page's own <main>, focused without being added to the tab order. */
 function skipToMain() {
@@ -45,8 +40,8 @@ watch(
   <div class="app-shell flex min-h-screen flex-col bg-background">
     <a
       v-if="!bare"
-      href="#"
-      class="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[90] focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-xs focus:font-bold focus:text-primary-foreground focus:no-underline focus:shadow-lg"
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-skip focus:inline-flex focus:min-h-control focus:items-center focus:rounded-md focus:bg-primary focus:px-4 focus:text-sm focus:font-semibold focus:text-primary-foreground focus:no-underline focus:shadow-2"
       @click.prevent="skipToMain"
     >
       Skip to content
@@ -61,5 +56,9 @@ watch(
     </div>
     <AppToast />
     <ConfirmDialog />
+    <SessionEndedDialog />
+    <!-- Live regions for `lib/announcer.ts`: route changes, saves, uploads, offline state. -->
+    <div class="sr-only" role="status" aria-live="polite" aria-atomic="true">{{ announcements.polite }}</div>
+    <div class="sr-only" role="alert" aria-live="assertive" aria-atomic="true">{{ announcements.assertive }}</div>
   </div>
 </template>

@@ -1,0 +1,70 @@
+{
+ "afterTitleTab": {
+  "tag": "INPUT",
+  "id": "",
+  "label": "",
+  "top": 348,
+  "bottom": 349,
+  "inViewport": true
+ },
+ "radioChecked": [
+  false,
+  true
+ ],
+ "route503": {
+  "text": "The route was not created | The platform is busy or down for maintenance. Nothing was created. Try again in a few minutes. | Request id req-p3a-503 | Copy request id",
+  "focus": true,
+  "alerts": 1
+ },
+ "routeOffline": {
+  "text": "The route was not created | You are offline. Nothing was created. What you typed is still here; reconnect and try again.",
+  "focus": true,
+  "alerts": 1
+ },
+ "axeRouteDialog": [],
+ "places503": {
+  "text": "The place was not created | The platform is busy or down for maintenance. Nothing was created. Try again in a few minutes. | Request id req-p3a-503 | Copy request id",
+  "focus": true,
+  "alerts": 1
+ },
+ "pois503": {
+  "text": "The point of interest was not created | The platform is busy or down for maintenance. Nothing was created. Try again in a few minutes. | Request id req-p3a-503 | Copy request id",
+  "focus": true,
+  "alerts": 1
+ },
+ "catAbort-pois": {
+  "rows": 50,
+  "notice": [
+   "Categories could not be loaded | The list is complete. Category names and the Category filter are left out. Check your connection and try again. Nothing was changed. | Try again"
+  ],
+  "tryAgain": true
+ },
+ "catAbortAxe-pois": [],
+ "catAbort-routes": {
+  "rows": 26,
+  "notice": [
+   "Categories could not be loaded | The list is complete. Category names and the Category filter are left out. Check your connection and try again. Nothing was changed. | Try again"
+  ],
+  "tryAgain": true
+ },
+ "catAbortAxe-routes": [],
+ "triggersAbort": {
+  "rows": 50,
+  "notLoaded": 50,
+  "notice": [
+   "Triggers could not be loaded | The list is complete. Trigger chips are left out. Check your connection and try again. Nothing was changed. | Try again"
+  ]
+ },
+ "axe-places": [],
+ "axe-pois": [],
+ "axe-routes": [],
+ "axePoisFilters": [],
+ "popoverLabels": [
+  "Language",
+  "Sort by",
+  "Pending changes",
+  "Needs translation",
+  "Category",
+  "Featured only"
+ ]
+}

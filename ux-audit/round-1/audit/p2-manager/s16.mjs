@@ -1,0 +1,14 @@
+import { shot, CMS } from "./h.mjs";
+import { open, go } from "../../../tools/session.mjs";
+const { browser, page } = await open("curator", { viewport: "1280" });
+const reqs=[]; page.on("response", r=>{ if(r.url().includes("/iguide/api")&&!/\/projects\/[0-9a-f-]{36}$/.test(r.url())) reqs.push(r.status()+" "+r.url().replace(/.*api\/v1/,"")) });
+await go(page, "/"); await page.waitForTimeout(2500);
+await shot(page, "curator__home-2", "1280");
+console.log((await page.locator("main").innerText()).slice(0,300));
+console.log(reqs.join("\n"));
+await go(page, "/projects/new"); await page.waitForTimeout(5000);
+await shot(page, "curator__create-direct", "1280");
+console.log("CREATE as curator:", (await page.locator("main").innerText()).slice(0,700));
+await go(page, "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5"); await page.waitForTimeout(1500);
+await shot(page, "curator__populated-dashboard", "1280");
+await browser.close();

@@ -1,0 +1,17 @@
+[skip preview] Enter -> div "End of preview" 255,305,1,1  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) | live=["Preview: Web, English, working content","Drafts and 15 pending changes of active items shown."]
+after skip  div "End of preview" 255,305,1,1  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px)
+frame inert before interact {"inertAttr":true,"ariaHidden":true,"focusables":53}
+[interact] Enter -> button "Stop interacting with the preview" 1242,306,174,40  solid 2px rgb(76, 29, 139) off 2px | live=[]
+interact state {"btns":["Stop interacting with the preview|true"]}
+tab into frame:
+0 button "UX Audit – Populated" 277,399,167,25  solid 2px rgb(76, 29, 139) off 2px LOWRING 1.38
+1 button "Home" 872,402,37,20  solid 2px rgb(76, 29, 139) off 2px LOWRING 1.38
+2 button "Places" 924,402,41,20  solid 2px rgb(76, 29, 139) off 2px LOWRING 1.38
+3 button "Points of interest" 981,402,104,20  solid 2px rgb(76, 29, 139) off 2px LOWRING 1.38
+4 button "Routes" 1100,402,43,20  solid 2px rgb(76, 29, 139) off 2px LOWRING 1.38
+5 button "Guides" 1159,402,42,20  solid 2px rgb(76, 29, 139) off 2px LOWRING 1.38
+[esc inside frame] Escape -> button "Interact with the preview" 1302,306,114,40  solid 2px rgb(76, 29, 139) off 2px | live=["Stopped interacting with the preview"]
+after esc []
+[esc 2] Escape -> button "Interact with the preview" 1302,306,114,40  solid 2px rgb(76, 29, 139) off 2px | live=[]
+left frame after 46 stops -> body "Skip to content  iGuide CMS UX Audit – PopulatedApp: Draft. " 0,0,1440,900 BODY! (no outline; shadow none)
+AXE {"label":"preview-interacting","url":"http://localhost:5173/projects/PID/preview","counts":{},"v":[]}

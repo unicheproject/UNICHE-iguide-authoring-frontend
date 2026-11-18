@@ -1,0 +1,24 @@
+import { shot, CMS } from "./h.mjs";
+import { open, go } from "../../../tools/session.mjs";
+const E="/projects/65f8958a-144a-46fe-851b-f1176b2a597e";
+const { browser, page } = await open("admin", { viewport: "1440" });
+await go(page, E+"/pois"); await page.waitForTimeout(1200);
+await page.getByRole("button", { name: /new point/i }).first().click(); await page.waitForTimeout(500);
+const d=page.getByRole("dialog");
+await d.locator("#poi-title").fill("UX-p2-manager POI");
+await d.locator("#poi-place").selectOption({ label: "UX-p2-manager Place" });
+console.log("slug", await d.locator("#poi-slug").inputValue());
+await d.getByRole("button",{name:/^create$/i}).click();
+await page.waitForURL(/pois\/[0-9a-f-]{36}/,{timeout:20000}).catch(()=>console.log("no nav",page.url()));
+await page.waitForLoadState("networkidle").catch(()=>{}); await page.waitForTimeout(1500);
+console.log(page.url());
+await shot(page, "poi-editor__first-open", "1440");
+console.log((await page.locator("main").innerText()));
+// scroll main to see lower parts
+await page.locator("main").evaluate(e=>e.scrollTo(0,99999)); await page.waitForTimeout(300);
+await shot(page, "poi-editor__bottom", "1440");
+await page.locator("main").evaluate(e=>e.scrollTo(0,0));
+await page.getByRole("button",{name:/^activate$/i}).click(); await page.waitForTimeout(1200);
+await shot(page, "poi-editor__activate-refusal", "1440");
+console.log("ACTIVATE:", (await page.locator("[role=dialog],[role=alert],[role=status]").allInnerTexts()).join(" || "));
+await browser.close();

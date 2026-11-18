@@ -27,3 +27,12 @@ dist-ssr
 /e2e/.auth/
 /test-results/
 /playwright-report/
+
+# UX audit: screenshots and saved sign-in sessions stay local
+/ux-audit/**/*.png
+/ux-audit/tools/.auth/
+
+# Local scratch
+/shots/
+/x.png
+/.tmp-dev.config.mjs

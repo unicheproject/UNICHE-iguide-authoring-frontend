@@ -1,0 +1,215 @@
+- link "Skip to content":
+  - /url: "#main"
+- banner:
+  - link "UNICHE, all projects":
+    - /url: /
+  - text: iGuide CMS
+  - 'button "UX Audit – Populated App: Draft . Switch project"'
+  - button "P. Admin , account menu"
+- navigation "Primary":
+  - link "Dashboard":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5
+  - paragraph: Content
+  - link "Places":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/places
+  - link "Points of Interest":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois
+  - link "Routes":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/routes
+  - link "Guides":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/guides
+  - link "Events":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/events
+  - link "Categories":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/categories
+  - link "Maps & Floor Plans":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/maps
+  - separator
+  - link "Media":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/media
+  - paragraph: Visitor app
+  - link "Overview":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/overview
+  - link "App settings":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/app-settings
+  - link "Pages":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pages
+  - link "Navigation":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/navigation
+  - link "Translations":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/translations
+  - link "Preview":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/preview
+  - link "Launch":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/launch
+  - paragraph: Project
+  - link "Audit log":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/audit-log
+- main:
+  - navigation "Breadcrumb":
+    - list:
+      - listitem:
+        - link "Routes":
+          - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/routes
+      - listitem: UX-R3-p5 Route
+  - heading "UX-R3-p5 Route" [level=1]
+  - text: Draft
+  - status
+  - 'button "3 warnings, nothing blocks in this route: show what needs attention"'
+  - button "Save No unsaved changes to save" [disabled]
+  - button "More actions"
+  - heading "Texts" [level=2]
+  - tablist "Language":
+    - tab "English default 1 of 4" [selected]
+    - tab "Ελληνικά Missing"
+    - tab "Italiano Missing"
+  - tabpanel "English default 1 of 4":
+    - text: Title
+    - paragraph: Required in the default language before the route can be activated.
+    - textbox "Title": UX-R3-p5 Route
+    - text: Summary
+    - paragraph: "Short text shown in lists: what the visitor will see and for how long."
+    - textbox "Summary"
+    - text: Description
+    - textbox "Description"
+    - button "More texts 0 of 1 filled Hide" [expanded]
+    - text: Instructions
+    - paragraph: Where it starts and what to bring.
+    - textbox "Instructions"
+  - region "Stops 0":
+    - heading "Stops 0" [level=2]
+    - paragraph: Pick the first stop below. The map of its Place opens here, and each next stop is joined to the one before.
+    - paragraph
+    - paragraph: No stops yet. Add the points of interest in the order visitors meet them.
+    - button "Add stops"
+  - region "Route settings":
+    - heading "Route settings" [level=2]
+    - group "Setting":
+      - text: Setting
+      - button "Indoor"
+      - button "Outdoor" [pressed]
+      - text: On a site or in a city. Drawn on a map.
+    - group "Mode":
+      - text: Mode
+      - button "Walking"
+      - button "Hiking"
+      - button "Biking"
+      - button "Car"
+      - button "Sailing"
+      - text: Choose the selected mode again to leave it unset.
+    - group "Difficulty":
+      - text: Difficulty
+      - button "Easy"
+      - button "Moderate"
+      - button "Demanding"
+      - text: Choose the selected difficulty again to leave it unset.
+    - text: Route total (minutes)
+    - paragraph: A whole number of minutes.
+    - textbox "Route total (minutes)"
+    - text: Distance (metres)
+    - paragraph: A whole number of metres, for example 2400.
+    - textbox "Distance (metres)"
+    - text: Category
+    - combobox "Category":
+      - option "Uncategorised" [selected]
+      - option "Guided Walks"
+      - option "Guided Walks › Family Trails"
+      - option "Guided Walks › Cycling Itineraries"
+      - option "Thematic Itineraries"
+      - option "UX-s11-editors Category"
+      - option "UX-R2-s7-chrome toast timing A"
+      - option "UX-R2-s7-chrome toast timing B"
+      - option "UX-R2-s11 Category"
+      - option "UX-R2-s7-chrome toast timing C"
+      - option "UX-R2-s7-chrome toast timing D"
+      - option "UX-R2-s7-chrome toast timing E"
+      - option "UX-R2-s7-chrome toast timing F"
+      - option "UX-R2-s7-chrome toast timing G"
+    - 'checkbox "Loop: the route ends where it started"'
+    - text: "Loop: the route ends where it started"
+  - region "Media 0 of 1 filled":
+    - heading "Media 0 of 1 filled" [level=2]
+    - group "Add media":
+      - button "Add Primary image"
+  - region "How visitors reach it Browsing only":
+    - heading "How visitors reach it Browsing only" [level=2]
+    - paragraph: "Visitors browse to it. Add a way to open it in place:"
+    - group "Add a way to reach it":
+      - button "Add Beacon (Bluetooth)"
+      - button "Add Geo-proximity"
+      - button "Add QR code"
+      - button "AR scan target Camera recognition is not part of the first release" [disabled]
+      - button "Why is AR scan target not available?"
+  - region "Details 1 of 3 set":
+    - heading "Details 1 of 3 set" [level=2]:
+      - button "Details 1 of 3 set"
+  - complementary "About this item":
+    - region "Status":
+      - heading "Status" [level=2]
+      - text: Draft
+      - paragraph: Only authors see it. Activate it once it has a default-language title and an active stop.
+      - button "Activate"
+      - term: Kind
+      - definition: Outdoor route
+      - term: Slug
+      - definition: ux-r3-p5-route
+      - term: Revision
+      - definition: Not saved yet
+      - term: Updated
+      - definition: 17 Nov 2026, 11:15
+      - term: Created
+      - definition: 17 Nov 2026, 11:15
+      - paragraph: The slug is part of the item's web address.
+    - button "Preview in app"
+    - region "Before you activate":
+      - heading "Before you activate" [level=2]
+      - paragraph: 3 warnings, nothing blocks.
+      - paragraph: 3 warnings, nothing blocks
+      - heading "Texts (3)" [level=3]
+      - list:
+        - listitem:
+          - 'button "Warning: English: 3 texts missing"'
+        - listitem:
+          - 'button "Warning: Ελληνικά: 4 texts missing"'
+        - listitem:
+          - 'button "Warning: Italiano: 4 texts missing"'
+    - navigation "On this page":
+      - heading "On this page" [level=2]
+      - list:
+        - listitem:
+          - link "Texts":
+            - /url: "#texts"
+        - listitem:
+          - link "Stops 0":
+            - /url: "#stops"
+        - listitem:
+          - link "Route settings":
+            - /url: "#route-settings"
+        - listitem:
+          - link "Media 0 of 1 filled":
+            - /url: "#media"
+        - listitem:
+          - link "How visitors reach it Browsing only":
+            - /url: "#triggers"
+        - listitem:
+          - link "Details 1 of 3 set":
+            - /url: "#details"
+    - region "Translations":
+      - heading "Translations" [level=2]
+      - 'button "Next missing: English"'
+      - list:
+        - listitem:
+          - button "English default editing 1 of 4"
+        - listitem:
+          - button "Ελληνικά Missing"
+        - listitem:
+          - button "Italiano Missing"
+    - region "Used in (0)":
+      - heading "Used in (0)" [level=2]
+      - paragraph: Not used anywhere yet.
+- status:
+  - strong: Route created
+  - text: It is a draft. Add its stops, then activate it.
+  - button "Dismiss notification"
+- status: UX-R3-p5 Route loaded
+- alert

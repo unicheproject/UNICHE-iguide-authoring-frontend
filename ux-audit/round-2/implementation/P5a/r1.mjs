@@ -1,0 +1,43 @@
+import { open, go } from "../../../tools/session.mjs";
+import fs from "fs";
+const P = "6958c18f-60d2-4140-a524-5a43f8a2f6b5";
+const rec = JSON.parse(fs.readFileSync("records.json"));
+const vp = process.argv[2] ?? "1440";
+const { browser, page } = await open("admin", { viewport: vp });
+const log = (...a) => console.log(...a);
+await go(page, `/projects/${P}/routes/${rec.route}`);
+await page.waitForSelector("#add-stop", { timeout: 40000 }); await page.waitForTimeout(1500);
+await page.screenshot({ path: `after/route-empty-${vp}.png`, fullPage: true });
+await page.click("#add-stop");
+await page.waitForSelector("#pick-search");
+await page.fill("#pick-search", "UX-s11-editors Stop");
+await page.press("#pick-search", "ArrowDown");
+log("focus after ArrowDown:", await page.evaluate(() => document.activeElement?.innerText.replace(/\s+/g," ").slice(0,60)));
+await page.keyboard.press("ArrowDown");
+log("focus after 2nd:", await page.evaluate(() => document.activeElement?.innerText.replace(/\s+/g," ").slice(0,60)));
+await page.keyboard.press("ArrowUp"); await page.keyboard.press("ArrowUp");
+log("focus back:", await page.evaluate(() => document.activeElement?.id));
+await page.press("#pick-search", "Enter"); await page.waitForTimeout(300);
+await page.press("#pick-search", "Enter"); await page.waitForTimeout(300);
+log("added:", await page.evaluate(() => document.querySelector("[role=dialog]")?.innerText.match(/\d+ added/g)?.join("|")));
+await page.screenshot({ path: `after/picker-${vp}.png` });
+// unplaced stop
+await page.fill("#pick-search", "Horsemen"); await page.press("#pick-search", "Enter"); await page.waitForTimeout(200);
+await page.fill("#pick-search", "Panathenaic"); await page.press("#pick-search", "ArrowDown"); await page.keyboard.press("Enter"); await page.waitForTimeout(200);
+await page.getByRole("button", { name: /^Done/ }).click(); await page.waitForTimeout(800);
+log("stops:", await page.locator("[data-stop-row]").count());
+log("map card:", await page.evaluate(() => document.querySelector(".route-map-pin")?.innerText.replace(/\s+/g," ").slice(0,500)));
+await page.screenshot({ path: `after/route-stops-${vp}.png`, fullPage: true });
+await page.getByRole("button", { name: "Show as list" }).click();
+log("list:", await page.evaluate(() => document.getElementById("route-stop-list")?.innerText.replace(/\s+/g," ").slice(0,300)));
+// completeness
+log("header:", await page.evaluate(() => document.querySelector("[data-sticky-bar]")?.innerText.replace(/\s+/g," ").slice(0,200)));
+// remove stop 2
+await page.getByRole("button", { name: /^Remove stop 2/ }).click(); await page.waitForTimeout(500);
+log("focus after remove:", await page.evaluate(() => document.activeElement?.innerText.replace(/\s+/g," ")));
+const bar = page.locator("[data-removed-bar]");
+log("bar in view:", await bar.evaluate(el => { const r=el.getBoundingClientRect(); return r.top>=0 && r.bottom<=innerHeight; }));
+await page.screenshot({ path: `after/route-removed-${vp}.png` });
+await page.keyboard.press("Control+z"); await page.waitForTimeout(500);
+log("stops after ctrl+z:", await page.locator("[data-stop-row]").count());
+await browser.close();

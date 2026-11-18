@@ -1,0 +1,41 @@
+[open upload] Enter -> h2 "Upload files" 329,260,738,26  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) | live=[]
+dlg {"name":"Upload files","text":"Upload files\n\nDrop files here, or\n\nChoose files\nUpload images as floor plans\nAccepted formats and largest file\nType\tFormats\tLargest file\nImage\tJPG, PNG, WebP, GIF, SVG, AVIF\t20.0 MB\nAudio\tMP3, WAV, M4A, OGG, FLAC\t50.0 MB\nVideo\tMP4, WebM, MOV\t200.0 MB\nDocument\tPDF\t20.0 MB\n3D model\tGLB, GLTF\t100.0 MB\n"}
+tab:
+0 button "Close dialog" 1079,260,40,40  solid 2px rgb(76, 29, 139) off 2px 
+1 button "Choose files" 619,330,121,40  solid 2px rgb(76, 29, 139) off 2px 
+2 input "on" 751,340,20,20  solid 2px rgb(76, 29, 139) off 2px 
+3 button "Close" 1038,604,73,40  solid 2px rgb(255, 255, 255) off 2px LOWRING 1
+4 button "Close dialog" 1079,260,40,40  solid 2px rgb(76, 29, 139) off 2px 
+AXE {"label":"upload-empty","url":"http://localhost:5173/projects/PID/media","counts":{},"v":[]}
+after choose button "Close dialog" 1079,256,40,40  solid 2px rgb(76, 29, 139) off 2px [{"t":7001,"role":"log","text":"Uploading 2 files.","why":"add"},{"t":7383,"role":"log","text":"Uploading 2 files.UX-R3-p5 upload a.png uploaded.","why":"add"},{"t":7435,"role":"log","text":"Uploading 2 files.UX-R3-p5 upload a.png uploaded.UX-R3-p5 upload b.png uploaded.","why":"add"},{"t":7436,"role":"log","text":"Uploading 2 files.UX-R3-p5 upload a.png uploaded.UX-R3-p5 upload b.png uploaded.2 uploaded.","why":"add"}]
+dlg text Upload files
+
+Drop files here, or
+
+Choose files
+Upload images as floor plans
+Accepted formats and largest file
+
+You can add several files at once. Other file types are held back until you confirm them.
+
+UX-R3-p5 upload a.png
+Image · 780 B
+Uploaded
+UX-R3-p5 upload b.png
+Image · 590 B
+Uploaded
+
+Uploading 2 files.
+
+UX-R3-p5 upload a.png uploaded.
+
+UX-R3-p5 upload b.png uploaded.
+
+2 uploaded.
+
+2 of 2 uploaded
+Describe now (2)
+Close
+live regions ["log/polite:Uploading 2 files.UX-R3-p5 upload a.png uploaded.UX-R3-p5 upload b.png uploaded."]
+AXE {"label":"upload-held","url":"http://localhost:5173/projects/PID/media","counts":{},"v":[]}
+buttons ["","Choose files","Describe now (2)","Close"]

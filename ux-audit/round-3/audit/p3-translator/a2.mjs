@@ -1,0 +1,12 @@
+import { open, go, base, shot, dump } from "./lib.mjs";
+const { browser, page } = await open("admin", { viewport: "1440" });
+await go(page, base + "/pois");
+await page.waitForTimeout(2000);
+let t=Date.now();
+await page.getByRole("button", { name: /filters and sort/i }).click();
+await page.waitForTimeout(500);
+await shot(page, "pois-list__filters-open__1440");
+const pop = await page.evaluate(()=>{const d=document.querySelector("[role=dialog],[data-reka-popper-content-wrapper],[data-state=open][role=menu]"); return d? d.innerText:"none"});
+console.log(pop);
+console.log((await dump(page)).filter(x=>!x.includes("/projects/")).join("\n"));
+await browser.close();

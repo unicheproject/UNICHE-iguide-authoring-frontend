@@ -1,0 +1,19 @@
+{
+ "place": "931a389a-9f23-45c7-88e9-7424ba206559",
+ "poiDraft": "0de4063f-c264-4eb7-be0a-ecf822439521",
+ "poiActive": "1cea705f-46b2-44a4-9145-24bb4653ebfd",
+ "guide": "6ecd76e7-e0ce-4e8b-ac3e-1310e5080a35",
+ "event": "bd0c77d4-dc87-4b71-8821-bb1f4746b51f",
+ "cat": "99bcee47-8189-46e6-91b2-e98b12ae5f27",
+ "catUsed": "5df7e0a7-9e28-4e10-a1fa-8b8e3336d6b7",
+ "route": "7fcd93cd-b3ef-431b-aeff-4de3f6766266",
+ "stopPois": [
+  "99f49ad9-9852-472c-8424-945c50dd982a",
+  "5ab1ce51-423e-439a-a43f-c1b2cf027fd4",
+  "916d8f98-2ebd-4d45-a1ac-93f7c0149fab",
+  "39e09ad0-ee53-437a-b364-c16546cc53c7",
+  "36cb19b2-d84d-4a5c-81c7-aeb19c3a9fd7"
+ ],
+ "poiTrig": "8a9d9561-c89e-40e0-b9de-9abd499c197e",
+ "poiTrig2": "29d5c393-467d-4c3f-9c7e-40fc5bf022a6"
+}

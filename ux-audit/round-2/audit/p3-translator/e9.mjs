@@ -1,0 +1,10 @@
+import { open, go, PID, shot, fs } from "./lib.mjs";
+const ids = JSON.parse(fs.readFileSync(new URL("./ids.json", import.meta.url)));
+const { browser, page } = await open("curator", { viewport: "1440" });
+await go(page, `/projects/${PID}/guides/${ids.guide}`);
+await page.waitForFunction(() => document.querySelector("h1")?.innerText.includes("UX-R2"), null, { timeout: 40000 }).catch(()=>{}); await page.waitForTimeout(1500);
+await page.getByRole("tab", { name: /Ελληνικά/ }).click(); await page.waitForTimeout(600);
+console.log(await page.evaluate(() => [...document.querySelectorAll("main [contenteditable], main input, main textarea")].map(f => `${f.tagName}|${f.id}|${f.getAttribute("aria-label")||f.labels?.[0]?.innerText}|${f.value ?? f.innerText}`.slice(0,120)).join("\n")));
+console.log((await page.locator("[role=tab]").evaluateAll(e => e.map(x => x.innerText.replace(/\n/g," ")))).join(" / "));
+await shot(page, "guide-editor__el-saved");
+await browser.close();

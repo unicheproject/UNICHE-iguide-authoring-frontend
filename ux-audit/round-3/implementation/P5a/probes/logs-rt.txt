@@ -1,0 +1,8 @@
+1440 pins {"count":5,"size":[26,26],"maxOverlap":0,"pair":""}
+1440 legend ["Numbered pins are the stops; the line joins them in stop order.","Stops 1, 3 and 4 are close together, so their pins are drawn slightly apart. Zoom in to see where each one is.","Stops 1, 2, 3, 4 and 5 are draft points of interest: visitors don't see them until they are activated."]
+1440 zoomed +3 pins {"count":5,"size":[26,26],"maxOverlap":0,"pair":""}
+1440 zoomed back pins {"count":5,"size":[26,26],"maxOverlap":0,"pair":""}
+1440 axe []
+768 pins {"count":5,"size":[26,26],"maxOverlap":0,"pair":""}
+768 legend ["Numbered pins are the stops; the line joins them in stop order.","Stops 1, 3 and 4 are close together, so their pins are drawn slightly apart. Zoom in to see where each one is.","Stops 1, 2, 3, 4 and 5 are draft points of interest: visitors don't see them until they are activated."]
+768 axe []

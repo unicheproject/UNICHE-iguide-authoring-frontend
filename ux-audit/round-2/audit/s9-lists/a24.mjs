@@ -1,0 +1,12 @@
+import { open, go, shot, POP } from "./lib.mjs";
+const { browser, page } = await open("curator", { viewport: "1440" });
+await go(page, `/projects/${POP}/categories?q=${encodeURIComponent("UX-R2-s9")}`); await page.waitForTimeout(1200);
+console.log(await page.locator("tbody tr").evaluateAll((r) => r.map((x) => x.innerText.replace(/\s+/g, " ").slice(0, 80) + " | left=" + Math.round(x.querySelector("td:nth-child(2) *")?.getBoundingClientRect().left))));
+await go(page, `/projects/${POP}/categories`); await page.waitForTimeout(800);
+await page.getByRole("button", { name: "New category", exact: true }).first().click(); await page.waitForTimeout(400);
+const d = page.getByRole("dialog");
+await d.getByText("Subcategory", { exact: true }).click(); await page.waitForTimeout(300);
+console.log("before choosing applies-to:", (await d.innerText()).replace(/\s+/g, " ").slice(-200));
+await d.getByText("Points of Interest", { exact: true }).first().click(); await page.waitForTimeout(300);
+console.log("parent select value:", await d.getByLabel(/Parent category/).inputValue(), "| selected text:", await d.getByLabel(/Parent category/).evaluate((s) => s.selectedOptions[0]?.text));
+await browser.close();

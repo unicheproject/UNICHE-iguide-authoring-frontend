@@ -1,0 +1,11 @@
+import { createRequire } from "node:module";
+import { open, go } from "../../../tools/session.mjs";
+const require = createRequire(new URL("../../../../package.json", import.meta.url));
+const { AxeBuilder } = require("@axe-core/playwright");
+const { browser, page } = await open("curator", { viewport: "1440" });
+await go(page, "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5"); await page.waitForTimeout(2500);
+const r = await new AxeBuilder({ page }).analyze();
+for (const v of r.violations) for (const n of v.nodes) console.log(v.id, v.impact, n.html.slice(0, 160));
+await page.keyboard.press("Tab");
+console.log("first tab:", await page.evaluate(() => document.activeElement?.textContent?.trim().slice(0, 40)));
+await browser.close();

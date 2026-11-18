@@ -1,0 +1,9 @@
+1024 end before 10/3/2026 14:00
+1024 ended chips 2 opacity ["1/rgb(233, 235, 239)","1/rgb(244, 245, 247)"]
+1024 axe []
+768 end before 10/3/2026 14:00
+768 ended chips 2 opacity ["1/rgb(233, 235, 239)","1/rgb(244, 245, 247)"]
+768 axe []
+zoom200 end before 10/3/2026 14:00
+zoom200 ended chips 2 opacity ["1/rgb(233, 235, 239)","1/rgb(244, 245, 247)"]
+zoom200 axe []

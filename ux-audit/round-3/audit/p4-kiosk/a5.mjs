@@ -1,0 +1,16 @@
+import { open, go, bearer, API } from "../../../tools/session.mjs"; import {P,shotp,log,rects,here} from "./lib.mjs";
+import fs from "node:fs";
+const { browser, context, page } = await open("admin",{viewport:"1440"});
+const auth=await bearer(page);
+const j=await (await page.request.get(`${API}/projects/${P}/triggers?size=200`,{headers:{authorization:auth}})).json(); const trig=j.content??j; fs.writeFileSync(here+"/trig.json",JSON.stringify(trig));
+const qr=trig.find(t=>t.triggerType==="QR_CODE"&&t.status==="ACTIVE"&&t.targetResourceType==="POI");
+log(qr.targetResourceType,qr.targetResourceId,qr.runtimeUrl);
+context.grantPermissions?.(["clipboard-read","clipboard-write"],{origin:"http://localhost:5173"}).catch(()=>{});
+await go(page,`/projects/${P}/pois/${qr.targetResourceId}`);
+await page.waitForSelector("text=How visitors reach it",{timeout:20000});
+const card=page.locator("section,div").filter({has:page.getByRole("heading",{name:/How visitors reach it/})}).last();
+await page.getByRole("heading",{name:/How visitors reach it/}).scrollIntoViewIfNeeded(); await page.waitForTimeout(800);
+await page.screenshot({path:shotp("poi-triggers__default__1440")});
+log("card text",(await card.innerText()).replace(/\s+/g," ").slice(0,1500));
+log(await page.evaluate(`(${rects})("main img, main button, main a")`).then(a=>a.filter(x=>x.y>0&&x.y<900&&x.x>240)));
+await browser.close();

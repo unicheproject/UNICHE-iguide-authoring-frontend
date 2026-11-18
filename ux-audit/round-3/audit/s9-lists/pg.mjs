@@ -1,0 +1,15 @@
+import { open, go, P, shot, settle } from "./h.mjs";
+const { browser, page } = await open("admin", { viewport: "1440" });
+const foc = () => page.evaluate(() => { const a=document.activeElement; const r=a.getBoundingClientRect(); return a.tagName + ":" + (a.getAttribute("aria-label")||a.innerText||"").slice(0,40).replace(/\n/g," ") + " top=" + Math.round(r.top) + " vh=" + innerHeight + " scroll=" + document.querySelector("main").scrollTop; });
+await go(page, `/projects/${P}/pois`); await settle(page, 2200);
+console.log("footer html:", await page.evaluate(() => { const n=[...document.querySelectorAll("nav")].find(n=>/page/i.test(n.getAttribute("aria-label")||"")); return n ? n.outerHTML.replace(/<svg.*?<\/svg>/g,"<svg/>").replace(/ data-v-[a-z0-9]+=""/g,"").slice(0,1600) : "no nav; " + document.querySelector("main").lastElementChild.outerHTML.slice(0,800); }));
+const next = page.getByRole("button", { name: /Next/ }).last();
+await next.scrollIntoViewIfNeeded(); await next.focus();
+await shot(page, "pois__pager-focus__1440");
+console.log("pager box", JSON.stringify(await page.evaluate(() => { const b=[...document.querySelectorAll("button")].filter(x=>/Next/.test(x.innerText+x.getAttribute("aria-label")||"")).pop(); const r=b.getBoundingClientRect(); return [Math.round(r.x),Math.round(r.y),Math.round(r.width),Math.round(r.height)]; })));
+await page.keyboard.press("Enter"); await settle(page, 1500);
+console.log("after Next:", await foc(), "url", await page.evaluate(()=>location.search), "live", await page.evaluate(() => [...document.querySelectorAll("[role=status]")].map(e=>e.textContent.trim()).filter(Boolean)));
+await shot(page, "pois__after-next-page__1440");
+console.log("first row", await page.locator("main table tbody tr").first().innerText().then(t=>t.slice(0,40).replace(/\n/g," ")), "rows", await page.locator("main table tbody tr").count());
+console.log("footer text", await page.evaluate(() => [...document.querySelectorAll("main *")].filter(e=>/Showing/.test(e.innerText||"") && e.children.length<5).map(e=>e.innerText.replace(/\n/g," | ")).slice(-1)));
+await browser.close();

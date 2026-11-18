@@ -38,6 +38,33 @@ const state = reactive<ProjectsState>({
 
 export const projectsState = readonly(state);
 
+/**
+ * Projects read on their own (the Dashboard layout, the picker), by id. The listing relays the Catalogue and carries no
+ * initialization state, so a listing that lands after such a read must not replace it, and a read that lands before the
+ * listing (a deep link, a reload) must survive until the listing arrives (C2-07). Cleared by `forgetProject`.
+ */
+const detailsById = reactive(new Map<string, Project>());
+/** Reads that failed, so the chip can stop waiting: a Project absent from here and not yet `detailed` is still loading. */
+const failedDetails = reactive(new Set<string>());
+
+/** "loading" until a read of the Project lands, "failed" when it could not be read, "ready" once it is detailed. */
+export function detailState(projectId: string): "ready" | "loading" | "failed" {
+  if (findProject(projectId)?.detailed) return "ready";
+  return failedDetails.has(projectId) ? "failed" : "loading";
+}
+
+/** Records that reading a Project failed (an error page is showing), so no chip waits for it. */
+export function markDetailFailed(projectId: string): void {
+  failedDetails.add(projectId);
+}
+
+/** The listed Project with whatever a direct read already told us about it. */
+function mergeDetails(listed: Project): Project {
+  const known = detailsById.get(listed.id);
+  if (!known || listed.detailed) return listed;
+  return { ...known, name: listed.name, status: listed.status, orgId: listed.orgId };
+}
+
 export const manageableOrganisations = computed(() =>
   state.groups.filter((g) => g.managed).map((g) => g.organisation),
 );
@@ -49,7 +76,8 @@ export function findProject(projectId: string): Project | undefined {
     const project = group.projects.find((p) => p.id === projectId);
     if (project) return project;
   }
-  return undefined;
+  // Opened by a deep link before (or without) a listing that names it: the direct read still gives its name and status.
+  return detailsById.get(projectId);
 }
 
 export function findOrganisation(orgId: string): Organisation | undefined {
@@ -75,7 +103,10 @@ async function doLoad(): Promise<void> {
     const groups = await Promise.all(
       organisationIdsOf(authorization).map((id) => loadGroup(id, authorization, named.get(id))),
     );
-    state.groups = groups.sort((a, b) => a.organisation.name.localeCompare(b.organisation.name));
+    // Merge, never replace: reads of single Projects made while the listing was in flight survive it.
+    state.groups = groups
+      .map((g) => ({ ...g, projects: sortByName(g.projects.map(mergeDetails)) }))
+      .sort((a, b) => collator.compare(a.organisation.name, b.organisation.name));
     state.status = "ready";
   } catch (e) {
     if (!(e instanceof ApiError)) throw e;
@@ -99,15 +130,42 @@ async function loadGroup(orgId: string, authorization: MyAuthorization, organisa
     if (isDenied(e)) return membershipProjects(orgId, authorization);
     throw e;
   });
-  return { organisation: organisation ?? placeholderOrganisation(orgId), managed, projects: sortByName(await detailed(projects)) };
+  return { organisation: organisation ?? placeholderOrganisation(orgId), managed, projects: sortByName(projects) };
 }
 
+/** Projects being read for their initialization state, so two lists asking for the same one send a single request. */
+const detailing = new Set<string>();
+/** How many Project reads run at once when the picker fills in the rows it shows (G-029 is the real fix). */
+const DETAIL_CONCURRENCY = 4;
+
 /**
- * Each listed Project read on its own, for its initialization state: the listing relays the Catalogue and carries
- * none (backend D-040, Q-020). A Project that cannot be read keeps its listed values.
+ * Reads the given Projects on their own, for their initialization state and Application status: the listing relays the
+ * Catalogue and carries none (backend D-040, Q-020). Only the rows the picker shows (and the open Project) are read, a
+ * few at a time, instead of one request per Project on every load (C1-53). A Project that cannot be read keeps its
+ * listed values.
  */
-function detailed(projects: Project[]): Promise<Project[]> {
-  return Promise.all(projects.map((p) => (p.detailed ? p : fetchProject(p.id).catch(() => p))));
+export async function ensureDetailed(projectIds: readonly string[]): Promise<void> {
+  const queue = projectIds.filter((id) => {
+    const p = findProject(id);
+    return p && !p.detailed && !detailing.has(id);
+  });
+  queue.forEach((id) => {
+    detailing.add(id);
+    failedDetails.delete(id);
+  });
+  async function worker(): Promise<void> {
+    for (let id = queue.shift(); id !== undefined; id = queue.shift()) {
+      try {
+        upsertProject(await fetchProject(id));
+      } catch (e) {
+        if (!(e instanceof ApiError)) throw e;
+        failedDetails.add(id);
+      } finally {
+        detailing.delete(id);
+      }
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(DETAIL_CONCURRENCY, queue.length) }, worker));
 }
 
 /** The Catalogue's names of the organisations; none when it cannot be read, so the picker still opens. */
@@ -154,6 +212,10 @@ export const projectTarget = (p: Listed) =>
 
 /** Adds or refreshes one Project, e.g. after creating or opening it. */
 export function upsertProject(project: Project): void {
+  if (project.detailed) {
+    detailsById.set(project.id, project);
+    failedDetails.delete(project.id);
+  }
   const group = state.groups.find((g) => g.organisation.id === project.orgId);
   if (!group) return;
   const index = group.projects.findIndex((p) => p.id === project.id);
@@ -167,11 +229,16 @@ export function upsertProject(project: Project): void {
 
 /** Drops a Project the Catalogue no longer admits the user to. */
 export function forgetProject(projectId: string): void {
+  detailsById.delete(projectId);
+  failedDetails.delete(projectId);
   for (const group of state.groups) {
     group.projects = group.projects.filter((p) => p.id !== projectId);
   }
 }
 
+/** Names sort the way the author reads them: accents and case ignored, digits by value, Greek after Latin as the platform's locale orders it. */
+const collator = new Intl.Collator(undefined, { sensitivity: "base", numeric: true });
+
 function sortByName(projects: Project[]): Project[] {
-  return [...projects].sort((a, b) => a.name.localeCompare(b.name));
+  return [...projects].sort((a, b) => collator.compare(a.name, b.name));
 }

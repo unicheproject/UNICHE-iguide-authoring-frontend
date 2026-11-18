@@ -1,0 +1,190 @@
+[
+ [
+  "1024 btn",
+  1
+ ],
+ [
+  "1024 btnBox",
+  {
+   "x": 834.09375,
+   "y": 240,
+   "width": 164.90625,
+   "height": 40
+  }
+ ],
+ [
+  "1024 opened",
+  {
+   "scrollY": 0,
+   "docH": 768,
+   "vh": 768,
+   "region": {
+    "x": 33,
+    "y": 378,
+    "w": 958,
+    "h": 680
+   },
+   "frame": {
+    "x": 33,
+    "y": 426,
+    "w": 958,
+    "h": 632
+   },
+   "scale": "0.748",
+   "btns": [
+    [
+     "Close preview",
+     {
+      "x": 716,
+      "y": 240,
+      "w": 158,
+      "h": 40
+     }
+    ],
+    [
+     "Expand",
+     {
+      "x": 887,
+      "y": 240,
+      "w": 113,
+      "h": 40
+     }
+    ],
+    [
+     "Open at real size",
+     {
+      "x": 691,
+      "y": 382,
+      "w": 170,
+      "h": 32
+     }
+    ],
+    [
+     "Interact with the preview",
+     {
+      "x": 877,
+      "y": 378,
+      "w": 114,
+      "h": 40
+     }
+    ]
+   ],
+   "active": "In the appWebMobileKiosk Skip ",
+   "cap": "Desktop browser, 1280 × 800. Shown at 75 %.",
+   "sw": 0
+  }
+ ],
+ [
+  "1024 expandBox(viewport)",
+  {
+   "x": 886.5,
+   "y": 240,
+   "width": 112.5,
+   "height": 40
+  }
+ ],
+ [
+  "1024 expandScrollDelta",
+  0
+ ],
+ [
+  "1024 expanded",
+  {
+   "scrollY": 0,
+   "docH": 768,
+   "vh": 768,
+   "region": {
+    "x": 33,
+    "y": 378,
+    "w": 958,
+    "h": 680
+   },
+   "frame": {
+    "x": 33,
+    "y": 426,
+    "w": 958,
+    "h": 632
+   },
+   "scale": "0.748",
+   "btns": [
+    [
+     "Close preview",
+     {
+      "x": 710,
+      "y": 240,
+      "w": 158,
+      "h": 40
+     }
+    ],
+    [
+     "Collapse",
+     {
+      "x": 880,
+      "y": 240,
+      "w": 119,
+      "h": 40
+     }
+    ],
+    [
+     "Open at real size",
+     {
+      "x": 691,
+      "y": 382,
+      "w": 170,
+      "h": 32
+     }
+    ],
+    [
+     "Interact with the preview",
+     {
+      "x": 877,
+      "y": 378,
+      "w": 114,
+      "h": 40
+     }
+    ]
+   ],
+   "active": "Collapse",
+   "cap": "Desktop browser, 1280 × 800. Shown at 75 %.",
+   "sw": 0
+  }
+ ],
+ [
+  "1024 focusAfterExpand",
+  "Collapse"
+ ],
+ [
+  "1024 afterEsc1",
+  {
+   "scrollY": 0,
+   "docH": 768,
+   "vh": 768,
+   "region": null,
+   "frame": null,
+   "btns": [],
+   "active": "Preview in app",
+   "sw": 0
+  }
+ ],
+ [
+  "1024 panelStillThere",
+  0
+ ],
+ [
+  "1024 afterEsc2",
+  {
+   "scrollY": 0,
+   "docH": 768,
+   "vh": 768,
+   "region": null,
+   "frame": null,
+   "btns": [],
+   "active": "Preview in app",
+   "sw": 0
+  }
+ ],
+ [
+  "1024 focusAfterClose",
+  "Preview in app"
+ ]
+]

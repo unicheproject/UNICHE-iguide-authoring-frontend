@@ -1,0 +1,5 @@
+category used by DRAFT POI: Deactivate aria-disabled: null | reason: none
+category used by DRAFT POI: Deactivate aria-disabled: true | reason: Used by 1 point of interest. Choose another category in that point of interest first. Show where it is used
+Show where used focus: used-in-heading
+Event no-dates lines before: 1
+Event no-dates lines after Add a date: 0

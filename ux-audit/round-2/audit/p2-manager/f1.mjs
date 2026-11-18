@@ -1,0 +1,12 @@
+import { fresh, uiSignIn, shot, CMS } from "./lib.mjs";
+const { browser, page } = await fresh("1440");
+await uiSignIn(page, "admin", "1440", () => {});
+const D = "f56e8c75-94af-4c87-88c8-06cba46240a1";
+await page.goto(`${CMS}/projects/${D}`); await page.waitForSelector("text=Get your visitor app started", {timeout:30000}); await page.waitForTimeout(800);
+await page.getByRole("link", { name: "Add a Place" }).or(page.getByRole("button", { name: "Add a Place" })).first().click();
+await page.waitForTimeout(2500);
+console.log("after Add a Place:", page.url().slice(-50), "dialogs:", await page.locator("[role=dialog]").count());
+await shot(page, "firstrun__add-place-click", "1440", false);
+console.log((await page.evaluate(()=>document.querySelector("[role=dialog]")?.innerText ?? document.querySelector("main")?.innerText)).replace(/\n+/g," | ").slice(0,900));
+console.log("focus:", await page.evaluate(()=>document.activeElement?.tagName+" "+(document.activeElement?.id||"")+" "+(document.activeElement?.getAttribute("aria-label")||"")));
+await browser.close();

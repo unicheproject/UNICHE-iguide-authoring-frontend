@@ -1,0 +1,13 @@
+import { start, go, P, focusInfo, tabWalk, tabTo, live, axe, seed } from "./common.mjs";
+const s = await start("1440"); const { page } = s;
+await go(page, P + "/pois"); await page.waitForTimeout(1500);
+await page.getByRole("button",{name:"New point of interest"}).focus(); await page.keyboard.press("Enter"); await page.waitForTimeout(500);
+await page.keyboard.press("Enter"); await page.waitForTimeout(600);
+console.log("describedby", await page.evaluate(()=>[...document.querySelectorAll("[role=dialog] input")].map(i=>({id:i.id, inv:i.getAttribute("aria-invalid"), dby:i.getAttribute("aria-describedby"), req:i.required||i.getAttribute("aria-required")}))));
+console.log("err el", await page.evaluate(()=>[...document.querySelectorAll("[role=dialog] p, [role=dialog] [id]")].filter(e=>/Enter a title|lowercase/.test(e.textContent)).map(e=>e.tagName+"#"+e.id+" role="+e.getAttribute("role")).slice(0,3)));
+await page.keyboard.press("Escape");
+await page.keyboard.press("Shift+Tab"); 
+await go(page, P + "/pois"); await page.waitForTimeout(1500);
+await page.keyboard.press("Tab"); await page.keyboard.press("Tab"); await page.keyboard.press("Enter"); await page.waitForTimeout(800);
+const v = await axe(page,"switcher"); console.log(JSON.stringify(v.map(x=>x.sample)));
+await s.browser.close();

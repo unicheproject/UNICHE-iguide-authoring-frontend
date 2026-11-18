@@ -2,143 +2,412 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Palette of the iGuide CMS mockup (iGuide CMS.html). */
-@layer base {
-  :root {
-    --background: 220 14% 96%; /* #f3f4f6 canvas */
-    --foreground: 224 71% 4%; /* #030712 */
+/*
+ * Design tokens of the iGuide CMS (DECISIONS.md D-069 to D-073, `ux-audit/round-1/implementation/system.md`).
+ * Colours are `H S% L%` triplets so Tailwind can add an alpha (`bg-primary/90`). Contrast ratios are stated next to
+ * the values that carry a rule; a value may be nudged only while the stated ratio holds.
+ */
 
-    --card: 0 0% 100%;
-    --card-foreground: 224 71% 4%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 224 71% 4%;
-
-    --primary: 266 65% 33%; /* #4c1d8b UNICHE purple */
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 263 52% 94%; /* #efe9f8 */
-    --secondary-foreground: 266 65% 33%;
-
-    --muted: 220 14% 96%;
-    /* #5d636f: 4.5:1 on the #f3f4f6 canvas and muted surfaces, which #6b7280 missed (`14` §4). */
-    --muted-foreground: 220 9% 40%;
-
-    --accent: 263 52% 94%;
-    --accent-foreground: 266 65% 33%;
-
-    --highlight: 325 93% 58%; /* #f832a4 link hover */
-
-    --destructive: 335 78% 42%; /* #c0185e */
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 220 13% 91%; /* #e5e7eb */
-    --input: 220 13% 91%;
-    --ring: 266 65% 33%;
-
-    --radius: 0.5rem;
-  }
+/*
+ * Montserrat, self-hosted variable file (wght 400 to 700), no request to a font host at runtime (D-071).
+ * The Montserrat family has no Greek glyphs, so no Greek file exists to ship: Greek text falls through the font stack
+ * to the system sans (recorded in D-071).
+ */
+@font-face {
+  font-family: "Montserrat Variable";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/montserrat-latin-ext-var.woff2") format("woff2");
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF,
+    U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "Montserrat Variable";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/montserrat-latin-var.woff2") format("woff2");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F,
+    U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Montserrat Variable";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/montserrat-cyrillic-var.woff2") format("woff2");
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* Same metrics as Montserrat drawn in a local sans, so the swap does not move the layout. */
+@font-face {
+  font-family: "Montserrat Fallback";
+  src: local("Arial"), local("Helvetica Neue"), local("Liberation Sans");
+  size-adjust: 113.5%;
+  ascent-override: 84.9%;
+  descent-override: 22%;
+  line-gap-override: 0%;
 }
 
 @layer base {
+  :root {
+    --background: 220 15.8% 96.3%; /* #f4f5f7 canvas */
+    --foreground: 220.9 39.3% 11%; /* #111827 ink */
+
+    --card: 0 0% 100%; /* surface: cards, dialogs, inputs, header, nav */
+    --popover: 0 0% 100%;
+    --popover-foreground: 220.9 39.3% 11%;
+
+    --primary: 265.6 65.5% 32.9%; /* #4c1d8b UNICHE purple: primary action, current item, links, focus */
+    --primary-hover: 266.8 68% 24.5%; /* #3a1469 */
+    --primary-active: 267 70% 19%; /* pressed primary, one step darker than hover (D-101) */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 264 51.7% 94.3%; /* #efe9f8 brand tint: selected nav item, row, toggled chip */
+    --secondary-foreground: 265.6 65.5% 32.9%;
+    --accent: 264 51.7% 94.3%;
+    --accent-strong: 264 55.6% 91.2%; /* #e6dcf5 */
+    --accent-foreground: 265.6 65.5% 32.9%;
+
+    --muted: 220 15.8% 92.5%; /* #e9ebef sunken: table head, disabled field, neutral chip, bar track */
+    --muted-foreground: 216.9 13.1% 38.8%; /* #566070: 5.3:1 on sunken, 5.8:1 on canvas, 6.4:1 on white */
+    --surface-hover: 216 17.2% 94.3%; /* #eef0f3 row and menu hover */
+    --surface-active: 218 15% 88.5%; /* pressed ghost, tab, nav, row and kebab: one grey step under hover (D-101) */
+
+    --ink-2: 216.9 19.1% 26.7%; /* #374151 labels, nav item */
+    --placeholder: 217.5 11.2% 42%; /* #5f6877: 5.63:1 on white; placeholder only, never the only label */
+    --disabled-ink: 220.9 10.4% 58.4%; /* #8a91a0 disabled text only, always with a stated reason */
+
+    --highlight: 323.3 82.1% 35.1%; /* #a3106a link hover: 7.4:1 on white */
+
+    --border: 220 13.4% 86.9%; /* #d9dce2 decorative hairlines: card edge, row divider; never a control edge */
+    --input: 220 9.4% 49.8%; /* #737b8b control border: 4.26:1 on white, 3.9:1 on canvas */
+    --ring: 265.6 65.5% 32.9%;
+    --ring-inverse: 264 51.7% 94.3%; /* focus ring on a dark surface (the preview stand-in): 12:1 on #111827 */
+
+    --success: 173.1 81.2% 22.9%; /* #0b6a5f ink */
+    --success-tint: 161.3 40% 92.2%; /* #e3f3ee */
+    --warning: 36.9 100% 23.9%; /* #7a4b00 */
+    --warning-tint: 40.5 90.9% 91.4%; /* #fdf0d5 */
+    --destructive: 333.5 80.9% 39%; /* #b4135a */
+    --destructive-tint: 334.3 72.4% 94.3%; /* #fbe6ef */
+    --destructive-active: 333.5 80.9% 28%; /* pressed danger: white text 8.6:1 (D-101) */
+    --destructive-foreground: 0 0% 100%;
+    --info: 214.1 63.7% 33.5%; /* #1f4e8c */
+    --info-tint: 213 58.8% 93.3%; /* #e4edf8 */
+
+    --scrim: 220.9 39.3% 11% / 0.45;
+
+    /* Elevation: cool, low alpha, always with an offset and a blur. */
+    --shadow-1: 0 1px 2px hsl(220 30% 12% / 0.06), 0 1px 3px hsl(220 30% 12% / 0.05);
+    --shadow-2: 0 4px 12px hsl(220 30% 12% / 0.1), 0 1px 3px hsl(220 30% 12% / 0.08);
+    --shadow-3: 0 16px 40px hsl(220 30% 12% / 0.18), 0 2px 8px hsl(220 30% 12% / 0.1);
+
+    /* Motion. */
+    --dur-1: 120ms;
+    --dur-2: 180ms;
+    --dur-3: 240ms;
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-std: cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Density: comfortable only in Round 1; the tokens exist so a compact density can land later. */
+    --control-h: 2.5rem; /* 40 px */
+    --row-h: 3.25rem; /* 52 px */
+    --header-h: 3.5rem; /* 56 px */
+    --nav-w: 14.5rem; /* 232 px */
+    --gutter: 1rem;
+    --z-modal: 50; /* the `modal` z-layer; `z-popover-over` is this plus one */
+  }
+  @media (min-width: 1100px) {
+    :root {
+      --gutter: 1.5rem;
+    }
+  }
+  @media (pointer: coarse) {
+    :root {
+      --control-h: 2.75rem; /* 44 px */
+      --row-h: 3.5rem;
+    }
+  }
+
   * {
     @apply border-border;
   }
-  body {
-    @apply bg-background font-sans text-sm leading-relaxed text-foreground antialiased;
+  html {
+    -webkit-text-size-adjust: 100%;
+    accent-color: hsl(var(--primary));
+    scroll-padding-top: 1rem;
   }
+  body {
+    @apply bg-background font-sans text-sm text-foreground antialiased;
+    }
+  ::selection {
+    background: hsl(var(--accent-strong));
+    color: hsl(var(--foreground));
+  }
+  /* Links in running text are underlined by default (WCAG 1.4.1); navigation and buttons opt out with `no-underline`. */
   a {
     color: hsl(var(--primary));
-    text-decoration: none;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    text-decoration-thickness: 1px;
   }
   a:hover {
     color: hsl(var(--highlight));
-    text-decoration: underline;
   }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+  code,
+  kbd,
+  samp,
+  .mono {
+    font-family: ui-monospace, "Cascadia Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    font-size: 0.8125rem;
+  }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /*
+   * One focus ring for every control (D-100): 2 px `--ring` outline with a 2 px offset. The offset shows the surface
+   * between control and ring, so the ring is 10.4:1 on the canvas and on a filled button alike; no white ring, no halo.
+   */
   :focus-visible {
-    outline: 2px solid hsl(var(--primary));
-    outline-offset: 3px;
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+  /* Controls that draw their own focus state replace the ring, never remove it. */
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    border-color: hsl(var(--primary));
+  }
+  /* Inside the dark preview stand-in the ring uses the inverse token. */
+  .on-dark :focus-visible {
+    outline-color: hsl(var(--ring-inverse));
+  }
+  /* Programmatic focus targets (the page heading, `<main>`, a dialog heading) show no ring: they are not controls. */
+  [tabindex="-1"]:focus,
+  [tabindex="-1"]:focus-visible {
+    outline: none;
+  }
+  input::placeholder,
+  textarea::placeholder {
+    color: hsl(var(--placeholder));
+    opacity: 1;
   }
 }
 
+/* Motion (D-070): only state changes move; a reduced-motion preference removes all of it. */
 @keyframes skelpulse {
   0%,
   100% {
     opacity: 1;
   }
   50% {
-    opacity: 0.45;
+    opacity: 0.5;
+  }
+}
+@keyframes ui-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes ui-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes ui-slide-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+}
+@keyframes ui-spin {
+  to {
+    transform: rotate(360deg);
   }
 }
 
-/* Form controls of the resource editors, as in the mockup. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+  /* A skeleton becomes a static block; a spinner stays a still ring with its text. */
+  .animate-skeleton,
+  .ui-spinner {
+    animation: none !important;
+  }
+  /* Appearing surfaces keep a 120 ms opacity fade (D-086): no transform, no slide. */
+  .animate-fade-in,
+  .animate-rise-in,
+  .animate-slide-in-left {
+    animation: ui-fade-in var(--dur-1) var(--ease-std) both !important;
+  }
+}
+
+/*
+ * Hit area of a text link or small control (D-086, `14` §4: 44 x 44). The element keeps its layout; a transparent
+ * `::after` grows its clickable box to at least 44 px each way, centred on it. Use `hit-44` on links in dense rows;
+ * put it on the element that is the link (it needs `position: relative`, which the class sets).
+ */
+@layer utilities {
+  .hit-44 {
+    position: relative;
+  }
+  .hit-44::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(100%, 2.75rem);
+    height: max(100%, 2.75rem);
+    transform: translate(-50%, -50%);
+  }
+}
+
+/*
+ * Legacy classes of the editors, kept as aliases restyled to the new look so screens not yet migrated render with the
+ * new tokens (D-072). New code uses the `ui/` primitives, not these.
+ */
 @layer components {
   .field-label {
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: #374151;
-  }
-  .small-label {
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 0.09em;
-    text-transform: uppercase;
-    color: #6b7280;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: hsl(var(--ink-2));
   }
   .field-input {
     width: 100%;
-    border: 1.5px solid #e5e7eb;
-    border-radius: 8px;
-    background: #fff;
-    padding: 11px 14px;
-    font-size: 14px;
-    color: #030712;
+    min-height: var(--control-h);
+    border: 1px solid hsl(var(--input));
+    border-radius: 0.5rem;
+    background: hsl(var(--card));
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: hsl(var(--foreground));
+    transition:
+      border-color var(--dur-1) var(--ease-std),
+      box-shadow var(--dur-1) var(--ease-std);
+  }
+  .field-input:hover:not(:disabled):not([readonly]) {
+    border-color: hsl(var(--foreground));
   }
   .field-input:focus {
-    border-color: #4c1d8b;
-    outline: none;
+    border-color: hsl(var(--primary));
   }
   .field-input:disabled,
   .field-input[readonly] {
-    background: #f9fafb;
-    color: #6b7280;
+    background: hsl(var(--muted));
+    color: hsl(var(--ink-2));
   }
-  .field-input.invalid {
-    border-color: #c0185e;
+  .field-input:disabled {
+    color: hsl(var(--disabled-ink));
+    cursor: not-allowed;
+  }
+  .field-input.invalid,
+  .field-input[aria-invalid="true"] {
+    border-color: hsl(var(--destructive));
+  }
+  /* The base of Input, Textarea and Select; `.field-input` is its legacy name. */
+  .ui-field {
+    width: 100%;
+    min-height: var(--control-h);
+    border: 1px solid hsl(var(--input));
+    border-radius: 0.5rem;
+    background: hsl(var(--card));
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: hsl(var(--foreground));
+    transition:
+      border-color var(--dur-1) var(--ease-std),
+      box-shadow var(--dur-1) var(--ease-std);
+  }
+  .ui-field:hover:not(:disabled):not([readonly]) {
+    border-color: hsl(var(--foreground));
+  }
+  .ui-field:focus {
+    border-color: hsl(var(--primary));
+  }
+  .ui-field:disabled,
+  .ui-field[readonly] {
+    background: hsl(var(--muted));
+    color: hsl(var(--ink-2));
+  }
+  .ui-field:disabled {
+    color: hsl(var(--disabled-ink));
+    cursor: not-allowed;
+  }
+  .ui-field[aria-invalid="true"] {
+    border-color: hsl(var(--destructive));
+  }
+  .dialog-secondary,
+  .dialog-primary {
+    display: inline-flex;
+    min-height: var(--control-h);
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    white-space: nowrap;
+    transition:
+      background-color var(--dur-1) var(--ease-std),
+      border-color var(--dur-1) var(--ease-std);
   }
   .dialog-secondary {
-    border-radius: 999px;
-    border: 1px solid #e5e7eb;
-    background: #f3f4f6;
-    padding: 10px 20px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: #374151;
+    border: 1px solid hsl(var(--input));
+    background: hsl(var(--card));
+    color: hsl(var(--foreground));
   }
+  .dialog-secondary:hover:not(:disabled) {
+    background: hsl(var(--surface-hover));
+  }
+  /* The caller adds `bg-primary` or `bg-destructive`; the text is white either way. */
   .dialog-primary {
-    border-radius: 999px;
-    padding: 10px 20px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: #fff;
+    border: 1px solid transparent;
+    color: hsl(var(--primary-foreground));
   }
-  .dialog-primary:disabled {
-    opacity: 0.6;
+  .dialog-primary:disabled,
+  .dialog-secondary:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+  .dialog-primary.bg-primary:hover:not(:disabled) {
+    background: hsl(var(--primary-hover));
+  }
+
+  /* Pressed step of the workspace menu (D-101): P1 adopts it in `WorkspaceNav`; the selected item keeps its tint. */
+  .nav-item:active:not([aria-current="page"]) {
+    background: hsl(var(--surface-active));
   }
 }
 
 /*
  * Application shell (D-062): the header and the workspace menu stay put and only the page's <main> scrolls. A
- * viewport lower than 420 CSS pixels (a phone held sideways, the 320 by 256 reflow check of `14` §1) scrolls as one
- * document instead, so the header does not take most of the screen.
+ * viewport lower than 300 CSS pixels (the 320 by 256 reflow check of `14` §1) scrolls as one document instead, so the
+ * header does not take most of the screen. The threshold is 300, not 420, so 200 % zoom on a 1280 by 720 window
+ * (640 by 360) keeps `<main>` as the scroll container and the editor's sticky header, the Working Copy banner and the
+ * Asset preview stay in view (W0-fixup).
  */
-@media (min-height: 420px) {
+@media (min-height: 300px) {
   .app-shell {
     height: 100vh;
     height: 100dvh;
@@ -149,4 +418,129 @@
    escape it and make the whole document scroll as well. */
 .app-shell main {
   position: relative;
+  /* The editor publishes the height of what sticks above the content as `--sticky-stack-h` (W0-B). */
+  scroll-padding-top: calc(var(--sticky-stack-h, 0px) + 1rem);
+  scroll-padding-bottom: 6rem; /* the toast stack must not cover what keyboard focus reaches */
+}
+
+/*
+ * Forced colours (D-070, D-086): every control and every floating surface keeps a boundary, focus and selection use
+ * system colours, and a selected or current item is filled with `Highlight`, not told apart by a background that forced
+ * colours remove.
+ */
+@media (forced-colors: active) {
+  button,
+  [role="button"],
+  [role="tab"],
+  .ui-tab,
+  .ui-chip,
+  .nav-item,
+  .dialog-primary,
+  .dialog-secondary {
+    border: 1px solid ButtonText;
+  }
+  /* Filled buttons lose their fill: a heavier frame marks the primary action. */
+  [data-variant="primary"],
+  [data-variant="danger"] {
+    border: 2px solid ButtonText;
+  }
+  /* Surfaces drawn by shadow and tint alone: dialogs, menus, popovers, toasts and alerts. */
+  [role="dialog"],
+  [role="alertdialog"],
+  [role="menu"],
+  [role="listbox"],
+  [role="tooltip"],
+  [role="alert"],
+  [role="status"]:not(.sr-only),
+  [data-radix-popper-content-wrapper] > * {
+    border: 1px solid CanvasText;
+  }
+  /* The tab, the nav item, the chosen option and the current page are filled with the selection colours. */
+  [aria-selected="true"],
+  [aria-current]:not([aria-current="false"]),
+  [role="tab"][data-state="active"],
+  [data-state="checked"][role="menuitemradio"] {
+    /* `!important`: the generated utilities (`text-primary`, `bg-secondary`) are emitted after this block. */
+    background: Highlight !important;
+    color: HighlightText !important;
+    /* Without this Chromium paints a Canvas backplate behind the text of a Highlight fill. */
+    forced-color-adjust: none;
+  }
+  [aria-selected="true"] *,
+  [aria-current]:not([aria-current="false"]) *:not(.forced-step-current, .forced-step-current *),
+  [role="tab"][data-state="active"] * {
+    color: HighlightText !important;
+  }
+  [role="tab"][aria-selected="true"],
+  [role="tab"][data-state="active"],
+  .ui-tab[aria-current="page"] {
+    border-bottom: 2px solid HighlightText;
+  }
+  .nav-item[aria-current="page"] {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+  :focus-visible {
+    outline: 2px solid Highlight;
+    box-shadow: none;
+  }
+  /* Menu items show their highlight by background, which forced colours remove: only the highlighted item is
+     outlined, the other rows stay plain text (D-101). */
+  [data-highlighted] {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+  [role="menuitem"]:not([data-highlighted]),
+  [role="option"]:not([data-highlighted]) {
+    border: 0;
+  }
+  /* Disclosure and sort-header buttons gain a border: give the text room inside it. */
+  summary,
+  th button,
+  th [role="button"] {
+    padding: 0.125rem 0.375rem;
+  }
+  summary {
+    border: 1px solid ButtonText;
+  }
+  svg {
+    forced-color-adjust: auto;
+  }
+  /* The current step of a stepper or the first-run guide: `Highlight` fills are not reliable on a small circle, so it
+     is drawn in Canvas/CanvasText with a thick ButtonText border and keeps its number (P1, P2 apply the class). */
+  .forced-step-current {
+    forced-color-adjust: none;
+    background: Canvas !important;
+    color: CanvasText !important;
+    border: 4px solid ButtonText !important;
+  }
+  .forced-step-current * {
+    color: CanvasText !important;
+  }
+  /* The drop line of the Route stops and the Guide story (`shadow-drop-*`): a purple shadow is removed, so it is drawn
+     in `Highlight` (the lists have their own, `.list-drop-*`). */
+  .shadow-drop-before {
+    box-shadow: inset 0 2px 0 0 Highlight !important;
+  }
+  .shadow-drop-after {
+    box-shadow: inset 0 -2px 0 0 Highlight !important;
+  }
+  .leaflet-marker-icon,
+  .map-pin {
+    outline: 2px solid CanvasText;
+  }
+}
+
+/*
+ * Greek companion. Montserrat has no Greek glyphs; Manrope (OFL, self-hosted, Greek subset only) is declared
+ * under the same family name with a Greek `unicode-range`, so Greek text uses it and Latin stays Montserrat.
+ * Greek Extended (polytonic, U+1F00-1FFF) is not in Manrope and still falls to the system sans.
+ */
+@font-face {
+  font-family: "Montserrat Variable";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/manrope-greek-var.woff2") format("woff2");
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
 }

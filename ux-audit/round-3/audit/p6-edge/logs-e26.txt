@@ -1,0 +1,2 @@
+inputs ["f-place:Place","f-category:Category","f-lat:Latitude","f-lng:Longitude","t-1-code:Code",":Web",":Mobile app",":Kiosk","t-2-lat:Latitude","t-2-lng:Longitude","t-2-area:Radius (m)","t-2-wait:Wait (s)",":Web",":Mobile app"]
+buttons ["Save and apply","Save draft","Save draft","Add\nPrimary image\n(recommended)","Add\nVideo","Add\nGallery","Add\n3D model","Remove QR code","Remove Geo-proximity","Add\nBeacon\n(Bluetooth)","Add\nGeo-proximity","Add\nQR code"]

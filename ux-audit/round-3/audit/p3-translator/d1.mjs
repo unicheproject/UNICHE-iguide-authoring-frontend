@@ -1,0 +1,14 @@
+import { open, go, base, shot } from "./lib.mjs";
+import { readFileSync } from "node:fs";
+const R = JSON.parse(readFileSync("ux-audit/round-3/audit/p3-translator/records.json","utf8"));
+const { browser, page } = await open("admin", { viewport: "1440" });
+const tabs = async (l) => console.log(l, await page.evaluate(()=>[...document.querySelectorAll("[role=tab]")].map(t=>t.innerText.replace(/\s+/g," ")).join(" / ")+" || "+[...document.querySelectorAll("button")].filter(b=>/^(Warning|Blocking)/.test(b.innerText)).map(e=>e.innerText.trim()).join(" | ")+" || HEAD "+[...document.querySelectorAll("button")].filter(b=>b.getBoundingClientRect().y<120 && /fix|warning|Nothing/i.test(b.innerText)).map(e=>e.innerText.trim().replace(/\s+/g," ")).join(" | ")));
+await go(page, R.guides);
+await page.waitForSelector("h1"); await page.waitForTimeout(1500);
+await shot(page,"guide-editor__empty-default__1440");
+await tabs("empty");
+await page.locator("#add-element-end").click();
+await page.waitForTimeout(600);
+console.log("textareas after add:", await page.evaluate(()=>[...document.querySelectorAll("main textarea,main input")].filter(e=>e.offsetParent).map(e=>e.id+"|"+(e.labels?.[0]?.innerText||e.getAttribute("aria-label")||"")).join("\n")));
+await shot(page,"guide-editor__paragraph-added__1440");
+await browser.close();

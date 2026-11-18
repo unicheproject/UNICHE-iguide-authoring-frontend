@@ -1,0 +1,95 @@
+- main:
+  - navigation "Breadcrumb":
+    - list:
+      - listitem:
+        - link "Points of Interest":
+          - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois
+      - listitem: UX-R3-p5 POI A – Parthenon test
+  - heading "UX-R3-p5 POI A – Parthenon test" [level=1]
+  - text: Draft
+  - status: Saved 11:12
+  - 'button "3 warnings, nothing blocks in this point of interest: show what needs attention"'
+  - button "Save No unsaved changes to save" [disabled]
+  - button "More actions"
+  - heading "Texts" [level=2]
+  - tablist "Language":
+    - tab "English default 1 of 5"
+    - tab "Ελληνικά Missing" [selected]
+    - tab "Italiano Missing"
+  - tabpanel "Ελληνικά Missing":
+    - paragraph: Translating from English into Ελληνικά. The source text is beside each field.
+    - text: Title in English UX-R3-p5 POI A – Parthenon test
+    - button "Copy source for Title"
+    - text: Title in Ελληνικά
+    - textbox "Title in Ελληνικά"
+    - text: Summary in English No text in English yet.
+    - button "Copy source for Summary There is no source text to copy" [disabled]
+    - text: Summary in Ελληνικά
+    - textbox "Summary in Ελληνικά"
+    - paragraph: Short text shown in lists; aim for a reading level a twelve-year-old follows.
+    - text: Description in English No text in English yet.
+    - button "Copy source for Description There is no source text to copy" [disabled]
+    - text: Description in Ελληνικά
+    - textbox "Description in Ελληνικά"
+    - button "Practical details 0 of 2 filled Show"
+  - heading "Other settings (all languages) Placement, Media, How visitors reach it, Details" [level=2]:
+    - button "Other settings (all languages) Placement, Media, How visitors reach it, Details"
+  - complementary "About this item":
+    - region "Status":
+      - heading "Status" [level=2]
+      - text: Draft
+      - paragraph: Only authors see it. Activate it once the default-language title is set.
+      - button "Activate"
+      - term: Kind
+      - definition: Point of interest
+      - term: Slug
+      - definition: ux-r3-p5-poi-a
+      - term: Updated
+      - definition: 17 Nov 2026, 11:12
+      - term: Created
+      - definition: 17 Nov 2026, 11:11
+      - paragraph: The slug is part of the item's web address.
+    - button "Preview in app"
+    - region "Before you activate":
+      - heading "Before you activate" [level=2]
+      - paragraph: 3 warnings, nothing blocks.
+      - paragraph: 3 warnings, nothing blocks
+      - heading "Texts (3)" [level=3]
+      - list:
+        - listitem:
+          - 'button "Warning: English: 4 texts missing"'
+        - listitem:
+          - 'button "Warning: Ελληνικά: 5 texts missing"'
+        - listitem:
+          - 'button "Warning: Italiano: 5 texts missing"'
+    - navigation "On this page":
+      - heading "On this page" [level=2]
+      - list:
+        - listitem:
+          - link "Texts 3 languages incomplete":
+            - /url: "#texts"
+        - listitem:
+          - link "Placement No position yet":
+            - /url: "#placement"
+        - listitem:
+          - link "Media Primary image missing":
+            - /url: "#media"
+        - listitem:
+          - link "How visitors reach it Browsing only":
+            - /url: "#triggers"
+        - listitem:
+          - link "Details 0 of 4 set":
+            - /url: "#details"
+    - region "Translations":
+      - heading "Translations" [level=2]
+      - 'button "Next missing: Ελληνικά"'
+      - list:
+        - listitem:
+          - button "English default 1 of 5"
+        - listitem:
+          - button "Ελληνικά editing Missing"
+        - listitem:
+          - button "Italiano Missing"
+    - region "Used in (0)":
+      - heading "Used in (0)" [level=2]
+      - paragraph: Not used anywhere yet.

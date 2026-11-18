@@ -1,0 +1,21 @@
+import { open, go, shot, POP, run, focusDesc, log, start } from "./lib.mjs";
+import { writeFileSync, readFileSync } from "node:fs";
+import { join, dirname } from "node:path"; import { fileURLToPath } from "node:url";
+const here = dirname(fileURLToPath(import.meta.url));
+await run(async () => { try {
+  const { browser, page } = await start("1440"); log("=== e2 create plan");
+  await go(page, `/projects/${POP}/floor-plans`); await page.waitForTimeout(1000);
+  await page.getByRole("button", { name: "New floor plan" }).click(); await page.waitForTimeout(600);
+  await page.getByRole("button", { name: /Plan image: Choose image/ }).click(); await page.waitForTimeout(1200);
+  await page.getByRole("dialog").last().getByRole("button", { name: /plan-parthenon-gallery/ }).click();
+  await page.getByRole("button", { name: "Use this file" }).click(); await page.waitForTimeout(600);
+  log("name prefilled", await page.locator("#fp-name").inputValue());
+  await shot(page, "new-plan__picked", "1440");
+  await page.locator("#fp-name").fill("UX-R3-s12 Plan");
+  await page.getByRole("button", { name: "Create floor plan" }).click();
+  await page.waitForURL(/\/floor-plans\/[0-9a-f-]{36}/, { timeout: 15000 });
+  const id = page.url().match(/floor-plans\/([0-9a-f-]{36})/)[1]; log("PLANURL", id);
+  const f = join(here, "ids.json"); const j = JSON.parse(readFileSync(f)); j.plan = id; writeFileSync(f, JSON.stringify(j));
+  await page.waitForTimeout(2000); await shot(page, "plan-editor__after-create", "1440");
+  await browser.close();
+} catch(e){ log("FAIL", e.message.slice(0,500)); } });

@@ -1,0 +1,20 @@
+import { open, go, shot, POP, t, run } from "./lib.mjs";
+await run(async () => {
+  const { browser, page } = await open("admin", { viewport: "1440" });
+  page.on("pageerror", (e) => console.log("PAGEERROR", e.message.slice(0,200)));
+  await go(page, `/projects/${POP}/floor-plans`);
+  await page.getByRole("button", { name: "New floor plan" }).click();
+  await page.locator("#fp-asset").click();
+  await page.waitForTimeout(1500);
+  await page.getByText("plan-parthenon-gallery").first().click();
+  await page.getByRole("button", { name: "Use this file" }).click();
+  await page.waitForTimeout(600);
+  console.log("name prefill", await page.locator("#fp-name").inputValue());
+  await page.locator("#fp-name").fill("UX-R2-s12 Plan");
+  await shot(page, "new-plan__filled", "1440");
+  await page.getByRole("button", { name: "Create floor plan" }).click();
+  await page.waitForTimeout(3000);
+  console.log("URL", page.url());
+  await shot(page, "plan-editor__after-create", "1440", true);
+  await browser.close();
+});

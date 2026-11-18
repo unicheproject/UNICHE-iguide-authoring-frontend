@@ -1,0 +1,13 @@
+import { open, go, shot, POP } from "./lib.mjs";
+const { browser, page } = await open("curator", { viewport: "1440" });
+await go(page, `/projects/${POP}/categories`); await page.waitForTimeout(800);
+await page.getByRole("button", { name: "New category", exact: true }).first().click(); await page.waitForTimeout(400);
+const d = page.getByRole("dialog");
+await d.getByRole("textbox").first().fill("UX-R2-s9 Subcat");
+await d.getByText("Points of Interest", { exact: true }).first().click();
+await d.getByText("Subcategory", { exact: true }).click(); await page.waitForTimeout(400);
+console.log("parent options:", await d.getByLabel(/Parent category/).locator("option").allTextContents());
+await shot(page, "create-categories__subcategory-parent", "1440");
+await d.getByRole("button", { name: "Create and open" }).click(); await page.waitForTimeout(1200);
+console.log("dialogs:", await page.getByRole("dialog").count(), "| summary:", (await d.locator("[data-error-summary]").innerText().catch(() => "none")).replace(/\s+/g, " "), "| url", page.url().slice(-50));
+await browser.close();

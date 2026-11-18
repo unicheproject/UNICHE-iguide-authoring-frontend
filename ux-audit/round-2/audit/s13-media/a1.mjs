@@ -1,0 +1,30 @@
+import { open, go, shot, POP, axe, t } from "./lib.mjs";
+const { browser, page } = await open("curator", { viewport: "1440" });
+page.on("pageerror", (e) => console.log("PAGEERROR", e.message.slice(0, 200)));
+const t0 = Date.now();
+await go(page, `/projects/${POP}/media`);
+await page.getByRole("heading", { level: 1 }).first().waitFor();
+console.log("h1 at", Date.now() - t0);
+await page.waitForTimeout(2500);
+console.log(page.url(), await page.title());
+console.log((await t(page, "main")).slice(0, 2500).replace(/\n+/g, " | "));
+await shot(page, "library__grid-default", "1440");
+await shot(page, "library__grid-default-full", "1440", true);
+const info = await page.evaluate(() => {
+  const q = (s) => [...document.querySelectorAll(s)];
+  const tiles = q("ul[aria-label='Media files'] > li");
+  const r = tiles.slice(0, 3).map((e) => e.innerText.replace(/\n+/g, " / "));
+  return { n: tiles.length, r, tab: q("ul[aria-label='Media files'] a, ul[aria-label='Media files'] button").length };
+});
+console.log(JSON.stringify(info, null, 1));
+await axe(page, "library-grid");
+// list view
+await page.getByRole("button", { name: /^List/ }).click();
+await page.waitForTimeout(800);
+console.log("URL after list", page.url());
+await shot(page, "library__list-default", "1440");
+const cols = await page.evaluate(() => [...document.querySelectorAll("th,[role=columnheader]")].map((e) => `${e.textContent.trim()}:${Math.round(e.getBoundingClientRect().width)}`));
+console.log("cols", cols.join(" "));
+console.log((await t(page, "main")).slice(0, 1800).replace(/\n+/g, " | "));
+await axe(page, "library-list");
+await browser.close();

@@ -1,0 +1,23 @@
+import { open, go, P, ids, shot, settle, alerts, focused, main, problem, AP } from "./lib.mjs";
+import { call, closeAll } from "../../../tools/lib.mjs";
+const I = ids(); const PP = `/projects/${P}`;
+const { browser, page } = await open("curator", { viewport: "1440" });
+await go(page, `${PP}/pois/${I.poiB}`); await settle(page, 600);
+await page.evaluate(() => localStorage.clear());
+await go(page, `${PP}/pois/${I.poiB}`); await settle(page, 600);
+await page.locator("#f-summary").fill("MINE v2 summary");
+await page.getByRole("button", { name: /Save draft/ }).first().click(); await page.waitForTimeout(2500);
+await page.route("**/working-copy:apply", (r) => r.fulfill(problem(409, "VERSION_CONFLICT", { currentVersion: 9, conflictingFields: ["translations.en.summary"] })));
+await page.getByRole("button", { name: /Apply changes/ }).first().click(); await page.waitForTimeout(800);
+await page.locator("[role=dialog],[role=alertdialog]").getByRole("button", { name: /apply/i }).last().click(); await page.waitForTimeout(2500);
+console.log("DIALOG", await page.locator("[role=dialog],[role=alertdialog]").first().innerText().catch(() => "(none)"));
+console.log("ALERTS", JSON.stringify(await alerts(page)).slice(0,600));
+console.log("FOCUS", await focused(page));
+console.log("HEADER", (await page.locator("main").innerText()).slice(0,200).replace(/\n+/g," | "));
+await shot(page, "poi-editor__apply-409-forced");
+await page.keyboard.press("Escape"); await page.waitForTimeout(500);
+console.log("after Esc dialog?", await page.locator("[role=dialog],[role=alertdialog]").count(), await focused(page));
+await shot(page, "poi-editor__apply-409-forced-esc");
+await page.unroute("**/working-copy:apply");
+// discard my pending to leave clean
+await closeAll(); await browser.close();

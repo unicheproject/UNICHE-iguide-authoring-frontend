@@ -52,3 +52,45 @@ export async function expectGradientTextContrast(page: Page, state: string): Pro
   });
   expect(failures, `text on gradients in ${state}`).toEqual([]);
 }
+
+/**
+ * Replaces the gradient check's job now that the primary action is a solid fill (D-072, superseding D-053): every
+ * visible button or link with a solid background must reach 4.5:1 between its text colour and its fill, and a control
+ * with a bordered outline (secondary buttons, fields) must reach 3:1 between border and the page behind it. At least
+ * as strict as the gradient sampling, which still runs for any gradient left in the app.
+ */
+export async function expectSolidFillContrast(page: Page, state: string): Promise<void> {
+  const failures = await page.evaluate(() => {
+    const rgb = (text: string) => (text.match(/\d+(\.\d+)?/g) ?? []).slice(0, 3).map(Number);
+    const alpha = (text: string) => {
+      const parts = text.match(/\d+(\.\d+)?/g) ?? [];
+      return parts.length > 3 ? Number(parts[3]) : 1;
+    };
+    const luminance = ([r, g, b]: number[]) => {
+      const c = [r, g, b].map((v) => {
+        const s = v / 255;
+        return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+      });
+      return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+    };
+    const ratio = (a: number[], b: number[]) => {
+      const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+      return (hi + 0.05) / (lo + 0.05);
+    };
+    const found: string[] = [];
+    for (const el of Array.from(document.querySelectorAll<HTMLElement>("button, a, input, select, textarea"))) {
+      if (el.offsetParent === null) continue;
+      const style = getComputedStyle(el);
+      if (alpha(style.backgroundColor) === 1 && el.innerText?.trim() && !style.backgroundColor.startsWith("rgba")) {
+        const r = ratio(rgb(style.backgroundColor), rgb(style.color));
+        if (r < 4.5 && el.matches("button, a")) found.push(`"${el.innerText.trim().slice(0, 40)}" text on fill ${r.toFixed(2)}:1`);
+      }
+      if (el.matches("input:not([type=hidden]):not([type=checkbox]):not([type=radio]), select, textarea") && parseFloat(style.borderTopWidth) > 0) {
+        const r = ratio(rgb(style.borderTopColor), [255, 255, 255]);
+        if (r < 3) found.push(`${el.tagName.toLowerCase()} border ${r.toFixed(2)}:1`);
+      }
+    }
+    return found;
+  });
+  expect(failures, `solid fills and control borders in ${state}`).toEqual([]);
+}

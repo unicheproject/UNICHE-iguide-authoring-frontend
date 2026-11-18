@@ -1,0 +1,15 @@
+import { start, log, state, dump } from "./lib.mjs";
+const s = await start("1440"); const { page } = s;
+await page.goto("http://localhost:5173" + state().guideUrl); await page.locator("main h1").first().waitFor({timeout:40000}); await page.waitForTimeout(2500);
+let mode = 409;
+await page.route(/\/guides\/[0-9a-f-]+(\/blocks.*)?$/, r => { if (["PUT","POST","DELETE"].includes(r.request().method())) return r.fulfill({ status: mode, contentType: "application/problem+json", body: JSON.stringify({ type:"urn:x", title: mode==409?"VERSION_CONFLICT":"VALIDATION_FAILED", status: mode, code: mode==409?"VERSION_CONFLICT":"VALIDATION_FAILED", detail:"forced", requestId:"req-s11-1", errors:[{path:"blocks[1].translations.en.text", code:"REQUIRED"}] }) }); return r.continue(); });
+await page.getByLabel(/^title/i).first().fill("UX-s11-editors Guide v3"); 
+await page.getByRole("button", { name: /save draft/i }).click().catch(()=>log("no save draft")); await page.waitForTimeout(1500);
+await page.evaluate(()=>document.querySelector("main")?.scrollTo(0,0));
+await s.shot("guide-forced-409");
+log("409:", await page.evaluate(()=>[...document.querySelectorAll("[role=alert]")].map(e=>e.innerText.slice(0,300))));
+mode = 422;
+await page.getByRole("button", { name: /save draft/i }).click().catch(()=>{}); await page.waitForTimeout(1500);
+await s.shot("guide-forced-422");
+log("422:", await page.evaluate(()=>[...document.querySelectorAll("[role=alert]")].map(e=>e.innerText.slice(0,300))), "focus", await page.evaluate(()=>document.activeElement.id+":"+document.activeElement.innerText.slice(0,40)));
+await s.browser.close();

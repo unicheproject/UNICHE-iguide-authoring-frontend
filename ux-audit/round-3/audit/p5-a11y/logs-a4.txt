@@ -1,0 +1,43 @@
+[sort Title] Enter -> button "Title" 326,221,47,32  solid 2px rgb(76, 29, 139) off 2px | live=["Sorted by Title, a to z"]
+aria-sort ["Order=null","Title=ascending","Place and ca=null","Status=none","Updated=none","Translations=none","Actions=null"]
+[sort Title again] Enter -> button "Title" 326,221,47,32  solid 2px rgb(76, 29, 139) off 2px | live=["Sorted by Title, z to a"]
+aria-sort ["Order=null","Title=descending","Place and ca=null","Status=none","Updated=none","Translations=none","Actions=null"]
+[sort Updated] Space -> button "Updated" 1012,221,74,32  solid 2px rgb(76, 29, 139) off 2px | live=["Sorted by Updated, newest first"]
+pager count 1
+pager html <nav data-v-8fb46270="" aria-label="Pages of points of interest" class="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-border px-4 py-3"><p data-v-8fb46270="" class="tabular text-sm text-ink-2">Showing 1–50 of 93</p><div data-v-8fb46270="" class="ml-auto flex items-center gap-2"><button data-v-8fb46270="" type="button" data-variant="secondary" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md border text-sm font-semibold no-underline transition-ui duration-1 ease-std hover:no-underline aria-disabled:cursor-not-allowed aria-disabled:opacity-60 disabled:cursor-not-allowed disabled:opacity-60 [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 border-input bg-ca
+pager focus button "Next" 1315,716,84,32  solid 2px rgb(76, 29, 139) off 2px {"outlineW":"2px","off":"2px","style":"solid","ringVsOutside":11.32,"ringVsOwnBg":11.32,"bg":"255,255,255","ring":"rgb(76, 29, 139)"}
+[pager next] Enter -> button "NextYou are on the last page" 1315,3703,84,32  solid 2px rgb(76, 29, 139) off 2px | live=["Page 2 of 2, showing 51 to 93 of 93"]
+after pager http://localhost:5173/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois?sort=updated&page=2 {"title":"Points of Interest · UX Audit – Populated · iGuide CMS","h1":"Points of Interest","ae":"BUTTON"} button "NextYou are on the last page" 1315,3703,84,32  solid 2px rgb(76, 29, 139) off 2px
+[pager again?] Enter -> button "NextYou are on the last page" 1315,3703,84,32  solid 2px rgb(76, 29, 139) off 2px | live=[]
+[kebab open] Enter -> div[menuitem] "Move up" 1224,475,182,36  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) | live=[]
+menu items ["Deactivate","Archive","Move up","Move down","Move to position...","Move to top","Move to bottom"]
+[menu] ArrowDown -> div[menuitem] "Move down" 1224,511,182,36  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) | live=[]
+[menu] ArrowDown -> div[menuitem] "Move to position..." 1224,547,182,36  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) | live=[]
+[menu] ArrowUp -> div[menuitem] "Move down" 1224,511,182,36  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) | live=[]
+[menu] End -> div[menuitem] "Move to bottom" 1224,619,182,36  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) | live=[]
+[menu] Home -> div[menuitem] "Deactivate" 1224,394,182,36  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) | live=[]
+[menu esc] Escape -> button "Actions for East Pediment Fragments" 1371,343,40,40  solid 2px rgb(76, 29, 139) off 2px | live=[]
+[reopen] Enter -> div[menuitem] "Move up" 1224,475,182,36  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) | live=[]
+move pos idx 4 [" Deactivate"," Archive"," Move up "," Move down "," Move to position... "," Move to top "," Move to bottom "]
+[home] Home -> div[menuitem] "Deactivate" 1224,394,182,36  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) | live=[]
+on div[menuitem] "Move to position..." 1224,547,182,36  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px)
+[choose move pos] Enter -> input "2" 521,452,112,40  solid 2px rgb(76, 29, 139) off 2px | live=[]
+dialog Move East Pediment Fragments
+New position
+
+Now at 2 of 93. Choose 1 to 93.
+
+Cancel
+Move
+[submit 0 (invalid?)] Enter -> input "0" 521,441,112,40  solid 2px rgb(76, 29, 139) off 2px | live=["Enter a number from 1 to 93."]
+dialog2 Move East Pediment Fragments
+New position
+
+Now at 2 of 93. Choose 1 to 93.
+
+Enter a number from 1 to 93.
+
+Cancel
+Move
+[esc dialog] Escape -> button "Actions for East Pediment Fragments" 1371,343,40,40  solid 2px rgb(76, 29, 139) off 2px | live=[]
+AXE {"label":"row-menu-closed","url":"http://localhost:5173/projects/PID/pois","counts":{},"v":[]}

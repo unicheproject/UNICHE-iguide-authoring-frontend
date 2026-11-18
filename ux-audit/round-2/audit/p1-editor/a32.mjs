@@ -1,0 +1,11 @@
+import { open, go, shot, P, settle } from "./lib.mjs";
+const ID="061eca49-e97e-483a-b48f-3dff0d96a3cc";
+const { browser, context, page } = await open("curator", { viewport: "1440" });
+await go(page, `/projects/${P}/pois/${ID}`); await page.getByRole("heading",{level:1}).first().waitFor(); await settle(page,1500);
+await page.getByLabel("Summary").fill("dirty then leave"); await settle(page,300);
+await page.getByRole("button",{name:/^Apply changes/}).click(); await settle(page,800);
+await page.getByRole("dialog").getByRole("button",{name:/Keep editing/}).click(); await settle(page,800);
+console.log("dialogs:", await page.getByRole("dialog").count());
+await shot(page,"poi-editor__after-keep-editing__1440");
+console.log(await page.evaluate(()=>document.querySelector(".z-modal")?.outerHTML.slice(0,500)));
+await browser.close();

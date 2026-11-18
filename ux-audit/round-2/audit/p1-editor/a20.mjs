@@ -1,0 +1,30 @@
+import { open, go, shot, P, settle } from "./lib.mjs";
+const { browser, page } = await open("curator", { viewport: "1440" });
+await go(page, `/projects/${P}/pois`); await page.getByRole("heading",{level:1}).first().waitFor(); await settle(page,1500);
+await page.getByRole("radio",{name:/^Active/}).check({force:true}); await settle(page,500);
+console.log("U1", page.url());
+await page.getByLabel("Category",{exact:true}).selectOption({label:"Sculpture"}); await settle(page,500);
+console.log("U2", page.url());
+await page.getByLabel("Sort by").selectOption({label:"Updated"}); await settle(page,800);
+console.log("U3", page.url());
+await page.getByLabel("Search in").selectOption({label:"Ελληνικά"}).catch(e=>console.log("searchin err")); 
+await page.getByLabel("Search",{exact:true}).fill("fr"); await settle(page,1200);
+console.log("U4", page.url());
+await shot(page,"pois-list__filters-set__1440");
+const firsts=async()=>page.evaluate(()=>[...document.querySelectorAll("tbody tr")].slice(0,4).map(r=>r.innerText.replace(/\s+/g," ").slice(0,110)));
+console.log("rows:", await firsts());
+console.log("Summary:", (await page.locator("main").innerText()).match(/Showing[^\n]*/)?.[0]);
+// open editor of 2nd row
+await page.locator("tbody tr").nth(1).getByRole("link").first().click(); await page.waitForURL(/pois\/[0-9a-f-]{36}/); await settle(page,1200);
+await page.goBack(); await settle(page,1500);
+console.log("BACK url", page.url());
+console.log("BACK rows:", await firsts());
+console.log("BACK controls:", await page.evaluate(()=>({sort:document.querySelector("select#list-sort, select")?.value, q:document.querySelector("input[type=search],input[type=text]")?.value})));
+await shot(page,"pois-list__after-back__1440");
+await page.reload(); await page.getByRole("heading",{level:1}).first().waitFor(); await settle(page,1800);
+console.log("RELOAD url", page.url()); console.log("RELOAD rows:", await firsts());
+await shot(page,"pois-list__after-reload__1440");
+// Sort Updated: does it list mine first?
+await go(page, `/projects/${P}/pois?sort=updated`); await settle(page,1500);
+console.log("SORT url param attempt rows:", await firsts());
+await browser.close();

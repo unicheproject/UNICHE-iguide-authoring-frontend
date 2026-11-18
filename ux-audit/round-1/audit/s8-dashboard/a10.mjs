@@ -1,0 +1,15 @@
+import { open, go, shot, E, text } from "./lib.mjs";
+const { browser, page } = await open("curator", { viewport: "1440" });
+await go(page, `/projects/${E}/pois`);
+await page.getByRole("heading", { name: /Points of Interest/ }).waitFor({ timeout: 30000 });
+await page.getByRole("button", { name: /new point/i }).first().click();
+const d = page.getByRole("dialog");
+const ins = d.locator("input"); console.log(await ins.count());
+await ins.nth(0).fill("UX-s8-dashboard POI");
+await d.locator("input").last().fill("ux-s8-dashboard-poi");
+await d.getByRole("button", { name: /^create$/i }).click();
+await page.waitForTimeout(3500); console.log(page.url());
+await go(page, `/projects/${E}`); await page.getByRole("heading", { name: "Dashboard" }).waitFor(); await page.waitForTimeout(3000);
+await shot(page, "emp__dashboard-after-place-and-poi-draft__1440", true);
+console.log(await text(page));
+await browser.close();

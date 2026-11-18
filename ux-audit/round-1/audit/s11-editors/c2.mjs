@@ -1,0 +1,17 @@
+import { start, goP, log, dump, save, focused } from "./lib.mjs";
+const s = await start("1440"); const { page } = s;
+await goP(page, "/categories");
+await page.getByRole("button", { name: /new category/i }).first().click(); await page.waitForTimeout(500);
+await page.getByLabel(/name/i).fill("UX-s11-editors Category");
+log("auto code:", await page.getByLabel(/^code/i).inputValue());
+await page.getByRole("button", { name: "Routes" }).click();
+await page.getByRole("button", { name: "Subcategory" }).click(); await page.waitForTimeout(500);
+await s.shot("category-create-subcategory-no-parent");
+log("sub dialog:", (await dump(page, "[role=dialog]")).slice(0, 700));
+await page.getByRole("button", { name: "Top-level" }).click();
+await page.getByRole("button", { name: /create category/i }).click();
+await page.waitForURL(/categories\/[0-9a-f-]+/, { timeout: 20000 }); await page.waitForTimeout(2500);
+save({ catUrl: page.url().replace(/^https?:\/\/[^/]+/, "") });
+await s.tall("category-editor__new-tall", 2600);
+log(await dump(page));
+await s.browser.close();

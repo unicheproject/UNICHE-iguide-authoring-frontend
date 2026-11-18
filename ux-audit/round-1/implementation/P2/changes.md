@@ -1,0 +1,8 @@
+# P2 Dashboard and first-run guide (D-077)
+
+Fixed: C1-41, C1-42 (P0), C1-43, C1-44, C1-45, C1-46, C1-49, C1-50, C1-51, C1-52 (pending only counted for the six Resource kinds). C1-47/C1-48 documented absences (G-023, G-024; no slots).
+Files: `src/views/workspace/DashboardView.vue`, `src/views/workspace/dashboard/{FirstRunGuide,StatusCard,PendingChanges,ReadinessGroups,ContentCounts,ProjectDetails}.vue`, `src/platform/dashboardData.ts` (new), `src/platform/readiness.ts` (language names, `groupIssues`, `issueSubject`). D-077 appended. No Q entries; G-023.. were already appended by W0.
+Behaviour note: the guide shows while nothing is ACTIVE and there is no Place or no POI (so a DRAFT Place ticks step 1 and step 2 becomes next, as the acceptance requires); plan 2.5 literally said "no content".
+Results: Empty C pristine: five-step guide, step 1 highlighted, no status card/warnings; after creating DRAFT `UX-P2 Place`: places done, pois next. Empty B (DRAFT only): "Nothing is live yet" + Activate content. Populated: Ready with 345 warnings, 12 Working Copies (10 shown, "Show 2 more"), counts strip, 7 collapsed warning groups. Forced states shot: blocked, not-live, ready, error (danger Alert with request id). Shots in `after/` at 1440/1024/768/zoom200 and forced-colors.
+axe (wcag2a/aa/21): only `label-content-name-mismatch` on the header account menu button (aria-label "D. Curator, account menu" vs visible name) - not P2's file; for W0/header owner. Tab stops: skip link is the first stop; 20 shell stops (header, nav) before main, 29 inside main (counts links, pending Open links, disclosures; warnings stay closed).
+Not run: e2e (none reference the Dashboard). Test record left: DRAFT Place `UX-P2 Place` in Empty C.

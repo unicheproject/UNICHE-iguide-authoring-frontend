@@ -1,0 +1,951 @@
+{
+ "dashboard": {
+  "sizes": {
+   "12": 7,
+   "13": 57,
+   "14": 432,
+   "16": 5,
+   "20": 1
+  },
+  "tiny": [],
+  "total": 217,
+  "small": [
+   "1x1 A Skip to content",
+   "139x23 BUTTON Show more (13 left)",
+   "143x23 BUTTON Show more (76 left)",
+   "148x23 BUTTON Show more (139 left)",
+   "134x23 BUTTON Show more (2 left)",
+   "144x23 BUTTON Show more (40 left)",
+   "134x23 BUTTON Show more (6 left)"
+  ],
+  "smallN": 7,
+  "belowTouch": 32,
+  "fam": {
+   "\"Montserrat Variable\"": 924,
+   "ui-monospace": 1
+  },
+  "rad": {
+   "4px": 8,
+   "0px": 869,
+   "8px": 30,
+   "9999px": 3,
+   "12px": 5
+  },
+  "sh": {
+   "rgb(76, 29, 139) 3px 0px 0px 0px inset": 1,
+   "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rg": 5
+  },
+  "iconSz": {},
+  "glyph": "",
+  "sticky": [],
+  "scrollW": 1280,
+  "clientW": 1280
+ },
+ "places": {
+  "sizes": {
+   "12": 70,
+   "13": 239,
+   "14": 37,
+   "20": 1
+  },
+  "tiny": [],
+  "total": 83,
+  "small": [
+   "1x1 A Skip to content",
+   "1x1 INPUT sr-only",
+   "1x1 INPUT sr-only",
+   "1x1 INPUT sr-only",
+   "1x1 INPUT sr-only",
+   "20x20 INPUT peer size-5 cursor-[inherit] a",
+   "20x20 INPUT peer size-5 cursor-[inherit] a",
+   "20x20 INPUT peer size-5 cursor-[inherit] a",
+   "163x21 A Athens Historic Centre",
+   "18x18 BUTTON Actions for Athens Historic Ce",
+   "134x21 A Acropolis Museum",
+   "18x18 BUTTON Actions for Acropolis Museum"
+  ],
+  "smallN": 49,
+  "belowTouch": 33,
+  "fam": {
+   "\"Montserrat Variable\"": 1669,
+   "ui-monospace": 22
+  },
+  "rad": {
+   "4px": 37,
+   "0px": 1537,
+   "8px": 46,
+   "9999px": 56,
+   "12px": 1,
+   "50%": 4
+  },
+  "sh": {
+   "rgb(76, 29, 139) 3px 0px 0px 0px inset": 1,
+   "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rg": 1
+  },
+  "iconSz": {
+   "32x32": 7,
+   "18x18": 22
+  },
+  "glyph": "",
+  "sticky": [
+   "s z10 top156 h138 DIV.z-sticky.flex",
+   "s z1 top294 h35 TH.list-th.w-12",
+   "s z1 top294 h35 TH.list-th.w-[34%]",
+   "s z1 top294 h35 TH.list-th.w-32",
+   "s z1 top294 h35 TH.list-th.w-40",
+   "s z1 top294 h35 TH.list-th.w-44",
+   "s z1 top294 h35 TH.list-th",
+   "s z1 top294 h35 TH.list-th.w-14"
+  ],
+  "scrollW": 1280,
+  "clientW": 1280
+ },
+ "pois": {
+  "sizes": {
+   "12": 245,
+   "13": 754,
+   "14": 184,
+   "20": 1
+  },
+  "tiny": [],
+  "total": 204,
+  "small": [
+   "1x1 A Skip to content",
+   "1x1 INPUT sr-only",
+   "1x1 INPUT sr-only",
+   "1x1 INPUT sr-only",
+   "1x1 INPUT sr-only",
+   "20x20 INPUT peer size-5 cursor-[inherit] a",
+   "20x20 INPUT peer size-5 cursor-[inherit] a",
+   "20x20 INPUT peer size-5 cursor-[inherit] a",
+   "216x21 A Parthenon Frieze – North Side",
+   "18x18 BUTTON Actions for Parthenon Frieze –",
+   "189x21 A East Pediment Fragments",
+   "18x18 BUTTON Actions for East Pediment Frag"
+  ],
+  "smallN": 169,
+  "belowTouch": 29,
+  "fam": {
+   "\"Montserrat Variable\"": 5098,
+   "ui-monospace": 101
+  },
+  "rad": {
+   "4px": 95,
+   "0px": 4823,
+   "8px": 109,
+   "9999px": 157,
+   "12px": 1,
+   "50%": 4
+  },
+  "sh": {
+   "rgb(76, 29, 139) 3px 0px 0px 0px inset": 1,
+   "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rg": 1
+  },
+  "iconSz": {
+   "18x18": 84
+  },
+  "glyph": "",
+  "sticky": [
+   "s z10 top156 h182 DIV.z-sticky.flex",
+   "s z1 top338 h49 TH.list-th.w-12",
+   "s z1 top338 h49 TH.list-th.w-[40%]",
+   "s z1 top338 h49 TH.list-th.w-40",
+   "s z1 top338 h49 TH.list-th.w-44",
+   "s z1 top338 h49 TH.list-th",
+   "s z1 top338 h49 TH.list-th.w-14"
+  ],
+  "scrollW": 1280,
+  "clientW": 1280
+ },
+ "routes": {
+  "sizes": {
+   "12": 46,
+   "13": 174,
+   "14": 44,
+   "20": 1
+  },
+  "tiny": [],
+  "total": 64,
+  "small": [
+   "1x1 A Skip to content",
+   "1x1 INPUT sr-only",
+   "1x1 INPUT sr-only",
+   "1x1 INPUT sr-only",
+   "1x1 INPUT sr-only",
+   "20x20 INPUT peer size-5 cursor-[inherit] a",
+   "20x20 INPUT peer size-5 cursor-[inherit] a",
+   "20x20 INPUT peer size-5 cursor-[inherit] a",
+   "263x21 A Acropolis Highlights – Classic",
+   "18x18 BUTTON Actions for Acropolis Highligh",
+   "283x21 A Museum Masterpieces – One Hour",
+   "18x18 BUTTON Actions for Museum Masterpiece"
+  ],
+  "smallN": 36,
+  "belowTouch": 28,
+  "fam": {
+   "\"Montserrat Variable\"": 1144,
+   "ui-monospace": 14
+  },
+  "rad": {
+   "4px": 25,
+   "0px": 1047,
+   "8px": 39,
+   "9999px": 32,
+   "12px": 1,
+   "50%": 4
+  },
+  "sh": {
+   "rgb(76, 29, 139) 3px 0px 0px 0px inset": 1,
+   "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rg": 1
+  },
+  "iconSz": {
+   "18x18": 14
+  },
+  "glyph": "",
+  "sticky": [
+   "s z10 top156 h182 DIV.z-sticky.flex",
+   "s z1 top338 h49 TH.list-th.w-12",
+   "s z1 top338 h49 TH.list-th.w-[32%]",
+   "s z1 top338 h49 TH.list-th.w-36",
+   "s z1 top338 h49 TH.list-th.w-36",
+   "s z1 top338 h49 TH.list-th.w-44",
+   "s z1 top338 h49 TH.list-th",
+   "s z1 top338 h49 TH.list-th.w-14"
+  ],
+  "scrollW": 1280,
+  "clientW": 1280
+ },
+ "guides": {
+  "sizes": {
+   "12": 31,
+   "13": 158,
+   "14": 43,
+   "20": 1
+  },
+  "tiny": [],
+  "total": 63,
+  "small": [
+   "1x1 A Skip to content",
+   "1x1 INPUT sr-only",
+   "1x1 INPUT sr-only",
+   "1x1 INPUT sr-only",
+   "1x1 INPUT sr-only",
+   "20x20 INPUT peer size-5 cursor-[inherit] a",
+   "20x20 INPUT peer size-5 cursor-[inherit] a",
+   "20x20 INPUT peer size-5 cursor-[inherit] a",
+   "18x18 BUTTON Actions for The Story of the P",
+   "18x18 BUTTON Actions for The Erechtheion an",
+   "248x21 A Everyday Life in the Ancient A",
+   "18x18 BUTTON Actions for Everyday Life in t"
+  ],
+  "smallN": 33,
+  "belowTouch": 30,
+  "fam": {
+   "\"Montserrat Variable\"": 1052,
+   "ui-monospace": 14
+  },
+  "rad": {
+   "4px": 25,
+   "0px": 969,
+   "8px": 38,
+   "9999px": 19,
+   "12px": 1,
+   "50%": 4
+  },
+  "sh": {
+   "rgb(76, 29, 139) 3px 0px 0px 0px inset": 1,
+   "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rg": 1
+  },
+  "iconSz": {
+   "18x18": 14
+  },
+  "glyph": "",
+  "sticky": [
+   "s z10 top156 h138 DIV.z-sticky.flex",
+   "s z1 top294 h49 TH.list-th.w-12",
+   "s z1 top294 h49 TH.list-th.w-[36%]",
+   "s z1 top294 h49 TH.list-th.w-52",
+   "s z1 top294 h49 TH.list-th.w-44",
+   "s z1 top294 h49 TH.list-th",
+   "s z1 top294 h49 TH.list-th.w-14"
+  ],
+  "scrollW": 1280,
+  "clientW": 1280
+ },
+ "events": {
+  "sizes": {
+   "12": 34,
+   "13": 164,
+   "14": 47,
+   "20": 1
+  },
+  "tiny": [],
+  "total": 68,
+  "small": [
+   "1x1 A Skip to content",
+   "1x1 INPUT sr-only",
+   "1x1 INPUT sr-only",
+   "1x1 INPUT sr-only",
+   "1x1 INPUT sr-only",
+   "20x20 INPUT peer size-5 cursor-[inherit] a",
+   "20x20 INPUT peer size-5 cursor-[inherit] a",
+   "20x20 INPUT peer size-5 cursor-[inherit] a",
+   "233x21 A Full Moon Night at the Acropol",
+   "18x18 BUTTON Actions for Full Moon Night at",
+   "276x21 A Panathenaic Procession Reenact",
+   "18x18 BUTTON Actions for Panathenaic Proces"
+  ],
+  "smallN": 39,
+  "belowTouch": 29,
+  "fam": {
+   "\"Montserrat Variable\"": 1158,
+   "ui-monospace": 16
+  },
+  "rad": {
+   "4px": 28,
+   "0px": 1070,
+   "8px": 40,
+   "9999px": 21,
+   "12px": 1,
+   "50%": 4
+  },
+  "sh": {
+   "rgb(76, 29, 139) 3px 0px 0px 0px inset": 1,
+   "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rg": 1
+  },
+  "iconSz": {
+   "18x18": 16
+  },
+  "glyph": "",
+  "sticky": [
+   "s z10 top156 h138 DIV.z-sticky.flex",
+   "s z1 top294 h49 TH.list-th.w-12",
+   "s z1 top294 h49 TH.list-th.w-[36%]",
+   "s z1 top294 h49 TH.list-th.w-64",
+   "s z1 top294 h49 TH.list-th.w-44",
+   "s z1 top294 h49 TH.list-th",
+   "s z1 top294 h49 TH.list-th.w-14"
+  ],
+  "scrollW": 1280,
+  "clientW": 1280
+ },
+ "categories": {
+  "sizes": {
+   "12": 74,
+   "13": 296,
+   "14": 45,
+   "20": 1
+  },
+  "tiny": [],
+  "total": 95,
+  "small": [
+   "1x1 A Skip to content",
+   "1x1 INPUT sr-only",
+   "1x1 INPUT sr-only",
+   "1x1 INPUT sr-only",
+   "1x1 INPUT sr-only",
+   "20x20 INPUT peer size-5 cursor-[inherit] a",
+   "20x20 INPUT peer size-5 cursor-[inherit] a",
+   "184x21 A Monuments and Temples",
+   "18x18 BUTTON Actions for Monuments and Temp",
+   "120x21 A UX-R2-s9 Subcat",
+   "18x18 BUTTON Actions for UX-R2-s9 Subcat",
+   "70x21 A Sculpture"
+  ],
+  "smallN": 67,
+  "belowTouch": 28,
+  "fam": {
+   "\"Montserrat Variable\"": 2160,
+   "ui-monospace": 30
+  },
+  "rad": {
+   "4px": 40,
+   "0px": 1988,
+   "8px": 85,
+   "9999px": 62,
+   "12px": 1,
+   "50%": 4
+  },
+  "sh": {
+   "rgb(76, 29, 139) 3px 0px 0px 0px inset": 1,
+   "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rg": 1
+  },
+  "iconSz": {
+   "32x32": 3,
+   "18x18": 30
+  },
+  "glyph": "",
+  "sticky": [
+   "s z10 top156 h182 DIV.z-sticky.flex",
+   "s z1 top338 h35 TH.list-th.w-12",
+   "s z1 top338 h35 TH.list-th.w-[38%]",
+   "s z1 top338 h35 TH.list-th.w-48",
+   "s z1 top338 h35 TH.list-th.w-44",
+   "s z1 top338 h35 TH.list-th",
+   "s z1 top338 h35 TH.list-th.w-14"
+  ],
+  "scrollW": 1280,
+  "clientW": 1280
+ },
+ "maps": {
+  "sizes": {
+   "12": 21,
+   "13": 36,
+   "14": 29,
+   "20": 1
+  },
+  "tiny": [],
+  "total": 48,
+  "small": [
+   "1x1 A Skip to content",
+   "18x18 BUTTON Ascending, switch to descendin",
+   "1x1 INPUT sr-only",
+   "1x1 INPUT sr-only",
+   "1x1 INPUT sr-only",
+   "1x1 INPUT sr-only",
+   "20x20 INPUT peer size-5 cursor-[inherit] a",
+   "18x18 BUTTON Actions for Acropolis and Sout",
+   "18x18 BUTTON Actions for Ancient Agora – si",
+   "18x18 BUTTON Actions for UX-s12-maps Map",
+   "18x18 BUTTON Actions for UX-P6 Map",
+   "18x18 BUTTON Actions for UX-P4 map"
+  ],
+  "smallN": 14,
+  "belowTouch": 27,
+  "fam": {
+   "\"Montserrat Variable\"": 404
+  },
+  "rad": {
+   "4px": 8,
+   "0px": 339,
+   "8px": 31,
+   "9999px": 11,
+   "12px": 1,
+   "50%": 4
+  },
+  "sh": {
+   "rgb(76, 29, 139) 3px 0px 0px 0px inset": 1,
+   "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rg": 1
+  },
+  "iconSz": {
+   "18x18": 8
+  },
+  "glyph": "",
+  "sticky": [
+   "s z10 top216 h138 DIV.z-sticky.flex",
+   "s z1 top354 h49 TH.list-th.w-[40%]",
+   "s z1 top354 h49 TH.list-th",
+   "s z1 top354 h49 TH.list-th.w-44",
+   "s z1 top354 h49 TH.list-th.w-14"
+  ],
+  "scrollW": 1280,
+  "clientW": 1280
+ },
+ "floorplans": {
+  "sizes": {
+   "12": 24,
+   "13": 42,
+   "14": 39,
+   "20": 1
+  },
+  "tiny": [],
+  "total": 49,
+  "small": [
+   "1x1 A Skip to content",
+   "1x1 INPUT sr-only",
+   "1x1 INPUT sr-only",
+   "1x1 INPUT sr-only",
+   "1x1 INPUT sr-only",
+   "20x20 INPUT peer size-5 cursor-[inherit] a",
+   "18x18 BUTTON Actions for Acropolis Museum –",
+   "18x18 BUTTON Actions for Acropolis Museum –",
+   "18x18 BUTTON Actions for UX-p5-a11y Plan",
+   "18x18 BUTTON Actions for UX-s12-maps Plan",
+   "18x18 BUTTON Actions for UX-P6 Plan",
+   "18x18 BUTTON Actions for UX-P4 floor plan"
+  ],
+  "smallN": 14,
+  "belowTouch": 27,
+  "fam": {
+   "\"Montserrat Variable\"": 510
+  },
+  "rad": {
+   "4px": 16,
+   "0px": 436,
+   "8px": 31,
+   "9999px": 12,
+   "12px": 1,
+   "50%": 4
+  },
+  "sh": {
+   "rgb(76, 29, 139) 3px 0px 0px 0px inset": 1,
+   "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rg": 1
+  },
+  "iconSz": {
+   "18x18": 8
+  },
+  "glyph": "×",
+  "sticky": [
+   "s z10 top216 h138 DIV.z-sticky.flex",
+   "s z1 top354 h49 TH.list-th.w-12",
+   "s z1 top354 h49 TH.list-th.w-[34%]",
+   "s z1 top354 h49 TH.list-th",
+   "s z1 top354 h49 TH.list-th.w-40",
+   "s z1 top354 h49 TH.list-th.w-44",
+   "s z1 top354 h49 TH.list-th.w-14"
+  ],
+  "scrollW": 1280,
+  "clientW": 1280
+ },
+ "media": {
+  "sizes": {
+   "12": 195,
+   "13": 23,
+   "14": 69,
+   "20": 1
+  },
+  "tiny": [],
+  "total": 86,
+  "small": [
+   "1x1 A Skip to content",
+   "18x18 BUTTON Descending, switch to ascendin",
+   "1x1 INPUT sr-only",
+   "1x1 INPUT sr-only",
+   "1x1 INPUT sr-only",
+   "1x1 INPUT sr-only",
+   "20x20 INPUT peer size-5 cursor-[inherit] a",
+   "20x20 INPUT peer size-5 cursor-[inherit] a",
+   "20x20 INPUT peer size-5 cursor-[inherit] a",
+   "20x20 INPUT peer size-5 cursor-[inherit] a"
+  ],
+  "smallN": 10,
+  "belowTouch": 28,
+  "fam": {
+   "\"Montserrat Variable\"": 1291
+  },
+  "rad": {
+   "4px": 9,
+   "0px": 1062,
+   "8px": 29,
+   "9999px": 128,
+   "12px": 49,
+   "50%": 4
+  },
+  "sh": {
+   "rgb(76, 29, 139) 3px 0px 0px 0px inset": 1,
+   "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rg": 49
+  },
+  "iconSz": {
+   "18x18": 1
+  },
+  "glyph": "×",
+  "sticky": [
+   "s z10 top156 h182 DIV.z-sticky.flex"
+  ],
+  "scrollW": 1280,
+  "clientW": 1280
+ },
+ "preview": {
+  "sizes": {
+   "12": 9,
+   "13": 17,
+   "14": 32,
+   "16": 32,
+   "20": 1,
+   "18.4": 1,
+   "14.4": 6,
+   "11.2": 2,
+   "30.4": 1,
+   "12.8": 11,
+   "13.6": 32
+  },
+  "tiny": [
+   "11.2px flex-none rounded-full border border-current px-[0 :: Search",
+   "11.2px flex-none rounded-full border border-current px-[0 :: en ▾"
+  ],
+  "total": 86,
+  "small": [
+   "1x1 A Skip to content",
+   "1x1 A Skip preview",
+   "144x22 BUTTON UX Audit – Populated",
+   "32x17 BUTTON Home",
+   "35x17 BUTTON Places",
+   "90x17 BUTTON Points of interest",
+   "37x17 BUTTON Routes",
+   "37x17 BUTTON Guides",
+   "35x17 BUTTON Events",
+   "58x18 BUTTON Search",
+   "32x15 BUTTON See all",
+   "32x15 BUTTON See all"
+  ],
+  "smallN": 15,
+  "belowTouch": 39,
+  "fam": {
+   "\"Montserrat Variable\"": 224,
+   "\"Libre Franklin\"": 159,
+   "Newsreader": 2
+  },
+  "rad": {
+   "4px": 1,
+   "0px": 295,
+   "8px": 23,
+   "9999px": 7,
+   "12px": 2,
+   "9.6px": 32,
+   "6.72px": 15
+  },
+  "sh": {
+   "rgb(76, 29, 139) 3px 0px 0px 0px inset": 1,
+   "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rg": 1
+  },
+  "iconSz": {},
+  "glyph": "×▾",
+  "sticky": [],
+  "scrollW": 1280,
+  "clientW": 1280
+ },
+ "navigation": {
+  "sizes": {
+   "11": 6,
+   "12": 23,
+   "13": 18,
+   "14": 9,
+   "15": 22,
+   "18": 1,
+   "20": 1,
+   "17.25": 1,
+   "10.5": 2,
+   "28.5": 1,
+   "12.75": 22
+  },
+  "tiny": [
+   "11px mt-3 text-[11px] text-muted-foreground :: Items open Places, Points",
+   "11px text-[11px] font-extrabold uppercase tracking-[0.1 :: Preview",
+   "11px rounded-full border px-2.5 py-1 text-[11px] font-s :: Mobile",
+   "11px rounded-full border px-2.5 py-1 text-[11px] font-s :: Web",
+   "10.5px flex-none rounded-full border border-current px-[0 :: Search",
+   "10.5px flex-none rounded-full border border-current px-[0 :: en ▾"
+  ],
+  "total": 59,
+  "small": [
+   "1x1 A Skip to content",
+   "12x21 BUTTON Menu",
+   "133x20 BUTTON UX Audit – Populated",
+   "54x17 BUTTON Search",
+   "29x14 BUTTON See all",
+   "29x14 BUTTON See all",
+   "29x14 BUTTON See all",
+   "29x14 BUTTON See all",
+   "29x14 BUTTON See all"
+  ],
+  "smallN": 9,
+  "belowTouch": 27,
+  "fam": {
+   "\"Montserrat Variable\"": 180,
+   "\"Libre Franklin\"": 117,
+   "Newsreader": 2
+  },
+  "rad": {
+   "4px": 1,
+   "0px": 221,
+   "8px": 22,
+   "9999px": 6,
+   "12px": 3,
+   "9px": 22,
+   "6.3px": 14
+  },
+  "sh": {
+   "rgb(76, 29, 139) 3px 0px 0px 0px inset": 1,
+   "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rg": 1
+  },
+  "iconSz": {},
+  "glyph": "☰▾",
+  "sticky": [
+   "s zauto top176 h678 ASIDE.min-w-0.xl:sticky"
+  ],
+  "scrollW": 1280,
+  "clientW": 1280
+ },
+ "translations": {
+  "sizes": {
+   "10": 545,
+   "11": 809,
+   "12": 7,
+   "13": 288,
+   "14": 10,
+   "20": 1
+  },
+  "tiny": [
+   "11px text-[11px] text-muted-foreground :: from English, the default",
+   "11px rounded-full border px-[13px] py-1.5 text-[11px] b :: All",
+   "11px rounded-full border px-[13px] py-1.5 text-[11px] b :: Places",
+   "11px rounded-full border px-[13px] py-1.5 text-[11px] b :: Points of interest",
+   "11px rounded-full border px-[13px] py-1.5 text-[11px] b :: Routes",
+   "11px rounded-full border px-[13px] py-1.5 text-[11px] b :: Guides"
+  ],
+  "total": 1098,
+  "small": [
+   "1x1 A Skip to content",
+   "151x20 BUTTON Athens Historic Centre",
+   "70x17 BUTTON Athens Historic Centre, Englis",
+   "70x17 BUTTON Athens Historic Centre, Ελληνι",
+   "43x17 BUTTON Athens Historic Centre, Italia",
+   "125x20 BUTTON Acropolis Museum",
+   "70x17 BUTTON Acropolis Museum, English: Com",
+   "70x17 BUTTON Acropolis Museum, Ελληνικά: Co",
+   "43x17 BUTTON Acropolis Museum, Italiano: 1 ",
+   "70x17 BUTTON Ground Floor – Slopes Level, E",
+   "70x17 BUTTON Ground Floor – Slopes Level, Ε",
+   "58x17 BUTTON Ground Floor – Slopes Level, I"
+  ],
+  "smallN": 929,
+  "belowTouch": 145,
+  "fam": {
+   "\"Montserrat Variable\"": 4178
+  },
+  "rad": {
+   "4px": 1,
+   "0px": 3052,
+   "8px": 21,
+   "9999px": 1090,
+   "12px": 4
+  },
+  "sh": {
+   "rgb(76, 29, 139) 3px 0px 0px 0px inset": 1
+  },
+  "iconSz": {},
+  "glyph": "",
+  "sticky": [
+   "s zauto top291 h22 THEAD.sticky.top-0"
+  ],
+  "scrollW": 1280,
+  "clientW": 1280
+ },
+ "languages": {
+  "sizes": {
+   "10": 5,
+   "11": 15,
+   "12": 5,
+   "13": 20,
+   "14": 10,
+   "20": 1
+  },
+  "tiny": [
+   "11px font-mono text-[11px] text-muted-foreground :: en · 180 of 180 content i",
+   "10px rounded-full bg-primary px-[9px] py-[3px] text-[10 :: default",
+   "11px font-mono text-[11px] text-muted-foreground :: el · 92 of 180 content it",
+   "10px rounded-full border bg-muted px-3.5 py-1.5 text-[1 :: Make default",
+   "10px rounded-full border-[1.5px] border-destructive px- :: Remove",
+   "11px font-mono text-[11px] text-muted-foreground :: it · 39 of 180 content it"
+  ],
+  "total": 41,
+  "small": [
+   "1x1 A Skip to content"
+  ],
+  "smallN": 1,
+  "belowTouch": 40,
+  "fam": {
+   "\"Montserrat Variable\"": 174,
+   "ui-monospace": 3
+  },
+  "rad": {
+   "4px": 1,
+   "0px": 127,
+   "8px": 19,
+   "9999px": 19,
+   "12px": 1
+  },
+  "sh": {
+   "rgb(76, 29, 139) 3px 0px 0px 0px inset": 1
+  },
+  "iconSz": {},
+  "glyph": "",
+  "sticky": [],
+  "scrollW": 1280,
+  "clientW": 1280
+ },
+ "overview": {
+  "sizes": {
+   "10": 6,
+   "12": 11,
+   "13": 52,
+   "14": 16,
+   "20": 1
+  },
+  "tiny": [
+   "10px mb-3 text-[10px] font-extrabold uppercase tracking :: How it fits together",
+   "10px block text-[10px] font-bold text-muted-foreground :: 1",
+   "10px block text-[10px] font-bold text-muted-foreground :: 2",
+   "10px block text-[10px] font-bold text-muted-foreground :: 3",
+   "10px block text-[10px] font-bold text-muted-foreground :: 4",
+   "10px block text-[10px] font-bold text-muted-foreground :: 5"
+  ],
+  "total": 33,
+  "small": [
+   "1x1 A Skip to content"
+  ],
+  "smallN": 1,
+  "belowTouch": 29,
+  "fam": {
+   "\"Montserrat Variable\"": 252
+  },
+  "rad": {
+   "4px": 1,
+   "0px": 209,
+   "8px": 19,
+   "9999px": 2,
+   "10px": 6,
+   "12px": 5
+  },
+  "sh": {
+   "rgb(76, 29, 139) 3px 0px 0px 0px inset": 1
+  },
+  "iconSz": {},
+  "glyph": "",
+  "sticky": [],
+  "scrollW": 1280,
+  "clientW": 1280
+ },
+ "surfaces": {
+  "sizes": {
+   "11": 4,
+   "12": 9,
+   "13": 20,
+   "14": 11,
+   "20": 1
+  },
+  "tiny": [
+   "11px flex items-center gap-2 text-[11px] font-bold uppe :: Enabled",
+   "11px mb-1 block text-[11px] font-extrabold uppercase tr :: Public web address",
+   "11px flex items-center gap-2 text-[11px] font-bold uppe :: Enabled",
+   "11px flex items-center gap-2 text-[11px] font-bold uppe :: Enabled"
+  ],
+  "total": 30,
+  "small": [
+   "1x1 A Skip to content",
+   "105x20 BUTTON Enabled",
+   "105x20 BUTTON Enabled",
+   "105x20 BUTTON Enabled"
+  ],
+  "smallN": 4,
+  "belowTouch": 26,
+  "fam": {
+   "\"Montserrat Variable\"": 175,
+   "ui-monospace": 1
+  },
+  "rad": {
+   "4px": 1,
+   "0px": 133,
+   "8px": 21,
+   "9999px": 8,
+   "12px": 3
+  },
+  "sh": {
+   "rgb(76, 29, 139) 3px 0px 0px 0px inset": 1,
+   "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rg": 3
+  },
+  "iconSz": {},
+  "glyph": "",
+  "sticky": [],
+  "scrollW": 1280,
+  "clientW": 1280
+ },
+ "poiEditor": {
+  "sizes": {
+   "12": 46,
+   "13": 19,
+   "14": 99,
+   "16": 6,
+   "20": 1,
+   "22": 2
+  },
+  "tiny": [],
+  "total": 84,
+  "small": [
+   "1x1 A Skip to content",
+   "18x18 BUTTON More actions",
+   "16x16 INPUT size-4",
+   "16x16 INPUT size-4",
+   "16x16 INPUT size-4"
+  ],
+  "smallN": 5,
+  "belowTouch": 63,
+  "fam": {
+   "\"Montserrat Variable\"": 517,
+   "ui-monospace": 5,
+   "\"Helvetica Neue\"": 78,
+   "\"Lucida Console\"": 4
+  },
+  "rad": {
+   "4px": 3,
+   "0px": 506,
+   "8px": 62,
+   "9999px": 9,
+   "12px": 12,
+   "2px 2px 0px 0px": 1,
+   "0px 0px 2px 2px": 1
+  },
+  "sh": {
+   "rgb(76, 29, 139) 3px 0px 0px 0px inset": 1,
+   "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rg": 10,
+   "rgba(0, 0, 0, 0.3) 0px 2px 7px 0px": 1
+  },
+  "iconSz": {
+   "18x18": 1,
+   "32x32": 2
+  },
+  "glyph": "",
+  "sticky": [
+   "s z10 top117 h138 DIV.sticky.-top-6",
+   "s zauto top287 h494 ASIDE.flex.min-w-0"
+  ],
+  "scrollW": 1280,
+  "clientW": 1280
+ },
+ "placeEditor": {
+  "sizes": {
+   "12": 38,
+   "13": 18,
+   "14": 87,
+   "16": 6,
+   "20": 1
+  },
+  "tiny": [],
+  "total": 69,
+  "small": [
+   "1x1 A Skip to content",
+   "18x18 BUTTON More actions",
+   "16x16 INPUT mt-1 size-4 accent-primary",
+   "16x16 INPUT mt-1 size-4 accent-primary"
+  ],
+  "smallN": 4,
+  "belowTouch": 49,
+  "fam": {
+   "\"Montserrat Variable\"": 453,
+   "ui-monospace": 1
+  },
+  "rad": {
+   "4px": 2,
+   "0px": 370,
+   "8px": 53,
+   "9999px": 6,
+   "12px": 11,
+   "50%": 2
+  },
+  "sh": {
+   "rgb(76, 29, 139) 3px 0px 0px 0px inset": 1,
+   "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rg": 10
+  },
+  "iconSz": {
+   "18x18": 1,
+   "32x32": 2
+  },
+  "glyph": "",
+  "sticky": [
+   "s z10 top117 h121 DIV.sticky.-top-6",
+   "s zauto top270 h511 ASIDE.flex.min-w-0"
+  ],
+  "scrollW": 1280,
+  "clientW": 1280
+ }
+}

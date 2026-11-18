@@ -1,0 +1,12 @@
+import { open, go, shot, E, text } from "./lib.mjs";
+const { browser, page } = await open("curator", { viewport: "1440" });
+const t0 = Date.now();
+await go(page, `/projects/${E}/pois`);
+await page.getByRole("heading", { name: /Points of Interest/ }).waitFor({ timeout: 30000 }); console.log("ms to heading", Date.now() - t0);
+await page.waitForTimeout(800);
+await shot(page, "emp__pois-list__1440", false);
+console.log(await page.getByRole("button").allInnerTexts());
+await page.getByRole("button", { name: /new/i }).first().click(); await page.waitForTimeout(800);
+await shot(page, "emp__poi-create-dialog__1440", false);
+console.log(await page.getByRole("dialog").innerText());
+await browser.close();

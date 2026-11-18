@@ -1,0 +1,8 @@
+{
+  "firstTabStop": "Skip to content",
+  "afterRouteChange": {
+    "active": "H1:Points of Interest",
+    "title": "Points of Interest · UX Audit – Populated · iGuide CMS",
+    "live": "polite: / polite:Points of Interest loaded / assertive:"
+  }
+}

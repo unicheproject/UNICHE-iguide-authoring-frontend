@@ -1,0 +1,1025 @@
+{
+ "1440/places": {
+  "ms": 2640,
+  "h1x": 256,
+  "searchx": 273,
+  "tblx": 257,
+  "tblw": 1158,
+  "newR": 1416,
+  "tblR": 1415,
+  "ths": [
+   [
+    "Order",
+    257,
+    48
+   ],
+   [
+    "Title",
+    305,
+    366
+   ],
+   [
+    "Setting and ma",
+    671,
+    208
+   ],
+   [
+    "Status",
+    879,
+    160
+   ],
+   [
+    "Updated",
+    1039,
+    128
+   ],
+   [
+    "Translations",
+    1167,
+    192
+   ],
+   [
+    "Actions",
+    1359,
+    56
+   ]
+  ],
+  "rowmin": 73,
+  "rowmax": 99,
+  "rows": 23,
+  "trunc": 72,
+  "hscroll": false
+ },
+ "1440/pois": {
+  "ms": 1874,
+  "h1x": 256,
+  "searchx": 273,
+  "tblx": 257,
+  "tblw": 1158,
+  "newR": 1416,
+  "tblR": 1415,
+  "ths": [
+   [
+    "Order",
+    257,
+    53
+   ],
+   [
+    "Title",
+    310,
+    347
+   ],
+   [
+    "Place and cate",
+    658,
+    160
+   ],
+   [
+    "Status",
+    818,
+    178
+   ],
+   [
+    "Updated",
+    996,
+    143
+   ],
+   [
+    "Translations",
+    1139,
+    214
+   ],
+   [
+    "Actions",
+    1353,
+    62
+   ]
+  ],
+  "rowmin": 73,
+  "rowmax": 146,
+  "rows": 50,
+  "trunc": 230,
+  "hscroll": false
+ },
+ "1440/routes": {
+  "ms": 1651,
+  "h1x": 256,
+  "searchx": 273,
+  "tblx": 257,
+  "tblw": 1158,
+  "newR": 1416,
+  "tblR": 1415,
+  "ths": [
+   [
+    "Order",
+    257,
+    48
+   ],
+   [
+    "Title",
+    305,
+    286
+   ],
+   [
+    "Category",
+    591,
+    112
+   ],
+   [
+    "Setting and st",
+    703,
+    176
+   ],
+   [
+    "Status",
+    879,
+    160
+   ],
+   [
+    "Updated",
+    1039,
+    128
+   ],
+   [
+    "Translations",
+    1167,
+    192
+   ],
+   [
+    "Actions",
+    1359,
+    56
+   ]
+  ],
+  "rowmin": 73,
+  "rowmax": 104,
+  "rows": 19,
+  "trunc": 58,
+  "hscroll": false
+ },
+ "1440/guides": {
+  "ms": 1928,
+  "h1x": 256,
+  "searchx": 273,
+  "tblx": 257,
+  "tblw": 1158,
+  "newR": 1416,
+  "tblR": 1415,
+  "ths": [
+   [
+    "Order",
+    257,
+    48
+   ],
+   [
+    "Title",
+    305,
+    382
+   ],
+   [
+    "Story",
+    687,
+    192
+   ],
+   [
+    "Status",
+    879,
+    160
+   ],
+   [
+    "Updated",
+    1039,
+    128
+   ],
+   [
+    "Translations",
+    1167,
+    192
+   ],
+   [
+    "Actions",
+    1359,
+    56
+   ]
+  ],
+  "rowmin": 73,
+  "rowmax": 127,
+  "rows": 18,
+  "trunc": 54,
+  "hscroll": false
+ },
+ "1440/events": {
+  "ms": 1606,
+  "h1x": 256,
+  "searchx": 273,
+  "tblx": 257,
+  "tblw": 1158,
+  "newR": 1416,
+  "tblR": 1415,
+  "ths": [
+   [
+    "Order",
+    257,
+    48
+   ],
+   [
+    "Title",
+    305,
+    334
+   ],
+   [
+    "Next date",
+    639,
+    240
+   ],
+   [
+    "Status",
+    879,
+    160
+   ],
+   [
+    "Updated",
+    1039,
+    128
+   ],
+   [
+    "Translations",
+    1167,
+    192
+   ],
+   [
+    "Actions",
+    1359,
+    56
+   ]
+  ],
+  "rowmin": 73,
+  "rowmax": 99,
+  "rows": 19,
+  "trunc": 57,
+  "hscroll": false
+ },
+ "1440/categories": {
+  "ms": 2017,
+  "h1x": 256,
+  "searchx": 273,
+  "tblx": 257,
+  "tblw": 1158,
+  "newR": 1416,
+  "tblR": 1415,
+  "ths": [
+   [
+    "Order",
+    257,
+    48
+   ],
+   [
+    "Name",
+    305,
+    394
+   ],
+   [
+    "Applies to",
+    699,
+    177
+   ],
+   [
+    "Status",
+    876,
+    161
+   ],
+   [
+    "Updated",
+    1037,
+    129
+   ],
+   [
+    "Translations",
+    1166,
+    193
+   ],
+   [
+    "Actions",
+    1359,
+    56
+   ]
+  ],
+  "rowmin": 73,
+  "rowmax": 83,
+  "rows": 33,
+  "trunc": 99,
+  "hscroll": false
+ },
+ "1280/places": {
+  "ms": 2353,
+  "h1x": 256,
+  "searchx": 273,
+  "tblx": 257,
+  "tblw": 998,
+  "newR": 1256,
+  "tblR": 1255,
+  "ths": [
+   [
+    "Order",
+    257,
+    48
+   ],
+   [
+    "Title",
+    305,
+    206
+   ],
+   [
+    "Setting and ma",
+    511,
+    208
+   ],
+   [
+    "Status",
+    719,
+    160
+   ],
+   [
+    "Updated",
+    879,
+    128
+   ],
+   [
+    "Translations",
+    1007,
+    192
+   ],
+   [
+    "Actions",
+    1199,
+    56
+   ]
+  ],
+  "rowmin": 73,
+  "rowmax": 162,
+  "rows": 23,
+  "trunc": 87,
+  "hscroll": false
+ },
+ "1280/pois": {
+  "ms": 2037,
+  "h1x": 256,
+  "searchx": 273,
+  "tblx": 257,
+  "tblw": 998,
+  "newR": 1256,
+  "tblR": 1255,
+  "ths": [
+   [
+    "Order",
+    257,
+    48
+   ],
+   [
+    "Title",
+    305,
+    270
+   ],
+   [
+    "Place and cate",
+    575,
+    144
+   ],
+   [
+    "Status",
+    719,
+    160
+   ],
+   [
+    "Updated",
+    879,
+    128
+   ],
+   [
+    "Translations",
+    1007,
+    192
+   ],
+   [
+    "Actions",
+    1199,
+    56
+   ]
+  ],
+  "rowmin": 73,
+  "rowmax": 167,
+  "rows": 50,
+  "trunc": 254,
+  "hscroll": false
+ },
+ "1280/routes": {
+  "ms": 1597,
+  "h1x": 256,
+  "searchx": 273,
+  "tblx": 257,
+  "tblw": 998,
+  "newR": 1256,
+  "tblR": 1255,
+  "ths": [
+   [
+    "Order",
+    257,
+    48
+   ],
+   [
+    "Title",
+    305,
+    126
+   ],
+   [
+    "Category",
+    431,
+    112
+   ],
+   [
+    "Setting and st",
+    543,
+    176
+   ],
+   [
+    "Status",
+    719,
+    160
+   ],
+   [
+    "Updated",
+    879,
+    128
+   ],
+   [
+    "Translations",
+    1007,
+    192
+   ],
+   [
+    "Actions",
+    1199,
+    56
+   ]
+  ],
+  "rowmin": 78,
+  "rowmax": 146,
+  "rows": 19,
+  "trunc": 75,
+  "hscroll": false
+ },
+ "1280/guides": {
+  "ms": 1608,
+  "h1x": 256,
+  "searchx": 273,
+  "tblx": 257,
+  "tblw": 998,
+  "newR": 1256,
+  "tblR": 1255,
+  "ths": [
+   [
+    "Order",
+    257,
+    48
+   ],
+   [
+    "Title",
+    305,
+    222
+   ],
+   [
+    "Story",
+    527,
+    192
+   ],
+   [
+    "Status",
+    719,
+    160
+   ],
+   [
+    "Updated",
+    879,
+    128
+   ],
+   [
+    "Translations",
+    1007,
+    192
+   ],
+   [
+    "Actions",
+    1199,
+    56
+   ]
+  ],
+  "rowmin": 73,
+  "rowmax": 168,
+  "rows": 18,
+  "trunc": 54,
+  "hscroll": false
+ },
+ "1280/events": {
+  "ms": 1614,
+  "h1x": 256,
+  "searchx": 273,
+  "tblx": 257,
+  "tblw": 998,
+  "newR": 1256,
+  "tblR": 1255,
+  "ths": [
+   [
+    "Order",
+    257,
+    48
+   ],
+   [
+    "Title",
+    305,
+    174
+   ],
+   [
+    "Next date",
+    479,
+    240
+   ],
+   [
+    "Status",
+    719,
+    160
+   ],
+   [
+    "Updated",
+    879,
+    128
+   ],
+   [
+    "Translations",
+    1007,
+    192
+   ],
+   [
+    "Actions",
+    1199,
+    56
+   ]
+  ],
+  "rowmin": 73,
+  "rowmax": 180,
+  "rows": 19,
+  "trunc": 57,
+  "hscroll": false
+ },
+ "1280/categories": {
+  "ms": 1847,
+  "h1x": 256,
+  "searchx": 273,
+  "tblx": 257,
+  "tblw": 998,
+  "newR": 1256,
+  "tblR": 1255,
+  "ths": [
+   [
+    "Order",
+    257,
+    48
+   ],
+   [
+    "Name",
+    305,
+    238
+   ],
+   [
+    "Applies to",
+    543,
+    176
+   ],
+   [
+    "Status",
+    719,
+    160
+   ],
+   [
+    "Updated",
+    879,
+    128
+   ],
+   [
+    "Translations",
+    1007,
+    192
+   ],
+   [
+    "Actions",
+    1199,
+    56
+   ]
+  ],
+  "rowmin": 73,
+  "rowmax": 99,
+  "rows": 33,
+  "trunc": 99,
+  "hscroll": false
+ },
+ "1024/places": {
+  "ms": 2403,
+  "h1x": 16,
+  "searchx": 33,
+  "tblx": 17,
+  "tblw": 990,
+  "newR": 1008,
+  "tblR": 1007,
+  "ths": [
+   [
+    "Order",
+    17,
+    48
+   ],
+   [
+    "Title",
+    65,
+    198
+   ],
+   [
+    "Setting and ma",
+    263,
+    208
+   ],
+   [
+    "Status",
+    471,
+    160
+   ],
+   [
+    "Updated",
+    631,
+    128
+   ],
+   [
+    "Translations",
+    759,
+    192
+   ],
+   [
+    "Actions",
+    951,
+    56
+   ]
+  ],
+  "rowmin": 73,
+  "rowmax": 183,
+  "rows": 23,
+  "trunc": 88,
+  "hscroll": false
+ },
+ "1024/pois": {
+  "ms": 2023,
+  "h1x": 16,
+  "searchx": 33,
+  "tblx": 17,
+  "tblw": 990,
+  "newR": 1008,
+  "tblR": 1007,
+  "ths": [
+   [
+    "Order",
+    17,
+    48
+   ],
+   [
+    "Title",
+    65,
+    262
+   ],
+   [
+    "Place and cate",
+    327,
+    144
+   ],
+   [
+    "Status",
+    471,
+    160
+   ],
+   [
+    "Updated",
+    631,
+    128
+   ],
+   [
+    "Translations",
+    759,
+    192
+   ],
+   [
+    "Actions",
+    951,
+    56
+   ]
+  ],
+  "rowmin": 73,
+  "rowmax": 168,
+  "rows": 50,
+  "trunc": 256,
+  "hscroll": false
+ },
+ "1024/routes": {
+  "ms": 1898,
+  "h1x": 16,
+  "searchx": 33,
+  "tblx": 17,
+  "tblw": 990,
+  "newR": 1008,
+  "tblR": 1007,
+  "ths": [
+   [
+    "Order",
+    17,
+    48
+   ],
+   [
+    "Title",
+    65,
+    118
+   ],
+   [
+    "Category",
+    183,
+    112
+   ],
+   [
+    "Setting and st",
+    295,
+    176
+   ],
+   [
+    "Status",
+    471,
+    160
+   ],
+   [
+    "Updated",
+    631,
+    128
+   ],
+   [
+    "Translations",
+    759,
+    192
+   ],
+   [
+    "Actions",
+    951,
+    56
+   ]
+  ],
+  "rowmin": 78,
+  "rowmax": 146,
+  "rows": 19,
+  "trunc": 76,
+  "hscroll": false
+ },
+ "1024/guides": {
+  "ms": 1992,
+  "h1x": 16,
+  "searchx": 33,
+  "tblx": 17,
+  "tblw": 990,
+  "newR": 1008,
+  "tblR": 1007,
+  "ths": [
+   [
+    "Order",
+    17,
+    48
+   ],
+   [
+    "Title",
+    65,
+    214
+   ],
+   [
+    "Story",
+    279,
+    192
+   ],
+   [
+    "Status",
+    471,
+    160
+   ],
+   [
+    "Updated",
+    631,
+    128
+   ],
+   [
+    "Translations",
+    759,
+    192
+   ],
+   [
+    "Actions",
+    951,
+    56
+   ]
+  ],
+  "rowmin": 73,
+  "rowmax": 168,
+  "rows": 18,
+  "trunc": 54,
+  "hscroll": false
+ },
+ "1024/events": {
+  "ms": 1698,
+  "h1x": 16,
+  "searchx": 33,
+  "tblx": 17,
+  "tblw": 990,
+  "newR": 1008,
+  "tblR": 1007,
+  "ths": [
+   [
+    "Order",
+    17,
+    48
+   ],
+   [
+    "Title",
+    65,
+    166
+   ],
+   [
+    "Next date",
+    231,
+    240
+   ],
+   [
+    "Status",
+    471,
+    160
+   ],
+   [
+    "Updated",
+    631,
+    128
+   ],
+   [
+    "Translations",
+    759,
+    192
+   ],
+   [
+    "Actions",
+    951,
+    56
+   ]
+  ],
+  "rowmin": 73,
+  "rowmax": 180,
+  "rows": 19,
+  "trunc": 57,
+  "hscroll": false
+ },
+ "1024/categories": {
+  "ms": 1880,
+  "h1x": 16,
+  "searchx": 33,
+  "tblx": 17,
+  "tblw": 990,
+  "newR": 1008,
+  "tblR": 1007,
+  "ths": [
+   [
+    "Order",
+    17,
+    48
+   ],
+   [
+    "Name",
+    65,
+    230
+   ],
+   [
+    "Applies to",
+    295,
+    176
+   ],
+   [
+    "Status",
+    471,
+    160
+   ],
+   [
+    "Updated",
+    631,
+    128
+   ],
+   [
+    "Translations",
+    759,
+    192
+   ],
+   [
+    "Actions",
+    951,
+    56
+   ]
+  ],
+  "rowmin": 73,
+  "rowmax": 99,
+  "rows": 33,
+  "trunc": 99,
+  "hscroll": false
+ },
+ "768/places": {
+  "ms": 22602,
+  "h1x": 16,
+  "searchx": 33,
+  "tblx": null,
+  "tblw": null,
+  "newR": 752,
+  "tblR": null,
+  "ths": [],
+  "rowmin": null,
+  "rowmax": null,
+  "rows": 0,
+  "trunc": 0,
+  "hscroll": false
+ },
+ "768/pois": {
+  "ms": 21845,
+  "h1x": 16,
+  "searchx": 33,
+  "tblx": null,
+  "tblw": null,
+  "newR": 752,
+  "tblR": null,
+  "ths": [],
+  "rowmin": null,
+  "rowmax": null,
+  "rows": 0,
+  "trunc": 0,
+  "hscroll": false
+ },
+ "768/routes": {
+  "ms": 22330,
+  "h1x": 16,
+  "searchx": 33,
+  "tblx": null,
+  "tblw": null,
+  "newR": 752,
+  "tblR": null,
+  "ths": [],
+  "rowmin": null,
+  "rowmax": null,
+  "rows": 0,
+  "trunc": 0,
+  "hscroll": false
+ },
+ "768/guides": {
+  "ms": 21789,
+  "h1x": 16,
+  "searchx": 33,
+  "tblx": null,
+  "tblw": null,
+  "newR": 752,
+  "tblR": null,
+  "ths": [],
+  "rowmin": null,
+  "rowmax": null,
+  "rows": 0,
+  "trunc": 0,
+  "hscroll": false
+ },
+ "768/events": {
+  "ms": 21938,
+  "h1x": 16,
+  "searchx": 33,
+  "tblx": null,
+  "tblw": null,
+  "newR": 752,
+  "tblR": null,
+  "ths": [],
+  "rowmin": null,
+  "rowmax": null,
+  "rows": 0,
+  "trunc": 0,
+  "hscroll": false
+ },
+ "768/categories": {
+  "ms": 21950,
+  "h1x": 16,
+  "searchx": 33,
+  "tblx": null,
+  "tblw": null,
+  "newR": 752,
+  "tblR": null,
+  "ths": [],
+  "rowmin": null,
+  "rowmax": null,
+  "rows": 0,
+  "trunc": 0,
+  "hscroll": false
+ }
+}

@@ -1,0 +1,16 @@
+import { start, goP, log, dump, save, focused } from "./lib.mjs";
+const s = await start("1440"); const { page } = s;
+await goP(page, "/guides");
+await s.shot("guides-list");
+await page.getByRole("button", { name: /new guide/i }).first().click(); await page.waitForTimeout(500);
+await s.shot("guide-create-dialog");
+log(await dump(page, "[role=dialog]"));
+await page.getByRole("button", { name: /create guide/i }).click(); await page.waitForTimeout(500);
+log("EMPTY:", await dump(page, "[role=dialog]"));
+await page.getByLabel(/title/i).fill("UX-s11-editors Guide");
+await page.getByRole("button", { name: /create guide/i }).click();
+await page.waitForURL(/guides\/[0-9a-f-]+/, { timeout: 20000 }); await page.waitForTimeout(2000);
+save({ guideUrl: page.url().replace(/^https?:\/\/[^/]+/, "") });
+await s.tall("guide-editor__new-tall");
+log(await dump(page));
+await s.browser.close();

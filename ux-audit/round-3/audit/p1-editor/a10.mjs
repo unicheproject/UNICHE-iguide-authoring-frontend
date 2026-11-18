@@ -1,0 +1,18 @@
+import {open,go,P,shot,btns,hdr} from "./lib.mjs";
+const { browser, page } = await open("admin",{viewport:"1440"});
+const U=P+"/pois/d2e48820-a468-4539-9f62-545eed5b06a6";
+await go(page, U);
+await page.waitForTimeout(1500);
+await page.locator("#f-title").fill("UX-R3-p1-editor Alpha POI");
+await page.keyboard.press("Control+s"); await page.waitForTimeout(2500);
+await page.locator("main").evaluate(m=>m.scrollTo?.(0,0));
+await page.getByRole("button",{name:/Next missing/}).first().click();
+await page.waitForTimeout(700);
+await shot(page,"next-missing__english-click__1440");
+console.log(await page.evaluate(()=>{const a=document.activeElement;const r=a.getBoundingClientRect();return a.tagName+"#"+a.id+" "+a.getAttribute("aria-label")+" y="+r.y}));
+console.log(await page.evaluate(()=>[...document.querySelectorAll("[aria-live]")].map(e=>e.innerText.trim())));
+const pd=page.getByRole("button",{name:/Practical details/});
+await pd.click(); await page.waitForTimeout(500);
+await shot(page,"poi-editor__practical-details-open__1440");
+console.log(await btns(page,"main"));
+await browser.close();

@@ -1,0 +1,21 @@
+import { freshCtx, shot, run, CMS, creds, t, POP } from "./lib.mjs";
+await run(async () => {
+  const { browser, context, page } = await freshCtx("1440");
+  const red=(u)=>u.replace(/(code|session_state|state)=[^&#]{4}[^&#]*/g,"$1=…");
+  await page.goto(CMS + "/"); await page.waitForLoadState("networkidle").catch(()=>{});
+  await page.getByRole("button",{name:/sign in/i}).first().click();
+  await page.waitForURL(/\/realms\//); const c=creds("curator");
+  await page.locator("#username").fill(c.user); await page.locator("#password").fill(c.password);
+  await page.locator("#kc-login").click();
+  await page.waitForURL(u=>!u.toString().includes("/realms/")); await page.waitForTimeout(3000);
+  console.log("1 landed:", red(page.url()), "| hash length", await page.evaluate(()=>location.hash.length), "| history", await page.evaluate(()=>history.length));
+  await page.getByPlaceholder("Search projects").fill("Populated"); 
+  await page.getByText("UX Audit – Populated").first().click(); await page.waitForTimeout(2500);
+  console.log("2 in project:", red(page.url()));
+  await page.goBack(); await page.waitForTimeout(2500); console.log("3 back:", red(page.url()), "|", (await t(page)).slice(0,80).replace(/\n/g," "));
+  await shot(page,"sso-landing__back-after-project","1440");
+  await page.reload(); await page.waitForLoadState("networkidle").catch(()=>{}); await page.waitForTimeout(3000);
+  console.log("4 reload on code url:", red(page.url()), "|", (await t(page)).slice(0,100).replace(/\n/g," "));
+  await shot(page,"sso-landing__reload-with-code","1440");
+  await browser.close();
+});

@@ -1,0 +1,10 @@
+import { open, go } from "../../../tools/session.mjs"; import {P,shotp,log,rects} from "./lib.mjs";
+const { browser, page } = await open("admin",{viewport:"1440"});
+const errs=[]; page.on("pageerror",e=>errs.push(String(e)));
+await go(page,`/projects/${P}/preview`);
+await page.waitForTimeout(6000);
+await page.screenshot({path:shotp("preview__default__1440")});
+log("body text", (await page.locator("main").innerText()).slice(0,900));
+log(await page.evaluate(`(${rects})("main button, main select, main a, main [role=tab], main input")`));
+log(errs);
+await browser.close();

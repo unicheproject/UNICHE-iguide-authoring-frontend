@@ -1,0 +1,1166 @@
+[
+ [
+  "1440 default",
+  {
+   "title": "Web, English, Working content · Preview · UX Audit – Populated · iGuide CMS",
+   "hdr": {
+    "x": 0,
+    "y": 0,
+    "w": 1440,
+    "h": 76
+   },
+   "ctl": [
+    [
+     "np-surface",
+     "WEB",
+     {
+      "x": 826,
+      "y": 27,
+      "w": 128,
+      "h": 40
+     }
+    ],
+    [
+     "np-lang",
+     "en",
+     {
+      "x": 970,
+      "y": 27,
+      "w": 144,
+      "h": 40
+     }
+    ],
+    [
+     "np-mode",
+     "WORKING",
+     {
+      "x": 1130,
+      "y": 27,
+      "w": 128,
+      "h": 40
+     }
+    ],
+    [
+     "",
+     "on",
+     {
+      "x": 1274,
+      "y": 37,
+      "w": 20,
+      "h": 20
+     }
+    ]
+   ],
+   "frame": {
+    "x": 80,
+    "y": 92,
+    "w": 1280,
+    "h": 802
+   },
+   "scale": "1.000",
+   "sw": 0,
+   "h1": [
+    "UX Audit – Populated",
+    "Highlights",
+    "Places",
+    "Points of interest",
+    "Routes",
+    "Guides",
+    "Events"
+   ],
+   "alerts": [
+    "",
+    ""
+   ],
+   "focus": "BODY:UX Audit – Populated · Preview",
+   "lang": "en",
+   "standIn": "UX Audit – Populated Home Places Points of interest Routes Guides Events SEARCH EN UX Audit – Popula"
+  }
+ ],
+ [
+  "1440 kiosk-it-live",
+  {
+   "title": "Kiosk, Italiano, Live content · Preview · UX Audit – Populated · iGuide CMS",
+   "hdr": {
+    "x": 0,
+    "y": 0,
+    "w": 1440,
+    "h": 76
+   },
+   "ctl": [
+    [
+     "np-surface",
+     "KIOSK",
+     {
+      "x": 826,
+      "y": 27,
+      "w": 128,
+      "h": 40
+     }
+    ],
+    [
+     "np-lang",
+     "it",
+     {
+      "x": 970,
+      "y": 27,
+      "w": 144,
+      "h": 40
+     }
+    ],
+    [
+     "np-mode",
+     "LIVE",
+     {
+      "x": 1130,
+      "y": 27,
+      "w": 128,
+      "h": 40
+     }
+    ],
+    [
+     "",
+     "on",
+     {
+      "x": 1274,
+      "y": 37,
+      "w": 20,
+      "h": 20
+     }
+    ]
+   ],
+   "frame": {
+    "x": 180,
+    "y": 92,
+    "w": 1080,
+    "h": 1922
+   },
+   "scale": "1.000",
+   "sw": 0,
+   "h1": [
+    "UX Audit – Populated",
+    "In evidenza",
+    "Luoghi",
+    "Punti di interesse",
+    "Percorsi",
+    "Guide",
+    "Eventi"
+   ],
+   "alerts": [
+    "",
+    ""
+   ],
+   "focus": "BODY:UX Audit – Populated · Preview",
+   "lang": "en",
+   "standIn": "UX Audit – Populated CERCA IT UX Audit – Populated Luoghi Punti di interesse Percorsi Guide Eventi I"
+  }
+ ],
+ [
+  "1440 mobile-el",
+  {
+   "title": "Mobile, Ελληνικά, Working content · Preview · UX Audit – Populated · iGuide CMS",
+   "hdr": {
+    "x": 0,
+    "y": 0,
+    "w": 1440,
+    "h": 76
+   },
+   "ctl": [
+    [
+     "np-surface",
+     "MOBILE",
+     {
+      "x": 826,
+      "y": 27,
+      "w": 128,
+      "h": 40
+     }
+    ],
+    [
+     "np-lang",
+     "el",
+     {
+      "x": 970,
+      "y": 27,
+      "w": 144,
+      "h": 40
+     }
+    ],
+    [
+     "np-mode",
+     "WORKING",
+     {
+      "x": 1130,
+      "y": 27,
+      "w": 128,
+      "h": 40
+     }
+    ],
+    [
+     "",
+     "on",
+     {
+      "x": 1274,
+      "y": 37,
+      "w": 20,
+      "h": 20
+     }
+    ]
+   ],
+   "frame": {
+    "x": 525,
+    "y": 92,
+    "w": 390,
+    "h": 782
+   },
+   "scale": "1.000",
+   "sw": 0,
+   "h1": [
+    "UX Audit – Populated",
+    "Ξεχωριστά",
+    "Τόποι",
+    "Σημεία",
+    "Διαδρομές",
+    "Οδηγοί",
+    "Εκδηλώσεις"
+   ],
+   "alerts": [
+    "",
+    ""
+   ],
+   "focus": "BODY:UX Audit – Populated · Preview",
+   "lang": "en",
+   "standIn": "UX Audit – Populated ΑΝΑΖΗΤΗΣΗ EL UX Audit – Populated ΞΕΧΩΡΙΣΤΑ Μοσχοφόρος Μια πιο προσεκτική ματιά"
+  }
+ ],
+ [
+  "1440 landscape-real",
+  {
+   "title": "Kiosk, English, Working content · Preview · UX Audit – Populated · iGuide CMS",
+   "hdr": {
+    "x": 0,
+    "y": 0,
+    "w": 1440,
+    "h": 76
+   },
+   "ctl": [
+    [
+     "np-surface",
+     "KIOSK",
+     {
+      "x": 826,
+      "y": 27,
+      "w": 128,
+      "h": 40
+     }
+    ],
+    [
+     "np-lang",
+     "en",
+     {
+      "x": 970,
+      "y": 27,
+      "w": 144,
+      "h": 40
+     }
+    ],
+    [
+     "np-mode",
+     "WORKING",
+     {
+      "x": 1130,
+      "y": 27,
+      "w": 128,
+      "h": 40
+     }
+    ],
+    [
+     "",
+     "on",
+     {
+      "x": 1274,
+      "y": 37,
+      "w": 20,
+      "h": 20
+     }
+    ]
+   ],
+   "frame": {
+    "x": 180,
+    "y": 92,
+    "w": 1080,
+    "h": 1922
+   },
+   "scale": "1.000",
+   "sw": 0,
+   "h1": [
+    "UX Audit – Populated",
+    "Highlights",
+    "Places",
+    "Points of interest",
+    "Routes",
+    "Guides",
+    "Events"
+   ],
+   "alerts": [
+    "",
+    ""
+   ],
+   "focus": "BODY:UX Audit – Populated · Preview",
+   "lang": "en",
+   "standIn": "UX Audit – Populated SEARCH EN UX Audit – Populated Places Points of interest Routes Guides Events H"
+  }
+ ],
+ [
+  "1440 qr",
+  {
+   "title": "Web, English, Working content · Preview · UX Audit – Populated · iGuide CMS",
+   "hdr": {
+    "x": 0,
+    "y": 0,
+    "w": 1440,
+    "h": 76
+   },
+   "ctl": [
+    [
+     "np-surface",
+     "WEB",
+     {
+      "x": 826,
+      "y": 27,
+      "w": 128,
+      "h": 40
+     }
+    ],
+    [
+     "np-lang",
+     "en",
+     {
+      "x": 970,
+      "y": 27,
+      "w": 144,
+      "h": 40
+     }
+    ],
+    [
+     "np-mode",
+     "WORKING",
+     {
+      "x": 1130,
+      "y": 27,
+      "w": 128,
+      "h": 40
+     }
+    ],
+    [
+     "",
+     "on",
+     {
+      "x": 1274,
+      "y": 37,
+      "w": 20,
+      "h": 20
+     }
+    ]
+   ],
+   "frame": {
+    "x": 80,
+    "y": 92,
+    "w": 1280,
+    "h": 802
+   },
+   "scale": "1.000",
+   "sw": 0,
+   "h1": [
+    "UX-p1-editor Alpha Kouros",
+    "Where"
+   ],
+   "alerts": [
+    "",
+    ""
+   ],
+   "focus": "BODY:UX Audit – Populated · Preview",
+   "lang": "en",
+   "standIn": "UX Audit – Populated Home Places Points of interest Routes Guides Events SEARCH EN Opened by QR code"
+  }
+ ],
+ [
+  "1440 qr-unknown",
+  {
+   "title": "Web, English, Working content · Preview · UX Audit – Populated · iGuide CMS",
+   "hdr": {
+    "x": 0,
+    "y": 0,
+    "w": 1440,
+    "h": 76
+   },
+   "ctl": [
+    [
+     "np-surface",
+     "WEB",
+     {
+      "x": 826,
+      "y": 27,
+      "w": 128,
+      "h": 40
+     }
+    ],
+    [
+     "np-lang",
+     "en",
+     {
+      "x": 970,
+      "y": 27,
+      "w": 144,
+      "h": 40
+     }
+    ],
+    [
+     "np-mode",
+     "WORKING",
+     {
+      "x": 1130,
+      "y": 27,
+      "w": 128,
+      "h": 40
+     }
+    ],
+    [
+     "",
+     "on",
+     {
+      "x": 1274,
+      "y": 37,
+      "w": 20,
+      "h": 20
+     }
+    ]
+   ],
+   "frame": {
+    "x": 80,
+    "y": 143,
+    "w": 1280,
+    "h": 802
+   },
+   "scale": "1.000",
+   "sw": 0,
+   "h1": [
+    "UX Audit – Populated",
+    "Highlights",
+    "Places",
+    "Points of interest",
+    "Routes",
+    "Guides",
+    "Events"
+   ],
+   "alerts": [
+    "No QR code “zzz-nope” in this Project. It may have been removed, or the code was mistyped.",
+    "",
+    ""
+   ],
+   "focus": "BODY:UX Audit – Populated · Preview",
+   "lang": "en",
+   "standIn": "UX Audit – Populated Home Places Points of interest Routes Guides Events SEARCH EN UX Audit – Popula"
+  }
+ ],
+ [
+  "1440 bad-params",
+  {
+   "title": "Web, English, Working content · Preview · UX Audit – Populated · iGuide CMS",
+   "hdr": {
+    "x": 0,
+    "y": 0,
+    "w": 1440,
+    "h": 76
+   },
+   "ctl": [
+    [
+     "np-surface",
+     "WEB",
+     {
+      "x": 826,
+      "y": 27,
+      "w": 128,
+      "h": 40
+     }
+    ],
+    [
+     "np-lang",
+     "en",
+     {
+      "x": 970,
+      "y": 27,
+      "w": 144,
+      "h": 40
+     }
+    ],
+    [
+     "np-mode",
+     "WORKING",
+     {
+      "x": 1130,
+      "y": 27,
+      "w": 128,
+      "h": 40
+     }
+    ],
+    [
+     "",
+     "on",
+     {
+      "x": 1274,
+      "y": 37,
+      "w": 20,
+      "h": 20
+     }
+    ]
+   ],
+   "frame": {
+    "x": 80,
+    "y": 198,
+    "w": 1280,
+    "h": 802
+   },
+   "scale": "1.000",
+   "sw": 0,
+   "h1": [
+    "UX Audit – Populated",
+    "Highlights",
+    "Places",
+    "Points of interest",
+    "Routes",
+    "Guides",
+    "Events"
+   ],
+   "alerts": [
+    "Surface \"tablet\" is not known (Web, Mobile or Kiosk). Showing Web.Content \"banana\" is not known (Working or Live). Showing Working.Language \"xx\" is not a langua",
+    "",
+    ""
+   ],
+   "focus": "BODY:UX Audit – Populated · Preview",
+   "lang": "en",
+   "standIn": "UX Audit – Populated Home Places Points of interest Routes Guides Events SEARCH EN UX Audit – Popula"
+  }
+ ],
+ [
+  "1440 xss",
+  {
+   "title": "Web, English, Working content · Preview · UX Audit – Populated · iGuide CMS",
+   "hdr": {
+    "x": 0,
+    "y": 0,
+    "w": 1440,
+    "h": 76
+   },
+   "ctl": [
+    [
+     "np-surface",
+     "WEB",
+     {
+      "x": 826,
+      "y": 27,
+      "w": 128,
+      "h": 40
+     }
+    ],
+    [
+     "np-lang",
+     "en",
+     {
+      "x": 970,
+      "y": 27,
+      "w": 144,
+      "h": 40
+     }
+    ],
+    [
+     "np-mode",
+     "WORKING",
+     {
+      "x": 1130,
+      "y": 27,
+      "w": 128,
+      "h": 40
+     }
+    ],
+    [
+     "",
+     "on",
+     {
+      "x": 1274,
+      "y": 37,
+      "w": 20,
+      "h": 20
+     }
+    ]
+   ],
+   "frame": {
+    "x": 80,
+    "y": 208,
+    "w": 1280,
+    "h": 802
+   },
+   "scale": "1.000",
+   "sw": 0,
+   "h1": [
+    "UX Audit – Populated",
+    "Highlights",
+    "Places",
+    "Points of interest",
+    "Routes",
+    "Guides",
+    "Events"
+   ],
+   "alerts": [
+    "Language \"<script>\" is not a language of this Project. Showing English.",
+    "No QR code “<b>x</b>” in this Project. It may have been removed, or the code was mistyped.",
+    "",
+    ""
+   ],
+   "focus": "BODY:UX Audit – Populated · Preview",
+   "lang": "en",
+   "standIn": "UX Audit – Populated Home Places Points of interest Routes Guides Events SEARCH EN UX Audit – Popula"
+  }
+ ],
+ [
+  "missingProject",
+  {
+   "title": "Project not found · iGuide CMS",
+   "hdr": null,
+   "ctl": [],
+   "frame": null,
+   "sw": 0,
+   "h1": [
+    "This Project is not available"
+   ],
+   "alerts": [
+    "",
+    ""
+   ],
+   "focus": "H1:This Project is not available",
+   "lang": "en"
+  }
+ ],
+ [
+  "missingProjectCard",
+  "This Project is not available\nIt may have been deleted, or the link was mistyped. Projects you can open are listed in the CMS.\nGo to Projects"
+ ],
+ [
+  "503",
+  {
+   "title": "Preview unavailable · iGuide CMS",
+   "hdr": null,
+   "ctl": [],
+   "frame": null,
+   "sw": 0,
+   "h1": [
+    "The preview could not be loaded"
+   ],
+   "alerts": [
+    "",
+    ""
+   ],
+   "focus": "H1:The preview could not be loade",
+   "lang": "en"
+  }
+ ],
+ [
+  "503text",
+  "The preview could not be loaded\nThe platform is busy or down for maintenance. Nothing was changed. Try again in a few minutes.\nTry again\n\nRequest id req-r3-s14-503\nCopy"
+ ],
+ [
+  "afterSurface",
+  "http://localhost:5173/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/app-preview?surface=MOBILE&lang=en&mode=WORKING | Mobile, English, Working content · Preview · UX Audit – Populated · iGuide CMS"
+ ],
+ [
+  "afterLang",
+  "http://localhost:5173/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/app-preview?surface=MOBILE&lang=el&mode=WORKING | Mobile, Ελληνικά, Working content · Preview · UX Audit – Populated · iGuide CMS"
+ ],
+ [
+  "afterBack",
+  "http://localhost:5173/projects/11111111-1111-4111-8111-111111111111/app-preview"
+ ],
+ [
+  "kbd",
+  [
+   "A:Go to Projects",
+   "BODY:This Project is not available ",
+   "A:Go to Projects",
+   "BODY:This Project is not available ",
+   "A:Go to Projects",
+   "BODY:This Project is not available ",
+   "A:Go to Projects",
+   "BODY:This Project is not available "
+  ]
+ ],
+ [
+  "768 default",
+  {
+   "title": "Web, English, Working content · Preview · UX Audit – Populated · iGuide CMS",
+   "hdr": {
+    "x": 0,
+    "y": 0,
+    "w": 768,
+    "h": 124
+   },
+   "ctl": [
+    [
+     "np-surface",
+     "WEB",
+     {
+      "x": 320,
+      "y": 27,
+      "w": 128,
+      "h": 40
+     }
+    ],
+    [
+     "np-lang",
+     "en",
+     {
+      "x": 464,
+      "y": 27,
+      "w": 144,
+      "h": 40
+     }
+    ],
+    [
+     "np-mode",
+     "WORKING",
+     {
+      "x": 624,
+      "y": 27,
+      "w": 128,
+      "h": 40
+     }
+    ],
+    [
+     "",
+     "on",
+     {
+      "x": 16,
+      "y": 85,
+      "w": 20,
+      "h": 20
+     }
+    ]
+   ],
+   "frame": {
+    "x": 16,
+    "y": 140,
+    "w": 736,
+    "h": 462
+   },
+   "scale": "0.575",
+   "sw": 0,
+   "h1": [
+    "UX Audit – Populated",
+    "Highlights",
+    "Places",
+    "Points of interest",
+    "Routes",
+    "Guides",
+    "Events"
+   ],
+   "alerts": [
+    "",
+    ""
+   ],
+   "focus": "BODY:UX Audit – Populated · Preview",
+   "lang": "en",
+   "standIn": "UX Audit – Populated Home Places Points of interest Routes Guides Events SEARCH EN UX Audit – Popula"
+  }
+ ],
+ [
+  "768 kiosk-it-live",
+  {
+   "title": "Kiosk, Italiano, Live content · Preview · UX Audit – Populated · iGuide CMS",
+   "hdr": {
+    "x": 0,
+    "y": 0,
+    "w": 768,
+    "h": 124
+   },
+   "ctl": [
+    [
+     "np-surface",
+     "KIOSK",
+     {
+      "x": 320,
+      "y": 27,
+      "w": 128,
+      "h": 40
+     }
+    ],
+    [
+     "np-lang",
+     "it",
+     {
+      "x": 464,
+      "y": 27,
+      "w": 144,
+      "h": 40
+     }
+    ],
+    [
+     "np-mode",
+     "LIVE",
+     {
+      "x": 624,
+      "y": 27,
+      "w": 128,
+      "h": 40
+     }
+    ],
+    [
+     "",
+     "on",
+     {
+      "x": 16,
+      "y": 85,
+      "w": 20,
+      "h": 20
+     }
+    ]
+   ],
+   "frame": {
+    "x": 16,
+    "y": 140,
+    "w": 736,
+    "h": 1310
+   },
+   "scale": "0.681",
+   "sw": 0,
+   "h1": [
+    "UX Audit – Populated",
+    "In evidenza",
+    "Luoghi",
+    "Punti di interesse",
+    "Percorsi",
+    "Guide",
+    "Eventi"
+   ],
+   "alerts": [
+    "",
+    ""
+   ],
+   "focus": "BODY:UX Audit – Populated · Preview",
+   "lang": "en",
+   "standIn": "UX Audit – Populated CERCA IT UX Audit – Populated Luoghi Punti di interesse Percorsi Guide Eventi I"
+  }
+ ],
+ [
+  "768 bad-params",
+  {
+   "title": "Web, English, Working content · Preview · UX Audit – Populated · iGuide CMS",
+   "hdr": {
+    "x": 0,
+    "y": 0,
+    "w": 768,
+    "h": 124
+   },
+   "ctl": [
+    [
+     "np-surface",
+     "WEB",
+     {
+      "x": 320,
+      "y": 27,
+      "w": 128,
+      "h": 40
+     }
+    ],
+    [
+     "np-lang",
+     "en",
+     {
+      "x": 464,
+      "y": 27,
+      "w": 144,
+      "h": 40
+     }
+    ],
+    [
+     "np-mode",
+     "WORKING",
+     {
+      "x": 624,
+      "y": 27,
+      "w": 128,
+      "h": 40
+     }
+    ],
+    [
+     "",
+     "on",
+     {
+      "x": 16,
+      "y": 85,
+      "w": 20,
+      "h": 20
+     }
+    ]
+   ],
+   "frame": {
+    "x": 16,
+    "y": 246,
+    "w": 736,
+    "h": 462
+   },
+   "scale": "0.575",
+   "sw": 0,
+   "h1": [
+    "UX Audit – Populated",
+    "Highlights",
+    "Places",
+    "Points of interest",
+    "Routes",
+    "Guides",
+    "Events"
+   ],
+   "alerts": [
+    "Surface \"tablet\" is not known (Web, Mobile or Kiosk). Showing Web.Content \"banana\" is not known (Working or Live). Showing Working.Language \"xx\" is not a langua",
+    "",
+    ""
+   ],
+   "focus": "BODY:UX Audit – Populated · Preview",
+   "lang": "en",
+   "standIn": "UX Audit – Populated Home Places Points of interest Routes Guides Events SEARCH EN UX Audit – Popula"
+  }
+ ],
+ [
+  "zoom200 default",
+  {
+   "title": "Web, English, Working content · Preview · UX Audit – Populated · iGuide CMS",
+   "hdr": {
+    "x": 0,
+    "y": 0,
+    "w": 640,
+    "h": 143
+   },
+   "ctl": [
+    [
+     "np-surface",
+     "WEB",
+     {
+      "x": 336,
+      "y": 27,
+      "w": 128,
+      "h": 40
+     }
+    ],
+    [
+     "np-lang",
+     "en",
+     {
+      "x": 480,
+      "y": 27,
+      "w": 144,
+      "h": 40
+     }
+    ],
+    [
+     "np-mode",
+     "WORKING",
+     {
+      "x": 16,
+      "y": 94,
+      "w": 128,
+      "h": 40
+     }
+    ],
+    [
+     "",
+     "on",
+     {
+      "x": 160,
+      "y": 104,
+      "w": 20,
+      "h": 20
+     }
+    ]
+   ],
+   "frame": {
+    "x": 16,
+    "y": 159,
+    "w": 608,
+    "h": 382
+   },
+   "scale": "0.475",
+   "sw": 0,
+   "h1": [
+    "UX Audit – Populated",
+    "Highlights",
+    "Places",
+    "Points of interest",
+    "Routes",
+    "Guides",
+    "Events"
+   ],
+   "alerts": [
+    "",
+    ""
+   ],
+   "focus": "BODY:UX Audit – Populated · Preview",
+   "lang": "en",
+   "standIn": "UX Audit – Populated Home Places Points of interest Routes Guides Events SEARCH EN UX Audit – Popula"
+  }
+ ],
+ [
+  "zoom200 kiosk-it-live",
+  {
+   "title": "Kiosk, Italiano, Live content · Preview · UX Audit – Populated · iGuide CMS",
+   "hdr": {
+    "x": 0,
+    "y": 0,
+    "w": 640,
+    "h": 143
+   },
+   "ctl": [
+    [
+     "np-surface",
+     "KIOSK",
+     {
+      "x": 336,
+      "y": 27,
+      "w": 128,
+      "h": 40
+     }
+    ],
+    [
+     "np-lang",
+     "it",
+     {
+      "x": 480,
+      "y": 27,
+      "w": 144,
+      "h": 40
+     }
+    ],
+    [
+     "np-mode",
+     "LIVE",
+     {
+      "x": 16,
+      "y": 94,
+      "w": 128,
+      "h": 40
+     }
+    ],
+    [
+     "",
+     "on",
+     {
+      "x": 160,
+      "y": 104,
+      "w": 20,
+      "h": 20
+     }
+    ]
+   ],
+   "frame": {
+    "x": 16,
+    "y": 159,
+    "w": 608,
+    "h": 1083
+   },
+   "scale": "0.563",
+   "sw": 0,
+   "h1": [
+    "UX Audit – Populated",
+    "In evidenza",
+    "Luoghi",
+    "Punti di interesse",
+    "Percorsi",
+    "Guide",
+    "Eventi"
+   ],
+   "alerts": [
+    "",
+    ""
+   ],
+   "focus": "BODY:UX Audit – Populated · Preview",
+   "lang": "en",
+   "standIn": "UX Audit – Populated CERCA IT UX Audit – Populated Luoghi Punti di interesse Percorsi Guide Eventi I"
+  }
+ ],
+ [
+  "zoom200 bad-params",
+  {
+   "title": "Web, English, Working content · Preview · UX Audit – Populated · iGuide CMS",
+   "hdr": {
+    "x": 0,
+    "y": 0,
+    "w": 640,
+    "h": 143
+   },
+   "ctl": [
+    [
+     "np-surface",
+     "WEB",
+     {
+      "x": 336,
+      "y": 27,
+      "w": 128,
+      "h": 40
+     }
+    ],
+    [
+     "np-lang",
+     "en",
+     {
+      "x": 480,
+      "y": 27,
+      "w": 144,
+      "h": 40
+     }
+    ],
+    [
+     "np-mode",
+     "WORKING",
+     {
+      "x": 16,
+      "y": 94,
+      "w": 128,
+      "h": 40
+     }
+    ],
+    [
+     "",
+     "on",
+     {
+      "x": 160,
+      "y": 104,
+      "w": 20,
+      "h": 20
+     }
+    ]
+   ],
+   "frame": {
+    "x": 16,
+    "y": 265,
+    "w": 608,
+    "h": 382
+   },
+   "scale": "0.475",
+   "sw": 0,
+   "h1": [
+    "UX Audit – Populated",
+    "Highlights",
+    "Places",
+    "Points of interest",
+    "Routes",
+    "Guides",
+    "Events"
+   ],
+   "alerts": [
+    "Surface \"tablet\" is not known (Web, Mobile or Kiosk). Showing Web.Content \"banana\" is not known (Working or Live). Showing Working.Language \"xx\" is not a langua",
+    "",
+    ""
+   ],
+   "focus": "BODY:UX Audit – Populated · Preview",
+   "lang": "en",
+   "standIn": "UX Audit – Populated Home Places Points of interest Routes Guides Events SEARCH EN UX Audit – Popula"
+  }
+ ]
+]

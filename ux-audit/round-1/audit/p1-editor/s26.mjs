@@ -1,0 +1,31 @@
+import { start, go, P, shotDir } from "./common.mjs";
+const B="1af84426-8230-46ee-8ab4-7edecaa9b20f";
+let s = await start("1280"); let p=s.page;
+await go(p, P+"/pois"); await p.waitForTimeout(3000);
+await s.shot("pois-list__default");
+await go(p, `${P}/pois/${B}`); await p.waitForTimeout(2500);
+await s.shot("poi-editor__active-top");
+console.log("hscroll 1280:", await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth));
+// focus after route change via nav link keyboard
+await p.getByRole("link",{name:"Routes",exact:true}).focus(); await p.keyboard.press("Enter"); await p.waitForTimeout(2500);
+console.log("focus after nav:", await p.evaluate(()=>document.activeElement.tagName+" "+(document.activeElement.innerText||"").slice(0,30)), "title:", await p.title());
+await p.keyboard.press("Tab");
+console.log("skip link first tab:", await p.evaluate(()=>document.activeElement.innerText));
+await s.shot("routes-list__keyboard-nav");
+console.log("routes rows:", await p.locator("main tbody tr").count());
+// open first route
+await p.locator("main a[href*='/routes/']").first().click(); await p.waitForTimeout(3000);
+await s.shot("route-editor__open");
+console.log("route title:", await p.locator("h1").first().innerText());
+await p.getByRole("link",{name:"Guides",exact:true}).click(); await p.waitForTimeout(2500);
+await p.locator("main a[href*='/guides/']").first().click(); await p.waitForTimeout(3000);
+await s.shot("guide-editor__open");
+console.log("guide title:", await p.locator("h1").first().innerText());
+await s.browser.close();
+s = await start("zoom200"); p=s.page;
+await go(p, `${P}/pois/${B}`); await p.waitForTimeout(3000);
+await s.shot("poi-editor__active-top");
+console.log("hscroll zoom200:", await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth));
+await go(p, P+"/pois"); await p.waitForTimeout(3500);
+await s.shot("pois-list__default");
+await s.browser.close();

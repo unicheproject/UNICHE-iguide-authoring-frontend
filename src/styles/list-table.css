@@ -1,20 +1,164 @@
-.th {
-  border-bottom: 1px solid #e5e7eb;
-  padding-top: 10px;
-  padding-bottom: 10px;
+/* ListTable (D-076, D-089): sticky head under the toolbar, rows, cards, tree guide, drop line. Tokens only. */
+/* A page change scrolls the table to just under the toolbar: the head (48 px) is part of the sticky stack (D-111). */
+.list-scope {
+  scroll-margin-top: -3rem;
+}
+.list-th {
+  position: sticky;
+  /* A sticky `top` counts from inside the page frame's 1.5rem top padding, so the head sits flush under the toolbar. */
+  top: calc(var(--list-toolbar-h, 0px) - 1.5rem);
+  z-index: 1;
+  border-bottom: 1px solid hsl(var(--border));
+  background: hsl(var(--muted));
+  /* One header height for every list (D-110): 48 px whatever the column holds. */
+  height: 3rem;
+  padding: 0.25rem 0.75rem;
   text-align: left;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: #6b7280;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: hsl(var(--muted-foreground));
 }
-.th.text-right {
-  text-align: right;
+.list-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: 2rem;
+  border-radius: 0.25rem;
+  font: inherit;
+  color: hsl(var(--foreground));
 }
-.td {
-  border-bottom: 1px solid #f3f4f6;
-  padding-top: 11px;
-  padding-bottom: 11px;
+.list-sort:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+.list-sort:hover {
+  text-decoration: underline;
+}
+.list-row {
+  height: 3.25rem;
+}
+/* A skeleton row is as tall as a real two-line row, so the rows that replace it do not push the page (C3-91). */
+.list-row-skeleton {
+  height: 4.5rem;
+}
+.list-card-skeleton {
+  min-height: 5rem;
+}
+.list-row:hover {
+  background: hsl(var(--surface-hover));
+}
+.list-td {
+  border-bottom: 1px solid hsl(var(--border));
+  padding: 0.5rem 0.75rem;
   vertical-align: top;
+  overflow-wrap: break-word;
+}
+/* The Title never breaks the row: a long unbroken word wraps inside its own cell (D-110, C3-42). */
+.list-tree-cell {
+  overflow-wrap: anywhere;
+}
+/* The Order column has one width in every list (D-110). */
+.list-th-order,
+.list-td-order {
+  width: 3rem;
+}
+/*
+ * The Translations column keeps each language together ("English", "Ελληνικά" never break inside a word, C2-42) and is
+ * wide enough for two of them side by side; further languages wrap between them. In a fixed table the width of the head
+ * cell is the column's width.
+ */
+.list-th-translations {
+  width: 12rem;
+}
+/*
+ * Title links in rows are `ListRowTitle`, which carries `hit-44` (D-106). Links a view still writes by hand inside the
+ * title cell get the same 44 px hit area here, so no row title is ever under a finger at 18-21 px (C3-48).
+ */
+.list-tree-cell :deep(a[href]:not(.hit-44)) {
+  position: relative;
+}
+.list-tree-cell :deep(a[href]:not(.hit-44))::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100%, 2.75rem);
+  height: max(100%, 2.75rem);
+  transform: translate(-50%, -50%);
+}
+/* A sort header is a 44 px target under a finger, 32 px with a mouse (D-106). */
+@media (pointer: coarse) {
+  .list-sort {
+    min-height: 2.75rem;
+  }
+}
+.list-card {
+  border-bottom: 1px solid hsl(var(--border));
+  padding: 0.5rem 1rem 0.75rem;
+}
+.list-card:hover {
+  background: hsl(var(--surface-hover));
+}
+/* The tree guide is drawn in the indent, so one step is 24 px whether or not a row has a guide (D-110). */
+.list-guide {
+  position: absolute;
+  inset-block: 0;
+  width: 1px;
+  background: hsl(var(--border));
+}
+.list-drop-before > .list-td,
+.list-drop-before.list-card {
+  box-shadow: inset 0 2px 0 0 hsl(var(--primary));
+}
+.list-drop-after > .list-td,
+.list-drop-after.list-card {
+  box-shadow: inset 0 -2px 0 0 hsl(var(--primary));
+}
+@media (pointer: coarse) {
+  .list-row {
+    height: 3.5rem;
+  }
+}
+
+/*
+ * A row that just moved (D-111): a 1.5 s wash of the selection tint that fades out. Under reduced motion the wash does
+ * not animate: the row keeps a 2 px purple rule above and below for the same 1.5 s (the class is removed by script).
+ */
+@keyframes list-flash {
+  from {
+    background-color: hsl(var(--accent-strong));
+  }
+  to {
+    background-color: transparent;
+  }
+}
+.list-flash > .list-td,
+.list-flash.list-card {
+  animation: list-flash 1.5s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .list-flash > .list-td,
+  .list-flash.list-card {
+    animation: none;
+    box-shadow:
+      inset 0 2px 0 0 hsl(var(--primary)),
+      inset 0 -2px 0 0 hsl(var(--primary));
+  }
+}
+@media (forced-colors: active) {
+  .list-flash > .list-td,
+  .list-flash.list-card {
+    animation: none;
+    box-shadow:
+      inset 0 2px 0 0 Highlight,
+      inset 0 -2px 0 0 Highlight;
+  }
+  .list-drop-before > .list-td,
+  .list-drop-before.list-card {
+    box-shadow: inset 0 2px 0 0 Highlight;
+  }
+  .list-drop-after > .list-td,
+  .list-drop-after.list-card {
+    box-shadow: inset 0 -2px 0 0 Highlight;
+  }
 }

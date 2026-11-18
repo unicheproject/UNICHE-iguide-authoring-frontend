@@ -1,0 +1,23 @@
+import { open, go } from "../../../tools/session.mjs"; import {P,shotp,log,rects} from "./lib.mjs"; import {coarse,small} from "./tlib.mjs";
+const vp=process.argv[2]||"1024";
+const { browser, page } = await open("admin",{viewport:vp,touch:true}); const cdp=await coarse(page);
+const errs=[]; page.on("pageerror",e=>errs.push(String(e)));
+await go(page,`/projects/${P}/floor-plans/d40864d1-684a-466f-819d-68fa651b7146`); await page.waitForTimeout(3500);
+const sc=()=>page.evaluate(()=>Math.round(document.querySelector("main").scrollTop));
+const planBox=()=>page.evaluate(()=>{const e=document.querySelector("main img, main [data-plan], main [role=application], main .plan-canvas");const c=[...document.querySelectorAll("main img")].find(i=>i.naturalWidth>1000)||e;if(!c)return null;const b=c.getBoundingClientRect();return {x:b.x|0,y:b.y|0,w:b.width|0,h:b.height|0}});
+log("plan box",await planBox());
+const place=page.getByRole("button",{name:/^PlaceThe Horsemen|^Place The Horsemen|Place The Horsemen/}).first();
+await place.scrollIntoViewIfNeeded(); log("scroll before",await sc());
+await place.tap(); await page.waitForTimeout(900);
+log("scroll after tap Place",await sc(),"plan",await planBox(),"focus",await page.evaluate(()=>document.activeElement.tagName+":"+(document.activeElement.getAttribute("aria-label")||document.activeElement.textContent||"").trim().slice(0,50)));
+await page.screenshot({path:shotp(`fp-editor__armed__${vp}-touch`)});
+log("status texts",await page.evaluate(()=>[...document.querySelectorAll("[role=status],[aria-live]")].map(e=>e.textContent.trim().slice(0,160)).filter(Boolean)));
+log("armed UI",await page.evaluate(`(${rects})("main button")`).then(a=>a.filter(b=>/Cancel|Placing|Esc|armed|Stop|Done/i.test(b.t))));
+const pb=await planBox(); if(pb){ await page.evaluate(([y])=>{document.querySelector("main").scrollTop+= y-200},[pb.y]); await page.waitForTimeout(400);
+ const pb2=await planBox(); await page.touchscreen.tap(pb2.x+pb2.w*0.3,pb2.y+pb2.h*0.4); await page.waitForTimeout(900); await page.screenshot({path:shotp(`fp-editor__placed-by-tap__${vp}-touch`)});
+ log("after plan tap: text",await page.evaluate(()=>[...document.querySelectorAll("[role=status],[aria-live]")].map(e=>e.textContent.trim().slice(0,160)).filter(Boolean)));
+ log("placed count text",(await page.locator("main").innerText()).match(/\d+ placed, \d+ not placed/)?.[0]);
+ log("pending banner",(await page.locator("main").innerText()).match(/Working Copy\.[^\n]*/)?.[0], await page.getByText(/unsaved|Unsaved/).count());
+}
+log("small",(await small(page)).small.filter(s=>!/UNICHE|Leaflet|OpenStreet/.test(s.t)).slice(0,10));
+log(errs); await browser.close();

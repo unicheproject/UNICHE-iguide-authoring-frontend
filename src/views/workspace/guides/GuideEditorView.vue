@@ -1,15 +1,26 @@
 <script setup lang="ts">
-import { computed, nextTick, reactive, ref } from "vue";
+import { computed, nextTick, reactive, ref, watch } from "vue";
+import EditorSection from "@/components/editor/EditorSection.vue";
 import EditorShell from "@/components/editor/EditorShell.vue";
-import { ArrowDown, ArrowUp, GripVertical, Heading as HeadingIcon, Image as ImageIcon, Link2, Pilcrow, Plus, X } from "lucide-vue-next";
+import RemovedBar from "@/components/editor/RemovedBar.vue";
+import ReorderControls from "@/components/editor/ReorderControls.vue";
+import SourcePairField from "@/components/editor/SourcePairField.vue";
+import { useUndoRemove } from "@/components/editor/undoRemove";
+import { Alert } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import FormField from "@/components/ui/field/FormField.vue";
+import Input from "@/components/ui/input/Input.vue";
+import { Heading as HeadingIcon, Image as ImageIcon, Link2, Pilcrow, Plus, TriangleAlert } from "lucide-vue-next";
 import AssetPickerDialog from "@/components/media/AssetPickerDialog.vue";
 import AssetThumb from "@/components/media/AssetThumb.vue";
 import TranslationsPanel, { type TextFieldGroup, type TextFieldMeta } from "@/components/editor/TranslationsPanel.vue";
-import { listTargetTriggers, saveWithTriggers, triggerToForm, type Trigger, type TriggerForm } from "@/platform/triggers";
+import { checkTriggers, listTargetTriggers, saveWithTriggers, triggerToForm, type Trigger, type TriggerForm } from "@/platform/triggers";
 import ResourcePickerDialog from "@/components/ResourcePickerDialog.vue";
 import type { PickerKind } from "@/components/resourcePicker";
 import StatusChip from "@/components/StatusChip.vue";
 import { SLUG_PATTERN } from "@/lib/format";
+import { completenessOf, storyGaps } from "@/platform/completeness";
 import { listAssets, missingAlternativeText, type Asset, type MediaBinding } from "@/platform/assets";
 import {
   changeGuideStatus,
@@ -206,6 +217,7 @@ const editor = useResourceEditor<Guide>({
       const at = layout.value.paths.get(e.key)?.[0];
       if (e.kind === "reference" && !e.resourceId && at) found[`${at}.resourceId`] = "Choose what the reference points to.";
     }
+    checkTriggers(form.triggers, found);
     return found;
   },
   describePath(path) {
@@ -343,28 +355,25 @@ function elementPath(e: ElementForm): string | undefined {
 
 const announcement = ref("");
 
-/** Focuses the moved row's button; at the end of the list that one is disabled, so its counterpart takes focus. */
-function focusMoved(id: string) {
-  const button = document.getElementById(id) as HTMLButtonElement | null;
-  const other = id.endsWith("-up") ? document.getElementById(id.replace(/-up$/, "-down")) : id.endsWith("-down") ? document.getElementById(id.replace(/-down$/, "-up")) : null;
-  (button && !button.disabled ? button : other ?? button)?.focus();
+/** Structural controls (reorder, insert, remove, replace) belong to the default language; other tabs only translate. */
+const structural = computed(() => activeLanguageInfo.value?.isDefault ?? true);
+const defaultLanguageInfo = computed(() => languages.value.find((l) => l.isDefault) ?? null);
+const elementBase = (key: string) => `ge-${key}`;
+
+/** Focuses the control that moved the row; at the end of the list that button is disabled, so its counterpart takes focus. */
+function focusMoved(key: string, via: "up" | "down" | "handle" | "position") {
+  const id = (suffix: string) => document.getElementById(`${elementBase(key)}-${suffix}`) as HTMLButtonElement | null;
+  const same = via === "handle" ? id("handle") : via === "position" ? id("position") : id(via === "up" ? "move-up" : "move-down");
+  const other = via === "up" ? id("move-down") : via === "down" ? id("move-up") : null;
+  (same && !same.disabled ? same : other ?? same)?.focus();
 }
 
-function moveTo(index: number, target: number, focusId?: (key: string) => string) {
+function moveTo(index: number, target: number, via?: "up" | "down" | "handle" | "position") {
   if (target < 0 || target >= form.elements.length || target === index) return;
   const [element] = form.elements.splice(index, 1);
   form.elements.splice(target, 0, element);
   announcement.value = `Moved ${elementName(element, target)} to position ${target + 1} of ${form.elements.length}.`;
-  if (focusId) void nextTick(() => focusMoved(focusId(element.key)));
-}
-
-/** Moves an element and keeps keyboard focus on the same button, so repeated presses keep moving it. */
-function move(index: number, delta: number) {
-  moveTo(index, index + delta, (key) => `ge-move-${key}-${delta < 0 ? "up" : "down"}`);
-}
-
-function setPosition(index: number, event: Event) {
-  moveTo(index, Number((event.target as HTMLSelectElement).value) - 1, (key) => `ge-position-${key}`);
+  if (via) void nextTick(() => focusMoved(element.key, via));
 }
 
 const dragging = ref<string | null>(null);
@@ -407,23 +416,40 @@ function takeInsertPosition(): number {
   return at;
 }
 
-function insert(element: ElementForm, at: number) {
+function insert(element: ElementForm, at: number, announce = true) {
   ensureElementLanguages(element);
   form.elements.splice(at, 0, element);
-  announcement.value = `Added ${elementName(element, at)} at position ${at + 1}.`;
+  // One message per action: a text block takes focus, so the field's own label ("Paragraph (block 3)") says it.
+  if (announce) announcement.value = `Added ${elementName(element, at)} at position ${at + 1}.`;
 }
 
 async function addText(kind: "paragraph" | "heading") {
   const element = newElement(kind);
-  insert(element, takeInsertPosition());
+  insert(element, takeInsertPosition(), false);
   await nextTick();
   document.getElementById(`ge-field-${element.key}`)?.focus();
 }
 
-function removeElement(index: number) {
-  const [element] = form.elements.splice(index, 1);
-  announcement.value = `Removed ${elementName(element, index)}.`;
-}
+/** Remove with Undo: the next row takes focus, the removal is announced, Undo puts the element back. */
+const elementUndo = useUndoRemove<ElementForm>({
+  list: () => form.elements,
+  describe: (element, index) => `${kindLabel(element)} ${index + 1}${itemInfo(element) ? `, ${itemInfo(element)!.title}` : ""}`,
+  noun: "block",
+  // Focus goes to Undo, next to the list (C2-70, D-098); Ctrl+Z works from anywhere.
+  focusAt(index, remaining) {
+    const undo = document.querySelector<HTMLElement>("#story [data-removed-bar] [data-undo]");
+    if (undo) return undo.focus();
+    const rows = document.querySelectorAll<HTMLElement>("[data-element-row]");
+    const row = rows[Math.min(index, remaining - 1)];
+    (row?.querySelector<HTMLElement>("[data-focus-target]") ?? row ?? document.getElementById("add-element-end"))?.focus();
+  },
+  focusRestored(element) {
+    const row = document.getElementById(`ge-row-${element.key}`);
+    (row?.querySelector<HTMLElement>("[data-focus-target]") ?? row)?.focus();
+  },
+});
+// A reload or an Apply replaces the form, so the old positions mean nothing.
+watch(() => editor.resource, () => elementUndo.clear());
 
 function setLevel(e: ElementForm, level: 2 | 3) {
   if (e.level === level) return;
@@ -489,6 +515,15 @@ const translationRows = computed(() =>
   ),
 );
 
+/** The live form's completeness (D-090, G-039): an empty story, or one of only empty blocks, is a warning, never "Complete". */
+const completeness = computed(() =>
+  completenessOf({
+    languages: languages.value,
+    base: translationRows.value.map((r) => ({ languageCode: r.language.languageCode, filled: r.filled, total: r.total })),
+    gaps: textElements.value.length ? [] : storyGaps([]),
+  }),
+);
+
 const ADD_ACTIONS: { kind: ElementKind; label: string; icon: typeof Pilcrow }[] = [
   { kind: "paragraph", label: "Paragraph", icon: Pilcrow },
   { kind: "heading", label: "Heading", icon: HeadingIcon },
@@ -496,6 +531,9 @@ const ADD_ACTIONS: { kind: ElementKind; label: string; icon: typeof Pilcrow }[] 
   { kind: "reference", label: "Reference", icon: Link2 },
 ];
 const KIND_ICONS: Record<ElementKind, typeof Pilcrow> = { paragraph: Pilcrow, heading: HeadingIcon, image: ImageIcon, reference: Link2 };
+
+const railSections = [{ id: "texts", label: "Texts" }];
+const detailsCount = computed(() => `${[form.slug, form.estimatedReadingMinutes, form.internalName, form.featured ? "x" : ""].filter(Boolean).length} of 4 set`);
 
 function add(kind: ElementKind) {
   if (kind === "image") startImage();
@@ -516,40 +554,45 @@ function add(kind: ElementKind) {
     :reference-link="toReference"
     :pending="languagesLoading"
     :translations="translationRows"
+    :completeness="completeness"
     :preview="preview"
+    :sections="railSections"
   >
-    <TranslationsPanel
-      v-model:active-language="editor.activeLanguage"
-      :project-id="projectId"
-      :languages="languages"
-      :texts="form.translations"
-      :groups="GROUPS"
-      :meta="TEXT_META"
-      :readonly="!editor.editable"
-      :error-languages="editor.languagesWithErrors"
-      :field-error="editor.fieldError"
-      title-required-hint="Required in the default language before the guide can be activated."
-    />
+    <div id="texts" class="scroll-mt-4">
+      <TranslationsPanel
+        v-model:active-language="editor.activeLanguage"
+        :project-id="projectId"
+        :languages="languages"
+        :texts="form.translations"
+        :groups="GROUPS"
+        :meta="TEXT_META"
+        :readonly="!editor.editable"
+        :error-languages="editor.languagesWithErrors"
+        :field-error="editor.fieldError"
+        title-required-hint="Required in the default language before the guide can be activated."
+      />
+    </div>
 
-    <section class="overflow-hidden rounded-lg border bg-card" aria-labelledby="story-heading" data-path="blocks" tabindex="-1">
-      <div class="flex flex-wrap items-baseline gap-x-2.5 gap-y-1 border-b px-5 py-3.5">
-        <h2 id="story-heading" class="text-[11px] font-extrabold uppercase tracking-[0.09em] text-muted-foreground">
-          Story{{ activeLanguageInfo ? ` · ${activeLanguageInfo.displayName}` : "" }}
-        </h2>
-        <span class="flex-1 text-[11px] text-muted-foreground">Paragraphs, headings, images and references, in the order visitors read them</span>
-      </div>
-      <p v-if="editor.fieldError('blocks')" class="border-b border-gray-100 px-5 py-3 text-xs font-semibold text-destructive">
-        ⚠ {{ editor.fieldError("blocks") }}
-      </p>
+    <EditorSection
+      id="story"
+      :title="structural ? 'Story' : `Story in ${activeLanguageInfo?.displayName ?? ''}`"
+      :count="form.elements.length ? `${form.elements.length}` : undefined"
+      :description="structural ? 'Paragraphs, headings, images and references, in the order visitors read them.' : 'Only the texts are translated here. Switch to the default language to add, remove or reorder the story.'"
+      data-path="blocks"
+      tabindex="-1"
+    >
+      <Alert v-if="editor.fieldError('blocks')" tone="danger">{{ editor.fieldError("blocks") }}</Alert>
       <p class="sr-only" aria-live="polite">{{ announcement }}</p>
-      <ol>
+      <ol v-if="form.elements.length" class="flex flex-col gap-3">
         <template v-for="(element, index) in form.elements" :key="element.key">
           <li
-            class="element border-b border-gray-100 px-5 py-3.5"
+            :id="`ge-row-${element.key}`"
+            data-element-row
+            class="rounded-md border border-border bg-card p-3"
             :class="{
               'opacity-50': dragging === element.key,
-              'shadow-[inset_0_2px_0_hsl(var(--primary))]': dropTarget?.key === element.key && !dropTarget.after,
-              'shadow-[inset_0_-2px_0_hsl(var(--primary))]': dropTarget?.key === element.key && dropTarget.after,
+              'shadow-drop-before': dropTarget?.key === element.key && !dropTarget.after,
+              'shadow-drop-after': dropTarget?.key === element.key && dropTarget.after,
             }"
             :data-path="elementPath(element)"
             tabindex="-1"
@@ -557,264 +600,164 @@ function add(kind: ElementKind) {
             @dragleave="dropTarget?.key === element.key && (dropTarget = null)"
             @drop.prevent="drop"
           >
-            <div class="flex flex-wrap items-center gap-x-2 gap-y-1.5">
-              <span
-                v-if="editor.editable && form.elements.length > 1"
-                class="-ml-1 cursor-grab select-none rounded p-0.5 text-gray-400 hover:bg-muted hover:text-gray-700 active:cursor-grabbing"
-                draggable="true"
-                aria-hidden="true"
-                title="Drag to reorder"
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+              <span class="flex size-7 flex-none items-center justify-center rounded-full bg-primary text-xs font-bold tabular text-primary-foreground" aria-hidden="true">{{ index + 1 }}</span>
+              <component :is="KIND_ICONS[element.kind]" class="size-4 flex-none text-muted-foreground" aria-hidden="true" />
+              <span v-if="element.kind === 'image' || element.kind === 'reference'" class="text-sm font-semibold">{{ kindLabel(element) }}</span>
+              <div v-if="element.kind === 'heading' && structural" class="flex gap-1" role="group" :aria-label="`Level of heading ${index + 1}`">
+                <Button
+                  v-for="level in ([2, 3] as const)"
+                  :key="level"
+                  :variant="element.level === level ? 'primary' : 'secondary'"
+                  size="sm"
+                  :disabled="!editor.editable"
+                  :aria-pressed="element.level === level"
+                  @click="setLevel(element, level)"
+                >
+                  H{{ level }}<span class="sr-only"> (level {{ level }})</span>
+                </Button>
+              </div>
+              <span class="min-w-2 flex-1"></span>
+              <ReorderControls
+                v-if="editor.editable && structural"
+                :id-base="elementBase(element.key)"
+                :index="index"
+                :count="form.elements.length"
+                :name="elementName(element, index)"
+                @move="(delta, via) => moveTo(index, index + delta, via)"
+                @position="(n) => moveTo(index, n - 1, 'position')"
+                @remove="elementUndo.remove(index)"
                 @dragstart="dragStart(element.key, $event)"
                 @dragend="dragEnd"
               >
-                <GripVertical class="h-4 w-4" />
-              </span>
-              <span class="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary text-[11px] font-extrabold tabular-nums text-white" aria-hidden="true">
-                {{ index + 1 }}
-              </span>
-              <component :is="KIND_ICONS[element.kind]" class="h-3.5 w-3.5 flex-none text-muted-foreground" aria-hidden="true" />
-              <label
-                v-if="element.kind === 'paragraph' || element.kind === 'heading'"
-                :for="`ge-field-${element.key}`"
-                class="text-[10px] font-extrabold uppercase tracking-[0.08em] text-muted-foreground"
-              >
-                {{ kindLabel(element) }}<span v-if="element.kind === 'heading'">, level {{ element.level }}</span>
-              </label>
-              <span v-else class="text-[10px] font-extrabold uppercase tracking-[0.08em] text-muted-foreground">{{ kindLabel(element) }}</span>
-              <div v-if="element.kind === 'heading'" class="flex gap-1" role="group" :aria-label="`Level of heading ${index + 1}`">
-                <button
-                  v-for="level in ([2, 3] as const)"
-                  :key="level"
-                  type="button"
-                  :disabled="!editor.editable"
-                  :aria-pressed="element.level === level"
-                  :aria-label="`Level ${level}`"
-                  class="rounded-full border px-2 py-px text-[10px] font-bold disabled:cursor-default"
-                  :class="element.level === level ? 'border-primary bg-primary text-white' : 'bg-card text-gray-700'"
-                  @click="setLevel(element, level)"
-                >
-                  H{{ level }}
-                </button>
-              </div>
-              <span class="min-w-2 flex-1"></span>
-              <div v-if="editor.editable" class="ml-auto flex flex-none items-center gap-0.5">
-                <label v-if="form.elements.length > 1" :for="`ge-position-${element.key}`" class="sr-only">Position of {{ elementName(element, index) }}</label>
-                <select
-                  v-if="form.elements.length > 1"
-                  :id="`ge-position-${element.key}`"
-                  :value="index + 1"
-                  title="Position"
-                  class="field-input element-position"
-                  @change="setPosition(index, $event)"
-                >
-                  <option v-for="n in form.elements.length" :key="n" :value="n">{{ n }}</option>
-                </select>
-                <button
-                  :id="`ge-move-${element.key}-up`"
-                  type="button"
-                  class="icon-button"
-                  :disabled="index === 0"
-                  :aria-label="`Move ${elementName(element, index)} up`"
-                  title="Move up"
-                  @click="move(index, -1)"
-                >
-                  <ArrowUp class="h-3.5 w-3.5" aria-hidden="true" />
-                </button>
-                <button
-                  :id="`ge-move-${element.key}-down`"
-                  type="button"
-                  class="icon-button"
-                  :disabled="index === form.elements.length - 1"
-                  :aria-label="`Move ${elementName(element, index)} down`"
-                  title="Move down"
-                  @click="move(index, 1)"
-                >
-                  <ArrowDown class="h-3.5 w-3.5" aria-hidden="true" />
-                </button>
-                <button
-                  type="button"
-                  class="icon-button"
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  :label="`Insert after ${elementName(element, index)}`"
+                  title="Insert after"
+                  class="size-8 [@media(pointer:coarse)]:size-11"
                   :class="{ 'bg-accent text-primary': insertAt === index + 1 }"
                   :aria-expanded="insertAt === index + 1"
-                  :aria-label="`Insert after ${elementName(element, index)}`"
-                  title="Insert after"
                   @click="insertAt = insertAt === index + 1 ? null : index + 1"
                 >
-                  <Plus class="h-3.5 w-3.5" aria-hidden="true" />
-                </button>
-                <button type="button" class="icon-button hover:!text-destructive" :aria-label="`Remove ${elementName(element, index)}`" title="Remove" @click="removeElement(index)">
-                  <X class="h-3.5 w-3.5" aria-hidden="true" />
-                </button>
-              </div>
+                  <Plus aria-hidden="true" />
+                </Button>
+              </ReorderControls>
             </div>
 
-            <div class="mt-2 sm:pl-[34px]">
-              <textarea
-                v-if="element.kind === 'paragraph' && activeCode"
-                :id="`ge-field-${element.key}`"
+            <div class="mt-3">
+              <SourcePairField
+                v-if="(element.kind === 'paragraph' || element.kind === 'heading') && activeLanguageInfo && activeCode"
                 v-model="element.texts[activeCode]"
-                :readonly="!editor.editable"
-                :lang="activeCode"
-                :dir="activeLanguageInfo!.direction.toLowerCase()"
-                :placeholder="`Write the paragraph in ${activeLanguageInfo!.displayName}`"
-                class="field-input min-h-[96px] resize-y leading-relaxed"
-                :aria-invalid="elementError(element) ? 'true' : undefined"
-                :aria-describedby="elementError(element) ? `ge-error-${element.key}` : undefined"
-                :class="{ invalid: elementError(element) }"
-              ></textarea>
-              <input
-                v-else-if="element.kind === 'heading' && activeCode"
                 :id="`ge-field-${element.key}`"
-                v-model="element.texts[activeCode]"
+                focus-target
+                :label="element.kind === 'paragraph' ? `Paragraph (block ${index + 1})` : `Heading (block ${index + 1})`"
+                :multiline="element.kind === 'paragraph'"
+                :min-rows="3"
                 :readonly="!editor.editable"
-                :lang="activeCode"
-                :dir="activeLanguageInfo!.direction.toLowerCase()"
-                :placeholder="`Heading in ${activeLanguageInfo!.displayName}`"
-                class="field-input font-bold"
-                :aria-invalid="elementError(element) ? 'true' : undefined"
-                :aria-describedby="elementError(element) ? `ge-error-${element.key}` : undefined"
-                :class="[element.level === 2 ? 'text-[17px]' : 'text-[15px]', { invalid: elementError(element) }]"
+                :language="activeLanguageInfo"
+                :source-language="defaultLanguageInfo"
+                :source-text="defaultLanguage ? (element.texts[defaultLanguage] ?? '') : ''"
+                :placeholder="element.kind === 'paragraph' ? `Write the paragraph in ${activeLanguageInfo.displayName}` : `Heading in ${activeLanguageInfo.displayName}`"
+                :control-class="element.kind === 'heading' ? (element.level === 2 ? 'text-base font-bold' : 'text-sm font-bold') : undefined"
+                :error="elementError(element)"
               />
-              <div v-else-if="element.kind === 'image'" class="flex items-center gap-3">
+              <div v-else-if="element.kind === 'image'" class="flex flex-wrap items-center gap-3">
                 <AssetThumb v-if="element.assetId && assetById.get(element.assetId)" :asset="assetById.get(element.assetId)!" height="72px" class="w-28 flex-none" />
                 <div class="min-w-0 flex-1">
-                  <div class="truncate text-xs font-bold">{{ (element.assetId && assetById.get(element.assetId)?.internalName) || "Unavailable image" }}</div>
+                  <div class="truncate text-sm font-semibold">{{ (element.assetId && assetById.get(element.assetId)?.internalName) || "Unavailable image" }}</div>
                   <template v-if="element.assetId && assetById.get(element.assetId) && activeLanguageInfo">
-                    <div v-if="missingAlternativeText(assetById.get(element.assetId)!, activeLanguageInfo.languageCode)" class="mt-1 text-[11px] font-semibold text-destructive">
-                      ⚠ No alternative text in {{ activeLanguageInfo.displayName }}
-                    </div>
-                    <div v-else-if="assetById.get(element.assetId)!.decorative" class="mt-1 text-[11px] text-muted-foreground">Decorative: screen readers skip it.</div>
-                    <div v-else-if="altText(assetById.get(element.assetId)!)" class="mt-1 text-[11px] text-gray-700">
+                    <p v-if="missingAlternativeText(assetById.get(element.assetId)!, activeLanguageInfo.languageCode)" class="mt-1 flex items-start gap-1.5 text-xs font-medium text-destructive">
+                      <TriangleAlert class="mt-px size-4 shrink-0" aria-hidden="true" />No alternative text in {{ activeLanguageInfo.displayName }}
+                    </p>
+                    <p v-else-if="assetById.get(element.assetId)!.decorative" class="mt-1 text-xs text-muted-foreground">Decorative: screen readers skip it.</p>
+                    <p v-else-if="altText(assetById.get(element.assetId)!)" class="mt-1 text-xs text-ink-2">
                       <span class="font-semibold text-muted-foreground">Alternative text ({{ activeLanguageInfo.languageCode }}):</span>
                       {{ altText(assetById.get(element.assetId)!) }}
-                    </div>
+                    </p>
                   </template>
-                  <div class="mt-1.5 flex gap-3">
-                    <RouterLink v-if="element.assetId" :to="{ name: 'asset-editor', params: { projectId, assetId: element.assetId } }" class="text-[11px] font-bold text-primary no-underline hover:underline">
-                      Edit image
-                    </RouterLink>
-                    <button v-if="editor.editable" type="button" class="text-[11px] font-bold text-primary hover:underline" @click="startImage(index)">Replace</button>
+                  <div class="mt-1 flex flex-wrap gap-x-4">
+                    <RouterLink v-if="element.assetId" :to="{ name: 'asset-editor', params: { projectId, assetId: element.assetId } }" class="inline-flex min-h-control items-center text-sm font-semibold" data-focus-target>Edit image</RouterLink>
+                    <Button v-if="editor.editable && structural" variant="link" class="hit-44" @click="startImage(index)">Replace<span class="sr-only"> image {{ index + 1 }}</span></Button>
                   </div>
                 </div>
               </div>
-              <div v-else-if="element.kind === 'reference'" class="flex flex-col gap-2">
-                <div class="flex flex-wrap items-center gap-2 rounded-lg border bg-muted/40 px-3 py-2.5">
-                  <RouterLink v-if="itemInfo(element) && itemLink(element)" :to="itemLink(element)!" class="min-w-0 flex-1 truncate text-[13px] font-bold">
+              <div v-else-if="element.kind === 'reference'" class="flex flex-col gap-3">
+                <div class="flex flex-wrap items-center gap-2 rounded-md border border-border bg-muted px-3 py-2">
+                  <RouterLink v-if="itemInfo(element) && itemLink(element)" :to="itemLink(element)!" data-focus-target class="inline-flex min-h-control min-w-0 flex-1 items-center truncate font-semibold">
                     {{ itemInfo(element)!.title }}
                   </RouterLink>
-                  <span v-else class="min-w-0 flex-1 text-[13px] text-muted-foreground">
+                  <span v-else class="min-w-0 flex-1 text-sm text-muted-foreground">
                     {{ element.resourceId ? "Unavailable item" : "Nothing chosen yet" }}
                   </span>
                   <StatusChip v-if="itemInfo(element) && itemInfo(element)!.status !== 'ACTIVE'" :status="itemInfo(element)!.status" />
-                  <button
-                    v-if="editor.editable"
-                    type="button"
-                    class="text-[11px] font-bold text-primary hover:underline"
+                  <Button
+                    v-if="editor.editable && structural"
+                    variant="secondary"
+                    size="sm"
                     @click="startReference(index, element.resourceType && element.resourceType !== 'PAGE' ? element.resourceType : 'POI')"
                   >
-                    Change
-                  </button>
+                    Change<span class="sr-only"> reference {{ index + 1 }}</span>
+                  </Button>
                 </div>
-                <p v-if="referenceWarning(element)" class="text-xs font-semibold text-[#855400]">⚠ {{ referenceWarning(element) }}</p>
-                <div v-if="activeLanguageInfo" class="flex flex-col gap-1">
-                  <label :for="`ge-caption-${element.key}`" class="small-label">
-                    Caption · {{ activeLanguageInfo.displayName }}
-                    <span class="font-normal normal-case tracking-normal text-muted-foreground">· optional</span>
-                  </label>
-                  <input
-                    :id="`ge-caption-${element.key}`"
-                    v-model="element.captions[activeLanguageInfo.languageCode]"
-                    :readonly="!editor.editable"
-                    :lang="activeLanguageInfo.languageCode"
-                    :dir="activeLanguageInfo.direction.toLowerCase()"
-                    placeholder="Why the reader should open it"
-                    class="field-input"
-                  />
-                </div>
+                <p v-if="referenceWarning(element)" class="flex items-start gap-1.5 text-xs font-medium text-warning">
+                  <TriangleAlert class="mt-px size-4 shrink-0" aria-hidden="true" />{{ referenceWarning(element) }}
+                </p>
+                <SourcePairField
+                  v-if="activeLanguageInfo"
+                  v-model="element.captions[activeLanguageInfo.languageCode]"
+                  :id="`ge-caption-${element.key}`"
+                  label="Caption (optional)"
+                  :readonly="!editor.editable"
+                  :language="activeLanguageInfo"
+                  :source-language="defaultLanguageInfo"
+                  :source-text="defaultLanguage ? (element.captions[defaultLanguage] ?? '') : ''"
+                  placeholder="Why the reader should open it"
+                />
               </div>
-              <p v-if="elementError(element)" :id="`ge-error-${element.key}`" class="mt-1.5 text-xs font-semibold text-destructive">⚠ {{ elementError(element) }}</p>
+              <p v-if="elementError(element) && (element.kind === 'image' || element.kind === 'reference')" :id="`ge-error-${element.key}`" class="mt-1.5 flex items-start gap-1.5 text-xs font-medium text-destructive">
+                <TriangleAlert class="mt-px size-4 shrink-0" aria-hidden="true" />{{ elementError(element) }}
+              </p>
             </div>
           </li>
-          <li v-if="editor.editable && insertAt === index + 1" class="flex flex-wrap items-center gap-2 border-b border-gray-100 bg-accent/40 px-5 py-2.5">
-            <span class="text-[11px] font-semibold text-muted-foreground">Insert after {{ index + 1 }}:</span>
-            <button v-for="action in ADD_ACTIONS" :key="action.kind" type="button" class="add-element" @click="add(action.kind)">
-              <component :is="action.icon" class="h-3.5 w-3.5" aria-hidden="true" />{{ action.label }}
-            </button>
+          <li v-if="editor.editable && structural && insertAt === index + 1" class="flex flex-wrap items-center gap-2 rounded-md bg-accent px-3 py-2">
+            <span class="text-sm font-semibold text-ink-2">Insert after {{ index + 1 }}:</span>
+            <Button v-for="action in ADD_ACTIONS" :key="action.kind" variant="secondary" size="sm" @click="add(action.kind)">
+              <component :is="action.icon" aria-hidden="true" />{{ action.label }}
+            </Button>
           </li>
         </template>
       </ol>
-      <p v-if="!form.elements.length" class="px-5 py-4 text-[13px] text-muted-foreground">
+      <p v-else class="text-sm text-muted-foreground">
         Nothing written yet. Start with a paragraph, and add references to the points of interest, routes, places, or
         events where the story talks about them.
       </p>
-      <div v-if="editor.editable" class="flex flex-wrap items-center gap-2 px-5 py-3.5">
-        <span class="sr-only">Add at the end:</span>
-        <button v-for="action in ADD_ACTIONS" :key="action.kind" type="button" class="add-element" @click="insertAt = null; add(action.kind)">
-          <component :is="action.icon" class="h-3.5 w-3.5" aria-hidden="true" />+ {{ action.label }}
-        </button>
+      <RemovedBar v-if="elementUndo.last.value" :label="elementUndo.last.value.label" noun="block" :count="elementUndo.removed.value.length" @undo="elementUndo.undo()" @dismiss="elementUndo.clear()" />
+      <div v-if="editor.editable && structural" class="flex flex-wrap items-center gap-2" role="group" aria-label="Add to the end of the story">
+        <Button v-for="action in ADD_ACTIONS" :id="action.kind === 'paragraph' ? 'add-element-end' : undefined" :key="action.kind" variant="secondary" size="sm" @click="insertAt = null; add(action.kind)">
+          <component :is="action.icon" aria-hidden="true" />Add {{ action.label.toLowerCase() }}
+        </Button>
       </div>
-    </section>
+    </EditorSection>
 
-    <section class="overflow-hidden rounded-lg border bg-card">
-      <div class="border-b px-5 py-3.5">
-        <h2 class="text-[11px] font-extrabold uppercase tracking-[0.09em] text-muted-foreground">Details</h2>
+    <EditorSection v-if="structural" id="details" title="Details" :count="detailsCount" collapsible :default-open="false">
+      <FormField id="f-slug" label="Slug" hint="Part of the item's web address and QR targets. Changing it breaks printed QR codes." :error="editor.fieldError('slug')" v-slot="f">
+        <Input :id="f.id" v-model="form.slug" :readonly="!editor.editable" spellcheck="false" class="mono" :aria-describedby="f.describedBy" :invalid="f.invalid" />
+      </FormField>
+      <div class="flex flex-col gap-2">
+        <FormField id="f-estimatedReadingMinutes" label="Reading time (minutes)" :error="editor.fieldError('estimatedReadingMinutes')" v-slot="f">
+          <Input :id="f.id" v-model="form.estimatedReadingMinutes" :readonly="!editor.editable" inputmode="numeric" class="sm:max-w-40" :aria-describedby="f.describedBy" :invalid="f.invalid" />
+        </FormField>
+        <p v-if="suggestedMinutes" class="text-xs text-muted-foreground">
+          The default-language story reads in about {{ suggestedMinutes }} min.
+          <Button v-if="editor.editable && form.estimatedReadingMinutes !== String(suggestedMinutes)" variant="link" class="ml-1" @click="form.estimatedReadingMinutes = String(suggestedMinutes)">Use it</Button>
+        </p>
       </div>
-      <div class="flex flex-col gap-3.5 px-5 py-[18px]">
-        <div class="flex flex-col gap-1.5">
-          <label for="f-slug" class="small-label">Slug</label>
-          <input
-            id="f-slug"
-            v-model="form.slug"
-            :readonly="!editor.editable"
-            spellcheck="false"
-            class="field-input font-mono text-[13px]"
-            :aria-invalid="editor.fieldError('slug') ? 'true' : undefined"
-            :aria-describedby="editor.fieldError('slug') ? 'err-GuideEditorView-1' : undefined"
-            :class="{ invalid: editor.fieldError('slug') }"
-          />
-          <span v-if="editor.fieldError('slug')" id="err-GuideEditorView-1" class="text-xs font-semibold text-destructive">⚠ {{ editor.fieldError("slug") }}</span>
-          <span v-else class="text-xs text-muted-foreground">Used in URLs and QR targets. Changing it breaks printed QR codes.</span>
-        </div>
-        <div class="flex flex-wrap items-end gap-4">
-          <div class="flex flex-[0_0_170px] flex-col gap-1.5">
-            <label for="f-reading" class="small-label">Reading time (min)</label>
-            <input
-              id="f-reading"
-              v-model="form.estimatedReadingMinutes"
-              :readonly="!editor.editable"
-              inputmode="numeric"
-              class="field-input"
-              :aria-invalid="editor.fieldError('estimatedReadingMinutes') ? 'true' : undefined"
-              :aria-describedby="editor.fieldError('estimatedReadingMinutes') ? 'err-GuideEditorView-2' : undefined"
-              :class="{ invalid: editor.fieldError('estimatedReadingMinutes') }"
-            />
-          </div>
-          <span v-if="suggestedMinutes" class="flex-1 text-xs text-muted-foreground">
-            The default-language story reads in about {{ suggestedMinutes }} min.
-            <button
-              v-if="editor.editable && form.estimatedReadingMinutes !== String(suggestedMinutes)"
-              type="button"
-              class="ml-1 font-bold text-primary"
-              @click="form.estimatedReadingMinutes = String(suggestedMinutes)"
-            >
-              Use it
-            </button>
-          </span>
-        </div>
-        <span v-if="editor.fieldError('estimatedReadingMinutes')" id="err-GuideEditorView-2" class="text-xs font-semibold text-destructive">
-          ⚠ {{ editor.fieldError("estimatedReadingMinutes") }}
-        </span>
-        <div class="flex flex-col gap-1.5">
-          <label for="f-internal" class="small-label">Internal name</label>
-          <input id="f-internal" v-model="form.internalName" :readonly="!editor.editable" class="field-input" />
-        </div>
-        <label class="flex items-center gap-2.5 text-[13px] font-semibold">
-          <input v-model="form.featured" type="checkbox" :disabled="!editor.editable" class="h-4 w-4 accent-primary" />
-          Featured: highlighted in the visitor app's lists
-        </label>
-      </div>
-    </section>
-
+      <FormField id="f-internalName" label="Internal name" hint="For authors only; visitors never see it." v-slot="f">
+        <Input :id="f.id" v-model="form.internalName" :readonly="!editor.editable" :aria-describedby="f.describedBy" />
+      </FormField>
+      <Checkbox v-model="form.featured" :disabled="!editor.editable">Featured: highlighted in the visitor app's lists</Checkbox>
+    </EditorSection>
   </EditorShell>
 
   <ResourcePickerDialog
@@ -839,45 +782,3 @@ function add(kind: ElementKind) {
     @uploaded="assets.unshift($event)"
   />
 </template>
-
-<style scoped>
-.element-position {
-  width: auto;
-  padding: 2px 6px;
-  font-size: 12px;
-}
-.icon-button {
-  display: inline-flex;
-  height: 26px;
-  width: 26px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-  color: hsl(var(--muted-foreground));
-}
-.icon-button:hover:not(:disabled) {
-  background: hsl(var(--muted));
-  color: hsl(var(--foreground));
-}
-.icon-button:disabled {
-  opacity: 0.3;
-}
-.add-element {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  border: 1px solid #e5e7eb;
-  border-radius: 9999px;
-  background: #f5f5f7;
-  padding: 7px 14px;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #374151;
-}
-.add-element:hover {
-  border-color: hsl(var(--primary) / 0.4);
-  color: hsl(var(--primary));
-}
-</style>

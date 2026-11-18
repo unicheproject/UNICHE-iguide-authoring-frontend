@@ -1,0 +1,223 @@
+{
+ "rows-places@1440": {
+  "n": 30,
+  "median": 81,
+  "max": 83,
+  "min": 81
+ },
+ "empty-places@1440": "No places match | Search: zzzznomatch | Status: Draft | Remove a filter, or use Clear filters in the toolbar above.",
+ "error-places@1440": {
+  "focus": {
+   "tag": "H1",
+   "id": "",
+   "label": "Places",
+   "top": 80,
+   "bottom": 106,
+   "inViewport": true
+  },
+  "card": "The platform is busy | The platform is busy or down for maintenance. Nothing was changed. Try again in a few minutes. | Try again | Request id req-p3a | Copy request id"
+ },
+ "rows-pois@1440": {
+  "n": 50,
+  "median": 81,
+  "max": 144,
+  "min": 81
+ },
+ "empty-pois@1440": "No points of interest match | Search: zzzznomatch | Status: Draft | Remove a filter, or use Clear filters in the toolbar above.",
+ "error-pois@1440": {
+  "focus": {
+   "tag": "H1",
+   "id": "",
+   "label": "Points of Interest",
+   "top": 80,
+   "bottom": 106,
+   "inViewport": true
+  },
+  "card": "The platform is busy | The platform is busy or down for maintenance. Nothing was changed. Try again in a few minutes. | Try again | Request id req-p3a | Copy request id"
+ },
+ "rows-routes@1440": {
+  "n": 26,
+  "median": 81,
+  "max": 141,
+  "min": 81
+ },
+ "empty-routes@1440": "No routes match | Search: zzzznomatch | Status: Draft | Remove a filter, or use Clear filters in the toolbar above.",
+ "error-routes@1440": {
+  "focus": {
+   "tag": "H1",
+   "id": "",
+   "label": "Routes",
+   "top": 80,
+   "bottom": 106,
+   "inViewport": true
+  },
+  "card": "The platform is busy | The platform is busy or down for maintenance. Nothing was changed. Try again in a few minutes. | Try again | Request id req-p3a | Copy request id"
+ },
+ "rows-places@1280": {
+  "n": 30,
+  "median": 81,
+  "max": 120,
+  "min": 81
+ },
+ "empty-places@1280": "No places match | Search: zzzznomatch | Status: Draft | Remove a filter, or use Clear filters in the toolbar above.",
+ "rows-pois@1280": {
+  "n": 50,
+  "median": 87,
+  "max": 186,
+  "min": 81
+ },
+ "empty-pois@1280": "No points of interest match | Search: zzzznomatch | Status: Draft | Remove a filter, or use Clear filters in the toolbar above.",
+ "rows-routes@1280": {
+  "n": 26,
+  "median": 81,
+  "max": 204,
+  "min": 81
+ },
+ "empty-routes@1280": "No routes match | Search: zzzznomatch | Status: Draft | Remove a filter, or use Clear filters in the toolbar above.",
+ "rows-places@1024": {
+  "n": 30,
+  "median": 118,
+  "max": 121,
+  "min": 118
+ },
+ "empty-places@1024": "No places match | Search: zzzznomatch | Status: Draft | Remove a filter, or use Clear filters in the toolbar above.",
+ "error-places@1024": {
+  "focus": {
+   "tag": "H1",
+   "id": "",
+   "label": "Places",
+   "top": 80,
+   "bottom": 106,
+   "inViewport": true
+  },
+  "card": "The platform is busy | The platform is busy or down for maintenance. Nothing was changed. Try again in a few minutes. | Try again | Request id req-p3a | Copy request id"
+ },
+ "rows-pois@1024": {
+  "n": 50,
+  "median": 87,
+  "max": 186,
+  "min": 81
+ },
+ "empty-pois@1024": "No points of interest match | Search: zzzznomatch | Status: Draft | Remove a filter, or use Clear filters in the toolbar above.",
+ "error-pois@1024": {
+  "focus": {
+   "tag": "H1",
+   "id": "",
+   "label": "Points of Interest",
+   "top": 80,
+   "bottom": 106,
+   "inViewport": true
+  },
+  "card": "The platform is busy | The platform is busy or down for maintenance. Nothing was changed. Try again in a few minutes. | Try again | Request id req-p3a | Copy request id"
+ },
+ "rows-routes@1024": {
+  "n": 26,
+  "median": 120,
+  "max": 141,
+  "min": 120
+ },
+ "empty-routes@1024": "No routes match | Search: zzzznomatch | Status: Draft | Remove a filter, or use Clear filters in the toolbar above.",
+ "error-routes@1024": {
+  "focus": {
+   "tag": "H1",
+   "id": "",
+   "label": "Routes",
+   "top": 80,
+   "bottom": 106,
+   "inViewport": true
+  },
+  "card": "The platform is busy | The platform is busy or down for maintenance. Nothing was changed. Try again in a few minutes. | Try again | Request id req-p3a | Copy request id"
+ },
+ "rows-places@768": {
+  "n": 30,
+  "median": 118,
+  "max": 139,
+  "min": 118
+ },
+ "empty-places@768": "No places match | Search: zzzznomatch | Status: Draft | Remove a filter, or use Clear filters in the toolbar above.",
+ "rows-pois@768": {
+  "n": 50,
+  "median": 143,
+  "max": 184,
+  "min": 131
+ },
+ "empty-pois@768": "No points of interest match | Search: zzzznomatch | Status: Draft | Remove a filter, or use Clear filters in the toolbar above.",
+ "rows-routes@768": {
+  "n": 26,
+  "median": 120,
+  "max": 162,
+  "min": 120
+ },
+ "empty-routes@768": "No routes match | Search: zzzznomatch | Status: Draft | Remove a filter, or use Clear filters in the toolbar above.",
+ "rows-places@zoom200": {
+  "n": 30,
+  "median": 156,
+  "max": 177,
+  "min": 156
+ },
+ "empty-places@zoom200": "No places match | Search: zzzznomatch | Status: Draft | Remove a filter, or use Clear filters in the toolbar above.",
+ "error-places@zoom200": {
+  "focus": {
+   "tag": "H1",
+   "id": "",
+   "label": "Places",
+   "top": 80,
+   "bottom": 106,
+   "inViewport": true
+  },
+  "card": "The platform is busy | The platform is busy or down for maintenance. Nothing was changed. Try again in a few minutes. | Try again | Request id req-p3a | Copy request id"
+ },
+ "rows-pois@zoom200": {
+  "n": 50,
+  "median": 172,
+  "max": 237,
+  "min": 131
+ },
+ "empty-pois@zoom200": "No points of interest match | Search: zzzznomatch | Status: Draft | Remove a filter, or use Clear filters in the toolbar above.",
+ "error-pois@zoom200": {
+  "focus": {
+   "tag": "H1",
+   "id": "",
+   "label": "Points of Interest",
+   "top": 80,
+   "bottom": 106,
+   "inViewport": true
+  },
+  "card": "The platform is busy | The platform is busy or down for maintenance. Nothing was changed. Try again in a few minutes. | Try again | Request id req-p3a | Copy request id"
+ },
+ "rows-routes@zoom200": {
+  "n": 26,
+  "median": 120,
+  "max": 162,
+  "min": 120
+ },
+ "empty-routes@zoom200": "No routes match | Search: zzzznomatch | Status: Draft | Remove a filter, or use Clear filters in the toolbar above.",
+ "error-routes@zoom200": {
+  "focus": {
+   "tag": "H1",
+   "id": "",
+   "label": "Routes",
+   "top": 80,
+   "bottom": 106,
+   "inViewport": true
+  },
+  "card": "The platform is busy | The platform is busy or down for maintenance. Nothing was changed. Try again in a few minutes. | Try again | Request id req-p3a | Copy request id"
+ },
+ "greek1280": [
+  {
+   "t": 19,
+   "lines": 1,
+   "bdi": true
+  },
+  {
+   "t": 71,
+   "lines": 3,
+   "bdi": true
+  },
+  {
+   "t": 19,
+   "lines": 1,
+   "bdi": true
+  }
+ ]
+}

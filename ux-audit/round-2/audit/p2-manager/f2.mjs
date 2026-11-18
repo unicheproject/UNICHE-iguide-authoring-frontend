@@ -1,0 +1,21 @@
+import { fresh, uiSignIn, shot, CMS } from "./lib.mjs";
+const { browser, page } = await fresh("1440");
+await uiSignIn(page, "admin", "1440", () => {});
+const D = "f56e8c75-94af-4c87-88c8-06cba46240a1";
+const dlg = () => page.locator("[role=dialog]").first();
+await page.goto(`${CMS}/projects/${D}/places`); await page.waitForTimeout(3500);
+await page.getByRole("button", { name: "New place" }).first().click(); await page.waitForTimeout(900);
+await shot(page, "firstrun__new-place-dialog", "1440", false);
+console.log("PLACE DIALOG:", (await dlg().innerText()).replace(/\n+/g," | "));
+console.log("focus:", await page.evaluate(()=>document.activeElement?.tagName+" "+(document.activeElement?.getAttribute("aria-label")||document.activeElement?.id||"")));
+// submit empty
+await dlg().getByRole("button", { name: /^Create/ }).click(); await page.waitForTimeout(600);
+await shot(page, "firstrun__new-place-empty-error", "1440", false);
+console.log("EMPTY ERR:", (await dlg().innerText()).replace(/\n+/g," | ").slice(0,500));
+await dlg().getByLabel(/Title/i).first().fill("UX-R2-p2 First Place");
+await shot(page, "firstrun__new-place-filled", "1440", false);
+await dlg().getByRole("button", { name: /^Create/ }).click(); await page.waitForTimeout(4000);
+console.log("after create:", page.url().slice(-60), await page.title());
+await shot(page, "firstrun__place-created", "1440");
+console.log((await page.evaluate(()=>document.body.innerText)).replace(/\n+/g," | ").slice(0,1500));
+await browser.close();

@@ -1,0 +1,7 @@
+export const SEL='button, a[href], input:not([type=hidden]), select, textarea, summary, [role=tab], [role=menuitem], [role=checkbox], [role=switch], [role=option], [role=combobox], [role=link], [role=button], [tabindex="0"]';
+export async function coarse(page){const cdp=await page.context().newCDPSession(page);await cdp.send("Emulation.setEmulatedMedia",{features:[{name:"pointer",value:"coarse"},{name:"hover",value:"none"},{name:"any-pointer",value:"coarse"},{name:"any-hover",value:"none"}]});return cdp;}
+export const small=(page,scope="body")=>page.evaluate(([SEL,scope])=>{
+ const root=document.querySelector(scope)||document.body; const out=[]; let total=0;
+ for(const e of root.querySelectorAll(SEL)){ const cs=getComputedStyle(e); if(cs.visibility==="hidden"||cs.display==="none")continue; const b=e.getBoundingClientRect(); if(b.width===0||b.height===0)continue; if(b.width<=2&&b.height<=2)continue; if(e.closest("[inert],[aria-hidden=true]"))continue; if(b.bottom<0&&false)continue;
+  total++; if(b.width<44||b.height<44){ const sr=e.classList.contains("sr-only"); if(sr)continue; out.push({t:(e.getAttribute("aria-label")||e.textContent||e.getAttribute("placeholder")||e.type||"").trim().replace(/\s+/g," ").slice(0,36),tag:e.tagName.toLowerCase()+(e.getAttribute("role")?"["+e.getAttribute("role")+"]":""),w:Math.round(b.width),h:Math.round(b.height)});}}
+ return {total,small:out};},[SEL,scope]);

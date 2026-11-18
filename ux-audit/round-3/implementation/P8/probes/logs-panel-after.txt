@@ -1,0 +1,45 @@
+1440 open {"vh":900,"picture":{"top":300,"bottom":1042,"h":742},"close":{"top":191,"bottom":231,"h":40},"expand":{"top":191,"bottom":231,"h":40},"panel":{"top":182,"bottom":812,"h":630},"scrollY":0}
+1440 expanded {"vh":900,"picture":{"top":300,"bottom":1042,"h":742},"close":{"top":191,"bottom":231,"h":40},"expand":{"top":191,"bottom":231,"h":40},"panel":{"top":182,"bottom":1017,"h":835},"scrollY":0}
+1440 focus button "Collapse the preview"
+1280 open {"vh":720,"picture":{"top":300,"bottom":942,"h":642},"close":{"top":191,"bottom":231,"h":40},"expand":{"top":191,"bottom":231,"h":40},"panel":{"top":182,"bottom":686,"h":504},"scrollY":0}
+1280 expanded {"vh":720,"picture":{"top":300,"bottom":942,"h":642},"close":{"top":191,"bottom":231,"h":40},"expand":{"top":191,"bottom":231,"h":40},"panel":{"top":182,"bottom":837,"h":655},"scrollY":0}
+1280 focus button "Collapse the preview"
+1024 open {"vh":768,"picture":{"top":374,"bottom":1011,"h":637},"close":{"top":265,"bottom":305,"h":40},"expand":{"top":265,"bottom":305,"h":40},"panel":{"top":256,"bottom":794,"h":538},"scrollY":0}
+1024 expanded {"vh":768,"picture":{"top":374,"bottom":1011,"h":637},"close":{"top":265,"bottom":305,"h":40},"expand":{"top":265,"bottom":305,"h":40},"panel":{"top":256,"bottom":959,"h":703},"scrollY":0}
+1024 focus button "Collapse the preview"
+768 open {"vh":1024,"picture":{"top":390,"bottom":867,"h":477},"close":{"top":265,"bottom":305,"h":40},"expand":null,"panel":{"top":256,"bottom":941,"h":685},"scrollY":0}
+768 no Expand button
+768 focus div "In the appWebMobileKioskClose the preview Skip pre"
+zoom200 open {"vh":360,"picture":{"top":390,"bottom":787,"h":397},"close":{"top":265,"bottom":305,"h":40},"expand":{"top":265,"bottom":305,"h":40},"panel":{"top":256,"bottom":508,"h":252},"scrollY":0}
+zoom200 expanded {"vh":360,"picture":{"top":265,"bottom":662,"h":397},"close":{"top":140,"bottom":180,"h":40},"expand":{"top":140,"bottom":180,"h":40},"panel":{"top":131,"bottom":475,"h":344},"scrollY":125}
+zoom200 focus button "Collapse the preview"
+1440 open {"vh":900,"picture":{"top":300,"bottom":1042,"h":742},"close":{"top":191,"bottom":231,"h":40},"expand":{"top":191,"bottom":231,"h":40},"panel":{"top":182,"bottom":812,"h":630},"scrollY":0}
+1440 expanded {"vh":900,"picture":{"top":223,"bottom":965,"h":742},"close":{"top":114,"bottom":154,"h":40},"expand":{"top":114,"bottom":154,"h":40},"panel":{"top":105,"bottom":940,"h":835},"scrollY":77}
+1440 focus button "Collapse the preview"
+1280 open {"vh":720,"picture":{"top":300,"bottom":942,"h":642},"close":{"top":191,"bottom":231,"h":40},"expand":{"top":191,"bottom":231,"h":40},"panel":{"top":182,"bottom":686,"h":504},"scrollY":0}
+1280 expanded {"vh":720,"picture":{"top":223,"bottom":865,"h":642},"close":{"top":114,"bottom":154,"h":40},"expand":{"top":114,"bottom":154,"h":40},"panel":{"top":105,"bottom":760,"h":655},"scrollY":77}
+1280 focus button "Collapse the preview"
+1024 open {"vh":768,"picture":{"top":374,"bottom":1011,"h":637},"close":{"top":265,"bottom":305,"h":40},"expand":{"top":265,"bottom":305,"h":40},"panel":{"top":256,"bottom":794,"h":538},"scrollY":0}
+1024 expanded {"vh":768,"picture":{"top":223,"bottom":860,"h":637},"close":{"top":114,"bottom":154,"h":40},"expand":{"top":114,"bottom":154,"h":40},"panel":{"top":105,"bottom":808,"h":703},"scrollY":151}
+1024 focus button "Collapse the preview"
+768 open {"vh":1024,"picture":{"top":390,"bottom":867,"h":477},"close":{"top":265,"bottom":305,"h":40},"expand":null,"panel":{"top":256,"bottom":941,"h":685},"scrollY":0}
+768 no Expand button
+768 focus div "In the appWebMobileKioskClose the preview Skip pre"
+zoom200 open {"vh":360,"picture":{"top":220,"bottom":617,"h":397},"close":{"top":95,"bottom":135,"h":40},"expand":{"top":95,"bottom":135,"h":40},"panel":{"top":86,"bottom":338,"h":252},"scrollY":170}
+zoom200 expanded {"vh":360,"picture":{"top":190,"bottom":587,"h":397},"close":{"top":65,"bottom":105,"h":40},"expand":{"top":65,"bottom":105,"h":40},"panel":{"top":56,"bottom":400,"h":344},"scrollY":200}
+zoom200 focus button "Collapse the preview"
+1440 open {"vh":900,"picture":{"top":300,"bottom":1042,"h":742},"close":{"top":191,"bottom":231,"h":40},"expand":{"top":191,"bottom":231,"h":40},"panel":{"top":182,"bottom":812,"h":630},"scrollY":0}
+1440 expanded {"vh":900,"picture":{"top":223,"bottom":965,"h":742},"close":{"top":114,"bottom":154,"h":40},"expand":{"top":114,"bottom":154,"h":40},"panel":{"top":105,"bottom":884,"h":779},"scrollY":77}
+1440 focus button "Collapse the preview"
+1280 open {"vh":720,"picture":{"top":300,"bottom":942,"h":642},"close":{"top":191,"bottom":231,"h":40},"expand":{"top":191,"bottom":231,"h":40},"panel":{"top":182,"bottom":686,"h":504},"scrollY":0}
+1280 expanded {"vh":720,"picture":{"top":223,"bottom":865,"h":642},"close":{"top":114,"bottom":154,"h":40},"expand":{"top":114,"bottom":154,"h":40},"panel":{"top":105,"bottom":704,"h":599},"scrollY":77}
+1280 focus button "Collapse the preview"
+1024 open {"vh":768,"picture":{"top":374,"bottom":1011,"h":637},"close":{"top":265,"bottom":305,"h":40},"expand":{"top":265,"bottom":305,"h":40},"panel":{"top":256,"bottom":794,"h":538},"scrollY":0}
+1024 expanded {"vh":768,"picture":{"top":223,"bottom":860,"h":637},"close":{"top":114,"bottom":154,"h":40},"expand":{"top":114,"bottom":154,"h":40},"panel":{"top":105,"bottom":752,"h":647},"scrollY":151}
+1024 focus button "Collapse the preview"
+768 open {"vh":1024,"picture":{"top":390,"bottom":867,"h":477},"close":{"top":265,"bottom":305,"h":40},"expand":null,"panel":{"top":256,"bottom":941,"h":685},"scrollY":0}
+768 no Expand button
+768 focus div "In the appWebMobileKioskClose the preview Skip pre"
+zoom200 open {"vh":360,"picture":{"top":220,"bottom":617,"h":397},"close":{"top":95,"bottom":135,"h":40},"expand":null,"panel":{"top":86,"bottom":338,"h":252},"scrollY":170}
+zoom200 no Expand button
+zoom200 focus div "In the appWebMobileKioskClose the preview Skip pre"

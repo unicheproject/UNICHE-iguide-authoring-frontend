@@ -1,0 +1,10 @@
+import { open, go, shot, P, settle } from "./lib.mjs";
+const { browser, page } = await open("curator", { viewport: "1440" });
+const reqs=[]; page.on("request", r=>{ if(r.url().includes("/api/v1") && r.method()==="GET" && /pois|routes|guides|events|places|categories/.test(r.url())) reqs.push(r.url().split("/api/v1")[1]) });
+await go(page, `/projects/${P}`); await settle(page,2500);
+console.log(reqs.join("\n"));
+await go(page, `/projects/${P}/pois?pending=1&q=Amphora`); await settle(page,1500);
+console.log((await page.locator("main").innerText()).match(/Showing[^\n]*/)?.[0], (await page.locator("main").innerText()).includes("Amphora Room"));
+await go(page, `/projects/${P}/pois?pending=1`); await settle(page,1500);
+console.log((await page.locator("main").innerText()).match(/Showing[^\n]*/)?.[0]);
+await browser.close();

@@ -85,6 +85,16 @@ export async function listFloorPlans(projectId: string, signal?: AbortSignal): P
   return Promise.all(plans.map((plan) => toFloorPlan(projectId, plan, signal)));
 }
 
+/** How many floor plans the Project has that are not archived, for the section tab; reads the list without positions. */
+export async function countFloorPlans(projectId: string, signal?: AbortSignal): Promise<number> {
+  let count = 0;
+  for (let page = 0; ; page++) {
+    const result = await apiRequest<Page<FloorPlanResponse>>(`${base(projectId)}?size=200&page=${page}`, { signal });
+    count += result.content.filter((p) => p.status !== "ARCHIVED").length;
+    if (page + 1 >= result.totalPages) return count;
+  }
+}
+
 export async function fetchFloorPlan(projectId: string, planId: string): Promise<FloorPlan> {
   return toFloorPlan(projectId, await apiRequest<FloorPlanResponse>(`${base(projectId)}/${encodeURIComponent(planId)}`));
 }

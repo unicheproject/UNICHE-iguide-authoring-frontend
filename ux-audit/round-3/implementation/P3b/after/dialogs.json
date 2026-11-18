@@ -1,0 +1,153 @@
+{
+ "guides": {
+  "empty": {
+   "dialogTop": 88,
+   "dialogH": 335,
+   "bodyPadB": 8,
+   "bodyPadT": 8,
+   "gapFormToBodyBottom": 8,
+   "bodyScrolls": false,
+   "closeCenterY": 129,
+   "titleCenterY": 124,
+   "closeRight": 17,
+   "alerts": 0
+  },
+  "slugOpen": {
+   "dialogTop": 88,
+   "dialogH": 433,
+   "bodyPadB": 8,
+   "bodyPadT": 8,
+   "gapFormToBodyBottom": 8,
+   "bodyScrolls": false,
+   "closeCenterY": 129,
+   "titleCenterY": 124,
+   "closeRight": 17,
+   "alerts": 0
+  },
+  "submitEmpty": {
+   "dialogTop": 88,
+   "dialogH": 532,
+   "bodyPadB": 8,
+   "bodyPadT": 8,
+   "gapFormToBodyBottom": 8,
+   "bodyScrolls": false,
+   "closeCenterY": 129,
+   "titleCenterY": 124,
+   "closeRight": 17,
+   "alerts": 1,
+   "titleInputJump": 76,
+   "focus": "summary"
+  },
+  "err503": {
+   "text": "The guide was not createdThe platform is busy or down for maintenance. Nothing was changed. Try again in a few minutes.Request id req-p3b-503Copy request id",
+   "alerts": 1,
+   "submit": "Create and open"
+  }
+ },
+ "events": {
+  "empty": {
+   "dialogTop": 88,
+   "dialogH": 335,
+   "bodyPadB": 8,
+   "bodyPadT": 8,
+   "gapFormToBodyBottom": 8,
+   "bodyScrolls": false,
+   "closeCenterY": 129,
+   "titleCenterY": 124,
+   "closeRight": 17,
+   "alerts": 0
+  },
+  "slugOpen": {
+   "dialogTop": 88,
+   "dialogH": 433,
+   "bodyPadB": 8,
+   "bodyPadT": 8,
+   "gapFormToBodyBottom": 8,
+   "bodyScrolls": false,
+   "closeCenterY": 129,
+   "titleCenterY": 124,
+   "closeRight": 17,
+   "alerts": 0
+  },
+  "submitEmpty": {
+   "dialogTop": 88,
+   "dialogH": 532,
+   "bodyPadB": 8,
+   "bodyPadT": 8,
+   "gapFormToBodyBottom": 8,
+   "bodyScrolls": false,
+   "closeCenterY": 129,
+   "titleCenterY": 124,
+   "closeRight": 17,
+   "alerts": 1,
+   "titleInputJump": 76,
+   "focus": "summary"
+  },
+  "err503": {
+   "text": "The event was not createdThe platform is busy or down for maintenance. Nothing was changed. Try again in a few minutes.Request id req-p3b-503Copy request id",
+   "alerts": 1,
+   "submit": "Create and open"
+  }
+ },
+ "categories": {
+  "empty": {
+   "dialogTop": 88,
+   "dialogH": 638,
+   "bodyPadB": 8,
+   "bodyPadT": 8,
+   "gapFormToBodyBottom": 8,
+   "bodyScrolls": false,
+   "closeCenterY": 129,
+   "titleCenterY": 124,
+   "closeRight": 17,
+   "alerts": 0
+  },
+  "slugOpen": {
+   "dialogTop": 88,
+   "dialogH": 736,
+   "bodyPadB": 8,
+   "bodyPadT": 8,
+   "gapFormToBodyBottom": 8,
+   "bodyScrolls": false,
+   "closeCenterY": 129,
+   "titleCenterY": 124,
+   "closeRight": 17,
+   "alerts": 0
+  },
+  "scopeDescribedBy": {
+   "ids": [
+    "fd-v-133-scope-hint"
+   ],
+   "resolves": true,
+   "text": [
+    "A category in use cannot change this later."
+   ]
+  },
+  "submitEmpty": {
+   "dialogTop": 88,
+   "dialogH": 804,
+   "bodyPadB": 8,
+   "bodyPadT": 8,
+   "gapFormToBodyBottom": -69,
+   "bodyScrolls": true,
+   "closeCenterY": 129,
+   "titleCenterY": 124,
+   "closeRight": 17,
+   "alerts": 1,
+   "titleInputJump": 122,
+   "focus": "summary"
+  },
+  "scopeErrDescribedBy": {
+   "ids": [
+    "fd-v-133-scope-err"
+   ],
+   "invalid": "true",
+   "resolves": true
+  },
+  "err503": {
+   "text": "The category was not createdThe platform is busy or down for maintenance. Nothing was changed. Try again in a few minutes.Request id req-p3b-503Copy request id",
+   "alerts": 1,
+   "submit": "Create and open"
+  }
+ }
+}

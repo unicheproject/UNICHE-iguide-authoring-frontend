@@ -1,0 +1,5 @@
+## 401 once {"puts":2,"msgs":["Saved 11:28","3 warnings, nothing blocks."],"focus":"button \"SaveNo unsaved changes to save\"","url":"cms"}
+## 401 persistent {"navs":0,"msgs":["Still saving…","3 warnings, nothing blocks.","Your session ended Your unsaved edits are kept in this browser. Sign in again to carry on where you were, or stay on this page to copy something first; changes cannot be saved until you sign in. Stay on this page Sign in again"],"focus":"h2#dialog-et3o8u9 \"Your session ended\"","url":"http://localhost:5173/projects/PID/pois/86e64373-b09c-4b8e-acbb-3fc84fdfc697"}
+dialog buttons ["","Stay on this page","Sign in again"]
+after Esc {"dialog":0,"focus":"button \"Saving…Saving…\"","msgs":["Still saving…","3 warnings, nothing blocks."],"title":"UX-R3-p6 POI A e2 persistent401"}
+Ctrl+S after dismiss {"dialog":0,"msgs":["Still saving…","3 warnings, nothing blocks."]}

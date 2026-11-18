@@ -1,0 +1,24 @@
+import { open, go, rec, P, shot, ready, axe, tall } from "./h.mjs";
+const S="ux-audit/round-2/audit/s11-editors/shots/";
+const { browser, page } = await open("curator", { viewport: "1440" });
+const live=()=>page.evaluate(()=>[...document.querySelectorAll("[aria-live]")].map(e=>e.textContent.trim()).filter(Boolean));
+await go(page, `/projects/${P}/routes/${rec.route}`); await ready(page,1200);
+console.log("WC banner:", await page.locator("main").innerText().then(t=>t.match(/Working Copy\.[^\n]*/)?.[0]));
+await page.locator("main select").filter({hasText:"Uncategorised"}).selectOption({label:"UX-R2-s11 Category"});
+await page.waitForTimeout(400);
+await page.getByRole("button",{name:"Apply changes"}).click(); await page.waitForTimeout(1200);
+console.log("APPLY DLG:", await page.getByRole("dialog").count() ? (await page.getByRole("dialog").innerText()).replace(/\n+/g," / ") : "none");
+await page.screenshot({path:S+"route-apply__confirm__1440.png"});
+if (await page.getByRole("dialog").count()) { await page.getByRole("dialog").getByRole("button",{name:/Apply/}).last().click(); await page.waitForTimeout(3000); }
+console.log("live", await live());
+await page.screenshot({path:S+"route-editor__after-apply__1440.png"});
+console.log("alert still?", await page.locator("main").innerText().then(t=>/different order/.test(t)));
+await go(page, `/projects/${P}/categories/${rec.category}`); await ready(page,1500);
+await tall(page,"category-editor__used-active__1440");
+await page.getByRole("button",{name:/Deactivate/}).first().click(); await page.waitForTimeout(1500);
+console.log("DEACT DLG:", (await page.getByRole("dialog").innerText()).replace(/\n+/g," / "));
+await page.screenshot({path:S+"category-deactivate__blocked__1440.png"});
+await page.getByRole("dialog").getByRole("button",{name:/Deactivate/}).last().click().catch(()=>{}); await page.waitForTimeout(2000);
+console.log("after confirm", await page.getByRole("dialog").count() && (await page.getByRole("dialog").innerText()).replace(/\n+/g," / "));
+await page.screenshot({path:S+"category-deactivate__refused__1440.png"});
+await browser.close();

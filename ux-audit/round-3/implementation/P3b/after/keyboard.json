@@ -1,0 +1,52 @@
+{
+ "tabStops": [
+  "BUTTON:New category:solid 2px:true",
+  "INPUT::solid 2px:true",
+  "INPUT::solid 2px:true",
+  "BUTTON:Filters:solid 2px:true",
+  "BUTTON:Sub-items of Monuments and Tem:solid 2px:true",
+  "A:Monuments and Temples:solid 2px:true",
+  "A:English: complete:solid 2px:true",
+  "A:Ελληνικά: complete:solid 2px:true",
+  "A:Italiano: partly translated:solid 2px:true",
+  "BUTTON:Actions for Monuments and Temp:solid 2px:true",
+  "A:UX-R2-s9 Subcat:solid 2px:true",
+  "A:English: partly translated:solid 2px:true",
+  "A:Ελληνικά: not translated:solid 2px:true",
+  "A:Italiano: not translated:solid 2px:true",
+  "BUTTON:Actions for UX-R2-s9 Subcat:solid 2px:true",
+  "A:Sculpture:solid 2px:true"
+ ],
+ "dialogOpenFocus": {
+  "tag": "INPUT",
+  "label": "",
+  "outline": "solid 2px",
+  "inView": true
+ },
+ "afterEscFocus": {
+  "tag": "BUTTON",
+  "label": "New category",
+  "outline": "solid 2px",
+  "inView": true
+ },
+ "radioEnd": {
+  "focus": {
+   "tag": "INPUT",
+   "label": "",
+   "outline": "solid 2px",
+   "inView": true
+  },
+  "checked": true,
+  "scrollDelta": 0
+ },
+ "radioHome": {
+  "focus": {
+   "tag": "INPUT",
+   "label": "",
+   "outline": "solid 2px",
+   "inView": true
+  },
+  "checked": true,
+  "scrollDelta": 0
+ }
+}

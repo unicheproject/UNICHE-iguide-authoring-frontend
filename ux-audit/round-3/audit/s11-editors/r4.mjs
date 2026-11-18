@@ -1,0 +1,10 @@
+import { open, go, P, shot, settle, IDS, url, txt, routeWithStops } from "./lib.mjs";
+const { browser, page } = await open("admin", { viewport: "1440" });
+await routeWithStops(page);
+const li = page.locator("li[data-stop-row]").first();
+await li.scrollIntoViewIfNeeded();
+console.log((await li.evaluate(e=>e.outerHTML)).replace(/<svg.*?<\/svg>/g,"<svg/>").slice(0,5000));
+await page.evaluate(()=>window.scrollBy(0,-150)); await settle(page,300);
+await shot(page,"route__stoprows__1440");
+console.log(await page.locator("li[data-stop-row]").evaluateAll(es=>es.map(e=>{const r=e.getBoundingClientRect();return [Math.round(r.height), [...e.querySelectorAll("button,select,a,input")].map(b=>{const q=b.getBoundingClientRect();return (b.getAttribute("aria-label")||b.textContent.trim()).slice(0,28)+":"+Math.round(q.width)+"x"+Math.round(q.height)}).join(",")]})));
+await browser.close();

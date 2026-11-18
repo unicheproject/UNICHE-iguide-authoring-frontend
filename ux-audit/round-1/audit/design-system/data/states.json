@@ -1,0 +1,254 @@
+{
+ "focus": {
+  "pois_tab0": {
+   "el": "a.sr-only.focus:not-sr-only.focus:fixed",
+   "t": "Skip to content",
+   "ol": "solid 2px rgb(77, 29, 139) off 3px",
+   "bs": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0",
+   "bc": "rgb(229, 231, 235)"
+  },
+  "pois_tab1": {
+   "el": "button.flex.w-full.items-center",
+   "t": "UX Audit – PopulatedTest",
+   "ol": "solid 2px rgb(77, 29, 139) off 3px",
+   "bs": "none",
+   "bc": "rgb(229, 231, 235)"
+  },
+  "pois_tab2": {
+   "el": "button.hidden.whitespace-nowrap.text-xs",
+   "t": "Manage members ↗",
+   "ol": "solid 2px rgb(77, 29, 139) off 3px",
+   "bs": "none",
+   "bc": "rgb(229, 231, 235)"
+  },
+  "pois_tab3": {
+   "el": "button.hidden.whitespace-nowrap.text-xs",
+   "t": "Help",
+   "ol": "solid 2px rgb(77, 29, 139) off 3px",
+   "bs": "none",
+   "bc": "rgb(229, 231, 235)"
+  },
+  "pois_tab4": {
+   "el": "button.flex.items-center.gap-2",
+   "t": "DCD. Curator",
+   "ol": "solid 2px rgb(77, 29, 139) off 3px",
+   "bs": "none",
+   "bc": "rgb(229, 231, 235)"
+  },
+  "pois_tab5": {
+   "el": "a.router-link-active.nav-item",
+   "t": "Dashboard",
+   "ol": "solid 2px rgb(77, 29, 139) off 3px",
+   "bs": "none",
+   "bc": "rgb(229, 231, 235)"
+  },
+  "pois_tab6": {
+   "el": "a.nav-item",
+   "t": "Places",
+   "ol": "solid 2px rgb(77, 29, 139) off 3px",
+   "bs": "none",
+   "bc": "rgb(229, 231, 235)"
+  },
+  "pois_tab7": {
+   "el": "a.router-link-active.router-link-exact-active.nav-item",
+   "t": "Points of Interest",
+   "ol": "solid 2px rgb(77, 29, 139) off 3px",
+   "bs": "none",
+   "bc": "rgb(229, 231, 235)"
+  },
+  "pois_tab8": {
+   "el": "a.nav-item",
+   "t": "Routes",
+   "ol": "solid 2px rgb(77, 29, 139) off 3px",
+   "bs": "none",
+   "bc": "rgb(229, 231, 235)"
+  },
+  "pois_tab9": {
+   "el": "a.nav-item",
+   "t": "Guides",
+   "ol": "solid 2px rgb(77, 29, 139) off 3px",
+   "bs": "none",
+   "bc": "rgb(229, 231, 235)"
+  },
+  "pois_tab10": {
+   "el": "a.nav-item",
+   "t": "Events",
+   "ol": "solid 2px rgb(77, 29, 139) off 3px",
+   "bs": "none",
+   "bc": "rgb(229, 231, 235)"
+  },
+  "pois_tab11": {
+   "el": "a.nav-item",
+   "t": "Categories",
+   "ol": "solid 2px rgb(77, 29, 139) off 3px",
+   "bs": "none",
+   "bc": "rgb(229, 231, 235)"
+  },
+  "pois_tab12": {
+   "el": "a.nav-item",
+   "t": "Media",
+   "ol": "solid 2px rgb(77, 29, 139) off 3px",
+   "bs": "none",
+   "bc": "rgb(229, 231, 235)"
+  },
+  "pois_tab13": {
+   "el": "a.nav-item",
+   "t": "Maps & Floor Plans",
+   "ol": "solid 2px rgb(77, 29, 139) off 3px",
+   "bs": "none",
+   "bc": "rgb(229, 231, 235)"
+  },
+  "searchInput": {
+   "ol": "solid 2px rgba(0, 0, 0, 0)",
+   "bc": "rgb(77, 29, 139)",
+   "bw": "1px",
+   "bs": "none"
+  }
+ },
+ "popover": {
+  "r": "8px",
+  "sh": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(17, 24, 39, 0.14) 0px 8px 28px 0px",
+  "z": "50",
+  "bg": "rgb(255, 255, 255)"
+ },
+ "dialog": {
+  "r": "12px",
+  "sh": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.12) 0px 16px 40px 0px",
+  "w": "520px",
+  "pad": "24px 26px",
+  "h2": "17px",
+  "btns": [
+   {
+    "t": "Top-level placeStand",
+    "cls": "flex flex-col gap-1 rounded-lg border-[1.5px] px-3.5 py-3 text-left disabled:opa",
+    "bg": "rgb(255, 255, 255)",
+    "bgi": "none",
+    "r": "8px",
+    "fs": "14px",
+    "tt": "none",
+    "py": "12px",
+    "px": "14px"
+   },
+   {
+    "t": "Sub-placeSits inside",
+    "cls": "flex flex-col gap-1 rounded-lg border-[1.5px] px-3.5 py-3 text-left disabled:opa",
+    "bg": "rgb(255, 255, 255)",
+    "bgi": "none",
+    "r": "8px",
+    "fs": "14px",
+    "tt": "none",
+    "py": "12px",
+    "px": "14px"
+   },
+   {
+    "t": "Cancel",
+    "cls": "rounded-full border bg-muted px-5 py-2.5 text-[11px] font-bold uppercase trackin",
+    "bg": "rgb(243, 244, 246)",
+    "bgi": "none",
+    "r": "9999px",
+    "fs": "11px",
+    "tt": "uppercase",
+    "py": "10px",
+    "px": "20px"
+   },
+   {
+    "t": "Create place",
+    "cls": "rounded-full bg-primary px-5 py-2.5 text-[11px] font-bold uppercase tracking-[0.",
+    "bg": "rgb(77, 29, 139)",
+    "bgi": "none",
+    "r": "9999px",
+    "fs": "11px",
+    "tt": "uppercase",
+    "py": "10px",
+    "px": "20px"
+   }
+  ],
+  "inputs": []
+ },
+ "invalid": [],
+ "errtext": [
+  {
+   "t": "Choose whether the place sits inside another one.",
+   "color": "rgb(191, 24, 93)",
+   "fs": "13px"
+  }
+ ],
+ "skeleton": [
+  {
+   "bg": "rgba(0, 0, 0, 0)",
+   "an": "skelpulse 1.2s",
+   "r": "0px"
+  }
+ ],
+ "hoverOutline": {
+  "backgroundColor": "rgb(243, 244, 246)",
+  "color": "rgb(55, 65, 81)",
+  "borderTopColor": "rgb(229, 231, 235)",
+  "textDecorationLine": "none",
+  "box": [
+   100,
+   30
+  ]
+ },
+ "hoverNav": {
+  "backgroundColor": "rgb(243, 244, 246)",
+  "color": "rgb(55, 65, 81)",
+  "box": [
+   235,
+   35
+  ]
+ },
+ "navActive": {
+  "backgroundColor": "rgba(0, 0, 0, 0)",
+  "color": "rgb(55, 65, 81)",
+  "fontWeight": "500",
+  "boxShadow": "none",
+  "borderLeftWidth": "3px",
+  "borderLeftColor": "rgba(0, 0, 0, 0)",
+  "box": [
+   235,
+   35
+  ]
+ },
+ "link": {
+  "t": "Parthenon Frieze – North Side",
+  "color": "rgb(3, 7, 17)",
+  "td": "none",
+  "fw": "600"
+ },
+ "forced": {
+  "chips": [
+   {
+    "t": "ACTIVE",
+    "border": "0px solid",
+    "bg": "rgba(255, 255, 255, 0.1)",
+    "color": "rgb(0, 0, 0)"
+   },
+   {
+    "t": "✓ACTIVE",
+    "border": "0px solid",
+    "bg": "rgba(255, 255, 255, 0.1)",
+    "color": "rgb(0, 0, 0)"
+   }
+  ],
+  "input": {
+   "bw": "1px",
+   "bs": "solid",
+   "bc": "rgb(0, 0, 0)"
+  }
+ },
+ "reduced": {
+  "mq": true,
+  "anims": 0
+ },
+ "rootScale": {
+  "48px": 1,
+  "13px": 66,
+  "24px": 1,
+  "11px": 373,
+  "12px": 1,
+  "10px": 798,
+  "15px": 65,
+  "9px": 38
+ }
+}

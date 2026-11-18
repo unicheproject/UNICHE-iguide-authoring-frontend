@@ -1,0 +1,14 @@
+import * as L from "./lib.mjs";
+const { page, browser } = await L.open("curator", { viewport: "1440" });
+const k = page.keyboard;
+await L.nav(page, L.P("/routes"), 1200);
+await L.watchLive(page);
+await page.getByRole("button", { name: /^New route/i }).focus(); await k.press("Enter"); await page.waitForTimeout(600);
+L.log("t16", "route create dialog focus", await L.focus(page));
+L.log("t16", "dialog aria", (await L.snap(page, "route-create", "[role=dialog]")).split("\n").slice(0, 40).join("\n"));
+await k.type("UX-R2-p5 Route");
+await L.shot(page, "route-create__open__1440");
+L.log("t16", "create tabs", await L.tabs(page, 8));
+const btn = page.getByRole("button", { name: /^Create/ }).last(); await btn.focus(); await k.press("Enter"); await page.waitForTimeout(3500);
+L.log("t16", "after create url", page.url(), "title", await page.title(), "focus", await L.focus(page), "live", (await L.liveLog(page)).slice(-3));
+await browser.close();

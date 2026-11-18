@@ -1,0 +1,41 @@
+import * as L from "./lib.mjs";
+const { page, browser } = await L.open("curator", { viewport: "1440" });
+const k = page.keyboard;
+const POI = "35d91cba-d64a-43ce-9773-1e472226d028";
+await L.nav(page, L.P("/pois/" + POI), 1500);
+await L.watchLive(page);
+const tablist = page.getByRole("tablist").first();
+L.log("t10", "tablist aria", await tablist.evaluate((e) => ({ label: e.getAttribute("aria-label"), orient: e.getAttribute("aria-orientation"), tabs: [...e.querySelectorAll("[role=tab]")].map((t) => t.textContent.trim().replace(/\s+/g, " ") + "|sel=" + t.getAttribute("aria-selected") + "|tab=" + t.tabIndex + "|ctrl=" + t.getAttribute("aria-controls") + "|lang=" + (t.getAttribute("lang") ?? t.querySelector("[lang]")?.getAttribute("lang"))) })));
+const first = page.getByRole("tab").first();
+await first.focus();
+await k.press("ArrowRight"); L.log("t10", "ArrowRight", await L.focus(page), "live", (await L.liveLog(page)).slice(-2));
+await k.press("ArrowRight"); L.log("t10", "ArrowRight2", await L.focus(page));
+await k.press("ArrowRight"); L.log("t10", "ArrowRight wrap", await L.focus(page));
+await k.press("End"); L.log("t10", "End", await L.focus(page));
+await k.press("Home"); L.log("t10", "Home", await L.focus(page));
+await k.press("ArrowLeft"); L.log("t10", "ArrowLeft wrap", await L.focus(page));
+// selection follows focus?
+L.log("t10", "selected tab", await page.getByRole("tab", { selected: true }).textContent());
+await k.press("Home"); await k.press("ArrowRight"); await page.waitForTimeout(200);
+L.log("t10", "after ArrowRight selected", await page.getByRole("tab", { selected: true }).textContent(), "URL", page.url().split("?")[1]);
+await k.press("Tab"); L.log("t10", "Tab from tab -> (panel/field?)", await L.focus(page));
+await L.shot(page, "poi-editor__greek-tab__1440");
+L.log("t10", "copy source buttons", await page.getByRole("button", { name: /copy/i }).evaluateAll((b) => b.map((x) => x.getAttribute("aria-label") + "|" + x.textContent.trim())));
+// Default tab: type title into EN & summary, then Copy source in Greek
+await page.getByRole("tab").first().focus(); await k.press("Enter");
+await page.getByRole("textbox", { name: "Summary" }).first().focus();
+await k.type("Keyboard-only summary text");
+await k.press("Control+s"); await page.waitForTimeout(2500);
+L.log("t10", "Ctrl+S: focus", await L.focus(page), "live", (await L.liveLog(page)).slice(-4));
+L.log("t10", "toasts", await page.locator("[role=status],[role=alert],[data-sonner-toast],[data-toast]").allTextContents());
+await L.shot(page, "poi-editor__after-ctrl-s__1440");
+// Greek tab copy source
+await page.getByRole("tab").nth(1).focus(); await k.press("Enter"); await page.waitForTimeout(300);
+const cp = page.getByRole("button", { name: /copy source/i }).first();
+L.log("t10", "copy btn count", await page.getByRole("button", { name: /copy source/i }).count());
+await cp.focus(); L.log("t10", "copy focus", await L.focus(page));
+await k.press("Enter"); await page.waitForTimeout(400);
+L.log("t10", "after copy: focus", await L.focus(page), "live", (await L.liveLog(page)).slice(-2));
+await L.shot(page, "poi-editor__copy-source__1440");
+L.log("t10", "greek aria", (await L.snap(page, "poi-editor-greek", "main")).split("\n").slice(0, 60).join("\n"));
+await browser.close();

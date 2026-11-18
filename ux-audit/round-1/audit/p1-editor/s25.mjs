@@ -1,0 +1,11 @@
+import { start, go, P, shotDir } from "./common.mjs";
+const s = await start(); const p=s.page;
+await go(p, P+"/media"); await p.waitForTimeout(2500);
+await p.getByPlaceholder(/Search by name/).fill("audio-frieze"); await p.waitForTimeout(700);
+await p.getByText("audio-frieze-en",{exact:true}).first().click(); await p.waitForTimeout(2000);
+await p.setViewportSize({width:1440,height:1500}); await p.waitForTimeout(400);
+await s.shot("asset-editor__audio");
+console.log(p.url());
+console.log((await p.locator("main").innerText()).replace(/\n+/g," | ").slice(0,1800));
+console.log("audio element:", await p.locator("audio").count());
+await s.browser.close();

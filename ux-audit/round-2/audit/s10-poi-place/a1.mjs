@@ -1,0 +1,12 @@
+import { open, go, rec, P, shot, ready, axe, H } from "./h.mjs";
+const { browser, page } = await open("curator", { viewport: "1440" });
+const errs=[]; page.on("pageerror",e=>errs.push(e.message)); page.on("console",m=>{if(m.type()==="error")errs.push(m.text().slice(0,150))});
+await go(page, `/projects/${P}/pois/${rec.poiA}`); await ready(page);
+console.log("H", JSON.stringify(await H(page)));
+await shot(page, "poi-editor__draft-new__1440");
+await page.screenshot({path: new URL("./shots/poi-editor__draft-new-viewport__1440.png", import.meta.url).pathname.replace(/^\/([A-Za-z]:)/,"$1")});
+console.log(await page.evaluate(()=>[...document.querySelectorAll("h1,h2,h3,[data-editor-primary],aside *[role=region]")].map(e=>e.tagName+":"+(e.textContent||"").trim().slice(0,60)).join("\n")));
+console.log("HEADER:", await page.evaluate(()=>{const h=document.querySelector("[data-editor-header]")||document.querySelector("main header"); return h?h.innerText:"none"}));
+await axe(page,"poi draft new");
+console.log(errs);
+await browser.close();

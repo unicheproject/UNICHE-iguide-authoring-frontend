@@ -1,0 +1,22 @@
+import { start, go, P } from "./common.mjs";
+const s = await start("1440"); const { page } = s;
+const dtext = async()=> (await page.getByRole("dialog").innerText()).replace(/\n+/g," | ");
+await go(page, `${P}/places`); await page.waitForSelector("tbody tr");
+await page.getByRole("button",{name:/^New place/i}).click(); await page.waitForTimeout(300);
+await page.getByRole("button",{name:/Top-level place/}).click(); await page.waitForTimeout(400);
+console.log("PLACES step after level:", await dtext());
+await s.shot("places__create-step2");
+console.log("fields", await page.getByRole("dialog").evaluate(d=>[...d.querySelectorAll("input,select,textarea,button")].map(e=>`${e.tagName}#${e.id}:${(e.labels?.[0]?.innerText||e.getAttribute("aria-label")||e.innerText).slice(0,30)}`)));
+await page.keyboard.press("Escape");
+// POI invalid slug + title typing behaviour
+await go(page, `${P}/pois`); await page.waitForSelector("tbody tr");
+await page.getByRole("button",{name:/^New point/i}).click(); await page.waitForTimeout(300);
+await page.locator("#poi-title").fill("Ακρόπολη Ελληνικός τίτλος");
+console.log("slug autoderive from Greek:", JSON.stringify(await page.locator("#poi-slug").inputValue()));
+await page.locator("#poi-title").fill("UX-s9-lists POI With A Very Long Title That Goes On And On To Test Wrapping In The List Row And Dialog Layout");
+console.log("slug auto:", await page.locator("#poi-slug").inputValue());
+await page.locator("#poi-slug").fill("Bad Slug!"); await page.getByRole("dialog").getByRole("button",{name:/^create/i}).click(); await page.waitForTimeout(400);
+console.log("invalid:", await dtext());
+await s.shot("pois__create-invalid");
+await page.keyboard.press("Escape");
+await s.browser.close();

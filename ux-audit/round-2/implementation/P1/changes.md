@@ -1,0 +1,11 @@
+# P1 changes (Chrome, session, picker, Create Project)
+
+Fixed: C2-08 (picker honest about unread rows), C2-11 (offline notice no shift, one alert, Create Project aria-disabled; editor-side "Back online" clears "not saved" is W0-B/P4s), C2-14, C2-15 (session dialog dismissible, Home no repeat, switcher height), C2-16/C2-18 (switcher named "Switch project"; axe clean), C2-17 (user menu: ArrowDown/Esc/focus return verified, was already Radix), C2-19, C2-21 (route-aware skeleton + "Loading <page>", inert nav, one logo, splash "Signing you in..."), C2-22, C2-23 (slug/name "e.g." placeholders), C2-25 (chip skeleton time-boxed via detailState), C2-13 (404 copy already links the Portal).
+Partly: C2-21 IdP-down splash length (needs Keycloak timeout option); C2-22 zoom200 fold (subtitle sr-only and state words hidden at height <= 480px).
+
+Files: platform/auth.ts, stores/connection.ts, components/{AppHeader,ProjectSwitcher,ProjectList,OfflineBanner,SessionEndedDialog,PageHead,WorkspaceNav}.vue, views/{HomeView,SignInView,CreateProjectView}.vue, views/createProject/{StepName,StepTemplate,StepLanguages,Stepper,useCreateProject}, views/workspace/ProjectLayout.vue (skeleton, `pending` nav), index.html (splash; unowned, edited since nobody else touches it).
+D: D-097. Q: none. Requests: see requests.md "From P1".
+
+Acceptance (admin, Windows Node): after load `location.hash === ""`, history.length 2 (unchanged by the cleanup; the live code-flow redirect itself was not repeated); switcher axe: 0 violations, dialog name "Switch project", 7 rows visible at 1440x900; user menu: ArrowDown opens, Esc returns focus to the trigger; no multi-line nav items; offline: h1 top 80 -> 80 (shift 0), 1 alert; axe on Home, wizard steps 1-3, session dialog: 0 violations; Esc closes session dialog; skeleton announces "Loading Points of Interest" with nav inert. Screenshots: implementation/P1/after/ (1440, 1024, 768, zoom200 for Home, skeleton, wizard; forced-colors switcher). Scripts v1-v3.mjs. impeccable detect: [].
+Not run: Create Project step 1 submit (real record), e2e (cannot run here; no spec selector touched), the real Keycloak redirect. Typecheck: only error is components/editor/undoRemove.ts (not P1).
+Deferred: tab title on 403/404 (W0-A A8, not re-verified here).

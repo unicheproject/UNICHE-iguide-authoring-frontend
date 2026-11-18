@@ -1,0 +1,88 @@
+[
+ [
+  "503",
+  {
+   "h": [
+    "The platform is busy The platform is busy or down for maintenance. Nothing was changed. Try again in a few minutes. Request id req-r3-s14-503 Copy request id Try again",
+    "",
+    ""
+   ],
+   "focus": "BODY:Skip to content  iGuide CMS UX",
+   "title": "Preview · UX Audit – Populated · iGuide CMS"
+  }
+ ],
+ [
+  "503 openTab disabled",
+  {
+   "d": false,
+   "a": "true"
+  }
+ ],
+ [
+  "afterRetry",
+  {
+   "h": [
+    "Drafts and 17 pending changes of active items shown.",
+    "Preview: Web, English, working content",
+    ""
+   ],
+   "focus": "BODY:Skip to content  iGuide CMS UX",
+   "title": "Preview · UX Audit – Populated · iGuide CMS"
+  }
+ ],
+ [
+  "focus after retry",
+  "BODY:Skip to content  iGuide CMS UX"
+ ],
+ [
+  "403",
+  {
+   "h": [
+    "You no longer have access Your account cannot do this in this Project. Ask a Project manager to check your membership. Request id req-r3-s14-403 Copy request id Try again",
+    "",
+    ""
+   ],
+   "focus": "BODY:Skip to content  iGuide CMS UX",
+   "title": "Preview · UX Audit – Populated · iGuide CMS"
+  }
+ ],
+ [
+  "500",
+  {
+   "h": [
+    "The server hit a problem The CMS could not load the preview. Nothing was changed. Try again; if it keeps happening, send the request id to support. Request id req-r3-s14-500 Copy request id Try again",
+    "",
+    ""
+   ],
+   "focus": "BODY:Skip to content  iGuide CMS UX",
+   "title": "Preview · UX Audit – Populated · iGuide CMS"
+  }
+ ],
+ [
+  "loading",
+  {
+   "busy": "MAIN",
+   "status": [
+    "Loading the preview",
+    ""
+   ],
+   "btn": "true"
+  }
+ ],
+ [
+  "empty",
+  {
+   "toolbar": "Surface Web Mobile Kiosk Language English Ελληνικά Italiano Content Working Live Fire a trigger No triggers to fire Fire No trigger to fire in this view. This Project has no triggers yet. Add one under \"How visitors reach it\" in an editor.",
+   "notes": "This Project has no triggers yet. Add one under \"How visitors reach it\" in an editor.",
+   "status": [
+    "Drafts and active content shown. No active item has pending changes."
+   ],
+   "standIn": "UX Audit – Populated Home Places Points of interest Routes Guides Events SEARCH EN UX Audit – Populated Nothing to show yet in this mode.",
+   "sel": true
+  }
+ ],
+ [
+  "newtab empty",
+  "UX Audit – Populated Home Places Points of interest Routes Guides Events SEARCH EN UX Audit – Populated Nothing to show yet in this mode."
+ ]
+]

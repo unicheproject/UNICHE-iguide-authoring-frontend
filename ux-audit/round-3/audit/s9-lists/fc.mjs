@@ -1,0 +1,17 @@
+import { open, go, P, shot, settle } from "./h.mjs";
+const { browser, page } = await open("admin", { viewport: "1440", forcedColors: "active" });
+await go(page, `/projects/${P}/pois`); await settle(page, 2200);
+console.log("forced:", await page.evaluate(() => matchMedia("(forced-colors: active)").matches));
+await shot(page, "pois__forced-colors__1440");
+await page.getByRole("button", { name: /Filters/ }).first().click(); await settle(page, 500);
+await shot(page, "pois__forced-colors-filters__1440");
+await page.keyboard.press("Escape");
+const kb = page.locator("main table tbody tr").nth(1).locator("button[aria-label^='Actions']");
+await kb.focus(); await page.keyboard.press("Enter"); await settle(page, 400);
+await shot(page, "pois__forced-colors-rowmenu__1440");
+console.log("menu focus outline:", await page.evaluate(() => { const f=document.activeElement, cs=getComputedStyle(f); return { txt: f.innerText, outline: cs.outlineStyle+" "+cs.outlineWidth+" "+cs.outlineColor, bg: cs.backgroundColor, color: cs.color }; }));
+await page.keyboard.press("Escape");
+await page.getByRole("button", { name: /New point of interest/ }).click(); await settle(page, 500);
+await page.locator("[role=dialog] button", { hasText: /^Create/ }).click(); await settle(page, 500);
+await shot(page, "pois__forced-colors-create-error__1440");
+await browser.close();

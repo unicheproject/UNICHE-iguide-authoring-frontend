@@ -1,0 +1,13 @@
+import * as L from "./lib.mjs";
+const { page, browser } = await L.open("curator", { viewport: "zoom200" });
+const k = page.keyboard;
+await L.nav(page, L.P("/pois/35d91cba-d64a-43ce-9773-1e472226d028"), 1500);
+await page.getByRole("textbox", { name: "Title" }).focus(); await k.type(" "); 
+await page.getByRole("textbox", { name: "Description" }).focus(); await page.waitForTimeout(400);
+L.log("t36", "focus Description (zoom200)", await page.evaluate(() => { const e = document.activeElement.getBoundingClientRect(); const hs = [...document.querySelectorAll("header,.sticky,[class*=sticky]")].map((x) => { const r = x.getBoundingClientRect(); return { c: (x.tagName + "." + [...x.classList].slice(0,2).join(".")), top: Math.round(r.top), bottom: Math.round(r.bottom) }; }).filter((x) => x.bottom > 0 && x.top < 200); return { el: [Math.round(e.top), Math.round(e.bottom)], vh: innerHeight, stickies: hs }; }));
+await L.shot(page, "poi-editor__focus-description__zoom200");
+for (let i = 0; i < 6; i++) await k.press("Tab");
+await page.waitForTimeout(400);
+L.log("t36", "after 6 tabs", await L.focus(page));
+await L.shot(page, "poi-editor__tabbed-down__zoom200");
+await browser.close();

@@ -1,0 +1,23 @@
+import { freshCtx, shot, axe, t, run, CMS, creds } from "./lib.mjs";
+await run(async () => {
+  const { browser, context, page } = await freshCtx("1440");
+  await page.goto(CMS + "/"); await page.waitForLoadState("networkidle").catch(()=>{});
+  console.log("logo links", await page.evaluate(()=>[...document.querySelectorAll("header a, a")].map(a=>a.href+" | label="+(a.getAttribute("aria-label")||"")+" | text="+a.textContent.trim().slice(0,30))));
+  await page.keyboard.press("Tab"); await page.keyboard.press("Tab"); await shot(page,"signin__focus-logo","1440");
+  await page.getByRole("button",{name:/sign in/i}).first().click();
+  await page.waitForURL(/\/realms\//); const c=creds("curator");
+  await page.locator("#username").fill(c.user); await page.locator("#password").fill(c.password);
+  await context.route("**/protocol/openid-connect/token", async (r)=>{ await new Promise(s=>setTimeout(s,6000)); r.continue(); });
+  page.on("framenavigated",f=>{ if(f===page.mainFrame()) console.log("nav", f.url().replace(/(code|state|session_state)=[^&#]+/g,"$1=…")); });
+  await page.locator("#kc-login").click();
+  await page.waitForURL(u=>!u.toString().includes("/realms/"));
+  await page.waitForTimeout(700);
+  console.log("URL during landing:", page.url().replace(/(code|session_state|state)=[^&#]{6}[^&#]*/g,"$1=<redacted>"));
+  console.log("TEXT:", JSON.stringify(await t(page)));
+  console.log("title", await page.title());
+  await shot(page,"sso-landing__code-in-url","1440"); 
+  await page.waitForTimeout(8000);
+  console.log("URL after:", page.url()); await shot(page,"sso-landing__after","1440");
+  await context.storageState({path:"C:/Users/mirto/IdeaProjects/iguide/uniche_iguide_frontend/ux-audit/round-2/audit/s7-chrome/.tmpstate.json"}).catch(()=>{});
+  await browser.close();
+});

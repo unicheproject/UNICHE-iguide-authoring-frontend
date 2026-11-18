@@ -1,0 +1,7 @@
+- dialog "Your session ended":
+  - heading "Your session ended" [level=2]
+  - button "Close dialog"
+  - paragraph: Your unsaved edits are kept in this browser. Sign in again to carry on where you were, or stay on this page to copy something first; changes cannot be saved until you sign in.
+  - contentinfo:
+    - button "Stay on this page"
+    - button "Sign in again"

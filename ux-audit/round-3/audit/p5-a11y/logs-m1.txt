@@ -1,0 +1,11 @@
+[go routes under 401] Enter -> h2 "Your session ended" 521,350,354,26  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) | live=["Routes loaded"]
+dlg {"role":"dialog","text":"Your session ended\n\nYour unsaved edits are kept in this browser. Sign in again to carry on where you were, or stay on this page to copy something first; changes cannot be saved until you sign in.\n\nStay on this page\nSign in again","name":"Your session ended"}
+secret leaked? false
+tab:
+0 button "Close dialog" 887,350,40,40  solid 2px rgb(76, 29, 139) off 2px 
+1 button "Stay on this page" 625,515,158,40  solid 2px rgb(76, 29, 139) off 2px 
+2 button "Sign in again" 791,515,128,40  solid 2px rgb(255, 255, 255) off 2px LOWRING 1
+3 button "Close dialog" 887,350,40,40  solid 2px rgb(76, 29, 139) off 2px 
+AXE {"label":"session-ended","url":"http://localhost:5173/projects/PID/routes","counts":{},"v":[]}
+[esc] Escape -> h1 "Routes" 256,80,72,26  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) | live=[]
+after esc {"title":"Routes · UX Audit – Populated · iGuide CMS","h1":"Routes","ae":"H1"} h1 "Routes" 256,80,72,26  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) dialog count 0

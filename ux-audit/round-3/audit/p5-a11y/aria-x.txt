@@ -1,0 +1,1412 @@
+- link "Skip to content":
+  - /url: "#main"
+- banner:
+  - link "UNICHE, all projects":
+    - /url: /
+  - text: iGuide CMS
+  - 'button "UX Audit – Populated App: Draft . Switch project"'
+  - button "P. Admin , account menu"
+- navigation "Primary":
+  - link "Dashboard":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5
+  - paragraph: Content
+  - link "Places":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/places
+  - link "Points of Interest":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois
+  - link "Routes":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/routes
+  - link "Guides":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/guides
+  - link "Events":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/events
+  - link "Categories":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/categories
+  - link "Maps & Floor Plans":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/maps
+  - separator
+  - link "Media":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/media
+  - paragraph: Visitor app
+  - link "Overview":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/overview
+  - link "App settings":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/app-settings
+  - link "Pages":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pages
+  - link "Navigation":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/navigation
+  - link "Translations":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/translations
+  - link "Preview":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/preview
+  - link "Launch":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/launch
+  - paragraph: Project
+  - link "Audit log":
+    - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/audit-log
+- main:
+  - heading "Points of Interest" [level=1]
+  - paragraph: Objects and spots visitors can open directly
+  - button "New point of interest"
+  - search "Search and filter":
+    - text: Search
+    - searchbox "Search"
+    - group "Status":
+      - text: Status
+      - radio "Not archived 93" [checked]
+      - text: Not archived 93
+      - radio "Active 55"
+      - text: Active 55
+      - radio "Draft 38"
+      - text: Draft 38
+      - radio "Archived 8"
+      - text: Archived 8
+    - button "Filters and sort": Filters
+  - status
+  - table "Points of interest":
+    - rowgroup:
+      - row "Order Title Place and category Status Updated Translations Actions":
+        - columnheader "Order"
+        - columnheader "Title":
+          - button "Title"
+        - columnheader "Place and category"
+        - columnheader "Status":
+          - button "Status"
+        - columnheader "Updated":
+          - button "Updated"
+        - columnheader "Translations":
+          - button "Translations"
+        - columnheader "Actions"
+    - rowgroup:
+      - 'row "Parthenon Frieze – North Side parthenon-frieze-north-side QR · frieze-101 (draft) Parthenon Gallery Sculpture Active Pending changes 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : partly translated Actions for Parthenon Frieze – North Side"':
+        - cell
+        - cell "Parthenon Frieze – North Side parthenon-frieze-north-side QR · frieze-101 (draft)":
+          - link "Parthenon Frieze – North Side":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/546c5177-effd-49c8-acae-85d751f89bbe
+          - text: parthenon-frieze-north-side
+          - list:
+            - listitem: QR · frieze-101 (draft)
+        - cell "Parthenon Gallery Sculpture":
+          - paragraph: Parthenon Gallery
+          - paragraph: Sculpture
+        - cell "Active Pending changes"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : partly translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/546c5177-effd-49c8-acae-85d751f89bbe?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/546c5177-effd-49c8-acae-85d751f89bbe?lang=el
+            - 'listitem "Italiano: partly translated"':
+              - 'link "Italiano : partly translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/546c5177-effd-49c8-acae-85d751f89bbe?lang=it
+        - cell "Actions for Parthenon Frieze – North Side":
+          - button "Actions for Parthenon Frieze – North Side"
+      - 'row "East Pediment Fragments east-pediment-fragments QR · pediment-102 (draft) Parthenon Gallery Sculpture Active 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : not translated Actions for East Pediment Fragments"':
+        - cell
+        - cell "East Pediment Fragments east-pediment-fragments QR · pediment-102 (draft)":
+          - link "East Pediment Fragments":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/9d32bf3f-6d1b-4ab1-a129-f52f4a890403
+          - text: east-pediment-fragments
+          - list:
+            - listitem: QR · pediment-102 (draft)
+        - cell "Parthenon Gallery Sculpture":
+          - paragraph: Parthenon Gallery
+          - paragraph: Sculpture
+        - cell "Active"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : not translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/9d32bf3f-6d1b-4ab1-a129-f52f4a890403?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/9d32bf3f-6d1b-4ab1-a129-f52f4a890403?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/9d32bf3f-6d1b-4ab1-a129-f52f4a890403?lang=it
+        - cell "Actions for East Pediment Fragments":
+          - button "Actions for East Pediment Fragments"
+      - 'row "South Metope XXXI: Centaur and Lapith 103 south-metope-xxxi-centaur-and-lapith No trigger Parthenon Gallery Sculpture Active Pending changes 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : not translated Actions for South Metope XXXI: Centaur and Lapith"':
+        - cell
+        - 'cell "South Metope XXXI: Centaur and Lapith 103 south-metope-xxxi-centaur-and-lapith No trigger"':
+          - 'link "South Metope XXXI: Centaur and Lapith"':
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/d7257e33-cfdb-4146-b3a3-aa4b02c5726b
+          - text: 103 south-metope-xxxi-centaur-and-lapith
+          - paragraph: No trigger
+        - cell "Parthenon Gallery Sculpture":
+          - paragraph: Parthenon Gallery
+          - paragraph: Sculpture
+        - cell "Active Pending changes"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : not translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/d7257e33-cfdb-4146-b3a3-aa4b02c5726b?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/d7257e33-cfdb-4146-b3a3-aa4b02c5726b?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/d7257e33-cfdb-4146-b3a3-aa4b02c5726b?lang=it
+        - 'cell "Actions for South Metope XXXI: Centaur and Lapith"':
+          - 'button "Actions for South Metope XXXI: Centaur and Lapith"'
+      - 'row "Dionysos, Hestia and Aphrodite dionysos-hestia-and-aphrodite No trigger Parthenon Gallery Sculpture Active 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : partly translated Actions for Dionysos, Hestia and Aphrodite"':
+        - cell
+        - cell "Dionysos, Hestia and Aphrodite dionysos-hestia-and-aphrodite No trigger":
+          - link "Dionysos, Hestia and Aphrodite":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/65785e7e-aced-47d6-ab2e-662ca86153ae
+          - text: dionysos-hestia-and-aphrodite
+          - paragraph: No trigger
+        - cell "Parthenon Gallery Sculpture":
+          - paragraph: Parthenon Gallery
+          - paragraph: Sculpture
+        - cell "Active"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : partly translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/65785e7e-aced-47d6-ab2e-662ca86153ae?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/65785e7e-aced-47d6-ab2e-662ca86153ae?lang=el
+            - 'listitem "Italiano: partly translated"':
+              - 'link "Italiano : partly translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/65785e7e-aced-47d6-ab2e-662ca86153ae?lang=it
+        - cell "Actions for Dionysos, Hestia and Aphrodite":
+          - button "Actions for Dionysos, Hestia and Aphrodite"
+      - 'row "The Horsemen of the Panathenaic Procession the-horsemen-of-the-panathenaic-procession No trigger Parthenon Gallery Sculpture Draft 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : not translated Actions for The Horsemen of the Panathenaic Procession"':
+        - cell
+        - cell "The Horsemen of the Panathenaic Procession the-horsemen-of-the-panathenaic-procession No trigger":
+          - link "The Horsemen of the Panathenaic Procession":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/cb763579-1082-45a7-8038-ed6a91ecc3d4
+          - text: the-horsemen-of-the-panathenaic-procession
+          - paragraph: No trigger
+        - cell "Parthenon Gallery Sculpture":
+          - paragraph: Parthenon Gallery
+          - paragraph: Sculpture
+        - cell "Draft"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : not translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/cb763579-1082-45a7-8038-ed6a91ecc3d4?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/cb763579-1082-45a7-8038-ed6a91ecc3d4?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/cb763579-1082-45a7-8038-ed6a91ecc3d4?lang=it
+        - cell "Actions for The Horsemen of the Panathenaic Procession":
+          - button "Actions for The Horsemen of the Panathenaic Procession"
+      - 'row "Moschophoros (The Calf-Bearer) Featured moschophoros-the-calf-bearer QR · moschophoros-107 (draft) First Floor – Archaic Gallery Sculpture Active 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : partly translated Actions for Moschophoros (The Calf-Bearer)"':
+        - cell
+        - cell "Moschophoros (The Calf-Bearer) Featured moschophoros-the-calf-bearer QR · moschophoros-107 (draft)":
+          - link "Moschophoros (The Calf-Bearer)":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/f38d32c7-380c-412c-8ed5-bd3095e42556
+          - text: Featured moschophoros-the-calf-bearer
+          - list:
+            - listitem: QR · moschophoros-107 (draft)
+        - cell "First Floor – Archaic Gallery Sculpture":
+          - paragraph: First Floor – Archaic Gallery
+          - paragraph: Sculpture
+        - cell "Active"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : partly translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/f38d32c7-380c-412c-8ed5-bd3095e42556?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/f38d32c7-380c-412c-8ed5-bd3095e42556?lang=el
+            - 'listitem "Italiano: partly translated"':
+              - 'link "Italiano : partly translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/f38d32c7-380c-412c-8ed5-bd3095e42556?lang=it
+        - cell "Actions for Moschophoros (The Calf-Bearer)":
+          - button "Actions for Moschophoros (The Calf-Bearer)"
+      - 'row "Rampin Rider rampin-rider No trigger First Floor – Archaic Gallery Sculpture Active Pending changes 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : not translated Actions for Rampin Rider"':
+        - cell
+        - cell "Rampin Rider rampin-rider No trigger":
+          - link "Rampin Rider":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/59e78fee-49a7-475d-9f22-7063529febe6
+          - text: rampin-rider
+          - paragraph: No trigger
+        - cell "First Floor – Archaic Gallery Sculpture":
+          - paragraph: First Floor – Archaic Gallery
+          - paragraph: Sculpture
+        - cell "Active Pending changes"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : not translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/59e78fee-49a7-475d-9f22-7063529febe6?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/59e78fee-49a7-475d-9f22-7063529febe6?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/59e78fee-49a7-475d-9f22-7063529febe6?lang=it
+        - cell "Actions for Rampin Rider":
+          - button "Actions for Rampin Rider"
+      - 'row "Archaic Pediment: Herakles and the Hydra 109 archaic-pediment-herakles-and-the-hydra No trigger First Floor – Archaic Gallery Sculpture Draft 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : not translated Actions for Archaic Pediment: Herakles and the Hydra"':
+        - cell
+        - 'cell "Archaic Pediment: Herakles and the Hydra 109 archaic-pediment-herakles-and-the-hydra No trigger"':
+          - 'link "Archaic Pediment: Herakles and the Hydra"':
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/d2b6e6a2-a517-459d-b80d-0cf63801b535
+          - text: 109 archaic-pediment-herakles-and-the-hydra
+          - paragraph: No trigger
+        - cell "First Floor – Archaic Gallery Sculpture":
+          - paragraph: First Floor – Archaic Gallery
+          - paragraph: Sculpture
+        - cell "Draft"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : not translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/d2b6e6a2-a517-459d-b80d-0cf63801b535?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/d2b6e6a2-a517-459d-b80d-0cf63801b535?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/d2b6e6a2-a517-459d-b80d-0cf63801b535?lang=it
+        - 'cell "Actions for Archaic Pediment: Herakles and the Hydra"':
+          - 'button "Actions for Archaic Pediment: Herakles and the Hydra"'
+      - 'row "Typhon, the Three-Bodied Daemon typhon-the-three-bodied-daemon No trigger First Floor – Archaic Gallery Sculpture Active 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : partly translated Actions for Typhon, the Three-Bodied Daemon"':
+        - cell
+        - cell "Typhon, the Three-Bodied Daemon typhon-the-three-bodied-daemon No trigger":
+          - link "Typhon, the Three-Bodied Daemon":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/880c1266-2b57-4cbe-945c-49677d74a349
+          - text: typhon-the-three-bodied-daemon
+          - paragraph: No trigger
+        - cell "First Floor – Archaic Gallery Sculpture":
+          - paragraph: First Floor – Archaic Gallery
+          - paragraph: Sculpture
+        - cell "Active"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : partly translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/880c1266-2b57-4cbe-945c-49677d74a349?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/880c1266-2b57-4cbe-945c-49677d74a349?lang=el
+            - 'listitem "Italiano: partly translated"':
+              - 'link "Italiano : partly translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/880c1266-2b57-4cbe-945c-49677d74a349?lang=it
+        - cell "Actions for Typhon, the Three-Bodied Daemon":
+          - button "Actions for Typhon, the Three-Bodied Daemon"
+      - 'row "Hekatompedon Pediment Lions hekatompedon-pediment-lions Geo · 58 m (draft) First Floor – Archaic Gallery Sculpture Active 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : not translated Actions for Hekatompedon Pediment Lions"':
+        - cell
+        - cell "Hekatompedon Pediment Lions hekatompedon-pediment-lions Geo · 58 m (draft)":
+          - link "Hekatompedon Pediment Lions":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/00ee3bc2-afdb-4931-a515-03b96a76b7a4
+          - text: hekatompedon-pediment-lions
+          - list:
+            - listitem: Geo · 58 m (draft)
+        - cell "First Floor – Archaic Gallery Sculpture":
+          - paragraph: First Floor – Archaic Gallery
+          - paragraph: Sculpture
+        - cell "Active"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : not translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/00ee3bc2-afdb-4931-a515-03b96a76b7a4?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/00ee3bc2-afdb-4931-a515-03b96a76b7a4?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/00ee3bc2-afdb-4931-a515-03b96a76b7a4?lang=it
+        - cell "Actions for Hekatompedon Pediment Lions":
+          - button "Actions for Hekatompedon Pediment Lions"
+      - 'row "Peplos Kore 112 peplos-kore QR · peplos-112 (draft) Room of the Korai Sculpture Active Pending changes 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : partly translated Actions for Peplos Kore"':
+        - cell
+        - cell "Peplos Kore 112 peplos-kore QR · peplos-112 (draft)":
+          - link "Peplos Kore":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/819d7e77-e283-4133-b556-f51d771eda5e
+          - text: 112 peplos-kore
+          - list:
+            - listitem: QR · peplos-112 (draft)
+        - cell "Room of the Korai Sculpture":
+          - paragraph: Room of the Korai
+          - paragraph: Sculpture
+        - cell "Active Pending changes"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : partly translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/819d7e77-e283-4133-b556-f51d771eda5e?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/819d7e77-e283-4133-b556-f51d771eda5e?lang=el
+            - 'listitem "Italiano: partly translated"':
+              - 'link "Italiano : partly translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/819d7e77-e283-4133-b556-f51d771eda5e?lang=it
+        - cell "Actions for Peplos Kore":
+          - button "Actions for Peplos Kore"
+      - 'row "Chian Kore (Kore 675) chian-kore-kore-675 No trigger Room of the Korai Sculpture Active 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : not translated Actions for Chian Kore (Kore 675)"':
+        - cell
+        - cell "Chian Kore (Kore 675) chian-kore-kore-675 No trigger":
+          - link "Chian Kore (Kore 675)":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/c3ab7f07-6778-4013-baf9-68b876a5f454
+          - text: chian-kore-kore-675
+          - paragraph: No trigger
+        - cell "Room of the Korai Sculpture":
+          - paragraph: Room of the Korai
+          - paragraph: Sculpture
+        - cell "Active"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : not translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/c3ab7f07-6778-4013-baf9-68b876a5f454?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/c3ab7f07-6778-4013-baf9-68b876a5f454?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/c3ab7f07-6778-4013-baf9-68b876a5f454?lang=it
+        - cell "Actions for Chian Kore (Kore 675)":
+          - button "Actions for Chian Kore (Kore 675)"
+      - 'row "Antenor Kore Featured antenor-kore No trigger Room of the Korai Sculpture Draft 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : not translated Actions for Antenor Kore"':
+        - cell
+        - cell "Antenor Kore Featured antenor-kore No trigger":
+          - link "Antenor Kore":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/2943a788-caa9-43d0-bf64-46f36e9a37b4
+          - text: Featured antenor-kore
+          - paragraph: No trigger
+        - cell "Room of the Korai Sculpture":
+          - paragraph: Room of the Korai
+          - paragraph: Sculpture
+        - cell "Draft"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : not translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/2943a788-caa9-43d0-bf64-46f36e9a37b4?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/2943a788-caa9-43d0-bf64-46f36e9a37b4?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/2943a788-caa9-43d0-bf64-46f36e9a37b4?lang=it
+        - cell "Actions for Antenor Kore":
+          - button "Actions for Antenor Kore"
+      - 'row "Kore of Euthydikos 115 kore-of-euthydikos No trigger Room of the Korai Sculpture Active 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : not translated Actions for Kore of Euthydikos"':
+        - cell
+        - cell "Kore of Euthydikos 115 kore-of-euthydikos No trigger":
+          - link "Kore of Euthydikos":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/c7d9ef27-2d13-4695-821b-7d7f75a6cf2a
+          - text: 115 kore-of-euthydikos
+          - paragraph: No trigger
+        - cell "Room of the Korai Sculpture":
+          - paragraph: Room of the Korai
+          - paragraph: Sculpture
+        - cell "Active"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : not translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/c7d9ef27-2d13-4695-821b-7d7f75a6cf2a?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/c7d9ef27-2d13-4695-821b-7d7f75a6cf2a?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/c7d9ef27-2d13-4695-821b-7d7f75a6cf2a?lang=it
+        - cell "Actions for Kore of Euthydikos":
+          - button "Actions for Kore of Euthydikos"
+      - 'row "Excavated Athenian Neighbourhood excavated-athenian-neighbourhood Beacon · 116/16 (draft) Excavation Hall of the Slopes Pottery and Everyday Life Active 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : not translated Actions for Excavated Athenian Neighbourhood"':
+        - cell
+        - cell "Excavated Athenian Neighbourhood excavated-athenian-neighbourhood Beacon · 116/16 (draft)":
+          - link "Excavated Athenian Neighbourhood":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/a12564e2-1d45-4441-b421-ef3497979ef6
+          - text: excavated-athenian-neighbourhood
+          - list:
+            - listitem: Beacon · 116/16 (draft)
+        - cell "Excavation Hall of the Slopes Pottery and Everyday Life":
+          - paragraph: Excavation Hall of the Slopes
+          - paragraph: Pottery and Everyday Life
+        - cell "Active"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : not translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/a12564e2-1d45-4441-b421-ef3497979ef6?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/a12564e2-1d45-4441-b421-ef3497979ef6?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/a12564e2-1d45-4441-b421-ef3497979ef6?lang=it
+        - cell "Actions for Excavated Athenian Neighbourhood":
+          - button "Actions for Excavated Athenian Neighbourhood"
+      - 'row "Classical Household Pottery classical-household-pottery No trigger Excavation Hall of the Slopes Pottery and Everyday Life Draft 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : not translated Actions for Classical Household Pottery"':
+        - cell
+        - cell "Classical Household Pottery classical-household-pottery No trigger":
+          - link "Classical Household Pottery":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/14d7a1e1-649a-4d84-a9b8-cd29786c0955
+          - text: classical-household-pottery
+          - paragraph: No trigger
+        - cell "Excavation Hall of the Slopes Pottery and Everyday Life":
+          - paragraph: Excavation Hall of the Slopes
+          - paragraph: Pottery and Everyday Life
+        - cell "Draft"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : not translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/14d7a1e1-649a-4d84-a9b8-cd29786c0955?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/14d7a1e1-649a-4d84-a9b8-cd29786c0955?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/14d7a1e1-649a-4d84-a9b8-cd29786c0955?lang=it
+        - cell "Actions for Classical Household Pottery":
+          - button "Actions for Classical Household Pottery"
+      - 'row "Bath Complex Floor Mosaic 118 bath-complex-floor-mosaic No trigger Excavation Hall of the Slopes Pottery and Everyday Life Active Pending changes 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : not translated Actions for Bath Complex Floor Mosaic"':
+        - cell
+        - cell "Bath Complex Floor Mosaic 118 bath-complex-floor-mosaic No trigger":
+          - link "Bath Complex Floor Mosaic":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/c4df4ce5-8b15-484b-8615-e669f413d296
+          - text: 118 bath-complex-floor-mosaic
+          - paragraph: No trigger
+        - cell "Excavation Hall of the Slopes Pottery and Everyday Life":
+          - paragraph: Excavation Hall of the Slopes
+          - paragraph: Pottery and Everyday Life
+        - cell "Active Pending changes"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : not translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/c4df4ce5-8b15-484b-8615-e669f413d296?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/c4df4ce5-8b15-484b-8615-e669f413d296?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/c4df4ce5-8b15-484b-8615-e669f413d296?lang=it
+        - cell "Actions for Bath Complex Floor Mosaic":
+          - button "Actions for Bath Complex Floor Mosaic"
+      - 'row "Reception and Information Desk, Ticket Collection Point, Audio Guide Rental and Accessibility Assistance Counter (Ground Floor, Main Entrance) reception-and-information-desk-ticket-collection-point-audio-guide-rental-and-accessibility-assistance-counter-ground-floor-main-entrance QR · reception-119 (draft) Ground Floor – Slopes Level Visitor Services Active 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : not translated Actions for Reception and Information Desk, Ticket Collection Point, Audio Guide Rental and Accessibility Assistance Counter (Ground Floor, Main Entrance)"':
+        - cell
+        - cell "Reception and Information Desk, Ticket Collection Point, Audio Guide Rental and Accessibility Assistance Counter (Ground Floor, Main Entrance) reception-and-information-desk-ticket-collection-point-audio-guide-rental-and-accessibility-assistance-counter-ground-floor-main-entrance QR · reception-119 (draft)":
+          - link "Reception and Information Desk, Ticket Collection Point, Audio Guide Rental and Accessibility Assistance Counter (Ground Floor, Main Entrance)":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/74756f10-a914-4fb6-9710-4a63b8e97ca7
+          - text: reception-and-information-desk-ticket-collection-point-audio-guide-rental-and-accessibility-assistance-counter-ground-floor-main-entrance
+          - list:
+            - listitem: QR · reception-119 (draft)
+        - cell "Ground Floor – Slopes Level Visitor Services":
+          - paragraph: Ground Floor – Slopes Level
+          - paragraph: Visitor Services
+        - cell "Active"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : not translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/74756f10-a914-4fb6-9710-4a63b8e97ca7?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/74756f10-a914-4fb6-9710-4a63b8e97ca7?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/74756f10-a914-4fb6-9710-4a63b8e97ca7?lang=it
+        - cell "Actions for Reception and Information Desk, Ticket Collection Point, Audio Guide Rental and Accessibility Assistance Counter (Ground Floor, Main Entrance)":
+          - button "Actions for Reception and Information Desk, Ticket Collection Point, Audio Guide Rental and Accessibility Assistance Counter (Ground Floor, Main Entrance)"
+      - 'row "Museum Shop 121 Featured museum-shop No trigger Ground Floor – Slopes Level Visitor Services › Shops Active 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : partly translated Actions for Museum Shop"':
+        - cell
+        - cell "Museum Shop 121 Featured museum-shop No trigger":
+          - link "Museum Shop":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/8579c4de-d37e-43ae-95a9-db9aeb43ffd7
+          - text: 121 Featured museum-shop
+          - paragraph: No trigger
+        - cell "Ground Floor – Slopes Level Visitor Services › Shops":
+          - paragraph: Ground Floor – Slopes Level
+          - paragraph: Visitor Services › Shops
+        - cell "Active"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : partly translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/8579c4de-d37e-43ae-95a9-db9aeb43ffd7?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/8579c4de-d37e-43ae-95a9-db9aeb43ffd7?lang=el
+            - 'listitem "Italiano: partly translated"':
+              - 'link "Italiano : partly translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/8579c4de-d37e-43ae-95a9-db9aeb43ffd7?lang=it
+        - cell "Actions for Museum Shop":
+          - button "Actions for Museum Shop"
+      - 'row "Museum Café – Terrace Restaurant museum-cafe-terrace-restaurant No trigger Acropolis Museum Visitor Services › Food and Drink Active 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : not translated Actions for Museum Café – Terrace Restaurant"':
+        - cell
+        - cell "Museum Café – Terrace Restaurant museum-cafe-terrace-restaurant No trigger":
+          - link "Museum Café – Terrace Restaurant":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/b1b30bd9-49c9-40d1-8171-95dc02f66939
+          - text: museum-cafe-terrace-restaurant
+          - paragraph: No trigger
+        - cell "Acropolis Museum Visitor Services › Food and Drink":
+          - paragraph: Acropolis Museum
+          - paragraph: Visitor Services › Food and Drink
+        - cell "Active"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : not translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/b1b30bd9-49c9-40d1-8171-95dc02f66939?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/b1b30bd9-49c9-40d1-8171-95dc02f66939?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/b1b30bd9-49c9-40d1-8171-95dc02f66939?lang=it
+        - cell "Actions for Museum Café – Terrace Restaurant":
+          - button "Actions for Museum Café – Terrace Restaurant"
+      - 'row "Acropolis View Terrace acropolis-view-terrace Geo · 94 m (draft) Acropolis Museum Viewpoints Active 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : partly translated Actions for Acropolis View Terrace"':
+        - cell
+        - cell "Acropolis View Terrace acropolis-view-terrace Geo · 94 m (draft)":
+          - link "Acropolis View Terrace":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/6f12125f-c1fb-4acf-9c03-1d81ced4372e
+          - text: acropolis-view-terrace
+          - list:
+            - listitem: Geo · 94 m (draft)
+        - cell "Acropolis Museum Viewpoints":
+          - paragraph: Acropolis Museum
+          - paragraph: Viewpoints
+        - cell "Active"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : partly translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/6f12125f-c1fb-4acf-9c03-1d81ced4372e?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/6f12125f-c1fb-4acf-9c03-1d81ced4372e?lang=el
+            - 'listitem "Italiano: partly translated"':
+              - 'link "Italiano : partly translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/6f12125f-c1fb-4acf-9c03-1d81ced4372e?lang=it
+        - cell "Actions for Acropolis View Terrace":
+          - button "Actions for Acropolis View Terrace"
+      - 'row "Temporary Exhibitions Hall: “The Acropolis Through the Eyes of Travellers, Antiquarians and Photographers from the Seventeenth Century to Today” 124 temporary-exhibitions-hall-the-acropolis-through-the-eyes-of-travellers-antiquarians-and-photographers-from-the-seventeenth-century-to-today No trigger Acropolis Museum Visitor Services Draft 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : not translated Actions for Temporary Exhibitions Hall: “The Acropolis Through the Eyes of Travellers, Antiquarians and Photographers from the Seventeenth Century to Today”"':
+        - cell
+        - 'cell "Temporary Exhibitions Hall: “The Acropolis Through the Eyes of Travellers, Antiquarians and Photographers from the Seventeenth Century to Today” 124 temporary-exhibitions-hall-the-acropolis-through-the-eyes-of-travellers-antiquarians-and-photographers-from-the-seventeenth-century-to-today No trigger"':
+          - 'link "Temporary Exhibitions Hall: “The Acropolis Through the Eyes of Travellers, Antiquarians and Photographers from the Seventeenth Century to Today”"':
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/883b205a-15cb-4068-b1bc-b031bf5d857b
+          - text: 124 temporary-exhibitions-hall-the-acropolis-through-the-eyes-of-travellers-antiquarians-and-photographers-from-the-seventeenth-century-to-today
+          - paragraph: No trigger
+        - cell "Acropolis Museum Visitor Services":
+          - paragraph: Acropolis Museum
+          - paragraph: Visitor Services
+        - cell "Draft"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : not translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/883b205a-15cb-4068-b1bc-b031bf5d857b?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/883b205a-15cb-4068-b1bc-b031bf5d857b?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/883b205a-15cb-4068-b1bc-b031bf5d857b?lang=it
+        - 'cell "Actions for Temporary Exhibitions Hall: “The Acropolis Through the Eyes of Travellers, Antiquarians and Photographers from the Seventeenth Century to Today”"':
+          - 'button "Actions for Temporary Exhibitions Hall: “The Acropolis Through the Eyes of Travellers, Antiquarians and Photographers from the Seventeenth Century to Today”"'
+      - 'row "Parthenon (Temple of Athena Parthenos) parthenon-temple-of-athena-parthenos Geo · 100 m (draft) Acropolis of Athens Monuments and Temples Active Pending changes 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : partly translated Actions for Parthenon (Temple of Athena Parthenos)"':
+        - cell
+        - cell "Parthenon (Temple of Athena Parthenos) parthenon-temple-of-athena-parthenos Geo · 100 m (draft)":
+          - link "Parthenon (Temple of Athena Parthenos)":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/e2905a9e-2c6a-49a3-89f6-5639c94ee9fe
+          - text: parthenon-temple-of-athena-parthenos
+          - list:
+            - listitem: Geo · 100 m (draft)
+        - cell "Acropolis of Athens Monuments and Temples":
+          - paragraph: Acropolis of Athens
+          - paragraph: Monuments and Temples
+        - cell "Active Pending changes"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : partly translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/e2905a9e-2c6a-49a3-89f6-5639c94ee9fe?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/e2905a9e-2c6a-49a3-89f6-5639c94ee9fe?lang=el
+            - 'listitem "Italiano: partly translated"':
+              - 'link "Italiano : partly translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/e2905a9e-2c6a-49a3-89f6-5639c94ee9fe?lang=it
+        - cell "Actions for Parthenon (Temple of Athena Parthenos)":
+          - button "Actions for Parthenon (Temple of Athena Parthenos)"
+      - 'row "Erechtheion and the Porch of the Caryatids erechtheion-and-the-porch-of-the-caryatids QR · erechtheion-126 (draft) Acropolis of Athens Monuments and Temples Active Pending changes 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : partly translated Actions for Erechtheion and the Porch of the Caryatids"':
+        - cell
+        - cell "Erechtheion and the Porch of the Caryatids erechtheion-and-the-porch-of-the-caryatids QR · erechtheion-126 (draft)":
+          - link "Erechtheion and the Porch of the Caryatids":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/3f7ff52f-26b2-423a-9530-f8378acd07e5
+          - text: erechtheion-and-the-porch-of-the-caryatids
+          - list:
+            - listitem: QR · erechtheion-126 (draft)
+        - cell "Acropolis of Athens Monuments and Temples":
+          - paragraph: Acropolis of Athens
+          - paragraph: Monuments and Temples
+        - cell "Active Pending changes"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : partly translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/3f7ff52f-26b2-423a-9530-f8378acd07e5?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/3f7ff52f-26b2-423a-9530-f8378acd07e5?lang=el
+            - 'listitem "Italiano: partly translated"':
+              - 'link "Italiano : partly translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/3f7ff52f-26b2-423a-9530-f8378acd07e5?lang=it
+        - cell "Actions for Erechtheion and the Porch of the Caryatids":
+          - button "Actions for Erechtheion and the Porch of the Caryatids"
+      - 'row "Temple of Athena Nike 127 temple-of-athena-nike QR · nike-127 (draft) Propylaea and Temple of Athena Nike Monuments and Temples Active 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : not translated Actions for Temple of Athena Nike"':
+        - cell
+        - cell "Temple of Athena Nike 127 temple-of-athena-nike QR · nike-127 (draft)":
+          - link "Temple of Athena Nike":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/87628a4c-90e1-4f0c-9aa0-70231d57e464
+          - text: 127 temple-of-athena-nike
+          - list:
+            - listitem: QR · nike-127 (draft)
+        - cell "Propylaea and Temple of Athena Nike Monuments and Temples":
+          - paragraph: Propylaea and Temple of Athena Nike
+          - paragraph: Monuments and Temples
+        - cell "Active"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : not translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/87628a4c-90e1-4f0c-9aa0-70231d57e464?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/87628a4c-90e1-4f0c-9aa0-70231d57e464?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/87628a4c-90e1-4f0c-9aa0-70231d57e464?lang=it
+        - cell "Actions for Temple of Athena Nike":
+          - button "Actions for Temple of Athena Nike"
+      - 'row "Propylaea Monumental Gateway Featured propylaea-monumental-gateway No trigger Propylaea and Temple of Athena Nike Monuments and Temples Active 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : partly translated Actions for Propylaea Monumental Gateway"':
+        - cell
+        - cell "Propylaea Monumental Gateway Featured propylaea-monumental-gateway No trigger":
+          - link "Propylaea Monumental Gateway":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/27144d6e-4c1e-450c-abf9-e3e5829d387f
+          - text: Featured propylaea-monumental-gateway
+          - paragraph: No trigger
+        - cell "Propylaea and Temple of Athena Nike Monuments and Temples":
+          - paragraph: Propylaea and Temple of Athena Nike
+          - paragraph: Monuments and Temples
+        - cell "Active"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : partly translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/27144d6e-4c1e-450c-abf9-e3e5829d387f?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/27144d6e-4c1e-450c-abf9-e3e5829d387f?lang=el
+            - 'listitem "Italiano: partly translated"':
+              - 'link "Italiano : partly translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/27144d6e-4c1e-450c-abf9-e3e5829d387f?lang=it
+        - cell "Actions for Propylaea Monumental Gateway":
+          - button "Actions for Propylaea Monumental Gateway"
+      - 'row "Foundations of the Old Temple of Athena 130 foundations-of-the-old-temple-of-athena No trigger Acropolis of Athens Monuments and Temples Draft 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : not translated Actions for Foundations of the Old Temple of Athena"':
+        - cell
+        - cell "Foundations of the Old Temple of Athena 130 foundations-of-the-old-temple-of-athena No trigger":
+          - link "Foundations of the Old Temple of Athena":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/c2570945-7727-4cac-bc9d-29717ccb0c58
+          - text: 130 foundations-of-the-old-temple-of-athena
+          - paragraph: No trigger
+        - cell "Acropolis of Athens Monuments and Temples":
+          - paragraph: Acropolis of Athens
+          - paragraph: Monuments and Temples
+        - cell "Draft"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : not translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/c2570945-7727-4cac-bc9d-29717ccb0c58?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/c2570945-7727-4cac-bc9d-29717ccb0c58?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/c2570945-7727-4cac-bc9d-29717ccb0c58?lang=it
+        - cell "Actions for Foundations of the Old Temple of Athena":
+          - button "Actions for Foundations of the Old Temple of Athena"
+      - 'row "Chalkotheke chalkotheke No trigger Acropolis of Athens Monuments and Temples Draft 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : not translated Actions for Chalkotheke"':
+        - cell
+        - cell "Chalkotheke chalkotheke No trigger":
+          - link "Chalkotheke":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/a43db55e-6203-4415-9a65-5da9c11757a5
+          - text: chalkotheke
+          - paragraph: No trigger
+        - cell "Acropolis of Athens Monuments and Temples":
+          - paragraph: Acropolis of Athens
+          - paragraph: Monuments and Temples
+        - cell "Draft"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : not translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/a43db55e-6203-4415-9a65-5da9c11757a5?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/a43db55e-6203-4415-9a65-5da9c11757a5?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/a43db55e-6203-4415-9a65-5da9c11757a5?lang=it
+        - cell "Actions for Chalkotheke":
+          - button "Actions for Chalkotheke"
+      - 'row "Theatre of Dionysus Eleuthereus – Orchestra 133 theatre-of-dionysus-eleuthereus-orchestra Geo · 124 m (draft) Theatre of Dionysus Monuments and Temples Active 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : partly translated Actions for Theatre of Dionysus Eleuthereus – Orchestra"':
+        - cell
+        - cell "Theatre of Dionysus Eleuthereus – Orchestra 133 theatre-of-dionysus-eleuthereus-orchestra Geo · 124 m (draft)":
+          - link "Theatre of Dionysus Eleuthereus – Orchestra":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/d3ea8cb2-119d-47f2-b776-80e0903b972f
+          - text: 133 theatre-of-dionysus-eleuthereus-orchestra
+          - list:
+            - listitem: Geo · 124 m (draft)
+        - cell "Theatre of Dionysus Monuments and Temples":
+          - paragraph: Theatre of Dionysus
+          - paragraph: Monuments and Temples
+        - cell "Active"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : partly translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/d3ea8cb2-119d-47f2-b776-80e0903b972f?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/d3ea8cb2-119d-47f2-b776-80e0903b972f?lang=el
+            - 'listitem "Italiano: partly translated"':
+              - 'link "Italiano : partly translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/d3ea8cb2-119d-47f2-b776-80e0903b972f?lang=it
+        - cell "Actions for Theatre of Dionysus Eleuthereus – Orchestra":
+          - button "Actions for Theatre of Dionysus Eleuthereus – Orchestra"
+      - 'row "Bema of Phaedrus bema-of-phaedrus No trigger Theatre of Dionysus Monuments and Temples Active 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : not translated Actions for Bema of Phaedrus"':
+        - cell
+        - cell "Bema of Phaedrus bema-of-phaedrus No trigger":
+          - link "Bema of Phaedrus":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/757ce945-e6a6-4e20-8e43-decc7a572970
+          - text: bema-of-phaedrus
+          - paragraph: No trigger
+        - cell "Theatre of Dionysus Monuments and Temples":
+          - paragraph: Theatre of Dionysus
+          - paragraph: Monuments and Temples
+        - cell "Active"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : not translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/757ce945-e6a6-4e20-8e43-decc7a572970?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/757ce945-e6a6-4e20-8e43-decc7a572970?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/757ce945-e6a6-4e20-8e43-decc7a572970?lang=it
+        - cell "Actions for Bema of Phaedrus":
+          - button "Actions for Bema of Phaedrus"
+      - 'row "Choragic Monument of Thrasyllos – Cave Shrine Above the Theatre with the Statue of Dionysus Later Installed Within the Arch Featured choragic-monument-of-thrasyllos-cave-shrine-above-the-theatre-with-the-statue-of-dionysus-later-installed-within-the-arch No trigger Theatre of Dionysus Monuments and Temples Draft 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : not translated Actions for Choragic Monument of Thrasyllos – Cave Shrine Above the Theatre with the Statue of Dionysus Later Installed Within the Arch"':
+        - cell
+        - cell "Choragic Monument of Thrasyllos – Cave Shrine Above the Theatre with the Statue of Dionysus Later Installed Within the Arch Featured choragic-monument-of-thrasyllos-cave-shrine-above-the-theatre-with-the-statue-of-dionysus-later-installed-within-the-arch No trigger":
+          - link "Choragic Monument of Thrasyllos – Cave Shrine Above the Theatre with the Statue of Dionysus Later Installed Within the Arch":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/511861d7-16e3-40fb-87fd-705d7349e31c
+          - text: Featured choragic-monument-of-thrasyllos-cave-shrine-above-the-theatre-with-the-statue-of-dionysus-later-installed-within-the-arch
+          - paragraph: No trigger
+        - cell "Theatre of Dionysus Monuments and Temples":
+          - paragraph: Theatre of Dionysus
+          - paragraph: Monuments and Temples
+        - cell "Draft"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : not translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/511861d7-16e3-40fb-87fd-705d7349e31c?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/511861d7-16e3-40fb-87fd-705d7349e31c?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/511861d7-16e3-40fb-87fd-705d7349e31c?lang=it
+        - cell "Actions for Choragic Monument of Thrasyllos – Cave Shrine Above the Theatre with the Statue of Dionysus Later Installed Within the Arch":
+          - button "Actions for Choragic Monument of Thrasyllos – Cave Shrine Above the Theatre with the Statue of Dionysus Later Installed Within the Arch"
+      - 'row "Temple of Hephaestus 136 temple-of-hephaestus Geo · 133 m (draft) Ancient Agora of Athens Monuments and Temples Active Pending changes 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : partly translated Actions for Temple of Hephaestus"':
+        - cell
+        - cell "Temple of Hephaestus 136 temple-of-hephaestus Geo · 133 m (draft)":
+          - link "Temple of Hephaestus":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/2de087a7-f384-4eed-a2f6-25f5332c3075
+          - text: 136 temple-of-hephaestus
+          - list:
+            - listitem: Geo · 133 m (draft)
+        - cell "Ancient Agora of Athens Monuments and Temples":
+          - paragraph: Ancient Agora of Athens
+          - paragraph: Monuments and Temples
+        - cell "Active Pending changes"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : partly translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/2de087a7-f384-4eed-a2f6-25f5332c3075?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/2de087a7-f384-4eed-a2f6-25f5332c3075?lang=el
+            - 'listitem "Italiano: partly translated"':
+              - 'link "Italiano : partly translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/2de087a7-f384-4eed-a2f6-25f5332c3075?lang=it
+        - cell "Actions for Temple of Hephaestus":
+          - button "Actions for Temple of Hephaestus"
+      - 'row "Stoa of Attalos (Facade) stoa-of-attalos-facade No trigger Ancient Agora of Athens Monuments and Temples Active 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : not translated Actions for Stoa of Attalos (Facade)"':
+        - cell
+        - cell "Stoa of Attalos (Facade) stoa-of-attalos-facade No trigger":
+          - link "Stoa of Attalos (Facade)":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/63fb97a6-30d7-49c1-9013-c45242cf70fa
+          - text: stoa-of-attalos-facade
+          - paragraph: No trigger
+        - cell "Ancient Agora of Athens Monuments and Temples":
+          - paragraph: Ancient Agora of Athens
+          - paragraph: Monuments and Temples
+        - cell "Active"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : not translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/63fb97a6-30d7-49c1-9013-c45242cf70fa?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/63fb97a6-30d7-49c1-9013-c45242cf70fa?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/63fb97a6-30d7-49c1-9013-c45242cf70fa?lang=it
+        - cell "Actions for Stoa of Attalos (Facade)":
+          - button "Actions for Stoa of Attalos (Facade)"
+      - 'row "Church of the Holy Apostles of Solaki (c. 1000 AD), an Eleventh-Century Byzantine Cross-in-Square Church Restored by the American School in the 1950s church-of-the-holy-apostles-of-solaki-c-1000-ad-an-eleventh-century-byzantine-cross-in-square-church-restored-by-the-american-school-in-the-1950s QR · solaki-138 (draft) Ancient Agora of Athens Monuments and Temples Active 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : not translated Actions for Church of the Holy Apostles of Solaki (c. 1000 AD), an Eleventh-Century Byzantine Cross-in-Square Church Restored by the American School in the 1950s"':
+        - cell
+        - cell "Church of the Holy Apostles of Solaki (c. 1000 AD), an Eleventh-Century Byzantine Cross-in-Square Church Restored by the American School in the 1950s church-of-the-holy-apostles-of-solaki-c-1000-ad-an-eleventh-century-byzantine-cross-in-square-church-restored-by-the-american-school-in-the-1950s QR · solaki-138 (draft)":
+          - link "Church of the Holy Apostles of Solaki (c. 1000 AD), an Eleventh-Century Byzantine Cross-in-Square Church Restored by the American School in the 1950s":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/6b5264b5-beba-43fd-9cac-5bb51c7c3fe9
+          - text: church-of-the-holy-apostles-of-solaki-c-1000-ad-an-eleventh-century-byzantine-cross-in-square-church-restored-by-the-american-school-in-the-1950s
+          - list:
+            - listitem: QR · solaki-138 (draft)
+        - cell "Ancient Agora of Athens Monuments and Temples":
+          - paragraph: Ancient Agora of Athens
+          - paragraph: Monuments and Temples
+        - cell "Active"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : not translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/6b5264b5-beba-43fd-9cac-5bb51c7c3fe9?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/6b5264b5-beba-43fd-9cac-5bb51c7c3fe9?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/6b5264b5-beba-43fd-9cac-5bb51c7c3fe9?lang=it
+        - cell "Actions for Church of the Holy Apostles of Solaki (c. 1000 AD), an Eleventh-Century Byzantine Cross-in-Square Church Restored by the American School in the 1950s":
+          - button "Actions for Church of the Holy Apostles of Solaki (c. 1000 AD), an Eleventh-Century Byzantine Cross-in-Square Church Restored by the American School in the 1950s"
+      - 'row "Tholos 139 tholos Beacon · 139/39 (draft) Ancient Agora of Athens Monuments and Temples Active 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : not translated Actions for Tholos"':
+        - cell
+        - cell "Tholos 139 tholos Beacon · 139/39 (draft)":
+          - link "Tholos":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/e5356b6c-de87-41cd-bec5-7a70bcef67ff
+          - text: 139 tholos
+          - list:
+            - listitem: Beacon · 139/39 (draft)
+        - cell "Ancient Agora of Athens Monuments and Temples":
+          - paragraph: Ancient Agora of Athens
+          - paragraph: Monuments and Temples
+        - cell "Active"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : not translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/e5356b6c-de87-41cd-bec5-7a70bcef67ff?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/e5356b6c-de87-41cd-bec5-7a70bcef67ff?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/e5356b6c-de87-41cd-bec5-7a70bcef67ff?lang=it
+        - cell "Actions for Tholos":
+          - button "Actions for Tholos"
+      - 'row "Altar of the Twelve Gods altar-of-the-twelve-gods No trigger Ancient Agora of Athens Monuments and Temples Draft 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : not translated Actions for Altar of the Twelve Gods"':
+        - cell
+        - cell "Altar of the Twelve Gods altar-of-the-twelve-gods No trigger":
+          - link "Altar of the Twelve Gods":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/47ec879c-3601-4092-8246-7fe8edad5df3
+          - text: altar-of-the-twelve-gods
+          - paragraph: No trigger
+        - cell "Ancient Agora of Athens Monuments and Temples":
+          - paragraph: Ancient Agora of Athens
+          - paragraph: Monuments and Temples
+        - cell "Draft"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : not translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/47ec879c-3601-4092-8246-7fe8edad5df3?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/47ec879c-3601-4092-8246-7fe8edad5df3?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/47ec879c-3601-4092-8246-7fe8edad5df3?lang=it
+        - cell "Actions for Altar of the Twelve Gods":
+          - button "Actions for Altar of the Twelve Gods"
+      - 'row "Ancient Agora Entrance and Ticket Office ancient-agora-entrance-and-ticket-office QR · gate-141 (draft) Ancient Agora of Athens Visitor Services Active 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : not translated Actions for Ancient Agora Entrance and Ticket Office"':
+        - cell
+        - cell "Ancient Agora Entrance and Ticket Office ancient-agora-entrance-and-ticket-office QR · gate-141 (draft)":
+          - link "Ancient Agora Entrance and Ticket Office":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/52afa185-ba47-42fe-992d-b87f982692e3
+          - text: ancient-agora-entrance-and-ticket-office
+          - list:
+            - listitem: QR · gate-141 (draft)
+        - cell "Ancient Agora of Athens Visitor Services":
+          - paragraph: Ancient Agora of Athens
+          - paragraph: Visitor Services
+        - cell "Active"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : not translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/52afa185-ba47-42fe-992d-b87f982692e3?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/52afa185-ba47-42fe-992d-b87f982692e3?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/52afa185-ba47-42fe-992d-b87f982692e3?lang=it
+        - cell "Actions for Ancient Agora Entrance and Ticket Office":
+          - button "Actions for Ancient Agora Entrance and Ticket Office"
+      - 'row "Ostraka and the Ostracism Vote 142 Featured ostraka-and-the-ostracism-vote No trigger Stoa of Attalos Museum Pottery and Everyday Life Active 12 Nov 2026, 13:29 English : complete Ελληνικά : complete Italiano : partly translated Actions for Ostraka and the Ostracism Vote"':
+        - cell
+        - cell "Ostraka and the Ostracism Vote 142 Featured ostraka-and-the-ostracism-vote No trigger":
+          - link "Ostraka and the Ostracism Vote":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/650e942d-8f56-489c-aea1-2fd3c70f117b
+          - text: 142 Featured ostraka-and-the-ostracism-vote
+          - paragraph: No trigger
+        - cell "Stoa of Attalos Museum Pottery and Everyday Life":
+          - paragraph: Stoa of Attalos Museum
+          - paragraph: Pottery and Everyday Life
+        - cell "Active"
+        - cell "12 Nov 2026, 13:29":
+          - time: 12 Nov 2026, 13:29
+        - 'cell "English : complete Ελληνικά : complete Italiano : partly translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/650e942d-8f56-489c-aea1-2fd3c70f117b?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/650e942d-8f56-489c-aea1-2fd3c70f117b?lang=el
+            - 'listitem "Italiano: partly translated"':
+              - 'link "Italiano : partly translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/650e942d-8f56-489c-aea1-2fd3c70f117b?lang=it
+        - cell "Actions for Ostraka and the Ostracism Vote":
+          - button "Actions for Ostraka and the Ostracism Vote"
+      - 'row "Klepsydra Water Clock klepsydra-water-clock Beacon · 143/43 (draft) Stoa of Attalos Museum Pottery and Everyday Life Active 12 Nov 2026, 13:30 English : complete Ελληνικά : complete Italiano : not translated Actions for Klepsydra Water Clock"':
+        - cell
+        - cell "Klepsydra Water Clock klepsydra-water-clock Beacon · 143/43 (draft)":
+          - link "Klepsydra Water Clock":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/d44feee5-38c2-41b1-bf98-097f078d8384
+          - text: klepsydra-water-clock
+          - list:
+            - listitem: Beacon · 143/43 (draft)
+        - cell "Stoa of Attalos Museum Pottery and Everyday Life":
+          - paragraph: Stoa of Attalos Museum
+          - paragraph: Pottery and Everyday Life
+        - cell "Active"
+        - cell "12 Nov 2026, 13:30":
+          - time: 12 Nov 2026, 13:30
+        - 'cell "English : complete Ελληνικά : complete Italiano : not translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/d44feee5-38c2-41b1-bf98-097f078d8384?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/d44feee5-38c2-41b1-bf98-097f078d8384?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/d44feee5-38c2-41b1-bf98-097f078d8384?lang=it
+        - cell "Actions for Klepsydra Water Clock":
+          - button "Actions for Klepsydra Water Clock"
+      - 'row "Kleroterion Allotment Machine kleroterion-allotment-machine No trigger Stoa of Attalos Museum Pottery and Everyday Life Draft 12 Nov 2026, 13:30 English : complete Ελληνικά : complete Italiano : not translated Actions for Kleroterion Allotment Machine"':
+        - cell
+        - cell "Kleroterion Allotment Machine kleroterion-allotment-machine No trigger":
+          - link "Kleroterion Allotment Machine":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/c5e9a66f-634f-4c99-9339-321e262b8485
+          - text: kleroterion-allotment-machine
+          - paragraph: No trigger
+        - cell "Stoa of Attalos Museum Pottery and Everyday Life":
+          - paragraph: Stoa of Attalos Museum
+          - paragraph: Pottery and Everyday Life
+        - cell "Draft"
+        - cell "12 Nov 2026, 13:30":
+          - time: 12 Nov 2026, 13:30
+        - 'cell "English : complete Ελληνικά : complete Italiano : not translated"':
+          - list:
+            - 'listitem "English: complete"':
+              - 'link "English : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/c5e9a66f-634f-4c99-9339-321e262b8485?lang=en
+            - 'listitem "Ελληνικά: complete"':
+              - 'link "Ελληνικά : complete"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/c5e9a66f-634f-4c99-9339-321e262b8485?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/c5e9a66f-634f-4c99-9339-321e262b8485?lang=it
+        - cell "Actions for Kleroterion Allotment Machine":
+          - button "Actions for Kleroterion Allotment Machine"
+      - 'row "UX-p3-translator Ακρόπολη POI ux-p3-translator-akropoli-poi No trigger Athens Historic Centre No category Draft 12 Nov 2026, 13:43 English : partly translated Ελληνικά : partly translated Italiano : partly translated Actions for UX-p3-translator Ακρόπολη POI"':
+        - cell
+        - cell "UX-p3-translator Ακρόπολη POI ux-p3-translator-akropoli-poi No trigger":
+          - link "UX-p3-translator Ακρόπολη POI":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/7a34b71d-23a6-436c-a5dc-399934e45d40
+          - text: ux-p3-translator-akropoli-poi
+          - paragraph: No trigger
+        - cell "Athens Historic Centre No category":
+          - paragraph: Athens Historic Centre
+          - paragraph: No category
+        - cell "Draft"
+        - cell "12 Nov 2026, 13:43":
+          - time: 12 Nov 2026, 13:43
+        - 'cell "English : partly translated Ελληνικά : partly translated Italiano : partly translated"':
+          - list:
+            - 'listitem "English: partly translated"':
+              - 'link "English : partly translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/7a34b71d-23a6-436c-a5dc-399934e45d40?lang=en
+            - 'listitem "Ελληνικά: partly translated"':
+              - 'link "Ελληνικά : partly translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/7a34b71d-23a6-436c-a5dc-399934e45d40?lang=el
+            - 'listitem "Italiano: partly translated"':
+              - 'link "Italiano : partly translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/7a34b71d-23a6-436c-a5dc-399934e45d40?lang=it
+        - cell "Actions for UX-p3-translator Ακρόπολη POI":
+          - button "Actions for UX-p3-translator Ακρόπολη POI"
+      - 'row "UX-p1-editor Alpha Kouros ux-p1-editor-alpha-kouros QR · av54v8fy Geo · 30 m Parthenon Gallery Monuments and Temples Active 12 Nov 2026, 13:53 English : partly translated Ελληνικά : not translated Italiano : not translated Actions for UX-p1-editor Alpha Kouros"':
+        - cell
+        - cell "UX-p1-editor Alpha Kouros ux-p1-editor-alpha-kouros QR · av54v8fy Geo · 30 m":
+          - link "UX-p1-editor Alpha Kouros":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/40cab7b2-a7f7-4057-b56e-5605a589156f
+          - text: ux-p1-editor-alpha-kouros
+          - list:
+            - listitem: QR · av54v8fy
+            - listitem: Geo · 30 m
+        - cell "Parthenon Gallery Monuments and Temples":
+          - paragraph: Parthenon Gallery
+          - paragraph: Monuments and Temples
+        - cell "Active"
+        - cell "12 Nov 2026, 13:53":
+          - time: 12 Nov 2026, 13:53
+        - 'cell "English : partly translated Ελληνικά : not translated Italiano : not translated"':
+          - list:
+            - 'listitem "English: partly translated"':
+              - 'link "English : partly translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/40cab7b2-a7f7-4057-b56e-5605a589156f?lang=en
+            - 'listitem "Ελληνικά: not translated"':
+              - 'link "Ελληνικά : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/40cab7b2-a7f7-4057-b56e-5605a589156f?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/40cab7b2-a7f7-4057-b56e-5605a589156f?lang=it
+        - cell "Actions for UX-p1-editor Alpha Kouros":
+          - button "Actions for UX-p1-editor Alpha Kouros"
+      - 'row "UX-p4-kiosk POI one ux-p4-kiosk-poi-one No trigger No place No category Draft 12 Nov 2026, 13:44 English : partly translated Ελληνικά : not translated Italiano : not translated Actions for UX-p4-kiosk POI one"':
+        - cell
+        - cell "UX-p4-kiosk POI one ux-p4-kiosk-poi-one No trigger":
+          - link "UX-p4-kiosk POI one":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/1c4d094e-a000-4f34-9856-cbc41bc79656
+          - text: ux-p4-kiosk-poi-one
+          - paragraph: No trigger
+        - cell "No place No category":
+          - paragraph: No place
+          - paragraph: No category
+        - cell "Draft"
+        - cell "12 Nov 2026, 13:44":
+          - time: 12 Nov 2026, 13:44
+        - 'cell "English : partly translated Ελληνικά : not translated Italiano : not translated"':
+          - list:
+            - 'listitem "English: partly translated"':
+              - 'link "English : partly translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/1c4d094e-a000-4f34-9856-cbc41bc79656?lang=en
+            - 'listitem "Ελληνικά: not translated"':
+              - 'link "Ελληνικά : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/1c4d094e-a000-4f34-9856-cbc41bc79656?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/1c4d094e-a000-4f34-9856-cbc41bc79656?lang=it
+        - cell "Actions for UX-p4-kiosk POI one":
+          - button "Actions for UX-p4-kiosk POI one"
+      - 'row "UX-p1-editor Beta ux-p1-editor-beta QR · zqk6rh3d Geo · 30 m Theatre of Dionysus Sculpture Active 12 Nov 2026, 13:53 English : partly translated Ελληνικά : not translated Italiano : not translated Actions for UX-p1-editor Beta"':
+        - cell
+        - cell "UX-p1-editor Beta ux-p1-editor-beta QR · zqk6rh3d Geo · 30 m":
+          - link "UX-p1-editor Beta":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/1af84426-8230-46ee-8ab4-7edecaa9b20f
+          - text: ux-p1-editor-beta
+          - list:
+            - listitem: QR · zqk6rh3d
+            - listitem: Geo · 30 m
+        - cell "Theatre of Dionysus Sculpture":
+          - paragraph: Theatre of Dionysus
+          - paragraph: Sculpture
+        - cell "Active"
+        - cell "12 Nov 2026, 13:53":
+          - time: 12 Nov 2026, 13:53
+        - 'cell "English : partly translated Ελληνικά : not translated Italiano : not translated"':
+          - list:
+            - 'listitem "English: partly translated"':
+              - 'link "English : partly translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/1af84426-8230-46ee-8ab4-7edecaa9b20f?lang=en
+            - 'listitem "Ελληνικά: not translated"':
+              - 'link "Ελληνικά : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/1af84426-8230-46ee-8ab4-7edecaa9b20f?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/1af84426-8230-46ee-8ab4-7edecaa9b20f?lang=it
+        - cell "Actions for UX-p1-editor Beta":
+          - button "Actions for UX-p1-editor Beta"
+      - 'row "UX-p1-editor Gamma ux-p1-editor-gamma No trigger No place No category Active 12 Nov 2026, 13:52 English : partly translated Ελληνικά : not translated Italiano : not translated Actions for UX-p1-editor Gamma"':
+        - cell
+        - cell "UX-p1-editor Gamma ux-p1-editor-gamma No trigger":
+          - link "UX-p1-editor Gamma":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/2f15e961-5a0a-4931-b28a-ced0f13b9e50
+          - text: ux-p1-editor-gamma
+          - paragraph: No trigger
+        - cell "No place No category":
+          - paragraph: No place
+          - paragraph: No category
+        - cell "Active"
+        - cell "12 Nov 2026, 13:52":
+          - time: 12 Nov 2026, 13:52
+        - 'cell "English : partly translated Ελληνικά : not translated Italiano : not translated"':
+          - list:
+            - 'listitem "English: partly translated"':
+              - 'link "English : partly translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/2f15e961-5a0a-4931-b28a-ced0f13b9e50?lang=en
+            - 'listitem "Ελληνικά: not translated"':
+              - 'link "Ελληνικά : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/2f15e961-5a0a-4931-b28a-ced0f13b9e50?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/2f15e961-5a0a-4931-b28a-ced0f13b9e50?lang=it
+        - cell "Actions for UX-p1-editor Gamma":
+          - button "Actions for UX-p1-editor Gamma"
+      - 'row "UX-p1-editor Delta ux-p1-editor-delta QR · zsn9sjfu Geo · 30 m Theatre of Dionysus Sculpture Active 12 Nov 2026, 13:51 English : partly translated Ελληνικά : not translated Italiano : not translated Actions for UX-p1-editor Delta"':
+        - cell
+        - cell "UX-p1-editor Delta ux-p1-editor-delta QR · zsn9sjfu Geo · 30 m":
+          - link "UX-p1-editor Delta":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/e85c94b4-f31f-4d1c-8711-dd4fe7695fc6
+          - text: ux-p1-editor-delta
+          - list:
+            - listitem: QR · zsn9sjfu
+            - listitem: Geo · 30 m
+        - cell "Theatre of Dionysus Sculpture":
+          - paragraph: Theatre of Dionysus
+          - paragraph: Sculpture
+        - cell "Active"
+        - cell "12 Nov 2026, 13:51":
+          - time: 12 Nov 2026, 13:51
+        - 'cell "English : partly translated Ελληνικά : not translated Italiano : not translated"':
+          - list:
+            - 'listitem "English: partly translated"':
+              - 'link "English : partly translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/e85c94b4-f31f-4d1c-8711-dd4fe7695fc6?lang=en
+            - 'listitem "Ελληνικά: not translated"':
+              - 'link "Ελληνικά : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/e85c94b4-f31f-4d1c-8711-dd4fe7695fc6?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/e85c94b4-f31f-4d1c-8711-dd4fe7695fc6?lang=it
+        - cell "Actions for UX-p1-editor Delta":
+          - button "Actions for UX-p1-editor Delta"
+      - 'row "UX-p6-edge POI A slow save ux-p6-edge-poi-a No trigger No place No category Draft 12 Nov 2026, 14:04 English : partly translated Ελληνικά : not translated Italiano : not translated Actions for UX-p6-edge POI A slow save"':
+        - cell
+        - cell "UX-p6-edge POI A slow save ux-p6-edge-poi-a No trigger":
+          - link "UX-p6-edge POI A slow save":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/8bbd9003-ccc9-4d4b-b10f-0bf416751773
+          - text: ux-p6-edge-poi-a
+          - paragraph: No trigger
+        - cell "No place No category":
+          - paragraph: No place
+          - paragraph: No category
+        - cell "Draft"
+        - cell "12 Nov 2026, 14:04":
+          - time: 12 Nov 2026, 14:04
+        - 'cell "English : partly translated Ελληνικά : not translated Italiano : not translated"':
+          - list:
+            - 'listitem "English: partly translated"':
+              - 'link "English : partly translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/8bbd9003-ccc9-4d4b-b10f-0bf416751773?lang=en
+            - 'listitem "Ελληνικά: not translated"':
+              - 'link "Ελληνικά : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/8bbd9003-ccc9-4d4b-b10f-0bf416751773?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/8bbd9003-ccc9-4d4b-b10f-0bf416751773?lang=it
+        - cell "Actions for UX-p6-edge POI A slow save":
+          - button "Actions for UX-p6-edge POI A slow save"
+      - 'row "UX-p6-edge POI B from A ux-p6-edge-poi-b-conflict No trigger No place No category Draft 12 Nov 2026, 14:03 English : partly translated Ελληνικά : not translated Italiano : not translated Actions for UX-p6-edge POI B from A"':
+        - cell
+        - cell "UX-p6-edge POI B from A ux-p6-edge-poi-b-conflict No trigger":
+          - link "UX-p6-edge POI B from A":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/00143631-4e34-43ed-b803-891f087a1c1c
+          - text: ux-p6-edge-poi-b-conflict
+          - paragraph: No trigger
+        - cell "No place No category":
+          - paragraph: No place
+          - paragraph: No category
+        - cell "Draft"
+        - cell "12 Nov 2026, 14:03":
+          - time: 12 Nov 2026, 14:03
+        - 'cell "English : partly translated Ελληνικά : not translated Italiano : not translated"':
+          - list:
+            - 'listitem "English: partly translated"':
+              - 'link "English : partly translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/00143631-4e34-43ed-b803-891f087a1c1c?lang=en
+            - 'listitem "Ελληνικά: not translated"':
+              - 'link "Ελληνικά : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/00143631-4e34-43ed-b803-891f087a1c1c?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/00143631-4e34-43ed-b803-891f087a1c1c?lang=it
+        - cell "Actions for UX-p6-edge POI B from A":
+          - button "Actions for UX-p6-edge POI B from A"
+      - 'row "UX-p6-edge POI C applied once ux-p6-edge-poi-c-in-route No trigger No place No category Active 12 Nov 2026, 14:17 English : partly translated Ελληνικά : not translated Italiano : not translated Actions for UX-p6-edge POI C applied once"':
+        - cell
+        - cell "UX-p6-edge POI C applied once ux-p6-edge-poi-c-in-route No trigger":
+          - link "UX-p6-edge POI C applied once":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/c10e8454-4484-4f47-bb0c-ad9e9571f155
+          - text: ux-p6-edge-poi-c-in-route
+          - paragraph: No trigger
+        - cell "No place No category":
+          - paragraph: No place
+          - paragraph: No category
+        - cell "Active"
+        - cell "12 Nov 2026, 14:17":
+          - time: 12 Nov 2026, 14:17
+        - 'cell "English : partly translated Ελληνικά : not translated Italiano : not translated"':
+          - list:
+            - 'listitem "English: partly translated"':
+              - 'link "English : partly translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/c10e8454-4484-4f47-bb0c-ad9e9571f155?lang=en
+            - 'listitem "Ελληνικά: not translated"':
+              - 'link "Ελληνικά : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/c10e8454-4484-4f47-bb0c-ad9e9571f155?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/c10e8454-4484-4f47-bb0c-ad9e9571f155?lang=it
+        - cell "Actions for UX-p6-edge POI C applied once":
+          - button "Actions for UX-p6-edge POI C applied once"
+      - 'row "edited! P5-001 ux-p5-a11y-alpha No trigger No place No category Draft 12 Nov 2026, 14:19 English : partly translated Ελληνικά : not translated Italiano : not translated Actions for edited!"':
+        - cell
+        - cell "edited! P5-001 ux-p5-a11y-alpha No trigger":
+          - link "edited!":
+            - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/22ba8181-7028-4c14-9cb2-ee091893190b
+          - text: P5-001 ux-p5-a11y-alpha
+          - paragraph: No trigger
+        - cell "No place No category":
+          - paragraph: No place
+          - paragraph: No category
+        - cell "Draft"
+        - cell "12 Nov 2026, 14:19":
+          - time: 12 Nov 2026, 14:19
+        - 'cell "English : partly translated Ελληνικά : not translated Italiano : not translated"':
+          - list:
+            - 'listitem "English: partly translated"':
+              - 'link "English : partly translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/22ba8181-7028-4c14-9cb2-ee091893190b?lang=en
+            - 'listitem "Ελληνικά: not translated"':
+              - 'link "Ελληνικά : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/22ba8181-7028-4c14-9cb2-ee091893190b?lang=el
+            - 'listitem "Italiano: not translated"':
+              - 'link "Italiano : not translated"':
+                - /url: /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/22ba8181-7028-4c14-9cb2-ee091893190b?lang=it
+        - cell "Actions for edited!":
+          - button "Actions for edited!"
+  - navigation "Pages of points of interest":
+    - paragraph: Showing 1–50 of 93
+    - button "Previous You are on the first page" [disabled]
+    - text: Page 1 of 2
+    - button "Next"
+  - paragraph: Translations Complete Partly Missing
+- status
+- alert

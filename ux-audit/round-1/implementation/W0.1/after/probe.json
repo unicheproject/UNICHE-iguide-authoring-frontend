@@ -1,0 +1,245 @@
+{
+  "home": {
+    "small": [
+      "10px SPAN \"Loading projects…\""
+    ],
+    "smallCount": 1,
+    "upper": [],
+    "upperCount": 0,
+    "fields": [],
+    "axe": [
+      {
+        "id": "label-content-name-mismatch",
+        "impact": "serious",
+        "nodes": 1,
+        "sample": "<button type=\"button\" class=\"flex min-h-control items-center gap-2 rounded-md px-1.5 hover:bg-surface-hover\" aria-label=\"Account menu, D. Curator\" id=\"radix-vue"
+      }
+    ]
+  },
+  "dashboard": {
+    "small": [
+      "10px SPAN \"Test Museum · ux-audit-populat\"",
+      "9px SPAN \"ACTIVE\"",
+      "10px SPAN \"Organisation\"",
+      "10px SPAN \"Slug\"",
+      "10px SPAN \"Template\"",
+      "10px SPAN \"Created\"",
+      "10px SPAN \"Last updated\""
+    ],
+    "smallCount": 7,
+    "upper": [
+      "SPAN \"ACTIVE\"",
+      "SPAN \"Organisation\"",
+      "SPAN \"Slug\"",
+      "SPAN \"Template\"",
+      "SPAN \"Created\"",
+      "SPAN \"Last updated\""
+    ],
+    "upperCount": 6,
+    "fields": [],
+    "axe": [
+      {
+        "id": "label-content-name-mismatch",
+        "impact": "serious",
+        "nodes": 1,
+        "sample": "<button type=\"button\" class=\"flex min-h-control items-center gap-2 rounded-md px-1.5 hover:bg-surface-hover\" aria-label=\"Account menu, D. Curator\" id=\"radix-vue"
+      }
+    ]
+  },
+  "poi-list": {
+    "small": [
+      "10px SPAN \"Test Museum · ux-audit-populat\"",
+      "9px SPAN \"ACTIVE\"",
+      "11px LABEL \"Search\"",
+      "11px SPAN \"Sorted by order · drag or use \"",
+      "10px TH \"Title\"",
+      "10px TH \"Status\"",
+      "10px TH \"Translations\"",
+      "10px TH \"Actions\"",
+      "10px BUTTON \"▲\"",
+      "10px BUTTON \"▼\"",
+      "11px SPAN \"parthenon-frieze-north-side\"",
+      "11px DIV \"· in Parthenon Gallery\"",
+      "11px DIV \"· 12 Nov 2026\"",
+      "9px SPAN \"QR · frieze-101\"",
+      "9px SPAN \"(draft)\""
+    ],
+    "smallCount": 550,
+    "upper": [
+      "SPAN \"ACTIVE\"",
+      "LABEL \"Search\"",
+      "TH \"Title\"",
+      "TH \"Status\"",
+      "TH \"Translations\"",
+      "TH \"Actions\"",
+      "SPAN \"QR · frieze-101\"",
+      "SPAN \"(draft)\"",
+      "BUTTON \"Deactivate\"",
+      "BUTTON \"Archive\""
+    ],
+    "upperCount": 171,
+    "fields": [
+      {
+        "tag": "INPUT",
+        "border": "rgb(217, 220, 226)",
+        "width": "1px"
+      }
+    ],
+    "axe": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 3,
+        "sample": "<span class=\"whitespace-nowrap rounded-full px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-[0.06em] bg-[#ececef] text-[#374151] opacity-60\" title=\"QR "
+      },
+      {
+        "id": "label-content-name-mismatch",
+        "impact": "serious",
+        "nodes": 1,
+        "sample": "<button type=\"button\" class=\"flex min-h-control items-center gap-2 rounded-md px-1.5 hover:bg-surface-hover\" aria-label=\"Account menu, D. Curator\" id=\"radix-vue"
+      }
+    ]
+  },
+  "poi-editor": {
+    "small": [
+      "10px SPAN \"Test Museum · ux-audit-populat\"",
+      "9px SPAN \"ACTIVE\"",
+      "11px BUTTON \"Save draft\"",
+      "11px BUTTON \"Discard changes\"",
+      "9px SPAN \"· default\"",
+      "11px SPAN \"Practical details\"",
+      "11px SPAN \"· All filled\"",
+      "11px H2 \"Media\"",
+      "10px DIV \"Primary image\"",
+      "11px SPAN \"Recommended · Image\"",
+      "10px BUTTON \"Choose asset\"",
+      "10px DIV \"Video\"",
+      "11px SPAN \"Optional · Video\"",
+      "10px BUTTON \"Choose asset\"",
+      "10px DIV \"Audio narration\""
+    ],
+    "smallCount": 58,
+    "upper": [
+      "SPAN \"ACTIVE\"",
+      "BUTTON \"Save draft\"",
+      "BUTTON \"Discard changes\"",
+      "BUTTON \"English\"",
+      "SPAN \"· default\"",
+      "BUTTON \"Ελληνικά\"",
+      "BUTTON \"Italiano\"",
+      "SPAN \"Practical details\"",
+      "H2 \"Media\"",
+      "DIV \"Primary image\""
+    ],
+    "upperCount": 45,
+    "fields": [
+      {
+        "tag": "INPUT",
+        "border": "rgb(115, 123, 139)",
+        "width": "1px"
+      },
+      {
+        "tag": "TEXTAREA",
+        "border": "rgb(115, 123, 139)",
+        "width": "1px"
+      },
+      {
+        "tag": "TEXTAREA",
+        "border": "rgb(115, 123, 139)",
+        "width": "1px"
+      },
+      {
+        "tag": "INPUT",
+        "border": "rgb(115, 123, 139)",
+        "width": "1px"
+      },
+      {
+        "tag": "SELECT",
+        "border": "rgb(115, 123, 139)",
+        "width": "1px"
+      },
+      {
+        "tag": "SELECT",
+        "border": "rgb(115, 123, 139)",
+        "width": "1px"
+      }
+    ],
+    "axe": [
+      {
+        "id": "label-content-name-mismatch",
+        "impact": "serious",
+        "nodes": 1,
+        "sample": "<button type=\"button\" class=\"flex min-h-control items-center gap-2 rounded-md px-1.5 hover:bg-surface-hover\" aria-label=\"Account menu, D. Curator\" id=\"radix-vue"
+      }
+    ]
+  },
+  "overview": {
+    "small": [
+      "10px SPAN \"Test Museum · ux-audit-populat\"",
+      "9px SPAN \"ACTIVE\"",
+      "10px H2 \"How it fits together\"",
+      "10px SPAN \"1\"",
+      "10px SPAN \"2\"",
+      "10px SPAN \"3\"",
+      "10px SPAN \"4\"",
+      "10px SPAN \"5\""
+    ],
+    "smallCount": 8,
+    "upper": [
+      "SPAN \"ACTIVE\"",
+      "H2 \"How it fits together\""
+    ],
+    "upperCount": 2,
+    "fields": [],
+    "axe": [
+      {
+        "id": "label-content-name-mismatch",
+        "impact": "serious",
+        "nodes": 1,
+        "sample": "<button type=\"button\" class=\"flex min-h-control items-center gap-2 rounded-md px-1.5 hover:bg-surface-hover\" aria-label=\"Account menu, D. Curator\" id=\"radix-vue"
+      }
+    ]
+  },
+  "languages": {
+    "small": [
+      "10px SPAN \"Test Museum · ux-audit-populat\"",
+      "9px SPAN \"ACTIVE\"",
+      "11px DIV \"en · 115 of 115 content items \"",
+      "10px SPAN \"default\"",
+      "11px DIV \"el · 82 of 115 content items t\"",
+      "10px BUTTON \"Make default\"",
+      "10px BUTTON \"Remove\"",
+      "11px DIV \"it · 34 of 115 content items t\"",
+      "10px BUTTON \"Make default\"",
+      "10px BUTTON \"Remove\"",
+      "11px BUTTON \"+ Français\"",
+      "11px BUTTON \"+ Deutsch\"",
+      "11px BUTTON \"+ Español\"",
+      "11px BUTTON \"+ Português\"",
+      "11px BUTTON \"+ Nederlands\""
+    ],
+    "smallCount": 22,
+    "upper": [
+      "SPAN \"ACTIVE\"",
+      "SPAN \"default\"",
+      "BUTTON \"Make default\"",
+      "BUTTON \"Remove\"",
+      "BUTTON \"Make default\"",
+      "BUTTON \"Remove\"",
+      "BUTTON \"+ Français\"",
+      "BUTTON \"+ Deutsch\"",
+      "BUTTON \"+ Español\"",
+      "BUTTON \"+ Português\""
+    ],
+    "upperCount": 18,
+    "fields": [],
+    "axe": [
+      {
+        "id": "label-content-name-mismatch",
+        "impact": "serious",
+        "nodes": 1,
+        "sample": "<button type=\"button\" class=\"flex min-h-control items-center gap-2 rounded-md px-1.5 hover:bg-surface-hover\" aria-label=\"Account menu, D. Curator\" id=\"radix-vue"
+      }
+    ]
+  }
+}

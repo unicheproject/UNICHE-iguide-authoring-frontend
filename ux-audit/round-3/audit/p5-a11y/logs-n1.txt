@@ -1,0 +1,27 @@
+AXE {"label":"dashboard@1440","url":"http://localhost:5173/projects/PID/","counts":{},"v":[]}
+AXE {"label":"places@1440","url":"http://localhost:5173/projects/PID/places","counts":{},"v":[]}
+AXE {"label":"place-editor@1440","url":"http://localhost:5173/projects/PID/places/9ce7037d-d9bd-4450-812c-3fee540bf71b","counts":{},"v":[]}
+AXE {"label":"pois@1440","url":"http://localhost:5173/projects/PID/pois","counts":{},"v":[]}
+AXE {"label":"poi-editor-mine@1440","url":"http://localhost:5173/projects/PID/pois/e51249c1-755b-42d5-9a20-5912046ea9c9","counts":{},"v":[]}
+AXE {"label":"poi-editor-active@1440","url":"http://localhost:5173/projects/PID/pois/546c5177-effd-49c8-acae-85d751f89bbe","counts":{},"v":[]}
+AXE {"label":"routes@1440","url":"http://localhost:5173/projects/PID/routes","counts":{},"v":[]}
+AXE {"label":"route-editor@1440","url":"http://localhost:5173/projects/PID/routes/f399b1d0-e035-4121-b896-612959811369","counts":{},"v":[]}
+AXE {"label":"guides@1440","url":"http://localhost:5173/projects/PID/guides","counts":{},"v":[]}
+AXE {"label":"guide-editor@1440","url":"http://localhost:5173/projects/PID/guides/6e5776ad-26de-48dd-90ab-ced84aa5ec46","counts":{},"v":[]}
+AXE {"label":"events@1440","url":"http://localhost:5173/projects/PID/events","counts":{},"v":[]}
+AXE {"label":"event-editor@1440","url":"http://localhost:5173/projects/PID/events/2ff0df72-9d2f-4bfe-82d6-c8ac13e3bf3e","counts":{},"v":[]}
+AXE {"label":"categories@1440","url":"http://localhost:5173/projects/PID/categories","counts":{},"v":[]}
+AXE {"label":"category-editor@1440","url":"http://localhost:5173/projects/PID/categories/3f0324d2-0b32-456a-aaae-ab7faa25481d","counts":{},"v":[]}
+AXE {"label":"maps@1440","url":"http://localhost:5173/projects/PID/maps?sort=updated","counts":{},"v":[]}
+AXE {"label":"map-editor@1440","url":"http://localhost:5173/projects/PID/maps/5eef6cab-a61e-419e-adff-053edfff9939","counts":{},"v":[]}
+AXE {"label":"floor-plans@1440","url":"http://localhost:5173/projects/PID/floor-plans","counts":{},"v":[]}
+AXE {"label":"floor-plan-editor@1440","url":"http://localhost:5173/projects/PID/floor-plans/d40864d1-684a-466f-819d-68fa651b7146","counts":{},"v":[]}
+AXE {"label":"media@1440","url":"http://localhost:5173/projects/PID/media","counts":{},"v":[]}
+NO H1 media
+AXE {"label":"asset-editor@1440","url":"http://localhost:5173/projects/PID/media/484a6bb2-d08c-41df-aa7c-d8cf2a2f1823","counts":{},"v":[]}
+AXE {"label":"preview@1440","url":"http://localhost:5173/projects/PID/preview","counts":{},"v":[]}
+AXE {"label":"not-found@1440","url":"http://localhost:5173/projects/PID/nothing-here","counts":{},"v":[]}
+AXE {"label":"create-project@1440","url":"http://localhost:5173/projects/new","counts":{},"v":[]}
+AXE {"label":"bad-project-id@1440","url":"http://localhost:5173/projects/not-a-uuid/pois","counts":{},"v":[]}
+bad id {"title":"Page not found · iGuide CMS","h1":"This page does not exist","ae":"H1"}
+AXE {"label":"home@1440","url":"http://localhost:5173/","counts":{},"v":[]}

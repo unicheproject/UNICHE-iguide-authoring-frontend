@@ -1,0 +1,16 @@
+import { open, go, rec, P, shot, ready, axe } from "./h.mjs";
+const { browser, page } = await open("curator", { viewport: "1440" });
+const errs=[]; page.on("pageerror",e=>errs.push(e.message));
+await go(page, `/projects/${P}/routes/${rec.route}`); await ready(page,1200);
+await page.getByRole("button",{name:"Add stops"}).click(); await page.waitForTimeout(800);
+await page.screenshot({path:"ux-audit/round-2/audit/s11-editors/shots/route-picker__open__1440.png"});
+const dlg = page.getByRole("dialog");
+console.log("dialog text:", (await dlg.innerText()).slice(0,900));
+console.log("focus:", await page.evaluate(()=>document.activeElement?.outerHTML.slice(0,150)));
+await dlg.getByRole("searchbox").or(dlg.getByRole("textbox")).first().fill("UX-R2-s11");
+await page.waitForTimeout(600);
+await page.screenshot({path:"ux-audit/round-2/audit/s11-editors/shots/route-picker__search__1440.png"});
+console.log("rows:", await dlg.getByRole("button").evaluateAll(b=>b.map(x=>(x.getAttribute("aria-label")||x.textContent).trim().slice(0,70))));
+console.log(await dlg.getByRole("checkbox").count(), await dlg.getByRole("option").count());
+console.log(errs);
+await browser.close();

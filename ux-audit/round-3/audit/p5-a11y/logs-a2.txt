@@ -1,0 +1,49 @@
+dash tab 1 button "What does the visitor app status mean?" 531,80,32,32  solid 2px rgb(76, 29, 139) off 2px
+dash tab 2 a "Preview the app" 313,291,152,40  solid 2px rgb(255, 255, 255) off 2px
+dash tab 3 a "About Launch" 473,301,101,21  solid 2px rgb(76, 29, 139) off 2px
+dash tab 4 button "Review warnings" 581,291,157,40  solid 2px rgb(76, 29, 139) off 2px
+dash tab 5 a "UX-R2-p1-editor Amphora Room" 277,488,368,21  solid 2px rgb(76, 29, 139) off 2px
+dash tab 6 a "UX-P4 pending point" 277,526,368,21  solid 2px rgb(76, 29, 139) off 2px
+dash tab 7 a "UX-W0.2 point" 277,564,368,21  solid 2px rgb(76, 29, 139) off 2px
+dash tab 8 a "UX-s11-editors Guide" 277,602,368,21  solid 2px rgb(76, 29, 139) off 2px
+dash tab 9 a "UX-s10-poi-place Odeon Mosaic Floor Ψηφιδωτό" 277,640,368,21  solid 2px rgb(76, 29, 139) off 2px
+dash tab 10 a "The Story of the Parthenon: From Temple to Monument" 277,678,368,42  solid 2px rgb(76, 29, 139) off 2px
+dash tab 11 a "Family Trail: Myths and Monsters" 277,737,368,21  solid 2px rgb(76, 29, 139) off 2px
+dash tab 12 a "Temple of Hephaestus" 277,775,368,21  solid 2px rgb(76, 29, 139) off 2px
+dash tab 13 a "Erechtheion and the Porch of the Caryatids" 277,427,368,21  solid 2px rgb(76, 29, 139) off 2px
+dash tab 14 a "Parthenon (Temple of Athena Parthenos)" 277,465,368,21  solid 2px rgb(76, 29, 139) off 2px
+dash tab 15 a "Points of Interest (12)" 470,507,137,19  solid 2px rgb(76, 29, 139) off 2px
+tabs to POI nav from h1: 15
+[go POI] Enter -> h1 "Points of Interest" 256,80,177,26  (no outline; shadow rgb(255, 255, 255) 0px 0px 0px 4px) | live=["Points of Interest loaded"]
+poi route {"title":"Points of Interest · UX Audit – Populated · iGuide CMS","h1":"Points of Interest","ae":"H1"}
+poi tab 1 button "New point of interest" 1230,80,186,40  solid 2px rgb(255, 255, 255) off 2px
+poi tab 2 input "Search title, slug, code or trigger" 273,164,413,40  solid 2px rgb(76, 29, 139) off 2px
+poi tab 3 input "NOT_ARCHIVED" 712,184,1,1  solid 2px rgb(76, 29, 139) off 2px
+poi tab 4 button "Filters and sort, 1 on" 1148,164,132,40  solid 2px rgb(76, 29, 139) off 2px
+poi tab 5 button "Clear filters" 1291,168,108,32  solid 2px rgb(76, 29, 139) off 2px
+poi tab 6 button "Title" 326,221,47,32  solid 2px rgb(76, 29, 139) off 2px
+poi tab 7 button "Status" 834,221,59,32  solid 2px rgb(76, 29, 139) off 2px
+poi tab 8 button "Updated" 1012,221,74,32  solid 2px rgb(76, 29, 139) off 2px
+poi tab 9 button "Translations" 1155,221,95,32  solid 2px rgb(76, 29, 139) off 2px
+poi tab 10 a "Parthenon Frieze – North Side" 326,270,216,21  solid 2px rgb(76, 29, 139) off 2px
+poi tab 11 a "English: complete" 1155,270,69,24  solid 2px rgb(76, 29, 139) off 2px
+poi tab 12 a "Ελληνικά: complete" 1236,270,76,24  solid 2px rgb(76, 29, 139) off 2px
+poi tab 13 a "Italiano: partly translated" 1155,300,69,24  solid 2px rgb(76, 29, 139) off 2px
+poi tab 14 button "Actions for Parthenon Frieze – North Side" 1371,270,40,40  solid 2px rgb(76, 29, 139) off 2px
+poi tab 15 a "South Metope XXXI: Centaur and Lapith" 326,343,285,21  solid 2px rgb(76, 29, 139) off 2px
+poi tab 16 a "English: complete" 1155,343,69,24  solid 2px rgb(76, 29, 139) off 2px
+poi tab 17 a "Ελληνικά: complete" 1236,343,76,24  solid 2px rgb(76, 29, 139) off 2px
+poi tab 18 a "Italiano: not translated" 1155,373,69,24  solid 2px rgb(76, 29, 139) off 2px
+poi tab 19 button "Actions for South Metope XXXI: Centaur and Lapith" 1371,343,40,40  solid 2px rgb(76, 29, 139) off 2px
+poi tab 20 a "Rampin Rider" 326,426,99,21  solid 2px rgb(76, 29, 139) off 2px
+poi tab 21 a "English: complete" 1155,426,69,24  solid 2px rgb(76, 29, 139) off 2px
+poi tab 22 a "Ελληνικά: complete" 1236,426,76,24  solid 2px rgb(76, 29, 139) off 2px
+poi tab 23 a "Italiano: not translated" 1155,456,69,24  solid 2px rgb(76, 29, 139) off 2px
+poi tab 24 button "Actions for Rampin Rider" 1371,426,40,40  solid 2px rgb(76, 29, 139) off 2px
+poi tab 25 a "Peplos Kore" 326,500,86,21  solid 2px rgb(76, 29, 139) off 2px
+poi tab 26 a "English: complete" 1155,499,69,24  solid 2px rgb(76, 29, 139) off 2px
+poi tab 27 a "Ελληνικά: complete" 1236,499,76,24  solid 2px rgb(76, 29, 139) off 2px
+poi tab 28 a "Italiano: partly translated" 1155,529,69,24  solid 2px rgb(76, 29, 139) off 2px
+poi tab 29 button "Actions for Peplos Kore" 1371,499,40,40  solid 2px rgb(76, 29, 139) off 2px
+poi tab 30 a "Bath Complex Floor Mosaic" 326,573,197,21  solid 2px rgb(76, 29, 139) off 2px
+AXE {"label":"poi-list","url":"http://localhost:5173/projects/PID/pois?pending=1","counts":{"serious":1},"v":[{"id":"label-content-name-mismatch","impact":"serious","n":1,"sel":["button[data-variant=\"secondary\"]"]}]}

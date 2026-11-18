@@ -1,0 +1,15 @@
+import * as L from "./lib.mjs";
+const { page, browser } = await L.open("curator", { viewport: "1440" });
+const k = page.keyboard;
+await L.nav(page, L.P("/categories"), 1200);
+await page.getByRole("button", { name: /^New category/i }).first().focus(); await k.press("Enter"); await page.waitForTimeout(700);
+await k.type("UX-R2-p5 Category");
+await k.press("Tab"); L.log("t23", "tab1", await L.focus(page));
+await k.press("Tab"); L.log("t23", "tab2", await L.focus(page));
+await page.getByRole("button", { name: /^Create/ }).last().focus(); await k.press("Enter"); await page.waitForTimeout(800);
+L.log("t23", "submit w/o applies-to: focus", await L.focus(page), await page.locator("[data-error-summary]").allTextContents());
+await L.shot(page, "category-create__applies-error__1440");
+await page.getByRole("radio", { name: /^Points of Interest/ }).focus(); await k.press("Space");
+await page.getByRole("button", { name: /^Create/ }).last().focus(); await k.press("Enter"); await page.waitForTimeout(3500);
+L.log("t23", "created", page.url(), await page.title(), await L.focus(page));
+await browser.close();

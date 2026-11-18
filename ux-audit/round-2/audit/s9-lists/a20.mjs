@@ -1,0 +1,11 @@
+import { open, go, shot, POP } from "./lib.mjs";
+const { browser, page } = await open("curator", { viewport: "1440" });
+await go(page, `/projects/${POP}/guides?q=${encodeURIComponent("Ο Ναός του Παρθενώνα")}`); await page.waitForTimeout(1200);
+console.log("rows", await page.locator("tbody tr").count(), (await page.locator("tbody tr").first().innerText().catch(() => "")).replace(/\s+/g, " ").slice(0, 100));
+await page.locator("tbody tr a").first().click(); await page.waitForTimeout(1500);
+const t = page.getByLabel(/^Title/).first();
+console.log("title field:", await t.inputValue());
+await t.fill("UX-R2-s9 Greek title guide");
+await page.getByRole("button", { name: /Save/ }).first().click(); await page.waitForTimeout(2000);
+console.log("h1:", await page.getByRole("heading", { level: 1 }).first().innerText(), page.url().slice(-50));
+await browser.close();

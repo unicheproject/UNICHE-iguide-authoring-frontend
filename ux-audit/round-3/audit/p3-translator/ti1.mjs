@@ -1,0 +1,12 @@
+import { open, go, base, shot } from "./lib.mjs";
+import { readFileSync } from "node:fs";
+const R = JSON.parse(readFileSync("ux-audit/round-3/audit/p3-translator/records.json","utf8"));
+const { browser, page } = await open("admin", { viewport: "1440" });
+await go(page, R.categories); await page.waitForSelector("h1"); await page.waitForTimeout(1800);
+console.log("fresh:", await page.title());
+await page.locator("#f-name").fill("UX-R3-p3 Category renamed Μετονομασία");
+await page.getByRole("button",{name:"Save", exact:true}).first().click(); await page.waitForTimeout(2500);
+console.log("after save:", await page.title(), "| h1:", await page.locator("h1").innerText());
+await page.reload(); await page.waitForSelector("h1"); await page.waitForTimeout(2000);
+console.log("after reload:", await page.title());
+await browser.close();

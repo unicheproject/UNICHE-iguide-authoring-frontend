@@ -1,0 +1,8 @@
+forced true
+kb: after tab from hour occ-start-o-1-minute hour aria-invalid null
+kb: after fix, focus occ-end-o-1-day errors left 0
+kb combobox value Parthenon Frieze – North Side focus f-poiId
+forced true
+kb: after tab from hour occ-start-o-1-minute hour aria-invalid true
+kb: after fix, focus occ-end-o-1-day errors left 0
+kb combobox value Parthenon Frieze – North Side focus f-poiId

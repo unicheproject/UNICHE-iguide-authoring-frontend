@@ -1,0 +1,21 @@
+group <fieldset id="f-icon" tabindex="-1" class="m-0 flex min-w-0 flex-col gap-2 border-0 p-0" aria-describedby="cat-icon-help"><legend class="mb-2 p-0 text-sm font-semibold text-ink-2">Icon</legend><!-- Native radios: one Tab stop, arrow keys move and choose, the group name is the legend. --><div class="
+radio count 21
+first input "" 326,493,1,1  solid 2px rgb(76, 29, 139) off 2px
+Tab from first radio -> button "Details Code set" 257,756,734,46  solid 2px rgb(76, 29, 139) off 2px
+[icon] ArrowRight -> input "monument" 425,493,1,1  solid 2px rgb(76, 29, 139) off 2px | live=["1 of 33 categories","UX-R3-p5 Category loaded","Unsaved changes"]
+   checked idx: 1 tabbable: 21
+[icon] ArrowRight -> input "building" 524,493,1,1  solid 2px rgb(76, 29, 139) off 2px | live=[]
+   checked idx: 2 tabbable: 21
+[icon] ArrowDown -> input "beach" 524,573,1,1  solid 2px rgb(76, 29, 139) off 2px | live=[]
+   checked idx: 9 tabbable: 21
+[icon] ArrowLeft -> input "mountain" 425,573,1,1  solid 2px rgb(76, 29, 139) off 2px | live=[]
+   checked idx: 8 tabbable: 21
+[icon] ArrowUp -> input "monument" 425,493,1,1  solid 2px rgb(76, 29, 139) off 2px | live=[]
+   checked idx: 1 tabbable: 21
+[icon] End -> input "monument" 425,493,1,1  solid 2px rgb(76, 29, 139) off 2px | live=[]
+   checked idx: 1 tabbable: 21
+[icon] Home -> input "monument" 425,915,1,1  solid 2px rgb(76, 29, 139) off 2px | live=[]
+   checked idx: 1 tabbable: 21
+ring (label wrapper) {"w":2,"off":2,"style":"solid","ring":"rgb(76, 29, 139)","ringOnWrapper":false,"vsOutside":9.53,"bg":"239,233,248","clipped":"MAIN.relative min-w-0 flex-1 overflow-y-auto  B20","obscured":"svg.[object SVGAnimatedString]","offscreen":true,"rect":[425,915,1,1]}
+live []
+AXE {"label":"category-editor","url":"http://localhost:5173/projects/PID/categories/3f0324d2-0b32-456a-aaae-ab7faa25481d","counts":{},"v":[]}

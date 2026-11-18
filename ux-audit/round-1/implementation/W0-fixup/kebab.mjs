@@ -1,0 +1,15 @@
+import { createRequire } from "node:module";
+import { open, go } from "../../../tools/session.mjs";
+const require = createRequire(new URL("../../../../package.json", import.meta.url));
+const { default: AxeBuilder } = require("@axe-core/playwright");
+const { browser, page } = await open("curator", { viewport: "1440" });
+await go(page, "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois"); await page.waitForTimeout(2500);
+await page.screenshot({ path: 'ux-audit/round-1/implementation/W0-fixup/after/kebab-debug.png' });
+await page.getByRole('button', { name: /Actions for/ }).first().click();
+await page.waitForTimeout(500);
+console.log("menu open:", await page.getByRole("menu").count());
+const r = await new AxeBuilder({ page }).withTags(["wcag2a","wcag2aa","wcag21aa"]).analyze();
+console.log("axe", r.violations.map(v=>`${v.id}/${v.impact}(${v.nodes.length})`).join(", ")||"none");
+await page.keyboard.press("Escape"); await page.waitForTimeout(300);
+console.log("closed:", await page.getByRole("menu").count());
+await browser.close();

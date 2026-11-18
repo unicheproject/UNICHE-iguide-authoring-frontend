@@ -1,0 +1,23 @@
+import { open, go, rec, P, shot, ready, tall, SH, axe } from "./h.mjs";
+const { browser, page } = await open("curator", { viewport: "1440" });
+const errs=[]; page.on("pageerror",e=>errs.push(e.message)); page.on("console",m=>{if(m.type()==="error")errs.push(m.text().slice(0,150))});
+const log=(...a)=>console.log(...a);
+const focus=()=>page.evaluate(()=>{const a=document.activeElement;return a?`${a.tagName}#${a.id}.${(a.getAttribute("aria-label")||a.textContent||"").trim().slice(0,40)}`:null});
+await go(page, `/projects/${P}/pois/${rec.poiA}`); await ready(page);
+await page.locator("#f-summary").fill("A bronze statue found near the north gate. Edited in a working copy.");
+await page.getByRole("button",{name:/^Save draft$/}).click(); await page.waitForTimeout(2500);
+log("focus after save draft", await focus());
+log("toasts", await page.locator("[role=status],[role=alert]").allInnerTexts());
+log("banner", await page.locator("[data-working-copy-banner]").innerText());
+await page.screenshot({path:SH+"poi-editor__pending__1440.png"});
+log("hdr", await page.evaluate(()=>document.querySelector("[data-editor-primary]")?.closest("div[class*=sticky]")?.innerText.replace(/\n+/g," | ")));
+// add triggers
+await page.locator("#triggers").scrollIntoViewIfNeeded();
+await page.getByRole("button",{name:/^\+?\s*QR code$/}).click(); await page.waitForTimeout(800);
+log("focus after add QR", await focus());
+await page.getByRole("button",{name:/Bluetooth beacon/}).click(); await page.waitForTimeout(500);
+await page.getByRole("button",{name:/Geo-proximity/}).click(); await page.waitForTimeout(500);
+log("triggers text", await page.locator("#triggers").innerText());
+await page.screenshot({path:SH+"poi-editor__triggers-added-viewport__1440.png"});
+log("hdr", await page.evaluate(()=>document.querySelector("[data-editor-primary]")?.closest("div[class*=sticky]")?.innerText.replace(/\n+/g," | ")));
+await browser.close(); log(errs);

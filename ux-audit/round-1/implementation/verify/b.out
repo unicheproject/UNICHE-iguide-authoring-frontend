@@ -1,0 +1,21 @@
+switcher-open -> Dashboard viol  err 0 0 
+places-create-dialog -> Places viol  err 0 0 
+pois-create-dialog -> Points of Interest viol  err 0 0 
+routes-create-dialog -> Routes viol  err 0 0 
+guides-create-dialog -> Guides viol  err 0 0 
+events-create-dialog -> Events viol  err 0 0 
+categories-create-dialog -> Categories viol  err 0 0 
+maps-create-dialog -> Maps & Floor Plans viol  err 0 0 
+floor-plans-create-dialog -> Maps & Floor Plans viol  err 0 0 
+pois-kebab-open -> Points of Interest viol aria-hidden-focus:serious err 0 0 
+pois-search-empty -> Points of Interest viol  err 0 0 
+poi-draft-activate-dialog -> The Horsemen of the Panathenaic Procession viol  err 0 0 
+poi-draft-preview-in-app -> The Horsemen of the Panathenaic Procession viol  err 0 0 
+poi-draft-greek-tab -> The Horsemen of the Panathenaic Procession viol  err 0 0 
+poi-pending-greek-tab -> Parthenon Frieze – North Side (revised wording) viol  err 0 0 
+media-upload-dialog -> Media viol  err 0 0 
+media-list-view -> Media viol  err 0 0 
+asset-picker -> East Pediment Fragments viol  err 0 0 (step failed)
+preview-web -> Preview viol  err 0 0 
+preview-mobile -> Preview viol  err 0 0 
+preview-kiosk -> Preview viol  err 0 0 

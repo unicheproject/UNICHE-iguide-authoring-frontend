@@ -1,0 +1,13 @@
+import { open, go, PID, shot } from "./lib.mjs";
+const { browser, page } = await open("curator", { viewport: "1440" });
+await go(page, `/projects/${PID}/maps`);
+await page.waitForFunction(() => /Maps|Floor/.test(document.querySelector("main")?.innerText ?? "") && !document.querySelector("[class*=animate-pulse]"), null, { timeout: 40000 }).catch(()=>{}); await page.waitForTimeout(3000);
+console.log((await page.locator("main").innerText()).replace(/\n+/g," | ").slice(0,900));
+await shot(page, "maps-list__default");
+const link = page.locator("main a[href*='/maps/']").first();
+const href = await link.getAttribute("href"); console.log("first map", href);
+await go(page, href); await page.waitForTimeout(5000);
+console.log((await page.locator("main").innerText()).replace(/\n+/g," | ").slice(0,900));
+console.log("tabs:", await page.locator("[role=tab]").count(), "lang-related:", await page.getByText(/Ελληνικά|Italiano/).count());
+await shot(page, "map-editor__translator-view");
+await browser.close();

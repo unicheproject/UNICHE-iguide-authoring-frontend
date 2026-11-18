@@ -1,0 +1,190 @@
+[
+ [
+  "1280 btn",
+  1
+ ],
+ [
+  "1280 btnBox",
+  {
+   "x": 912,
+   "y": 556.390625,
+   "width": 344,
+   "height": 40
+  }
+ ],
+ [
+  "1280 opened",
+  {
+   "scrollY": 0,
+   "docH": 720,
+   "vh": 720,
+   "region": {
+    "x": 273,
+    "y": 309,
+    "w": 966,
+    "h": 685
+   },
+   "frame": {
+    "x": 273,
+    "y": 357,
+    "w": 966,
+    "h": 637
+   },
+   "scale": "0.755",
+   "btns": [
+    [
+     "Open at real size",
+     {
+      "x": 939,
+      "y": 313,
+      "w": 170,
+      "h": 32
+     }
+    ],
+    [
+     "Interact with the preview",
+     {
+      "x": 1125,
+      "y": 309,
+      "w": 114,
+      "h": 40
+     }
+    ],
+    [
+     "Close preview",
+     {
+      "x": 912,
+      "y": 1179,
+      "w": 224,
+      "h": 40
+     }
+    ],
+    [
+     "Expand",
+     {
+      "x": 1144,
+      "y": 1179,
+      "w": 113,
+      "h": 40
+     }
+    ]
+   ],
+   "active": "In the appWebMobileKiosk Skip ",
+   "cap": "Desktop browser, 1280 × 800. Shown at 75 %.",
+   "sw": 0
+  }
+ ],
+ [
+  "1280 expandBox(viewport)",
+  {
+   "x": 1143.5,
+   "y": 1179.390625,
+   "width": 112.5,
+   "height": 40
+  }
+ ],
+ [
+  "1280 expandScrollDelta",
+  0
+ ],
+ [
+  "1280 expanded",
+  {
+   "scrollY": 0,
+   "docH": 720,
+   "vh": 720,
+   "region": {
+    "x": 273,
+    "y": -659,
+    "w": 966,
+    "h": 685
+   },
+   "frame": {
+    "x": 273,
+    "y": -611,
+    "w": 966,
+    "h": 637
+   },
+   "scale": "0.755",
+   "btns": [
+    [
+     "Open at real size",
+     {
+      "x": 939,
+      "y": -655,
+      "w": 170,
+      "h": 32
+     }
+    ],
+    [
+     "Interact with the preview",
+     {
+      "x": 1125,
+      "y": -659,
+      "w": 114,
+      "h": 40
+     }
+    ],
+    [
+     "Close preview",
+     {
+      "x": 912,
+      "y": 556,
+      "w": 217,
+      "h": 40
+     }
+    ],
+    [
+     "Collapse",
+     {
+      "x": 1137,
+      "y": 556,
+      "w": 119,
+      "h": 40
+     }
+    ]
+   ],
+   "active": "Collapse",
+   "cap": "Desktop browser, 1280 × 800. Shown at 75 %.",
+   "sw": 0
+  }
+ ],
+ [
+  "1280 focusAfterExpand",
+  "Collapse"
+ ],
+ [
+  "1280 afterEsc1",
+  {
+   "scrollY": 0,
+   "docH": 720,
+   "vh": 720,
+   "region": null,
+   "frame": null,
+   "btns": [],
+   "active": "Preview in app",
+   "sw": 0
+  }
+ ],
+ [
+  "1280 panelStillThere",
+  0
+ ],
+ [
+  "1280 afterEsc2",
+  {
+   "scrollY": 0,
+   "docH": 720,
+   "vh": 720,
+   "region": null,
+   "frame": null,
+   "btns": [],
+   "active": "Preview in app",
+   "sw": 0
+  }
+ ],
+ [
+  "1280 focusAfterClose",
+  "Preview in app"
+ ]
+]

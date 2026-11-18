@@ -1,0 +1,37 @@
+import { open, go, shot, POP, axe, t, focusDesc } from "./lib.mjs";
+const F = "ux-audit/round-2/audit/s13-media/fixtures/";
+const vp = process.argv[2] ?? "1440";
+const { browser, page } = await open("curator", { viewport: vp });
+page.on("pageerror", (e) => console.log("PAGEERROR", e.message.slice(0, 200)));
+await go(page, `/projects/${POP}/media`);
+await page.getByRole("heading",{level:1}).first().waitFor(); await page.waitForTimeout(2000);
+await page.getByRole("button",{name:"Upload files"}).click(); await page.waitForTimeout(800);
+await page.locator("input[type=file]").setInputFiles([F+"UX-R2-s13 delta.png", F+"UX-R2-s13 epsilon.png", F+"UX-R2-s13 zeta.png"]);
+await page.waitForTimeout(3500);
+await shot(page,"upload__three-done",vp);
+console.log("footer:", (await page.locator("[role=dialog]").last().innerText()).split("\n").slice(-6).join(" | "));
+await page.getByRole("button",{name:/Describe now/}).click(); await page.waitForTimeout(800);
+console.log("DESC open focus", await focusDesc(page));
+const dlgs = page.locator("[role=dialog]"); console.log("dialogs", await dlgs.count());
+console.log((await dlgs.last().innerText()).replace(/\n+/g," | "));
+await shot(page,"describe-now__step1",vp);
+await axe(page,"describe");
+// disabled Save reason
+console.log("save disabled?", await page.getByRole("button",{name:/Save/}).first().isDisabled().catch(()=>"n/a"), await page.getByRole("button",{name:/Save/}).first().getAttribute("aria-disabled"));
+await page.keyboard.type("Ένα πορτοκαλί τετράγωνο με κύκλους");
+await page.keyboard.press("Tab"); console.log("tab1", await focusDesc(page));
+await page.getByRole("button",{name:/Save/}).first().click(); await page.waitForTimeout(1500);
+console.log("after save", (await dlgs.last().innerText()).replace(/\n+/g," | ").slice(0,500), "focus", await focusDesc(page));
+await shot(page,"describe-now__step2",vp);
+// decorative
+await page.getByRole("checkbox").last().check().catch(()=>{});
+console.log("textarea disabled", await page.locator("textarea").last().isDisabled());
+await shot(page,"describe-now__decorative",vp);
+await page.getByRole("button",{name:/Save/}).first().click(); await page.waitForTimeout(1500);
+console.log("after 2", (await dlgs.last().innerText()).replace(/\n+/g," | ").slice(0,400), "focus", await focusDesc(page));
+await shot(page,"describe-now__step3",vp);
+await page.getByRole("button",{name:/Skip/}).first().click(); await page.waitForTimeout(1000);
+console.log("after skip: dialogs", await dlgs.count(), "focus", await focusDesc(page));
+console.log((await dlgs.last().innerText()).replace(/\n+/g," | ").slice(-400));
+await shot(page,"describe-now__finished",vp);
+await browser.close();

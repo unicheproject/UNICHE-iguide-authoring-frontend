@@ -1,0 +1,14 @@
+import { open, go, PID, shot, fs } from "./lib.mjs";
+const ids = JSON.parse(fs.readFileSync(new URL("./ids.json", import.meta.url)));
+const { browser, page } = await open("curator", { viewport: "1440" });
+const wait = async () => { await page.waitForFunction(() => document.querySelector("h1")?.innerText.includes("UX-R2"), null, { timeout: 40000 }).catch(()=>{}); await page.waitForTimeout(1500); };
+const tabs = async () => (await page.locator("[role=tab]").evaluateAll(e => e.map(x => x.innerText.replace(/\n/g," ")))).join(" / ");
+const ctrls = () => page.evaluate(() => [...document.querySelectorAll("main button, main input, main select, main textarea")].filter(e=>e.offsetParent).map(b => `${b.tagName}${b.type?"/"+b.type:""}:${(b.getAttribute("aria-label")||b.labels?.[0]?.innerText||b.innerText).trim().replace(/\n/g," ").slice(0,40)}${b.readOnly?"[ro]":""}${b.disabled?"[dis]":""}`).join(" ; "));
+await go(page, `/projects/${PID}/events/${ids.event}`); await wait();
+await shot(page, "event-editor__en-tab");
+console.log("EN ctrls:", await ctrls());
+await page.getByRole("tab", { name: /Ελληνικά/ }).click(); await page.waitForTimeout(700);
+await shot(page, "event-editor__el-tab");
+console.log("EL ctrls:", await ctrls());
+console.log((await page.locator("main").innerText()).replace(/\n+/g," | ").slice(0, 1800));
+await browser.close();

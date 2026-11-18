@@ -1,0 +1,22 @@
+import { go, POP, run, log, start, box } from "./lib.mjs";
+const MAP = "9fda753d-4d8e-4fba-9760-f300253e2060";
+const vp = process.argv[2] || "1024";
+await run(async () => {
+  const { page } = await start(vp, { touch: true });
+  await go(page, `/projects/${POP}/maps/${MAP}`); await page.waitForSelector(".leaflet-container"); await page.waitForTimeout(4000);
+  const scroller = await page.evaluate(() => { const c=[document.scrollingElement, ...document.querySelectorAll("main, div")].filter(e=>e.scrollHeight>e.clientHeight+50 && /auto|scroll/.test(getComputedStyle(e).overflowY)||e===document.scrollingElement).map(e=>e.tagName+"."+(e.className||"").toString().slice(0,30)+" sh"+e.scrollHeight+" ch"+e.clientHeight); return c.slice(0,5); });
+  log("scrollers", scroller);
+  const cdp = await page.context().newCDPSession(page);
+  const sc = () => page.evaluate(() => { const e=[...document.querySelectorAll("*")].find(e=>e.scrollTop>0); return (e?e.tagName:"-")+":"+(e?e.scrollTop:0)+" win"+scrollY; });
+  const swipe = async (label, x, y, d) => { const b = await sc(); await cdp.send("Input.dispatchTouchEvent",{type:"touchStart",touchPoints:[{x,y}]}); const n=10; for(let i=1;i<=n;i++){ await cdp.send("Input.dispatchTouchEvent",{type:"touchMove",touchPoints:[{x,y:y+(-d)*0+ (d/n)*i*-1*-1}]}); await page.waitForTimeout(16);} await cdp.send("Input.dispatchTouchEvent",{type:"touchEnd",touchPoints:[]}); await page.waitForTimeout(900); log(label, b, "->", await sc()); };
+  await page.evaluate(() => document.querySelector(".leaflet-container").scrollIntoView({ block: "start" }));
+  const mb = await page.evaluate(box(".leaflet-container")); log("map", mb);
+  const mb2 = await page.evaluate(box(".leaflet-container")); 
+  const btn = page.getByRole("button", { name: /Move map|Scroll page/ }); 
+  log("btn label", await btn.first().innerText(), "pressed", await btn.first().getAttribute("aria-pressed"));
+  await btn.first().tap(); await page.waitForTimeout(500);
+  log("after tap", await btn.first().innerText(), "pressed", await btn.first().getAttribute("aria-pressed"), "hint", await page.evaluate(()=>document.querySelector(".geo-map").innerText.replace(/\n/g," | ").slice(0,200)));
+  const m3 = await page.evaluate(box(".leaflet-container")); log("map box now", m3, "scrollTop", await sc());
+  await swipe("swipe on map in move mode", m3.x+m3.w/2, m3.y+m3.h/2, -150);
+  await page.screenshot({path:"shots/map-editor__move-mode__"+""+vp+".png"});
+});

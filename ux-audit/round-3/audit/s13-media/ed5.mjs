@@ -1,0 +1,11 @@
+import { open, go, P, shot, settle } from "./h.mjs";
+const vp = process.argv[2] ?? "1440";
+const { browser, page } = await open("admin", { viewport: vp });
+await go(page, `/projects/${P}/media?q=${encodeURIComponent("UX-R3-s13 one")}`); await settle(page);
+await page.locator("ul[aria-label='Media files'] a").first().click(); await page.waitForTimeout(2500);
+await page.getByLabel("Decorative image").check(); await page.waitForTimeout(600);
+console.log(await page.evaluate(()=>({dlg: document.querySelector("[role=dialog],[role=alertdialog]")?.innerText.replace(/\n+/g," | "), focus: document.activeElement.tagName+" "+document.activeElement.textContent.trim().slice(0,40), role: document.querySelector("[role=alertdialog]") ? "alertdialog":"dialog"})));
+await shot(page, `editor__decorative-confirm__${vp}`);
+await page.keyboard.press("Escape"); await page.waitForTimeout(400);
+console.log("after esc", await page.evaluate(()=>({checked: document.querySelector("input[type=checkbox]")?.checked, focus: document.activeElement.tagName+" "+(document.activeElement.getAttribute("aria-label")||document.activeElement.textContent).trim().slice(0,40)})));
+await browser.close();

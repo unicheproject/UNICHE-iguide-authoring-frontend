@@ -1,0 +1,15 @@
+1440 open {"vh":900,"picture":{"top":303,"bottom":1040,"h":737},"close":null,"expand":null,"panel":{"top":182,"bottom":812,"h":630},"scrollY":0}
+1440 no Expand button
+1440 focus div "In the appWebMobileKiosk Skip preview Desktop brow"
+1280 open {"vh":720,"picture":{"top":303,"bottom":940,"h":637},"close":null,"expand":null,"panel":{"top":182,"bottom":686,"h":504},"scrollY":0}
+1280 no Expand button
+1280 focus div "In the appWebMobileKiosk Skip preview Desktop brow"
+1024 open {"vh":768,"picture":{"top":377,"bottom":1009,"h":632},"close":null,"expand":null,"panel":{"top":256,"bottom":794,"h":538},"scrollY":0}
+1024 no Expand button
+1024 focus div "In the appWebMobileKiosk Skip preview Desktop brow"
+768 open {"vh":1024,"picture":{"top":377,"bottom":849,"h":472},"close":null,"expand":null,"panel":{"top":256,"bottom":927,"h":671},"scrollY":0}
+768 no Expand button
+768 focus div "In the appWebMobileKiosk Skip preview Desktop brow"
+zoom200 open {"vh":360,"picture":{"top":200,"bottom":592,"h":392},"close":null,"expand":null,"panel":{"top":79,"bottom":331,"h":252},"scrollY":177}
+zoom200 no Expand button
+zoom200 focus div "In the appWebMobileKiosk Skip preview Desktop brow"

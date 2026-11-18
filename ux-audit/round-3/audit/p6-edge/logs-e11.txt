@@ -1,0 +1,5 @@
+## reload {"dl":["beforeunload"],"msgs":["Unsaved changes from 17 Nov 2026, 11:40 are kept in this browser. Restore (1 field) Discard"],"title":"UX-R3-p6 POI A e2 slow","focus":"body \"Skip to content  iGuide CMS UX Audit – PopulatedAp\""}
+restore row rect {"row":[256,189,736,46],"titleTop":401}
+after restore {"focus":"textarea#f-title \"UX-R3-p6 POI A e2 slow reloadme\"","title":"UX-R3-p6 POI A e2 slow reloadme","msgs":["Unsaved changes","3 warnings, nothing blocks."],"live":["Unsaved changes"]}
+after save {"msgs":["Saved 11:40","3 warnings, nothing blocks."]}
+switcher ["null: UX Audit – Populated App: Draft . Switch project","dialog: Search projects by name, address or organisation Current project UX Audit – Populated App: Draft ux-audit-populated Multi-region network Updated 12 Nov 2026 Needs setup (9+) Created but not initialize"]

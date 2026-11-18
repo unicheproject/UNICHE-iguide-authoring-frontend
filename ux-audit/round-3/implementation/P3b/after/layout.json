@@ -1,0 +1,338 @@
+{
+ "guides@1440": {
+  "mode": "table",
+  "rows": 27,
+  "titleMin": 422,
+  "titleMax": 422,
+  "overlaps": 0,
+  "overflow": 0,
+  "rowH": {
+   "median": 81,
+   "max": 104,
+   "min": 81
+  },
+  "slugMulti": 0,
+  "slugCut": 2,
+  "updMulti": 0,
+  "usedMulti": 0,
+  "updColors": [
+   "rgb(86, 96, 112)"
+  ],
+  "theadH": [
+   48,
+   48,
+   48,
+   48,
+   48,
+   48,
+   48
+  ],
+  "docOverflow": false
+ },
+ "events@1440": {
+  "mode": "table",
+  "rows": 27,
+  "titleMin": 414,
+  "titleMax": 414,
+  "overlaps": 0,
+  "overflow": 0,
+  "rowH": {
+   "median": 81,
+   "max": 106,
+   "min": 81
+  },
+  "slugMulti": 0,
+  "slugCut": 1,
+  "updMulti": 0,
+  "usedMulti": 0,
+  "updColors": [
+   "rgb(86, 96, 112)"
+  ],
+  "theadH": [
+   48,
+   48,
+   48,
+   48,
+   48,
+   48,
+   48
+  ],
+  "docOverflow": false
+ },
+ "categories@1440": {
+  "mode": "table",
+  "rows": 41,
+  "titleMin": 414,
+  "titleMax": 414,
+  "overlaps": 0,
+  "overflow": 0,
+  "rowH": {
+   "median": 83,
+   "max": 118,
+   "min": 83
+  },
+  "slugMulti": 0,
+  "slugCut": 1,
+  "updMulti": 0,
+  "usedMulti": 0,
+  "updColors": [
+   "rgb(86, 96, 112)"
+  ],
+  "theadH": [
+   48,
+   48,
+   48,
+   48,
+   48,
+   48,
+   48
+  ],
+  "docOverflow": false
+ },
+ "guides@1280": {
+  "mode": "table",
+  "rows": 27,
+  "titleMin": 262,
+  "titleMax": 262,
+  "overlaps": 0,
+  "overflow": 0,
+  "rowH": {
+   "median": 81,
+   "max": 120,
+   "min": 81
+  },
+  "slugMulti": 0,
+  "slugCut": 6,
+  "updMulti": 0,
+  "usedMulti": 0,
+  "updColors": [
+   "rgb(86, 96, 112)"
+  ],
+  "theadH": [
+   48,
+   48,
+   48,
+   48,
+   48,
+   48,
+   48
+  ],
+  "docOverflow": false
+ },
+ "events@1280": {
+  "mode": "table",
+  "rows": 27,
+  "titleMin": 254,
+  "titleMax": 254,
+  "overlaps": 0,
+  "overflow": 0,
+  "rowH": {
+   "median": 81,
+   "max": 120,
+   "min": 81
+  },
+  "slugMulti": 0,
+  "slugCut": 7,
+  "updMulti": 0,
+  "usedMulti": 0,
+  "updColors": [
+   "rgb(86, 96, 112)"
+  ],
+  "theadH": [
+   48,
+   48,
+   48,
+   48,
+   48,
+   48,
+   48
+  ],
+  "docOverflow": false
+ },
+ "categories@1280": {
+  "mode": "table",
+  "rows": 41,
+  "titleMin": 254,
+  "titleMax": 254,
+  "overlaps": 0,
+  "overflow": 0,
+  "rowH": {
+   "median": 83,
+   "max": 160,
+   "min": 83
+  },
+  "slugMulti": 0,
+  "slugCut": 9,
+  "updMulti": 0,
+  "usedMulti": 0,
+  "updColors": [
+   "rgb(86, 96, 112)"
+  ],
+  "theadH": [
+   48,
+   48,
+   48,
+   48,
+   48,
+   48,
+   48
+  ],
+  "docOverflow": false
+ },
+ "guides@1024": {
+  "mode": "table",
+  "rows": 27,
+  "titleMin": 254,
+  "titleMax": 254,
+  "overlaps": 0,
+  "overflow": 0,
+  "rowH": {
+   "median": 81,
+   "max": 120,
+   "min": 81
+  },
+  "slugMulti": 0,
+  "slugCut": 6,
+  "updMulti": 0,
+  "usedMulti": 0,
+  "updColors": [
+   "rgb(86, 96, 112)"
+  ],
+  "theadH": [
+   48,
+   48,
+   48,
+   48,
+   48,
+   48,
+   48
+  ],
+  "docOverflow": false
+ },
+ "events@1024": {
+  "mode": "table",
+  "rows": 27,
+  "titleMin": 246,
+  "titleMax": 246,
+  "overlaps": 0,
+  "overflow": 0,
+  "rowH": {
+   "median": 81,
+   "max": 120,
+   "min": 81
+  },
+  "slugMulti": 0,
+  "slugCut": 7,
+  "updMulti": 0,
+  "usedMulti": 0,
+  "updColors": [
+   "rgb(86, 96, 112)"
+  ],
+  "theadH": [
+   48,
+   48,
+   48,
+   48,
+   48,
+   48,
+   48
+  ],
+  "docOverflow": false
+ },
+ "categories@1024": {
+  "mode": "table",
+  "rows": 41,
+  "titleMin": 246,
+  "titleMax": 246,
+  "overlaps": 0,
+  "overflow": 0,
+  "rowH": {
+   "median": 97,
+   "max": 160,
+   "min": 83
+  },
+  "slugMulti": 0,
+  "slugCut": 9,
+  "updMulti": 0,
+  "usedMulti": 0,
+  "updColors": [
+   "rgb(86, 96, 112)"
+  ],
+  "theadH": [
+   48,
+   48,
+   48,
+   48,
+   48,
+   48,
+   48
+  ],
+  "docOverflow": false
+ },
+ "guides@768": {
+  "mode": "cards",
+  "rows": 27,
+  "titleMin": 658,
+  "titleMax": 658,
+  "overlaps": 0,
+  "overflow": 0,
+  "rowH": {
+   "median": 113,
+   "max": 173,
+   "min": 113
+  },
+  "slugMulti": 0,
+  "slugCut": 1,
+  "updMulti": 0,
+  "usedMulti": 0,
+  "updColors": [
+   "rgb(86, 96, 112)"
+  ],
+  "theadH": [],
+  "docOverflow": false
+ },
+ "events@768": {
+  "mode": "cards",
+  "rows": 27,
+  "titleMin": 658,
+  "titleMax": 658,
+  "overlaps": 0,
+  "overflow": 0,
+  "rowH": {
+   "median": 113,
+   "max": 151,
+   "min": 105
+  },
+  "slugMulti": 0,
+  "slugCut": 1,
+  "updMulti": 0,
+  "usedMulti": 0,
+  "updColors": [
+   "rgb(86, 96, 112)"
+  ],
+  "theadH": [],
+  "docOverflow": false
+ },
+ "categories@768": {
+  "mode": "cards",
+  "rows": 41,
+  "titleMin": 610,
+  "titleMax": 658,
+  "overlaps": 0,
+  "overflow": 0,
+  "rowH": {
+   "median": 131,
+   "max": 145,
+   "min": 131
+  },
+  "slugMulti": 0,
+  "slugCut": 1,
+  "updMulti": 0,
+  "usedMulti": 0,
+  "updColors": [
+   "rgb(86, 96, 112)"
+  ],
+  "theadH": [],
+  "docOverflow": false
+ }
+}

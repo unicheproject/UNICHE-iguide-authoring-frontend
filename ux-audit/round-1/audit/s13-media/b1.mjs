@@ -1,0 +1,15 @@
+import { start, go, P } from "./common.mjs";
+const vp = process.argv[2] ?? "1440";
+const s = await start(vp); const { page } = s;
+const t0 = Date.now();
+await go(page, `${P}/media`);
+await page.waitForSelector("ul li a, table, [role=alert]", { timeout: 30000 }).catch(()=>console.log("timeout"));
+console.log("load ms", Date.now()-t0);
+await page.waitForTimeout(1500);
+await s.shot("library__grid");
+const info = await page.evaluate(() => ({ cards: document.querySelectorAll("main ul li").length, text: document.querySelector("main").innerText.slice(0,1500), imgs:[...document.querySelectorAll("main img")].map(i=>[i.alt, i.naturalWidth, i.loading]).slice(0,5), h1: document.querySelectorAll("h1").length }));
+console.log(JSON.stringify(info,null,1));
+await page.getByRole("button",{name:"List"}).click(); await page.waitForTimeout(800);
+await s.shot("library__list");
+await page.screenshot({path: new URL(`./shots/library__list-full__${vp}.png`, import.meta.url).pathname.replace(/^\/([A-Z]:)/,"$1"), fullPage:true});
+await s.browser.close();

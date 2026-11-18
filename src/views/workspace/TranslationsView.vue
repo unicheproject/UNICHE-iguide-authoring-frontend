@@ -14,6 +14,7 @@ import StoryEditor from "@/components/editor/StoryEditor.vue";
 import { blocksForApi, blocksToForm, type StoryBlockForm } from "@/components/editor/StoryEditor";
 import { Button } from "@/components/ui/button";
 import { statusChipStyle } from "@/lib/format";
+import { fold } from "@/lib/utils";
 import {
   entryLocation,
   fetchAiProvenance,
@@ -156,16 +157,15 @@ const kindFilter = ref<"ALL" | CatalogKind>("ALL");
 const aiFilter = ref(false);
 const stateFilter = ref<"ALL" | ItemState>("ALL");
 const query = ref("");
-const normalize = (text: string) => text.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
 const rows = computed(() => {
-  const q = normalize(query.value.trim());
+  const q = fold(query.value.trim());
   return items.value.filter((item) => {
     if (item.status === "ARCHIVED") return false;
     if (kindFilter.value !== "ALL" && item.kind !== kindFilter.value) return false;
     if (stateFilter.value !== "ALL" && target.value && itemProgress(item, target.value).state !== stateFilter.value) return false;
     if (aiFilter.value && !hasUnreviewedAi(item)) return false;
-    return !q || normalize(item.title).includes(q);
+    return !q || fold(item.title).includes(q);
   });
 });
 const unreviewedCount = computed(() => items.value.filter((i) => i.status !== "ARCHIVED" && hasUnreviewedAi(i)).length);

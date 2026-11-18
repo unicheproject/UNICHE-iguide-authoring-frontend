@@ -1,0 +1,7 @@
+{
+ "draft": "4e03e8e8-7d90-46bb-a3b0-4aab41d67135",
+ "draftUpd": 1,
+ "active": "07927651-be7a-44e9-85eb-843d8ed219f7",
+ "activeUpd": 1,
+ "act": "POST /projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois/07927651-be7a-44e9-85eb-843d8ed219f7/status -> 422 {\"type\":\"urn:uniche:iguide:problem:VALIDATION_ERROR\",\"title\":\"Validation error\",\"status\":422,\"detail\":\"The request is not valid.\",\"code\":\"VALIDATION_ERROR\",\"requestId\":\"220eec9b-f6cc-4a07-a360-e27d5ec8a425\",\"errors\":[{\"path\":\"targetStatus\",\"code\":\"NOTNULL\",\"message\":\"must not be null\"}]}"
+}

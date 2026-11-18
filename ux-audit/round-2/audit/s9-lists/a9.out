@@ -1,0 +1,130 @@
+
+== places focus: input#fd-v-71-title ""
+{
+ "heading": "New place",
+ "name": "New place",
+ "text": "New place The place starts as a draft. Visitors see it once it is complete and you activate it. Link its map or floor plan afterwards, in the editor. Title · English(required) Level Top-level place Stands on its own, such as a site or a region. Sub-place Sits inside another place, such as a room in a building. Slug: built from the title Edit slug Cancel Create and open",
+ "fields": [
+  "input[text] \"Title · English(required)\" req=null val=\"\" ph=",
+  "input[radio] \"Top-level placeStands on its own, such as a site or a region.\" req=null val=true ph=",
+  "input[radio] \"Sub-placeSits inside another place, such as a room in a building.\" req=null val=false ph=",
+  "input[text] \"Slug\" req=null val=\"\" ph="
+ ],
+ "btns": [
+  "Edit slug",
+  "Cancel",
+  "Create and open"
+ ],
+ "h": 484,
+ "w": 576
+}
+ after empty submit focus: div "1 thing to fixTitle: Enter a title in the default " | summary: 1 thing to fix Title: Enter a title in the default language. | alerts: [ '', '1 thing to fixTitle: Enter a title in the default language.' ]
+ esc -> dialog count 0 focus: button "New place"
+
+== pois focus: input#fd-v-247-title ""
+{
+ "heading": "New point of interest",
+ "name": "New point of interest",
+ "text": "New point of interest It starts as a draft. Visitors see it once it is complete and you activate it. Title · English(required) Place Not inside a Place Athens Historic Centre Acropolis Museum Ground Floor – Slopes Level Excavation Hall of the Slopes First Floor – Archaic Gallery Room of the Korai Parthenon Gallery Acropolis of Athens Propylaea and Temple of Athena Nike Theatre of Dionysus Ancient Agora of Athens Stoa of Attalos Museum UX-p6-edge Place UX-s10-poi-place Κήπος Ωδείου – Odeon Garden with a deliberately long name to test wrapping UX-P4 outdoor place UX-P4 indoor place UX-P4 sub place UX-R2-p6 Place UX-R2-s10 Place Category No category Monuments and Temples Sculpture Pottery and Everyday Life Visitor Services Visitor Services › Food and Drink Visitor Services › Shops Viewpoints UX-p3-translator categorie UX-p6-edge Category UX-p6-edge dup categories UX-P5b category UX-R2-p3 Ma",
+ "fields": [
+  "input[text] \"Title · English(required)\" req=null val=\"\" ph=",
+  "select[select-one] \"Place\" req=null val=\"\" ph=",
+  "select[select-one] \"Category\" req=null val=\"\" ph=",
+  "input[text] \"Exhibit code\" req=null val=\"\" ph=",
+  "input[text] \"Slug\" req=null val=\"\" ph="
+ ],
+ "btns": [
+  "Edit slug",
+  "Cancel",
+  "Create and open"
+ ],
+ "h": 617,
+ "w": 576
+}
+ after empty submit focus: div "1 thing to fixTitle: Enter a title in the default " | summary: 1 thing to fix Title: Enter a title in the default language. | alerts: [ '', '1 thing to fixTitle: Enter a title in the default language.' ]
+ esc -> dialog count 0 focus: button "New point of interest"
+
+== routes focus: input#fd-v-49-title ""
+{
+ "heading": "New route",
+ "name": "New route",
+ "text": "New route It starts as a draft without stops; add them in the editor, then activate it. Title · English(required) Setting(required) Indoor routes put their stops on floor plans; outdoor routes are drawn on a map. Choose where the route runs Indoor: Inside a building. Stops sit on floor plans Outdoor: On a site or in a city. Drawn on a map Slug: built from the title Edit slug Cancel Create and open",
+ "fields": [
+  "input[text] \"Title · English(required)\" req=null val=\"\" ph=",
+  "select[select-one] \"Setting(required)\" req=null val=\"\" ph=",
+  "input[text] \"Slug\" req=null val=\"\" ph="
+ ],
+ "btns": [
+  "Edit slug",
+  "Cancel",
+  "Create and open"
+ ],
+ "h": 443,
+ "w": 576
+}
+ after empty submit focus: div "1 thing to fixTitle: Enter a title in the default " | summary: 1 thing to fix Title: Enter a title in the default language. | alerts: [ '', '1 thing to fixTitle: Enter a title in the default language.' ]
+ esc -> dialog count 0 focus: button "New route"
+
+== guides focus: input#fd-v-45-title ""
+{
+ "heading": "New guide",
+ "name": "New guide",
+ "text": "New guide It starts as an empty draft. Write its story in the editor, then activate it. Title · English(required) Slug: built from the title Edit slug Cancel Create and open",
+ "fields": [
+  "input[text] \"Title · English(required)\" req=null val=\"\" ph=",
+  "input[text] \"Slug\" req=null val=\"\" ph="
+ ],
+ "btns": [
+  "Edit slug",
+  "Cancel",
+  "Create and open"
+ ],
+ "h": 333,
+ "w": 576
+}
+ after empty submit focus: div "1 thing to fixTitle: Enter a title in the default " | summary: 1 thing to fix Title: Enter a title in the default language. | alerts: [ '', '1 thing to fixTitle: Enter a title in the default language.' ]
+ esc -> dialog count 0 focus: button "New guide"
+
+== events focus: input#fd-v-54-title ""
+{
+ "heading": "New event",
+ "name": "New event",
+ "text": "New event It starts as a draft without dates. Add its dates in the editor, then activate it. Title · English(required) Slug: built from the title Edit slug Cancel Create and open",
+ "fields": [
+  "input[text] \"Title · English(required)\" req=null val=\"\" ph=",
+  "input[text] \"Slug\" req=null val=\"\" ph="
+ ],
+ "btns": [
+  "Edit slug",
+  "Cancel",
+  "Create and open"
+ ],
+ "h": 333,
+ "w": 576
+}
+ after empty submit focus: div "1 thing to fixTitle: Enter a title in the default " | summary: 1 thing to fix Title: Enter a title in the default language. | alerts: [ '', '1 thing to fixTitle: Enter a title in the default language.' ]
+ esc -> dialog count 0 focus: button "New event"
+
+== categories focus: input#fd-v-74-title ""
+{
+ "heading": "New category",
+ "name": "New category",
+ "text": "New category The category starts as a draft. Points of interest or routes are put in it from their editors; categories have two levels at most. Name · English(required) Applies to * Points of Interest Groups points of interest, such as Sculpture. Routes Groups routes, such as Short tours. A category in use cannot change this later. Level Top-level A main group with its own subcategories. Subcategory Sits under a top-level category of the same kind. Code: built from the title Edit code Cancel Create and open",
+ "fields": [
+  "input[text] \"Name · English(required)\" req=null val=\"\" ph=",
+  "input[radio] \"Points of InterestGroups points of interest, such as Sculpture.\" req=null val=false ph=",
+  "input[radio] \"RoutesGroups routes, such as Short tours.\" req=null val=false ph=",
+  "input[radio] \"Top-levelA main group with its own subcategories.\" req=null val=true ph=",
+  "input[radio] \"SubcategorySits under a top-level category of the same kind.\" req=null val=false ph=",
+  "input[text] \"Code\" req=null val=\"\" ph="
+ ],
+ "btns": [
+  "Edit code",
+  "Cancel",
+  "Create and open"
+ ],
+ "h": 636,
+ "w": 576
+}
+ after empty submit focus: div "1 thing to fixName: Enter a name in the default la" | summary: 1 thing to fix Name: Enter a name in the default language. | alerts: [ '', '1 thing to fixName: Enter a name in the default language.' ]
+ esc -> dialog count 0 focus: button "New category"

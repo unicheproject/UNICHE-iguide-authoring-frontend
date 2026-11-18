@@ -1,0 +1,27 @@
+import { open, go, shot, wait, url, ids, active, txt, live, liveLog } from "./h.mjs";
+const { browser, page } = await open("admin", { viewport: "1440" });
+await go(page, url("pois", ids.poiTrig)); await wait(page, 1800);
+await live(page);
+const card = page.locator("section:has(h2:has-text('How visitors reach it'))");
+for (const n of ["QR code","Geo-proximity","Beacon"]) { await card.getByRole("button",{name:new RegExp(n)}).first().click(); await wait(page,300); }
+await page.locator("#t-2-lat").fill("37.97"); await page.locator("#t-2-lng").fill("23.72"); await page.locator("#t-2-area").fill("30"); await page.locator("#t-2-wait").fill("60");
+await page.locator("#t-3-uuid").fill("f7826da6-4fa2-4e98-8024-bc5b71e0893e"); await page.locator("#t-3-major").fill("1"); await page.locator("#t-3-minor").fill("2"); await page.locator("#t-3-radius").fill("5"); await page.locator("#t-3-wait").fill("60");
+let failBeacon = true, posts=[];
+await page.route(/\/triggers(\?.*)?$/, async r => { const req=r.request(); if (req.method()==="POST") { const b=req.postData()||""; const isBeacon=/BEACON/i.test(b); posts.push((isBeacon?"BEACON":/GEO/i.test(b)?"GEO":"QR")+(isBeacon&&failBeacon?":503":":pass")); if (isBeacon && failBeacon) return r.fulfill({status:503,contentType:"application/problem+json",body:JSON.stringify({type:"urn:uniche:iguide:problem:UNAVAILABLE",title:"SECRET-SERVER-DETAIL",status:503,detail:"SECRET-SERVER-DETAIL",code:"SERVICE_UNAVAILABLE",requestId:"req-trig-503"})}); } return r.continue(); });
+await page.getByRole("button",{name:/^Save/}).first().click(); await wait(page,3500);
+console.log("posts1", posts);
+console.log("live", JSON.stringify(await liveLog(page)));
+console.log("SUMMARY:", await page.locator("[role=alert]").allInnerTexts().then(a=>a.map(t=>t.replace(/\n+/g," | "))));
+console.log("CARD:", await card.innerText().then(t=>t.replace(/\n+/g," | ").slice(0,900)));
+console.log("HEADER:", await page.locator(".editor-header").innerText().then(t=>t.replace(/\n+/g," | ")));
+await shot(page,"poi-trig__partial-failure__1440", true);
+console.log("canary", (await page.content()).includes("SECRET-SERVER-DETAIL"));
+posts=[]; failBeacon=false;
+await page.getByRole("button",{name:/^Save/}).first().click(); await wait(page,3500);
+console.log("posts2 (retry)", posts);
+console.log("SUMMARY2:", await page.locator("[role=alert]").allInnerTexts().then(a=>a.map(t=>t.replace(/\n+/g," | "))));
+console.log("HEADER2:", await page.locator(".editor-header").innerText().then(t=>t.replace(/\n+/g," | ")));
+await shot(page,"poi-trig__after-retry__1440", true);
+const h = await page.evaluate(()=>document.querySelector("main").scrollHeight); console.log("main scrollHeight", h);
+console.log("CARD after:", await card.innerText().then(t=>t.replace(/\n+/g," | ").slice(0,900)));
+await browser.close();

@@ -1,0 +1,12 @@
+import { shot, CMS } from "./h.mjs";
+import { open, go } from "../../../tools/session.mjs";
+const { browser, page } = await open("admin", { viewport: "1440" });
+const reqs=[]; page.on("response", r=>{ if(r.url().includes("/iguide/api")) reqs.push(r.status()+" "+r.url().replace(/.*api\/v1/,"")) });
+await go(page, "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5"); await page.waitForTimeout(2500);
+console.log(reqs.join("\n"));
+await page.getByText(/Warnings \(/).click(); await page.waitForTimeout(400);
+await shot(page, "dashboard-populated__warnings-open", "1440");
+await page.screenshot({ path: "ux-audit/round-1/audit/p2-manager/shots/dashboard-populated__warnings-full__1440.png", fullPage: true });
+console.log(await page.locator("main").innerText().then(t=>t.slice(0,2500)));
+console.log("links in warnings:", await page.locator("main details a, main details button").count());
+await browser.close();

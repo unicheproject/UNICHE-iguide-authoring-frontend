@@ -1,0 +1,12 @@
+import { open, go } from "../../../tools/session.mjs";
+const P = "6958c18f-60d2-4140-a524-5a43f8a2f6b5", C = "40f6ddf4-aa94-46cc-99b2-a1b49f40f0e9";
+const { browser, page } = await open("admin", { viewport: "1440" });
+await go(page, `/projects/${P}/categories/${C}`);
+await page.waitForSelector("#f-icon", { timeout: 30000 }); await page.waitForTimeout(1200);
+await page.locator("#f-scope").getByText("Routes", { exact: true }).click();
+await page.waitForTimeout(500);
+console.log("scope live", await page.$$eval("[aria-live]", (e) => e.map((x) => x.textContent.trim()).filter(Boolean)));
+console.log("scope checked", await page.$$eval("#f-scope input:checked", (e) => e.map((x) => x.value)));
+await page.locator("#f-scope").scrollIntoViewIfNeeded();
+await page.screenshot({ path: "after/category-scope-1440.png" });
+await browser.close();

@@ -1,0 +1,13 @@
+import { open, go, shot, P, settle } from "./lib.mjs";
+const ID="57d05371-0303-4f11-bcea-cab34522be19";
+const { browser, page } = await open("curator", { viewport: "1440" });
+await go(page, `/projects/${P}/pois/${ID}`);
+await page.getByRole("heading", { level: 1 }).first().waitFor(); await settle(page,1500);
+await shot(page,"poi-editor__long-greek-title-draft__1440");
+await page.getByRole("button",{name:/^Activate$/}).click(); await settle(page,800);
+await page.getByRole("dialog").getByRole("button",{name:/^Activate$/}).click(); await settle(page,1500);
+console.log("TOASTS", await page.evaluate(()=>[...document.querySelectorAll("[role=status],[aria-live]")].map(e=>e.textContent.trim().slice(0,200)).filter(Boolean)));
+console.log("focus",await page.evaluate(()=>document.activeElement?.outerHTML.slice(0,90)));
+await shot(page,"poi-editor__activated-with-warnings__1440");
+console.log((await page.locator("aside").innerText()).slice(0,600));
+await browser.close();

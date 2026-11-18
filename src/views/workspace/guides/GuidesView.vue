@@ -1,45 +1,61 @@
 <script setup lang="ts">
+/**
+ * Guides list (plan 2.2, D-076): the shared list scaffold with this kind's columns (title with slug and trigger chips;
+ * story size: text blocks, references, reading time; status; translations), a Featured filter in the toolbar, manual order
+ * with "Move to position...", and activation through the shared confirm. Filters, sort and search live in the URL.
+ */
+import { Star } from "lucide-vue-next";
 import { computed, onBeforeUnmount, ref, watch } from "vue";
-import ReorderControls from "@/components/ReorderControls.vue";
-import TriggerChips from "@/components/TriggerChips.vue";
-import { groupTriggersByTarget, listProjectTriggers, type Trigger } from "@/platform/triggers";
-import { saveOrder } from "@/platform/ordering";
-import { dropLineClass, useReorder } from "@/workspace/useReorder";
 import { useRouter } from "vue-router";
+import ListEmpty from "@/components/list/ListEmpty.vue";
+import ListFooter from "@/components/list/ListFooter.vue";
+import ListLoadError from "@/components/list/ListLoadError.vue";
+import ListRowTitle from "@/components/list/ListRowTitle.vue";
+import ListSourceNotice from "@/components/list/ListSourceNotice.vue";
+import MatchHint from "@/components/list/MatchHint.vue";
+import ListTable, { type ListColumn } from "@/components/list/ListTable.vue";
+import ListToolbar from "@/components/list/ListToolbar.vue";
+import RowMenu from "@/components/list/RowMenu.vue";
+import { useCreateParam } from "@/components/list/useCreateParam";
+import { matchesStatus, segmentTotal, statusCounts, useListQuery, useResultAnnouncer, useScrollRestore } from "@/components/list/useListQuery";
+import PageFrame from "@/components/PageFrame.vue";
 import PageHead from "@/components/PageHead.vue";
 import StatusChip from "@/components/StatusChip.vue";
 import TranslationDots from "@/components/TranslationDots.vue";
-import StatusChangeDialog from "@/components/StatusChangeDialog.vue";
+import TriggerChips from "@/components/TriggerChips.vue";
+import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { formatDate } from "@/lib/format";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Chip } from "@/components/ui/chip";
+import { formatDateTime, NBSP } from "@/lib/format";
 import { ApiError } from "@/platform/api";
-import type { ResourceStatus } from "@/platform/places";
 import { changeGuideStatus, fetchGuideReferences, guideCompleteness, guideTitle, listGuides, type Guide } from "@/platform/guides";
+import { saveOrder } from "@/platform/ordering";
+import { groupTriggersByTarget, listProjectTriggers, triggerLabel, type Trigger } from "@/platform/triggers";
 import { showToast } from "@/stores/toast";
-import { handOffActivationErrors, isMissingFieldsError } from "@/workspace/activationHandoff";
 import { useCurrentProject } from "@/workspace/currentProject";
-import type { ResourceReference } from "@/platform/references";
-import { referenceLink } from "@/workspace/referenceLinks";
 import { findSection } from "@/workspace/sections";
-import { STATUS_FILTER_OPTIONS, choiceFilter, useListFilters } from "@/workspace/listFilters";
-import ListFilterMenu from "@/components/ListFilterMenu.vue";
-import FilterChoiceGroup from "@/components/FilterChoiceGroup.vue";
-import SearchLanguageSelect from "@/components/SearchLanguageSelect.vue";
-import FeaturedFilterChip from "@/components/FeaturedFilterChip.vue";
 import { useProjectLanguages } from "@/workspace/useProjectLanguages";
+import { useReorder } from "@/workspace/useReorder";
+import LifecycleDialogs from "../LifecycleDialogs.vue";
+import { matchedInOtherLanguage, searchTitles, sortByQuery, translationScore } from "../listRows";
+import { fold } from "@/lib/utils";
+import { useListLifecycle } from "../useListLifecycle";
 import CreateGuideDialog from "./CreateGuideDialog.vue";
 
 const section = findSection("guides")!;
 const project = useCurrentProject();
 const router = useRouter();
 const projectId = computed(() => project.value.id);
-const { languages, defaultLanguage, error: languagesError, loading: languagesLoading } = useProjectLanguages(projectId);
+const { languages, defaultLanguage, error: languagesError, loading: languagesLoading, reload: reloadLanguages } = useProjectLanguages(projectId);
+
+const query = useListQuery();
 
 const guides = ref<Guide[]>([]);
+/** Non-archived triggers by Guide; null when they could not be read (each row then says "Triggers not loaded"). */
+const triggersByGuide = ref<Map<string, Trigger[]> | null>(null);
 const loading = ref(true);
 const loadError = ref<ApiError | null>(null);
-/** Non-archived triggers by Resource; null when they could not be read, so no chips show. */
-const triggersByTarget = ref<Map<string, Trigger[]> | null>(null);
 let controller: AbortController | null = null;
 
 async function load() {
@@ -49,10 +65,23 @@ async function load() {
   loadError.value = null;
   try {
     const signal = controller.signal;
-    // The chips are a hint: a failure to read them must not hide the list.
-    const triggers = listProjectTriggers(projectId.value, signal).catch(() => null);
-    guides.value = await listGuides(projectId.value, signal);
-    triggersByTarget.value = groupTriggersByTarget(await triggers, "GUIDE");
+    // The chips are a hint: a failure to read them must not hide the list (it is reported as a notice).
+    const triggers = listProjectTriggers(projectId.value, signal).then(
+      (found) => {
+        query.reportError("triggers", null);
+        return found;
+      },
+      (e: unknown) => {
+        if (e instanceof DOMException && e.name === "AbortError") throw e;
+        query.reportError("triggers", e);
+        return null;
+      },
+    );
+    // The rows are set only once the triggers read has settled, so the chips do not grow rows already on screen
+    // (C3-91: the skeleton stays until then).
+    const [found, triggerRows] = await Promise.all([listGuides(projectId.value, signal), triggers]);
+    guides.value = found;
+    triggersByGuide.value = triggerRows ? groupTriggersByTarget(triggerRows, "GUIDE") : null;
   } catch (e) {
     if (e instanceof DOMException && e.name === "AbortError") return;
     if (!(e instanceof ApiError)) throw e;
@@ -64,286 +93,225 @@ async function load() {
 watch(projectId, load, { immediate: true });
 onBeforeUnmount(() => controller?.abort());
 
-type StatusFilter = "ALL" | ResourceStatus | "PENDING";
-const statusFilter = ref<StatusFilter>("ALL");
-const query = ref("");
-const filters = useListFilters();
-const { featuredOnly, searchLanguage } = filters;
-/** The filters in force, shown as chips beside the Filters button. */
-const activeFilters = computed(() => [
-  ...choiceFilter("status", "Status", statusFilter, STATUS_FILTER_OPTIONS, "ALL"),
-  ...filters.active(languages.value),
-]);
+const title = (guide: Guide) => guideTitle(guide, defaultLanguage.value);
 
-function normalize(text: string): string {
-  return text.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+/** What a Guide's story is made of: text blocks, references to other items, and the author's reading time. */
+function story(guide: Guide) {
+  const references = guide.blocks.filter((b) => b.blockType === "REFERENCE").length;
+  return { texts: guide.blocks.length - references, references, minutes: guide.estimatedReadingMinutes };
 }
+const count = (n: number, one: string, many: string) => `${n}${NBSP}${n === 1 ? one : many}`;
+
+/** Rows that pass every filter except the status segment: the segment counts are taken from these (no false zeros). */
+const filteredAnyStatus = computed(() => {
+  const q = fold(query.q.value.trim());
+  return guides.value.filter((guide) => {
+    if (query.pending.value && !guide.hasWorkingCopy) return false;
+    if (query.missing.value && guideCompleteness(guide, query.missing.value) === "complete") return false;
+    if (query.featured.value && !guide.featured) return false;
+    if (!q) return true;
+    const triggerTexts = (triggersByGuide.value?.get(guide.id) ?? []).map(triggerLabel);
+    return [guide.slug, ...searchTitles(guide.translations, query.lang.value), ...triggerTexts].some((t) => fold(t).includes(q));
+  });
+});
+const counts = computed(() => statusCounts(filteredAnyStatus.value));
 
 const rows = computed(() => {
-  const q = normalize(query.value.trim());
-  return [...guides.value]
-    .sort((a, b) => a.sortOrder - b.sortOrder)
-    .filter((guide) => {
-      if (statusFilter.value === "PENDING" ? !guide.hasWorkingCopy : statusFilter.value !== "ALL" && guide.status !== statusFilter.value) return false;
-      if (featuredOnly.value && !guide.featured) return false;
-      if (!q) return true;
-      const haystack = [guide.slug, ...filters.texts(guide.translations, "title")];
-      return haystack.some((text) => normalize(text).includes(q));
-    });
+  const found = filteredAnyStatus.value.filter((guide) => matchesStatus(guide, query.status.value));
+  return sortByQuery(found, query, (guide) => ({
+    title: title(guide),
+    status: guide.status,
+    updated: guide.updatedAt,
+    translations: translationScore(languages.value, (code) => guideCompleteness(guide, code)),
+    sortOrder: guide.sortOrder,
+  }));
 });
+const segmentCount = computed(() => segmentTotal(guides.value, query.status.value));
+
+/** The language that explains a row the search found through a title other than the one shown. */
+function matchOf(guide: Guide) {
+  const match = matchedInOtherLanguage(guide.translations, query.q.value, defaultLanguage.value ?? "", [title(guide), guide.slug]);
+  return match ? { match, languageName: languages.value.find((l) => l.languageCode === match.languageCode)?.displayName ?? match.languageCode } : null;
+}
 
 const defaultLanguageInfo = computed(() => languages.value.find((l) => l.isDefault) ?? null);
 const noLanguages = computed(() => !languagesLoading.value && !languagesError.value && !languages.value.length);
+const editorRoute = (guide: Guide) => ({ name: "guide-editor", params: { projectId: projectId.value, guideId: guide.id } });
 
-const countText = computed(() => {
-  const total = guides.value.length;
-  const noun = total === 1 ? "guide" : "guides";
-  return rows.value.length === total ? `${total} ${noun}` : `${rows.value.length} of ${total} ${noun}`;
+const lifecycle = useListLifecycle<Guide>({
+  items: guides,
+  projectId,
+  noun: "guide",
+  referenceType: "GUIDE",
+  title,
+  changeStatus: changeGuideStatus,
+  fetchReferences: fetchGuideReferences,
+  editorRoute,
+  reload: load,
+  completeness: guideCompleteness,
+  languages,
 });
 
-function facts(guide: Guide): string {
-  const refs = guide.blocks.filter((b) => b.blockType === "REFERENCE").length;
-  const texts = guide.blocks.length - refs;
-  const parts = [`${texts === 1 ? "1 text block" : `${texts} text blocks`}, ${refs === 1 ? "1 reference" : `${refs} references`}`];
-  if (guide.estimatedReadingMinutes) parts.push(`${guide.estimatedReadingMinutes} min read`);
-  if (guide.featured) parts.push("featured");
-  return parts.join(" · ");
+// Manual order (spec 12 section 3); off while a search or filter hides rows (D-017); a move steps over hidden ARCHIVED rows.
+const reorder = useReorder<Guide>({
+  items: guides,
+  title,
+  canReorder: query.canReorder,
+  visible: (guide) => matchesStatus(guide, query.status.value),
+  save: (ids) => saveOrder(projectId.value, "guides", ids),
+  reload: load,
+});
+
+const ready = computed(() => !loading.value);
+const { rowKeyFocus } = useScrollRestore(ready);
+
+/** The optional read to run again from the notice's "Try again". */
+function retrySource() {
+  void load();
 }
 
-// Lifecycle actions -----------------------------------------------------------------------------------
-
+// Width budget (D-110, plan 9.7): Story 160 + Status 128 + Updated 152 + Translations 192 leave the Title 254 px at 1280.
+const columns: ListColumn[] = [
+  { key: "title", label: "Title", tree: true, sortKey: "title" },
+  { key: "story", label: "Story", class: "w-40" },
+  { key: "status", label: "Status", sortKey: "status", class: "w-32" },
+  { key: "updated", label: "Updated", sortKey: "updated", class: "w-[9.5rem]" },
+  { key: "translations", label: "Translations", sortKey: "translations" },
+];
+const SORTS = [
+  { value: "manual", label: "Manual order" },
+  { value: "title", label: "Title" },
+  { value: "status", label: "Status" },
+  { value: "updated", label: "Updated" },
+  { value: "translations", label: "Translations" },
+];
 const creating = ref(false);
-const pendingId = ref<string | null>(null);
-const confirm = ref<{ guide: Guide; target: ResourceStatus; blockedBy?: ResourceReference[] } | null>(null);
+useResultAnnouncer(computed(() => rows.value.length), segmentCount, ready, "guides", { query, options: SORTS });
+/** `?create=1` (Dashboard guide) opens the dialog once the default language is known. */
+useCreateParam(creating, computed(() => !!defaultLanguageInfo.value));
+/** Why "New guide" is off, or undefined. */
+const createReason = computed(() => (defaultLanguageInfo.value ? undefined : languagesError.value ? "The languages could not be loaded" : languagesLoading.value ? "Loading languages" : "Add a language first"));
 
-const title = (guide: Guide) => guideTitle(guide, defaultLanguage.value);
-
-function toggleLabel(guide: Guide): string {
-  return guide.status === "DRAFT" ? "Activate" : guide.status === "ACTIVE" ? "Deactivate" : "Restore";
+function onSelect(guide: Guide, key: string) {
+  if (key === "restore-order") query.restoreManualOrder();
+  else lifecycle.onSelect(guide, key);
 }
-
-function onToggle(guide: Guide) {
-  if (guide.status === "DRAFT") void transition(guide, "ACTIVE");
-  else if (guide.status === "ACTIVE") confirm.value = { guide, target: "DRAFT" };
-  else void transition(guide, "DRAFT");
-}
-
-async function transition(guide: Guide, target: ResourceStatus) {
-  pendingId.value = guide.id;
-  try {
-    const updated = await changeGuideStatus(projectId.value, guide.id, target, guide.version);
-    guides.value = guides.value.map((r) => (r.id === updated.id ? updated : r));
-    confirm.value = null;
-    const messages: Record<ResourceStatus, [string, string]> = {
-      ACTIVE: ["Activated", `${title(updated)} is complete and visible to visitors.`],
-      DRAFT: guide.status === "ARCHIVED"
-        ? ["Restored", `${title(updated)} is a draft again.`]
-        : ["Deactivated", `${title(updated)} is a draft again and no longer visible to visitors.`],
-      ARCHIVED: ["Archived", `${title(updated)} is archived.`],
-    };
-    const [heading, body] = messages[target];
-    showToast(heading, body, target === "ACTIVE" ? "success" : "warning");
-  } catch (e) {
-    if (!(e instanceof ApiError)) throw e;
-    if (e.code === "RESOURCE_IN_USE" && confirm.value) {
-      confirm.value = { ...confirm.value, blockedBy: (e.body.references as ResourceReference[]) ?? [] };
-      return;
-    }
-    confirm.value = null;
-    if (isMissingFieldsError(e)) {
-      // The editor shows every missing field and focuses the first (`12` §3, DECISIONS.md D-036).
-      handOffActivationErrors(guide.id, e);
-      showToast("Cannot activate yet", `${title(guide)} opens at the first missing field.`, "error");
-      void router.push({ name: "guide-editor", params: { projectId: projectId.value, guideId: guide.id } });
-    } else if (e.code === "VERSION_CONFLICT") {
-      showToast("It changed meanwhile", "The list was reloaded; check it and try again.", "warning");
-      void load();
-    } else {
-      showToast("The change was not saved", e.platformUnavailable ? "The UNICHE platform is not reachable." : e.message, "error");
-    }
-  } finally {
-    pendingId.value = null;
-  }
-}
-
-// A trigger that opens the guide being changed links to its editor's "How visitors reach it" card.
-const toReference = (r: ResourceReference) =>
-  referenceLink(projectId.value, r, confirm.value && { resourceType: "GUIDE", resourceId: confirm.value.guide.id });
 
 function onCreated(guide: Guide) {
   creating.value = false;
   showToast("Guide created", "It is a draft. Write its story, then activate it.");
-  void router.push({ name: "guide-editor", params: { projectId: projectId.value, guideId: guide.id } });
+  void router.push(editorRoute(guide));
 }
-
-const confirmCopy = computed(() => {
-  const c = confirm.value;
-  if (!c) return null;
-  return c.target === "ARCHIVED"
-    ? { heading: `Archive ${title(c.guide)}?`, body: "An archived guide leaves the visitor app and the default lists. Restoring it makes it a draft again.", action: "Archive" }
-    : { heading: `Deactivate ${title(c.guide)}?`, body: "Visitors stop seeing it on their next refresh. It becomes a draft you can edit.", action: "Deactivate" };
-});
-// Manual order (spec 12 section 3); off while a search or filter hides rows (DECISIONS.md D-017).
-const reorder = useReorder<Guide>({
-  items: guides,
-  save: (ids) => saveOrder(projectId.value, "guides", ids),
-  title: (guide) => title(guide),
-  canReorder: computed(() => !query.value.trim() && !featuredOnly.value && statusFilter.value === "ALL"),
-  reload: load,
-});
 </script>
 
 <template>
-  <main class="relative min-w-0 flex-1 overflow-y-auto px-4 pb-16 pt-6 md:px-7">
-    <PageHead :title="section.title" :subtitle="section.subtitle">
+  <PageFrame>
+    <PageHead :title="section.title" :subtitle="section.subtitle" section="guides">
       <template #actions>
-        <Button variant="brand" :disabled="!defaultLanguageInfo" @click="creating = true">New guide</Button>
+        <Button :disabled-reason="createReason" @click="creating = true">New guide</Button>
       </template>
     </PageHead>
 
-    <div
-      v-if="noLanguages"
-      class="mb-5 flex flex-wrap items-center gap-3.5 rounded-lg border-l-[3px] border-l-[#855400] bg-[rgba(154,98,0,0.07)] px-[18px] py-3.5 text-[13px]"
-    >
-      <div class="min-w-[min(100%,260px)] flex-1">
-        <strong class="mb-0.5 block text-[13px] font-bold">Add a language first</strong>
-        <span class="text-gray-700">Every guide has its title and texts per language, starting with the default language.</span>
-      </div>
-      <RouterLink :to="{ name: 'project-languages', params: { projectId } }" class="whitespace-nowrap text-[11px] font-bold uppercase tracking-[0.06em] text-primary">
-        Set up languages
-      </RouterLink>
+    <Alert v-if="noLanguages" tone="warning" title="Add a language first" class="mb-5">
+      Every guide has its title and texts per language, starting with the default language.
+      <template #actions>
+        <Button as-child variant="secondary" size="sm">
+          <RouterLink :to="{ name: 'project-languages', params: { projectId } }">Set up languages</RouterLink>
+        </Button>
+      </template>
+    </Alert>
+
+    <ListLoadError v-if="languagesError" :error="languagesError" what="the project's languages" @retry="reloadLanguages" />
+    <ListLoadError v-else-if="loadError" :error="loadError" what="the guides" @retry="load" />
+
+    <template v-else>
+    <ListSourceNotice :errors="query.errors" @retry="retrySource" />
+    <div class="rounded-lg border border-border bg-card shadow-1">
+      <template v-if="loading || guides.length">
+        <ListToolbar
+          :query="query"
+          :counts="counts"
+          :loading="loading"
+          :languages="languages"
+          search-placeholder="Search title, slug or trigger"
+          :sort-options="SORTS"
+        >
+          <template #filters-extra>
+            <Checkbox v-model="query.featured.value">
+              <span class="inline-flex items-center gap-1.5">
+                <Star class="size-4" :class="query.featured.value ? 'fill-current text-primary' : 'text-muted-foreground'" aria-hidden="true" />
+                Featured only
+              </span>
+            </Checkbox>
+          </template>
+        </ListToolbar>
+        <ListTable
+          :columns="columns"
+          :rows="rows"
+          :loading="loading"
+          :query="query"
+          :reorder="reorder"
+          :row-label="title"
+          :row-key-focus="rowKeyFocus"
+          label="Guides"
+          openable
+          @open="(guide) => router.push(editorRoute(guide))"
+        >
+          <template #cell-title="{ row }">
+            <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+              <ListRowTitle :to="editorRoute(row)" :muted="row.status === 'ARCHIVED'" :missing="query.missing.value">{{ title(row) }}</ListRowTitle>
+              <Chip v-if="row.featured" tone="brand" :icon="Star">Featured</Chip>
+            </div>
+            <p class="mono truncate text-compact text-muted-foreground" :title="row.slug">{{ row.slug }}</p>
+            <MatchHint v-if="matchOf(row)" v-bind="matchOf(row)!" />
+            <TriggerChips :triggers="triggersByGuide?.get(row.id) ?? []" :unavailable="triggersByGuide === null" />
+          </template>
+          <template #cell-story="{ row }">
+            <p class="text-sm font-medium">{{ count(story(row).texts, "text block", "text blocks") }}</p>
+            <p class="text-compact text-muted-foreground">
+              {{ count(story(row).references, "reference", "references") }}
+            </p>
+            <p v-if="story(row).minutes" class="whitespace-nowrap text-compact text-muted-foreground">{{ story(row).minutes }}{{ NBSP }}min{{ NBSP }}read</p>
+          </template>
+          <template #cell-status="{ row }">
+            <div class="flex flex-wrap gap-1">
+              <StatusChip :status="row.status" />
+              <StatusChip v-if="row.hasWorkingCopy" status="PENDING" label="Pending changes" title="Has pending changes that visitors do not see yet" wrap />
+            </div>
+          </template>
+          <template #cell-updated="{ row }">
+            <time :datetime="row.updatedAt" class="tabular whitespace-nowrap text-compact text-muted-foreground">{{ formatDateTime(row.updatedAt).replaceAll(" ", NBSP) }}</time>
+          </template>
+          <template #cell-translations="{ row }">
+            <TranslationDots names :route="editorRoute(row)" :languages="languages" :completeness="(code) => guideCompleteness(row, code)" />
+          </template>
+          <template #menu="{ row }">
+            <RowMenu
+              :title="title(row)"
+              :actions="lifecycle.actionsFor(row)"
+              :reorder="reorder"
+              :item="row"
+              :reorder-reason="query.reorderReason.value"
+              @select="(key) => onSelect(row, key)"
+            />
+          </template>
+        </ListTable>
+      </template>
+      <ListEmpty
+        v-if="!loading && !rows.length"
+        noun="guides"
+        empty-title="No guides yet"
+        :filtered="guides.length > 0"
+        :filters="query.chips([], languages)"
+        :counts="counts"
+        :status="query.status.value"
+        header-action
+      >
+        Guides are article-like reading pieces, such as the story of a collection, with references to points of interest and routes inside the story.
+      </ListEmpty>
+      <ListFooter v-if="loading || guides.length" :loading="loading" :shown="rows.length" :total="segmentCount" noun="guides" paged legend />
     </div>
-
-    <div v-if="loadError" role="alert" class="max-w-[640px] rounded-lg border border-l-[3px] border-l-destructive bg-card px-[18px] py-4">
-      <strong class="block text-[13px] font-bold text-destructive">
-        {{ loadError.platformUnavailable ? "The UNICHE platform is not reachable" : "The guides could not be loaded" }}
-      </strong>
-      <p class="mt-1 text-[13px] text-gray-700">{{ loadError.message }}</p>
-      <p v-if="loadError.requestId" class="mt-1 font-mono text-[11px] text-muted-foreground">Request id {{ loadError.requestId }}</p>
-      <Button variant="outline" size="sm" class="mt-3" @click="load">Try again</Button>
-    </div>
-
-    <div v-else class="overflow-hidden rounded-lg border bg-card shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-      <div class="flex flex-wrap items-center gap-2.5 border-b px-[18px] py-3.5">
-        <label for="guides-search" class="text-[11px] font-bold uppercase tracking-[0.06em] text-muted-foreground">Search</label>
-        <input
-          id="guides-search"
-          v-model="query"
-          type="search"
-          placeholder="Search titles"
-          class="min-w-[min(100%,200px)] flex-1 rounded-lg border-[1.5px] px-3 py-[9px] text-[13px] focus:border-primary focus:outline-none"
-        />
-        <ListFilterMenu :active="activeFilters">
-          <FilterChoiceGroup v-model="statusFilter" legend="Status" :options="STATUS_FILTER_OPTIONS" />
-          <FeaturedFilterChip v-model="featuredOnly" />
-          <SearchLanguageSelect v-model="searchLanguage" :languages="languages" />
-        </ListFilterMenu>
-        <span class="ml-auto text-[11px] text-muted-foreground">
-          {{ reorder.enabled || reorder.saving ? "Sorted by order · drag or use the arrows to reorder" : "Clear the search and filters to reorder" }}
-        </span>
-        <p class="sr-only" aria-live="polite">{{ reorder.announcement }}</p>
-      </div>
-
-      <div v-if="loading" class="animate-skeleton" role="status" aria-busy="true" aria-label="Loading guides">
-        <div v-for="n in 3" :key="n" class="flex items-center gap-3.5 border-b border-gray-100 px-[18px] py-4">
-          <div class="h-[13px] w-1/3 rounded bg-[#e2e3e7]"></div>
-          <div class="flex-1"></div>
-          <div class="h-2.5 w-[90px] rounded bg-[#eceef1]"></div>
-        </div>
-      </div>
-
-      <div v-else-if="rows.length" class="overflow-x-auto">
-        <table class="w-full min-w-[560px] table-fixed border-collapse">
-          <thead>
-            <tr>
-              <th class="th w-[56px] px-2"><span class="sr-only">Order</span></th>
-              <th class="th w-[41%] px-[18px]">Title</th>
-              <th class="th w-[15%] px-3">Status</th>
-              <th class="th w-[14%] px-3">Translations</th>
-              <th class="th w-[30%] px-[18px] text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="guide in rows" :key="guide.id"
-              class="hover:bg-muted"
-              :class="dropLineClass(reorder.dropLine(guide))"
-              @dragover="reorder.dragOver(guide, $event)"
-              @drop="reorder.drop(guide, $event)"
-            >
-              <td class="td px-2"><ReorderControls :reorder="reorder" :item="guide" :title="title(guide)" /></td>
-              <td class="td px-[18px]">
-                <div class="flex flex-wrap items-center gap-2">
-                  <RouterLink
-                    :to="{ name: 'guide-editor', params: { projectId, guideId: guide.id } }"
-                    class="text-left text-[13px] font-semibold no-underline hover:underline"
-                    :class="guide.status === 'ARCHIVED' ? 'text-muted-foreground' : 'text-foreground'"
-                  >
-                    {{ title(guide) }}
-                  </RouterLink>
-                  <span
-                    v-if="guide.featured"
-                    class="rounded-full border bg-muted px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-[0.08em] text-muted-foreground"
-                  >
-                    Featured
-                  </span>
-                </div>
-                <div class="mt-[3px] break-words text-[11px] text-gray-500">
-                  <span class="font-mono">{{ guide.slug }}</span> · {{ facts(guide) }} · {{ formatDate(guide.updatedAt) }}
-                </div>
-                <TriggerChips v-if="triggersByTarget" :triggers="triggersByTarget.get(guide.id) ?? []" />
-              </td>
-              <td class="td px-3">
-                <StatusChip :status="guide.status" />
-                <StatusChip
-                  v-if="guide.hasWorkingCopy"
-                  status="PENDING"
-                  label="Pending changes"
-                  class="ml-1"
-                  title="Has pending changes that visitors do not see yet"
-                />
-              </td>
-              <td class="td px-3">
-                <TranslationDots :languages="languages" :completeness="(code) => guideCompleteness(guide, code)" />
-              </td>
-              <td class="td px-[18px]">
-                <div class="flex flex-wrap items-center justify-end gap-2.5">
-                  <button
-                    type="button"
-                    class="whitespace-nowrap rounded-full border bg-muted px-[13px] py-1.5 text-[10px] font-bold uppercase tracking-[0.06em] text-gray-700 disabled:opacity-50"
-                    :disabled="pendingId === guide.id"
-                    @click="onToggle(guide)"
-                  >
-                    {{ toggleLabel(guide) }}
-                  </button>
-                  <button
-                    v-if="guide.status !== 'ARCHIVED'"
-                    type="button"
-                    class="whitespace-nowrap text-[10px] font-bold uppercase tracking-[0.06em] text-destructive disabled:opacity-50"
-                    :disabled="pendingId === guide.id"
-                    @click="confirm = { guide, target: 'ARCHIVED' }"
-                  >
-                    Archive
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div v-else class="px-6 py-12 text-center">
-        <p class="mx-auto mb-[18px] max-w-[420px] text-[13px] text-muted-foreground">
-          {{
-            guides.length
-              ? "No guide matches the search or the filters."
-              : "Guides are article-like reading pieces, such as the story of a collection, with references to points of interest and routes inside the story."
-          }}
-        </p>
-        <Button v-if="!guides.length" variant="brand" :disabled="!defaultLanguageInfo" @click="creating = true">New guide</Button>
-      </div>
-
-      <div class="border-t border-gray-100 px-[18px] py-3 text-[11px] text-muted-foreground">{{ countText }}</div>
-    </div>
+    </template>
 
     <CreateGuideDialog
       v-if="creating && defaultLanguageInfo"
@@ -352,42 +320,6 @@ const reorder = useReorder<Guide>({
       @close="creating = false"
       @created="onCreated"
     />
-
-    <StatusChangeDialog
-      v-if="confirm && confirmCopy"
-      :heading="confirmCopy.heading"
-      :body="confirmCopy.body"
-      :action-label="confirmCopy.action"
-      :danger="confirm.target === 'ARCHIVED'"
-      :busy="pendingId === confirm.guide.id"
-      :load-references="() => fetchGuideReferences(projectId, confirm!.guide.id)"
-      :blocked-by="confirm.blockedBy ?? null"
-      :link-for="toReference"
-      @close="confirm = null"
-      @confirm="transition(confirm.guide, confirm.target)"
-    />
-  </main>
+    <LifecycleDialogs :lifecycle="lifecycle" />
+  </PageFrame>
 </template>
-
-<style scoped>
-.th {
-  border-bottom: 1px solid #e5e7eb;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  text-align: left;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: #6b7280;
-}
-.th.text-right {
-  text-align: right;
-}
-.td {
-  border-bottom: 1px solid #f3f4f6;
-  padding-top: 11px;
-  padding-bottom: 11px;
-  vertical-align: top;
-}
-</style>

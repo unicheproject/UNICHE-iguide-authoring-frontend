@@ -1,0 +1,2 @@
+B applied ["Saved 11:46","6 warnings, nothing blocks.","Changes applied Visitors see them on their next refresh."]
+A save draft (stale) {"msgs":["Unsaved changes","6 warnings, nothing blocks.","Someone else changed this point of interest It was saved by someone else while you were editing. Reload to see their version and lose your changes, or keep your changes and save them over theirs. Request id deb06132-1096-4a5d-bf70-5be1f868eaef Reload their version Keep my changes"],"focus":"h2#dialog-xz3psuq \"Someone else changed this point of interest\""}

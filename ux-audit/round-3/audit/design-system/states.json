@@ -1,0 +1,829 @@
+{
+ "btn_primary": {
+  "rest": {
+   "backgroundColor": "rgb(76, 29, 139)",
+   "color": "rgb(255, 255, 255)",
+   "borderTopColor": "rgba(0, 0, 0, 0)",
+   "outlineStyle": "none",
+   "outlineWidth": "3px",
+   "outlineOffset": "0px",
+   "outlineColor": "rgb(255, 255, 255)",
+   "boxShadow": "none",
+   "opacity": "1",
+   "cursor": "pointer",
+   "fontSize": "14px",
+   "fontWeight": "600",
+   "borderRadius": "8px",
+   "rect": [
+    1306.5,
+    80,
+    109.5,
+    40
+   ]
+  },
+  "hover": {
+   "backgroundColor": "rgb(76, 29, 139)",
+   "color": "rgb(255, 255, 255)",
+   "borderTopColor": "rgba(0, 0, 0, 0)",
+   "outlineStyle": "none",
+   "outlineWidth": "3px",
+   "outlineOffset": "0px",
+   "outlineColor": "rgb(255, 255, 255)",
+   "boxShadow": "none",
+   "opacity": "1",
+   "cursor": "pointer",
+   "fontSize": "14px",
+   "fontWeight": "600",
+   "borderRadius": "8px",
+   "rect": [
+    1306.5,
+    80,
+    109.5,
+    40
+   ]
+  },
+  "active": {
+   "backgroundColor": "rgb(75, 28, 137)",
+   "color": "rgb(255, 255, 255)",
+   "borderTopColor": "rgba(0, 0, 0, 0)",
+   "outlineStyle": "none",
+   "outlineWidth": "3px",
+   "outlineOffset": "0px",
+   "outlineColor": "rgb(255, 255, 255)",
+   "boxShadow": "none",
+   "opacity": "1",
+   "cursor": "pointer",
+   "fontSize": "14px",
+   "fontWeight": "600",
+   "borderRadius": "8px",
+   "rect": [
+    1306.5,
+    80,
+    109.5,
+    40
+   ]
+  },
+  "focus": {
+   "backgroundColor": "rgb(76, 29, 139)",
+   "color": "rgb(255, 255, 255)",
+   "borderTopColor": "rgba(0, 0, 0, 0)",
+   "outlineStyle": "solid",
+   "outlineWidth": "2px",
+   "outlineOffset": "2px",
+   "outlineColor": "rgb(255, 255, 255)",
+   "boxShadow": "rgb(76, 29, 139) 0px 0px 0px 4px",
+   "opacity": "1",
+   "cursor": "pointer",
+   "fontSize": "14px",
+   "fontWeight": "600",
+   "borderRadius": "8px",
+   "rect": [
+    1306.5,
+    80,
+    109.5,
+    40
+   ]
+  }
+ },
+ "btn_secondary": {
+  "rest": {
+   "backgroundColor": "rgb(255, 255, 255)",
+   "color": "rgb(17, 24, 39)",
+   "borderTopColor": "rgb(115, 123, 139)",
+   "outlineStyle": "none",
+   "outlineWidth": "3px",
+   "outlineOffset": "0px",
+   "outlineColor": "rgb(17, 24, 39)",
+   "boxShadow": "none",
+   "opacity": "1",
+   "cursor": "pointer",
+   "fontSize": "14px",
+   "fontWeight": "600",
+   "borderRadius": "8px",
+   "rect": [
+    1296.5,
+    164,
+    102.5,
+    40
+   ]
+  },
+  "hover": {
+   "backgroundColor": "rgb(255, 255, 255)",
+   "color": "rgb(17, 24, 39)",
+   "borderTopColor": "rgb(115, 123, 139)",
+   "outlineStyle": "none",
+   "outlineWidth": "3px",
+   "outlineOffset": "0px",
+   "outlineColor": "rgb(17, 24, 39)",
+   "boxShadow": "none",
+   "opacity": "1",
+   "cursor": "pointer",
+   "fontSize": "14px",
+   "fontWeight": "600",
+   "borderRadius": "8px",
+   "rect": [
+    1296.5,
+    164,
+    102.5,
+    40
+   ]
+  },
+  "active": {
+   "backgroundColor": "rgb(254, 254, 254)",
+   "color": "rgb(17, 24, 39)",
+   "borderTopColor": "rgb(115, 123, 139)",
+   "outlineStyle": "none",
+   "outlineWidth": "3px",
+   "outlineOffset": "0px",
+   "outlineColor": "rgb(17, 24, 39)",
+   "boxShadow": "none",
+   "opacity": "1",
+   "cursor": "pointer",
+   "fontSize": "14px",
+   "fontWeight": "600",
+   "borderRadius": "8px",
+   "rect": [
+    1296.5,
+    164,
+    102.5,
+    40
+   ]
+  },
+  "focus": {
+   "backgroundColor": "rgb(255, 255, 255)",
+   "color": "rgb(17, 24, 39)",
+   "borderTopColor": "rgb(115, 123, 139)",
+   "outlineStyle": "solid",
+   "outlineWidth": "2px",
+   "outlineOffset": "2px",
+   "outlineColor": "rgb(76, 29, 139)",
+   "boxShadow": "rgb(255, 255, 255) 0px 0px 0px 4px",
+   "opacity": "1",
+   "cursor": "pointer",
+   "fontSize": "14px",
+   "fontWeight": "600",
+   "borderRadius": "8px",
+   "rect": [
+    1296.5,
+    164,
+    102.5,
+    40
+   ]
+  }
+ },
+ "rowMenu": {
+  "menu": {
+   "backgroundColor": "rgb(255, 255, 255)",
+   "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(21, 28, 40, 0.1) 0px 4px 12px 0px, rgba(21, 28, 40, 0.08) 0px 1px 3px 0px",
+   "borderTopColor": "rgb(217, 220, 226)",
+   "borderTopWidth": "1px",
+   "borderRadius": "8px",
+   "zIndex": "40",
+   "rect": [
+    1219,
+    338,
+    192,
+    307
+   ]
+  },
+  "hi": {
+   "backgroundColor": "rgb(238, 240, 243)",
+   "color": "rgb(17, 24, 39)",
+   "borderTopColor": "rgb(217, 220, 226)",
+   "outlineStyle": "none",
+   "outlineWidth": "3px",
+   "outlineOffset": "2px",
+   "outlineColor": "rgb(17, 24, 39)",
+   "boxShadow": "rgb(255, 255, 255) 0px 0px 0px 4px",
+   "opacity": "1",
+   "cursor": "pointer",
+   "fontSize": "14px",
+   "fontWeight": "500",
+   "borderRadius": "4px",
+   "paddingTop": "6px",
+   "paddingLeft": "12px",
+   "rect": [
+    1224,
+    532,
+    182,
+    36
+   ]
+  },
+  "items": 8
+ },
+ "dialog": {
+  "panel": {
+   "backgroundColor": "rgb(255, 255, 255)",
+   "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(21, 28, 40, 0.18) 0px 16px 40px 0px, rgba(21, 28, 40, 0.1) 0px 2px 8px 0px",
+   "borderRadius": "12px",
+   "borderTopWidth": "1px",
+   "borderTopColor": "rgba(0, 0, 0, 0)",
+   "animationName": "ui-rise-in",
+   "animationDuration": "0.24s",
+   "maxWidth": "576px",
+   "rect": [
+    432,
+    207.2,
+    576,
+    485.6
+   ]
+  },
+  "close": {
+   "backgroundColor": "rgba(0, 0, 0, 0)",
+   "color": "rgb(86, 96, 112)",
+   "borderTopColor": "rgb(217, 220, 226)",
+   "outlineStyle": "none",
+   "outlineWidth": "3px",
+   "outlineOffset": "0px",
+   "outlineColor": "rgb(86, 96, 112)",
+   "boxShadow": "none",
+   "opacity": "1",
+   "cursor": "pointer",
+   "fontSize": "14px",
+   "fontWeight": "400",
+   "borderRadius": "8px",
+   "rect": [
+    951,
+    228.2,
+    40,
+    40
+   ]
+  },
+  "heading": {
+   "fontSize": "16px",
+   "fontWeight": "700",
+   "paddingTop": "4px",
+   "lineHeight": "22.4px",
+   "rect": [
+    457,
+    228.2,
+    482,
+    26.4
+   ]
+  },
+  "overlayZ": "50",
+  "footer": {
+   "pad": "16px 24px",
+   "top": "1px"
+  },
+  "focusedTag": "INPUT:fd-v-12-title",
+  "closeFocus": {
+   "backgroundColor": "rgba(0, 0, 0, 0)",
+   "color": "rgb(86, 96, 112)",
+   "borderTopColor": "rgb(217, 220, 226)",
+   "outlineStyle": "solid",
+   "outlineWidth": "2px",
+   "outlineOffset": "2px",
+   "outlineColor": "rgb(76, 29, 139)",
+   "boxShadow": "rgb(255, 255, 255) 0px 0px 0px 4px",
+   "opacity": "1",
+   "cursor": "pointer",
+   "fontSize": "14px",
+   "fontWeight": "400",
+   "borderRadius": "8px",
+   "rect": [
+    951,
+    228.2,
+    40,
+    40
+   ]
+  }
+ },
+ "tabCount": 3,
+ "tabFocus": {
+  "backgroundColor": "rgba(0, 0, 0, 0)",
+  "color": "rgb(76, 29, 139)",
+  "borderTopColor": "rgb(217, 220, 226)",
+  "outlineStyle": "solid",
+  "outlineWidth": "2px",
+  "outlineOffset": "2px",
+  "outlineColor": "rgb(76, 29, 139)",
+  "boxShadow": "rgba(255, 255, 255, 0.03) 0px 0px 0px 0.131191px",
+  "opacity": "1",
+  "cursor": "pointer",
+  "fontSize": "14px",
+  "fontWeight": "600",
+  "borderRadius": "0px",
+  "rect": [
+   256,
+   253.4,
+   134.8,
+   51.8
+  ]
+ },
+ "tablist": {
+  "overflowX": "auto",
+  "overflowY": "auto",
+  "rect": {
+   "x": 256,
+   "y": 253.390625,
+   "width": 736,
+   "height": 51.796875,
+   "top": 253.390625,
+   "right": 992,
+   "bottom": 305.1875,
+   "left": 256
+  },
+  "clip": {
+   "tag": "DIV.flex min-w-0 flex-1 overflow-x-auto",
+   "ox": "auto",
+   "oy": "auto",
+   "r": {
+    "x": 256,
+    "y": 253.390625,
+    "width": 736,
+    "height": 51.796875,
+    "top": 253.390625,
+    "right": 992,
+    "bottom": 305.1875,
+    "left": 256
+   }
+  },
+  "tabRect": {
+   "x": 256,
+   "y": 253.390625,
+   "width": 134.84375,
+   "height": 51.796875,
+   "top": 253.390625,
+   "right": 390.84375,
+   "bottom": 305.1875,
+   "left": 256
+  }
+ },
+ "help": [
+  {
+   "l": "What is a Working Copy?",
+   "w": 32,
+   "h": 32
+  }
+ ],
+ "cards": [
+  {
+   "h": "Status",
+   "tag": "H2",
+   "hs": "16px/700",
+   "pad": "16px",
+   "radius": "12px",
+   "shadow": "yes",
+   "w": 344,
+   "cls": "rounded-lg border bg-card p-4 shadow-1"
+  },
+  {
+   "h": "What needs attention",
+   "tag": "H2",
+   "hs": "14px/700",
+   "pad": "16px",
+   "radius": "12px",
+   "shadow": "yes",
+   "w": 344,
+   "cls": "rounded-lg border bg-card p-4 shadow-1"
+  },
+  {
+   "h": "What needs attention",
+   "tag": "H2",
+   "hs": "14px/700",
+   "pad": "0px",
+   "radius": "0px",
+   "shadow": "none",
+   "w": 310,
+   "cls": ""
+  },
+  {
+   "h": "On this page",
+   "tag": "H2",
+   "hs": "14px/700",
+   "pad": "12px",
+   "radius": "12px",
+   "shadow": "yes",
+   "w": 344,
+   "cls": "rounded-lg border bg-card p-3 shadow-1"
+  },
+  {
+   "h": "Translations",
+   "tag": "H2",
+   "hs": "14px/700",
+   "pad": "16px",
+   "radius": "12px",
+   "shadow": "yes",
+   "w": 344,
+   "cls": "rounded-lg border bg-card p-4 shadow-1"
+  },
+  {
+   "h": "Used in (0)",
+   "tag": "H2",
+   "hs": "14px/700",
+   "pad": "16px",
+   "radius": "12px",
+   "shadow": "yes",
+   "w": 344,
+   "cls": "rounded-lg border bg-card p-4 shadow-1"
+  }
+ ],
+ "stops": [
+  {
+   "tag": "a",
+   "name": "UNICHE, all projects",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(255, 255, 255) 0px 0px 0px 4px",
+   "w": 123,
+   "h": 26,
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  {
+   "tag": "button",
+   "name": "UX Audit – PopulatedAp",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(255, 255, 255) 0px 0px 0px 4px",
+   "w": 352,
+   "h": 40,
+   "bg": "rgb(255, 255, 255)"
+  },
+  {
+   "tag": "button",
+   "name": "PAP. Admin, account me",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(255, 255, 255) 0px 0px 0px 4px",
+   "w": 117,
+   "h": 40,
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  {
+   "tag": "a",
+   "name": "Dashboard",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(255, 255, 255) 0px 0px 0px 4px",
+   "w": 215,
+   "h": 36,
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  {
+   "tag": "a",
+   "name": "Places",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(76, 29, 139) 3px 0px 0px 0px inset",
+   "w": 215,
+   "h": 36,
+   "bg": "rgb(239, 233, 248)"
+  },
+  {
+   "tag": "a",
+   "name": "Points of Interest",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(255, 255, 255) 0px 0px 0px 4px",
+   "w": 215,
+   "h": 36,
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  {
+   "tag": "a",
+   "name": "Routes",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(255, 255, 255) 0px 0px 0px 4px",
+   "w": 215,
+   "h": 36,
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  {
+   "tag": "a",
+   "name": "Guides",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(255, 255, 255) 0px 0px 0px 4px",
+   "w": 215,
+   "h": 36,
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  {
+   "tag": "a",
+   "name": "Events",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(255, 255, 255) 0px 0px 0px 4px",
+   "w": 215,
+   "h": 36,
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  {
+   "tag": "a",
+   "name": "Categories",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(255, 255, 255) 0px 0px 0px 4px",
+   "w": 215,
+   "h": 36,
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  {
+   "tag": "a",
+   "name": "Maps & Floor Plans",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(255, 255, 255) 0px 0px 0px 4px",
+   "w": 215,
+   "h": 36,
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  {
+   "tag": "a",
+   "name": "Media",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(255, 255, 255) 0px 0px 0px 4px",
+   "w": 215,
+   "h": 36,
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  {
+   "tag": "a",
+   "name": "Overview",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(255, 255, 255) 0px 0px 0px 4px",
+   "w": 215,
+   "h": 36,
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  {
+   "tag": "a",
+   "name": "App settings",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(255, 255, 255) 0px 0px 0px 4px",
+   "w": 215,
+   "h": 36,
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  {
+   "tag": "a",
+   "name": "Pages",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(255, 255, 255) 0px 0px 0px 4px",
+   "w": 215,
+   "h": 36,
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  {
+   "tag": "a",
+   "name": "Navigation",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(255, 255, 255) 0px 0px 0px 4px",
+   "w": 215,
+   "h": 36,
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  {
+   "tag": "a",
+   "name": "Translations",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(255, 255, 255) 0px 0px 0px 4px",
+   "w": 215,
+   "h": 36,
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  {
+   "tag": "a",
+   "name": "Preview",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(255, 255, 255) 0px 0px 0px 4px",
+   "w": 215,
+   "h": 36,
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  {
+   "tag": "a",
+   "name": "Launch",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(255, 255, 255) 0px 0px 0px 4px",
+   "w": 215,
+   "h": 36,
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  {
+   "tag": "a",
+   "name": "Audit log",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(255, 255, 255) 0px 0px 0px 4px",
+   "w": 215,
+   "h": 36,
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  {
+   "tag": "a",
+   "name": "Places",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(255, 255, 255) 0px 0px 0px 4px",
+   "w": 40,
+   "h": 32,
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  {
+   "tag": "button",
+   "name": "2 warnings, nothing bl",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(255, 255, 255) 0px 0px 0px 4px",
+   "w": 232,
+   "h": 40,
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  {
+   "tag": "button{primary}",
+   "name": "Apply changesNothing t",
+   "outline": "solid 2px rgb(255, 255, 255) off 2px",
+   "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+   "w": 141,
+   "h": 40,
+   "bg": "rgb(76, 29, 139)"
+  },
+  {
+   "tag": "button{ghost}",
+   "name": "More actions",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+   "w": 40,
+   "h": 40,
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  {
+   "tag": "button",
+   "name": "What is a Working Copy",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(255, 255, 255) 0px 0px 0px 4px",
+   "w": 32,
+   "h": 32,
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  {
+   "tag": "button{secondary}",
+   "name": "Save draftNothing to s",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+   "w": 122,
+   "h": 32,
+   "bg": "rgb(255, 255, 255)"
+  },
+  {
+   "tag": "button{ghost}",
+   "name": "Discard changesThere a",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+   "w": 170,
+   "h": 32,
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  {
+   "tag": "button[tab]",
+   "name": "EnglishdefaultComplete",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(255, 255, 255, 0.01) 0px 0px 0px 0.0523213px",
+   "w": 135,
+   "h": 52,
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  {
+   "tag": "textarea",
+   "name": "",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+   "w": 686,
+   "h": 40,
+   "bg": "rgb(255, 255, 255)"
+  },
+  {
+   "tag": "textarea",
+   "name": "",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+   "w": 335,
+   "h": 60,
+   "bg": "rgb(255, 255, 255)"
+  },
+  {
+   "tag": "textarea",
+   "name": "",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+   "w": 335,
+   "h": 144,
+   "bg": "rgb(255, 255, 255)"
+  },
+  {
+   "tag": "textarea",
+   "name": "",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+   "w": 686,
+   "h": 60,
+   "bg": "rgb(255, 255, 255)"
+  },
+  {
+   "tag": "textarea",
+   "name": "",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+   "w": 686,
+   "h": 60,
+   "bg": "rgb(255, 255, 255)"
+  },
+  {
+   "tag": "input",
+   "name": "",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(255, 255, 255) 0px 0px 0px 4px",
+   "w": 16,
+   "h": 16,
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  {
+   "tag": "select",
+   "name": "SiteAreaDestinationReg",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+   "w": 335,
+   "h": 40,
+   "bg": "rgb(255, 255, 255)"
+  },
+  {
+   "tag": "select",
+   "name": "No mapUX-R3-s12 MapUX-",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+   "w": 335,
+   "h": 40,
+   "bg": "rgb(255, 255, 255)"
+  },
+  {
+   "tag": "button{secondary}",
+   "name": "New map",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+   "w": 95,
+   "h": 32,
+   "bg": "rgb(255, 255, 255)"
+  },
+  {
+   "tag": "a",
+   "name": "Acropolis Museum",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(255, 255, 255) 0px 0px 0px 4px",
+   "w": 131,
+   "h": 18,
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  {
+   "tag": "a",
+   "name": "Acropolis of Athens",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(255, 255, 255) 0px 0px 0px 4px",
+   "w": 135,
+   "h": 18,
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  {
+   "tag": "a",
+   "name": "Theatre of Dionysus",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(255, 255, 255) 0px 0px 0px 4px",
+   "w": 138,
+   "h": 18,
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  {
+   "tag": "a",
+   "name": "Ancient Agora of Athen",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(255, 255, 255) 0px 0px 0px 4px",
+   "w": 171,
+   "h": 18,
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  {
+   "tag": "a",
+   "name": "UX-R2-s9 temp",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(255, 255, 255) 0px 0px 0px 4px",
+   "w": 106,
+   "h": 18,
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  {
+   "tag": "a",
+   "name": "UX-R2-s9 temp2",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(255, 255, 255) 0px 0px 0px 4px",
+   "w": 114,
+   "h": 18,
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  {
+   "tag": "a",
+   "name": "UX-p3-translator Ακρόπ",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(255, 255, 255) 0px 0px 0px 4px",
+   "w": 213,
+   "h": 18,
+   "bg": "rgba(0, 0, 0, 0)"
+  },
+  {
+   "tag": "button{secondary}",
+   "name": "Add Primary image (rec",
+   "outline": "solid 2px rgb(76, 29, 139) off 2px",
+   "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+   "w": 157,
+   "h": 32,
+   "bg": "rgb(255, 255, 255)"
+  }
+ ]
+}

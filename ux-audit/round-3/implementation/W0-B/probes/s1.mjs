@@ -1,0 +1,14 @@
+import { call, closeAll } from "../../../../tools/lib.mjs";
+import { readFileSync } from "node:fs";
+const ids=JSON.parse(readFileSync(new URL("./ids.json",import.meta.url)));
+const PID="6958c18f-60d2-4140-a524-5a43f8a2f6b5"; const P=(p)=>`/projects/${PID}${p}`;
+const W=(m,p,b)=>call("admin",m,P(p),b);
+const poi2 = await W("GET",`/pois/${ids.poi2}`);
+const act = await W("POST",`/pois/${ids.poi2}/status`,{targetStatus:"ACTIVE",version:poi2.version}).catch(e=>console.log("ERR",e.message));
+console.log(JSON.stringify(act)?.slice(0,300));
+const r = await W("GET","/readiness");
+console.log(JSON.stringify(r.warnings.filter(i=>i.resourceId===ids.poi2)));
+console.log(JSON.stringify(r.blocking.filter(i=>i.resourceId===ids.poi2)));
+const rt = await W("GET",`/routes/${ids.route}`); console.log(JSON.stringify(rt).slice(0,900));
+const cats = await W("GET",`/categories/${ids.category}`); console.log(JSON.stringify(cats).slice(0,400));
+await closeAll();

@@ -1,0 +1,10 @@
+import { open, go, shot, P, settle } from "./lib.mjs";
+const { browser, page } = await open("curator", { viewport: "1440" });
+const t0=Date.now();
+await go(page, `/projects/${P}/media`); await page.getByRole("heading",{level:1}).first().waitFor(); await page.waitForFunction(()=>!/Loading/.test(document.querySelector("main")?.innerText||""),null,{timeout:30000}).catch(()=>{}); 
+console.log("media cold ms", Date.now()-t0, page.url());
+await settle(page,800);
+await shot(page,"media__library-default__1440");
+await shot(page,"media__library-default-full__1440",true);
+console.log((await page.locator("main").innerText()).slice(0,1800));
+await browser.close();

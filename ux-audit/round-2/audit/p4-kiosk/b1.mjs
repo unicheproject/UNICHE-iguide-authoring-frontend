@@ -1,0 +1,21 @@
+import { open, go, P, seed, shot, settle, targets, report } from "./lib.mjs";
+const { browser, page } = await open("curator", { viewport: "1024", touch: true });
+const errs=[]; page.on("pageerror", e=>errs.push(e.message));
+await go(page, `/projects/${P}/pois`); await settle(page, 2000);
+await page.getByRole("button", { name: /New point of interest/ }).or(page.getByRole("link", { name: /New point of interest/ })).first().tap(); await page.waitForTimeout(1000);
+await shot(page, "poi-create-dialog__open__1024", false);
+const dlg = page.getByRole("dialog"); console.log("dialog box", JSON.stringify(await dlg.boundingBox()));
+report("create dialog 1024", await page.evaluate(()=>0).then(()=>targets(page)));
+console.log("fields", await dlg.locator("label").allTextContents());
+// invalid submit
+await dlg.getByRole("button", { name: /^(Create|Add|Save)/ }).first().tap().catch(()=>console.log("no create btn")); await page.waitForTimeout(600);
+await shot(page, "poi-create-dialog__invalid__1024", false);
+console.log("alerts", await page.locator("[role=alert]").allTextContents());
+await dlg.getByLabel(/Title/).first().fill("UX-R2-p4 Tablet POI");
+await shot(page, "poi-create-dialog__filled__1024", false);
+console.log("buttons", await dlg.getByRole("button").allTextContents());
+await dlg.getByRole("button", { name: /^(Create|Add|Save)/ }).first().tap(); await page.waitForTimeout(3000);
+console.log("after create url", page.url());
+await shot(page, "poi-editor__new-draft__1024", false);
+console.log("errs", errs);
+await browser.close();

@@ -1,0 +1,35 @@
+[open picker] Enter -> input "Name, file name or title" 233,114,974,40  solid 2px rgb(76, 29, 139) off 2px | live=[]
+dlg {"name":"Choose an asset for primary image","modal":"true","text":"Choose an asset for primary image\nSearch\nFilters and view (Active, 41 draft hidden, tiles)\nUpload new\nor drop files here\nUX-s13-media portrait.png\nImage · 900 × 1600 · 1.4 MB\nActive\nNot used yet\nmeander-border\nImage · 1200 × 120 · 163 KB\nActive\nNot u"}
+tab trace in picker:
+0 summary "Filters and view (Active, 41 draft hidden, tiles)" 246,175,948,40  solid 2px rgb(76, 29, 139) off 2px 
+1 button "Upload new or drop files here" 235,238,184,284  solid 2px rgb(76, 29, 139) off 2px 
+2 button "UX-s13-media portrait.pngImage · 900 × 1600 · 1.4 MBActiveNo" 431,238,184,284  solid 2px rgb(76, 29, 139) off 2px 
+3 button "Show any status" 377,762,120,40  solid 2px rgb(76, 29, 139) off 2px 
+4 button "Cancel" 975,827,83,40  solid 2px rgb(76, 29, 139) off 2px 
+5 button "Use this imageChoose a file first" 1066,827,141,40  solid 2px rgb(255, 255, 255) off 2px LOWRING 1
+6 button "Close dialog" 1175,37,40,40  solid 2px rgb(76, 29, 139) off 2px 
+7 input "Name, file name or title" 233,114,974,40  solid 2px rgb(76, 29, 139) off 2px 
+8 summary "Filters and view (Active, 41 draft hidden, tiles)" 246,175,948,40  solid 2px rgb(76, 29, 139) off 2px 
+9 button "Upload new or drop files here" 235,238,184,284  solid 2px rgb(76, 29, 139) off 2px 
+10 button "UX-s13-media portrait.pngImage · 900 × 1600 · 1.4 MBActiveNo" 431,238,184,284  solid 2px rgb(76, 29, 139) off 2px 
+11 button "Show any status" 377,762,120,40  solid 2px rgb(76, 29, 139) off 2px 
+tiles {"radios":0,"options":0,"tabbableTiles":0}
+AXE {"label":"asset-picker","url":"http://localhost:5173/projects/PID/pois/e51249c1-755b-42d5-9a20-5912046ea9c9","counts":{},"v":[]}
+[open picker] Enter -> input "Name, file name or title" 233,114,974,40  solid 2px rgb(76, 29, 139) off 2px | live=[]
+dlg {"name":"Choose an asset for primary image","modal":"true","text":"Choose an asset for primary image\nSearch\nFilters and view (Active, 41 draft hidden, tiles)\nUpload new\nor drop files here\nUX-s13-media portrait.png\nImage · 900 × 1600 · 1.4 MB\nActive\nNot used yet\nmeander-border\nImage · 1200 × 120 · 163 KB\nActive\nNot u"}
+on first tile? button "UX-s13-media portrait.pngImage · 900 × 1600 · 1.4 MBActiveNo" 431,238,184,284  solid 2px rgb(76, 29, 139) off 2px
+[tiles] ArrowRight -> button "meander-borderImage · 1200 × 120 · 163 KBActiveNot used yet" 628,238,184,284  solid 2px rgb(76, 29, 139) off 2px | live=[]
+[tiles] ArrowRight -> button "acropolis-panoramaImage · 4200 × 1000 · 68 KBActiveUsed in 4" 824,238,184,284  solid 2px rgb(76, 29, 139) off 2px | live=[]
+[tiles] ArrowDown -> button "rampin-riderImage · 700 × 1000 · 20 KBActiveUsed in 3" 824,533,184,263  solid 2px rgb(76, 29, 139) off 2px | live=[]
+[tiles] ArrowLeft -> button "slopes-excavationImage · 1920 × 1280 · 56 KBActiveUsed in 3" 628,533,184,263  solid 2px rgb(76, 29, 139) off 2px | live=[]
+[tiles] ArrowUp -> button "meander-borderImage · 1200 × 120 · 163 KBActiveNot used yet" 628,238,184,284  solid 2px rgb(76, 29, 139) off 2px | live=[]
+[tiles] End -> button "parthenon-west-dawnImage · 1920 × 1080 · 48 KBActiveUsed in " 235,485,184,263  solid 2px rgb(76, 29, 139) off 2px | live=[]
+[tiles] Home -> button "UX-s13-media portrait.pngImage · 900 × 1600 · 1.4 MBActiveNo" 431,238,184,284  solid 2px rgb(76, 29, 139) off 2px | live=[]
+tile attrs {"role":null,"pressed":"false","checked":null,"selected":null,"tabindex":0,"name":"UX-s13-media portrait.pngImage · 900 × 1600 · 1.4 MBActiveNot used yet"}
+[to second] ArrowRight -> button "meander-borderImage · 1200 × 120 · 163 KBActiveNot used yet" 628,238,184,284  solid 2px rgb(76, 29, 139) off 2px | live=[]
+[select] Space -> button "meander-borderImage · 1200 × 120 · 163 KBActiveSelectedNot u" 628,238,184,291  solid 2px rgb(76, 29, 139) off 2px | live=["Selected: meander-border. Decorative"]
+selected state {"pressed":"true","checked":null,"cls":"flex h-full w-full flex-col gap-1.5 rounded-lg border-2 bg-card p-2 text-left ho"} []
+ring {"w":2,"off":2,"style":"solid","ring":"rgb(76, 29, 139)","ringOnWrapper":false,"vsOutside":11.32,"bg":"255,255,255","clipped":null,"obscured":null,"offscreen":false,"rect":[628,238,184,291]}
+[use image] Enter -> button "ReplacePrimary image" 768,453,108,32  solid 2px rgb(76, 29, 139) off 2px | live=["Unsaved changes","meander-border attached."]
+after attach {"w":2,"off":2,"style":"solid","ring":"rgb(76, 29, 139)","ringOnWrapper":false,"vsOutside":11.32,"bg":"255,255,255","clipped":null,"obscured":null,"offscreen":false,"rect":[768,453,108,32]}
+AXE {"label":"asset-picker","url":"http://localhost:5173/projects/PID/pois/e51249c1-755b-42d5-9a20-5912046ea9c9","counts":{},"v":[]}

@@ -1,0 +1,18 @@
+import { start, goP, log, dump, state, focused } from "./lib.mjs";
+const s = await start("1440"); const { page } = s;
+await page.goto("http://localhost:5173" + state().routeUrl); await page.waitForTimeout(3000);
+await s.shot("route-active__top");
+log("apply disabled:", await page.getByRole("button", { name: /apply changes/i }).first().isDisabled());
+await page.getByLabel(/^title/i).first().fill("UX-s11-editors Route (edited)");
+await page.waitForTimeout(500);
+await s.shot("route-active__dirty");
+await page.getByRole("button", { name: /move stop 1 down/i }).click(); await page.waitForTimeout(500);
+await s.tall("route-active__dirty-reordered-tall");
+const t = await dump(page); log(t.match(/The stops[\s\S]{0,300}|order[\s\S]{0,200}/i)?.[0]);
+log("alerts", await page.evaluate(()=>[...document.querySelectorAll("[role=alert],[role=status]")].map(e=>e.innerText.slice(0,300))));
+await page.evaluate(()=>document.querySelector("main")?.scrollTo(0,0));
+log("header buttons:", await page.evaluate(()=>[...document.querySelectorAll("main button")].slice(0,12).map(b=>b.innerText.trim()).filter(Boolean)));
+await page.getByRole("button", { name: /save draft/i }).first().click().catch(e=>log("no save draft btn")); await page.waitForTimeout(1500);
+await s.shot("route-active__after-save-draft");
+log("banner:", await page.evaluate(()=>[...document.querySelectorAll("[role=region],[role=status],section")].map(e=>e.innerText.slice(0,200)).filter(t=>/working|pending|draft/i.test(t)).slice(0,3)));
+await s.browser.close();

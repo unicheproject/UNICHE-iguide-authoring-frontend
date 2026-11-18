@@ -1,3 +1,4 @@
+import { formatOccurrenceSpan } from "@/lib/format";
 import { apiRequest, completeSave } from "./api";
 import { syncMedia, toMediaBindings, type MediaBinding, type MediaBindingResponse } from "./assets";
 import type { ResourceStatus } from "./places";
@@ -236,14 +237,7 @@ export function shiftLocal(value: string, days: number): string {
   return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}T${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}`;
 }
 
-/** "Tue 10 Nov 2026, 10:00–11:00" in the given timezone. */
+/** "Tue 10 Nov 2026, 10:00–11:00" in the given timezone, in the CMS interface locale (`lib/format.UI_LOCALE`). */
 export function formatOccurrence(startsAt: string, endsAt: string, timeZone: string): string {
-  const start = new Date(startsAt);
-  const end = new Date(endsAt);
-  const day = new Intl.DateTimeFormat(undefined, { timeZone, weekday: "short", day: "numeric", month: "short", year: "numeric" });
-  const time = new Intl.DateTimeFormat(undefined, { timeZone, hour: "2-digit", minute: "2-digit" });
-  const sameDay = day.format(start) === day.format(end);
-  return sameDay
-    ? `${day.format(start)}, ${time.format(start)}–${time.format(end)}`
-    : `${day.format(start)}, ${time.format(start)} – ${day.format(end)}, ${time.format(end)}`;
+  return formatOccurrenceSpan(startsAt, endsAt, timeZone);
 }

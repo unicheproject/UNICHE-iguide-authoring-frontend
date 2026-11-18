@@ -1,0 +1,21 @@
+import * as L from "./lib.mjs";
+const { page, browser } = await L.open("curator", { viewport: "1440" });
+const k = page.keyboard;
+await L.nav(page, L.P("/pois"), 1200);
+await L.watchLive(page);
+const mb = page.getByRole("button", { name: /^Actions for UX-R2-p5 Keyboard POI/ });
+await mb.scrollIntoViewIfNeeded(); await mb.focus(); await k.press("Enter"); await page.waitForTimeout(400);
+L.log("t31", "menu items", await page.getByRole("menuitem").allTextContents());
+await page.getByRole("menuitem", { name: /Move to position/ }).focus(); await k.press("Enter"); await page.waitForTimeout(600);
+L.log("t31", "move-to-position: focus", await L.focus(page));
+L.log("t31", "dialog aria", await L.snap(page, "move-to-position", "[role=dialog],[role=alertdialog]"));
+await L.shot(page, "poi-list__move-to-position__1440");
+await k.type("0"); await k.press("Enter"); await page.waitForTimeout(500);
+L.log("t31", "invalid 0: focus", await L.focus(page), "alerts", await page.locator("[role=alert]").allTextContents(), "dlg", await page.locator("[role=dialog]").count());
+await L.shot(page, "poi-list__move-to-position-invalid__1440");
+await k.press("Control+a"); await k.type("2"); await k.press("Enter"); await page.waitForTimeout(1500);
+L.log("t31", "valid 2: focus", await L.focus(page), "live", (await L.liveLog(page)).slice(-3), "dlg", await page.locator("[role=dialog]").count());
+// Esc path
+await mb.focus().catch(() => {});
+L.log("t31", "row now", await page.locator("tbody tr").first().innerText().then((t) => t.slice(0, 60)));
+await browser.close();

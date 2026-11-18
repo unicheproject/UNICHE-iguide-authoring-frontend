@@ -1,0 +1,14 @@
+import { open, go } from "../../../tools/session.mjs";
+import { readFileSync } from "node:fs";
+const P = "6958c18f-60d2-4140-a524-5a43f8a2f6b5";
+const r = JSON.parse(readFileSync("records.json", "utf8"));
+const { browser, page } = await open("admin", { viewport: "zoom200" });
+await go(page, `/projects/${P}/pois/${r.poi}`);
+await page.waitForSelector("[data-sticky-bar]", { timeout: 30000 }); await page.waitForTimeout(2000);
+const add = page.getByRole("button", { name: /Add primary image/i }).first();
+await add.scrollIntoViewIfNeeded(); await add.click(); await page.waitForTimeout(2500);
+await page.evaluate(() => { const b = document.querySelector("[data-dialog-body]"); b.scrollTop = b.querySelector("[data-asset-id]").closest("ul").offsetTop - 20; });
+await page.waitForTimeout(300);
+console.log("visible rows", await page.evaluate(() => { const b = document.querySelector("[data-dialog-body]").getBoundingClientRect(); return [...document.querySelectorAll("[data-dialog-body] [data-asset-id]")].filter(e => { const x = e.getBoundingClientRect(); return x.top >= b.top - 1 && x.bottom <= b.bottom + 1; }).length; }));
+await page.screenshot({ path: "after/picker-zoom200-scrolled.png" });
+await browser.close();

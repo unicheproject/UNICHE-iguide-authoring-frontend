@@ -1,0 +1,14 @@
+import { open, go } from "../../../../tools/session.mjs";
+const PID="6958c18f-60d2-4140-a524-5a43f8a2f6b5", PLACE="93abfa5d-4113-48d6-b718-1f58dd246b79";
+const out="C:/Users/mirto/IdeaProjects/iguide/uniche_iguide_frontend/ux-audit/round-3/implementation/P4/after/";
+const { browser, page } = await open("admin",{viewport:"1440"});
+await go(page,`/projects/${PID}/places/${PLACE}`);
+await page.waitForSelector("text=Place setup");
+const sel=page.locator("#f-link");
+await page.getByLabel(/^summary$/i).fill("x"+Date.now());
+await sel.selectOption({label:"UX-R3-P4 Map"}); await page.waitForTimeout(2000);
+console.log(await page.evaluate(()=>({v:document.querySelector("#f-link").value,d:document.querySelector("#f-link").disabled,n:document.querySelector("[data-link-notice]")?.textContent.trim().replace(/\s+/g," "),u:/Unsaved changes/.test(document.body.innerText)})));
+await page.locator("#f-link").scrollIntoViewIfNeeded();
+await page.screenshot({path:out+"place-linked-dirty__1440.png"});
+await sel.selectOption({label:"No map"}); await page.waitForTimeout(1500);
+await browser.close();

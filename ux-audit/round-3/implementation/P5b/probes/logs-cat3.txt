@@ -1,0 +1,2 @@
+B active user aria-disabled true reason: ["Used by 1 point of interest. Choose another category in that point of interest first. Show where it is used"] link: 2
+A draft user aria-disabled null reason: [] link: 1

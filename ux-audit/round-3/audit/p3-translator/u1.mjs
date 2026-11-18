@@ -1,0 +1,13 @@
+import { open, go, base, shot } from "./lib.mjs";
+const { browser, page } = await open("admin", { viewport: "1440" });
+await go(page, base + "/media");
+await page.waitForSelector("h1"); await page.waitForTimeout(1500);
+await page.getByRole("button",{name:/Upload files/}).click();
+await page.waitForTimeout(800);
+await shot(page,"media__upload-dialog__1440");
+await page.locator("input[type=file]").setInputFiles("C:\\Users\\mirto\\IdeaProjects\\iguide\\uniche_iguide_frontend\\ux-audit\\round-3\\audit\\p3-translator\\UX-R3-p3-asset.png");
+await page.waitForTimeout(3500);
+await shot(page,"media__upload-done__1440");
+console.log(await page.evaluate(()=>document.querySelector("[role=dialog]")?.innerText));
+console.log(await page.evaluate(()=>[...document.querySelectorAll("[role=dialog] a")].map(a=>a.getAttribute("href")+" | "+a.innerText).join("\n")));
+await browser.close();

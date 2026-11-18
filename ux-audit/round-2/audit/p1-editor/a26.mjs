@@ -1,0 +1,37 @@
+import { open, go, shot, P, settle } from "./lib.mjs";
+const { browser, page } = await open("curator", { viewport: "1440" });
+await go(page, `/projects/${P}/media`); await page.getByRole("heading",{level:1}).first().waitFor(); await settle(page,2000);
+await page.getByLabel("Type",{exact:true}).selectOption({label:"Audio"}); await settle(page,800);
+console.log("U type", page.url(), (await page.locator("main").innerText()).match(/Showing[^\n]*/)?.[0]);
+await shot(page,"media__type-audio__1440");
+await page.getByLabel("Search",{exact:true}).fill("tone"); await settle(page,1000);
+console.log("U search", page.url(), (await page.locator("main").innerText()).match(/Showing[^\n]*/)?.[0]);
+await page.getByLabel("Search",{exact:true}).fill(""); 
+await page.getByRole("checkbox",{name:/No alt text/}).check(); await settle(page,800);
+console.log("U noalt", page.url(), (await page.locator("main").innerText()).match(/Showing[^\n]*/)?.[0]);
+await shot(page,"media__no-alt-audio__1440");
+await page.getByRole("checkbox",{name:/No alt text/}).uncheck();
+await page.getByRole("checkbox",{name:"Unused"}).check(); await settle(page,800);
+console.log("U unused", page.url(), (await page.locator("main").innerText()).match(/Showing[^\n]*/)?.[0]);
+await page.getByRole("checkbox",{name:"Unused"}).uncheck(); await page.getByRole("checkbox",{name:"Decorative"}).check(); await settle(page,800);
+console.log("U deco", page.url(), (await page.locator("main").innerText()).match(/Showing[^\n]*/)?.[0]);
+// empty state
+await go(page, `/projects/${P}/media?q=zzzzqqq`); await settle(page,1500);
+await shot(page,"media__filtered-empty__1440");
+console.log("EMPTY:", (await page.locator("main").innerText()).slice(-300));
+// upload
+await go(page, `/projects/${P}/media`); await settle(page,1500);
+await page.getByRole("button",{name:/Upload files/}).click(); await settle(page,600);
+await shot(page,"media__upload-dialog-empty__1440");
+console.log("UPLOAD DLG:", (await page.getByRole("dialog").innerText()).replace(/\n/g," | "));
+console.log("focus", await page.evaluate(()=>document.activeElement?.outerHTML.slice(0,100)));
+await page.getByRole("dialog").locator("input[type=file]").setInputFiles("ux-audit/round-2/audit/p1-editor/fixtures/UX-R2-p1-editor tone.wav");
+const t=Date.now(); await settle(page,300);
+await shot(page,"media__upload-in-progress__1440");
+await page.waitForFunction(()=>/Uploaded|uploaded|Describe|Done|failed/i.test(document.querySelector("[role=dialog]")?.innerText||""),null,{timeout:30000});
+console.log("upload ms", Date.now()-t);
+await settle(page,800);
+await shot(page,"media__upload-done__1440");
+console.log("UPLOAD DONE:", (await page.getByRole("dialog").innerText()).replace(/\n/g," | "));
+console.log("live:", await page.evaluate(()=>[...document.querySelectorAll("[aria-live]")].map(e=>e.textContent.trim()).filter(Boolean)));
+await browser.close();

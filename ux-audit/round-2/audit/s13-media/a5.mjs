@@ -1,0 +1,18 @@
+import { open, go, shot, POP, axe, t, focusDesc } from "./lib.mjs";
+const vp = process.argv[2] ?? "1440";
+const id = process.argv[3] ?? "5b1832c9-7931-4f25-b0dc-bce27dbfc2a6";
+const { browser, page } = await open("curator", { viewport: vp });
+page.on("pageerror", (e) => console.log("PAGEERROR", e.message.slice(0, 200)));
+await go(page, `/projects/${POP}/media/${id}`);
+await page.getByRole("heading",{level:1}).first().waitFor(); await page.waitForTimeout(2000);
+console.log(await page.title());
+console.log((await t(page,"main")).replace(/\n+/g," | "));
+await shot(page,"asset-editor__active-used",vp);
+await shot(page,"asset-editor__active-used-full",vp,true);
+const info = await page.evaluate(()=>{ const q=s=>[...document.querySelectorAll(s)];
+ const st=q("*").filter(e=>getComputedStyle(e).position==="sticky").map(e=>{const r=e.getBoundingClientRect();return `${e.tagName}.${(e.className+"").slice(0,30)} top=${Math.round(r.top)} h=${Math.round(r.height)}`});
+ const fields=q("textarea,input:not([type=hidden]),select").map(e=>{const r=e.getBoundingClientRect();return `${e.tagName} ${e.getAttribute("aria-label")||e.id} y=${Math.round(r.top+scrollY)} x=${Math.round(r.left)} w=${Math.round(r.width)}`});
+ return {st,fields,docH:document.documentElement.scrollHeight,tabs:q("[role=tab]").map(e=>e.textContent.trim())};});
+console.log(JSON.stringify(info,null,1));
+await axe(page,"asset-editor");
+await browser.close();

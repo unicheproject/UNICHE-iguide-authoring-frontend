@@ -1,0 +1,10 @@
+import { open, go, base, shot, dump } from "./lib.mjs";
+const { browser, page } = await open("admin", { viewport: "1440" });
+await go(page, base + "/media");
+await page.waitForSelector("h1"); await page.waitForTimeout(2000);
+const t0=Date.now();
+await page.getByRole("button",{name:/filters and sort/i}).click();
+await page.waitForTimeout(400);
+await shot(page,"media__filters-open__1440");
+console.log(await page.evaluate(()=>{const lbls=[...document.querySelectorAll("label,legend")].map(l=>l.innerText.trim().replace(/\s+/g," ")); const sels=[...document.querySelectorAll("select")].map(s=>(s.labels?.[0]?.innerText||s.getAttribute("aria-label"))+": "+[...s.options].map(o=>o.text).join(", ")); return JSON.stringify({lbls,sels},null,1)}));
+await browser.close();

@@ -1,0 +1,10 @@
+import { open } from "./lib.mjs";
+import { browserMedia } from "../../../tools/media.mjs";
+import { writeFileSync } from "node:fs";
+const { browser, context } = await open("curator", { viewport: "1440" });
+const m = await browserMedia(context);
+const dir = "ux-audit/round-2/audit/s13-media/fixtures/";
+writeFileSync(dir+"UX-R2-s13 delta.png", await m.image(700,500,"UX-R2-s13 delta","image/png",300));
+writeFileSync(dir+"UX-R2-s13 epsilon.png", await m.image(500,700,"UX-R2-s13 epsilon","image/png",60));
+writeFileSync(dir+"UX-R2-s13 zeta.png", await m.image(900,450,"UX-R2-s13 zeta","image/png",260));
+await browser.close();

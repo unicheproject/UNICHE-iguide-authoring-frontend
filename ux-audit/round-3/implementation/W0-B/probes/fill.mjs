@@ -1,0 +1,13 @@
+import { call, closeAll } from "../../../../tools/lib.mjs";
+import { readFileSync } from "node:fs";
+const ids = JSON.parse(readFileSync(new URL("./ids.json", import.meta.url)));
+const PID = "6958c18f-60d2-4140-a524-5a43f8a2f6b5"; const P = (p) => `/projects/${PID}${p}`;
+const [kind, key] = [process.argv[2], process.argv[3]];
+const cur = await call("admin", "GET", P(`/${kind}/${ids[key]}`));
+const body = { ...cur };
+for (const k of ["id","projectId","slug","status","archivedAt","createdAt","updatedAt","hasWorkingCopy","workingCopyUpdatedAt","sortOrder"]) delete body[k];
+body.translations = { ...cur.translations, en: { ...cur.translations.en, summary: "A short summary.", description: "A longer description of this point of interest." }, el: { title: "Τίτλος", summary: "Σύνοψη", description: "Περιγραφή" } };
+body.slug = cur.slug;
+const r = await call("admin", "PUT", P(`/${kind}/${ids[key]}`), body);
+console.log(r.version, JSON.stringify(r.translations.en));
+await closeAll();

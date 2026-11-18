@@ -1,0 +1,18 @@
+import { open, go, PID, shot, fs } from "./lib.mjs";
+const ids = JSON.parse(fs.readFileSync(new URL("./ids.json", import.meta.url)));
+const { browser, page } = await open("curator", { viewport: "1440" });
+const tabs = async () => (await page.locator("[role=tab]").evaluateAll(e => e.map(x => x.innerText.replace(/\n/g," ")))).join(" / ");
+await go(page, `/projects/${PID}/media/${ids.asset}`);
+await page.waitForFunction(() => document.querySelector("h1")?.innerText.includes("UX-R2"), null, { timeout: 40000 }).catch(()=>{}); await page.waitForTimeout(2000);
+console.log("aside has Translations card:", /Translations/.test(await page.locator("aside").innerText()));
+await page.getByRole("tab", { name: /Ελληνικά/ }).click(); await page.waitForTimeout(400);
+await page.getByLabel("Alternative text in Ελληνικά").fill("Ψηφιδωτό με μπλε και χρυσά πλακίδια που σχηματίζουν κυματιστό σχέδιο.");
+await page.getByLabel("Title in Ελληνικά").fill("UX-R2-p3 Ψηφιδωτό δαπέδου");
+console.log("tabs:", await tabs());
+await page.getByRole("tab", { name: /Italiano/ }).click(); await page.waitForTimeout(400);
+await page.getByLabel("Alternative text in Italiano").fill("Un mosaico di tessere blu e oro che formano un motivo a onde.");
+console.log("tabs:", await tabs());
+await page.keyboard.press("Control+s"); await page.waitForTimeout(2500);
+console.log("saved:", await tabs());
+await shot(page, "asset-editor__it-saved");
+await browser.close();

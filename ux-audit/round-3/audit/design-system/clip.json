@@ -1,0 +1,87 @@
+{
+ "places": {
+  "clipped": [],
+  "ringless": []
+ },
+ "maps": {
+  "clipped": [
+   {
+    "tag": "a",
+    "name": "Maps 8",
+    "outline": "solid",
+    "ow": "2px",
+    "inView": true,
+    "clip": {
+     "by": "NAV.mb-5 flex overflow-x-auto border-b borde",
+     "sides": "LTB"
+    }
+   },
+   {
+    "tag": "a",
+    "name": "Floor plans 9",
+    "outline": "solid",
+    "ow": "2px",
+    "inView": true,
+    "clip": {
+     "by": "NAV.mb-5 flex overflow-x-auto border-b borde",
+     "sides": "TB"
+    }
+   },
+   {
+    "tag": "a",
+    "name": "Maps 8",
+    "outline": "solid",
+    "ow": "2px",
+    "inView": true,
+    "clip": {
+     "by": "NAV.mb-5 flex overflow-x-auto border-b borde",
+     "sides": "LTB"
+    }
+   },
+   {
+    "tag": "a",
+    "name": "Floor plans 9",
+    "outline": "solid",
+    "ow": "2px",
+    "inView": true,
+    "clip": {
+     "by": "NAV.mb-5 flex overflow-x-auto border-b borde",
+     "sides": "TB"
+    }
+   }
+  ],
+  "ringless": []
+ },
+ "media": {
+  "clipped": [],
+  "ringless": []
+ },
+ "dashboard": {
+  "clipped": [],
+  "ringless": []
+ },
+ "events": {
+  "clipped": [],
+  "ringless": []
+ },
+ "categories": {
+  "clipped": [],
+  "ringless": []
+ },
+ "poiEditor": {
+  "clipped": [
+   {
+    "tag": "button[tab]",
+    "name": "EnglishdefaultComplete",
+    "outline": "solid",
+    "ow": "2px",
+    "inView": true,
+    "clip": {
+     "by": "DIV.flex min-w-0 flex-1 overflow-x-auto",
+     "sides": "LTB"
+    }
+   }
+  ],
+  "ringless": []
+ }
+}

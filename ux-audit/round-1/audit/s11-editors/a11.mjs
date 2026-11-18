@@ -1,0 +1,10 @@
+import { start, goP, log, dump, state, focused } from "./lib.mjs";
+const s = await start("1440"); const { page } = s;
+page.on("response", r => { if (r.request().method() !== "GET") log("NET", r.request().method(), r.url().replace(/.*iguide\/api\/v1/, ""), r.status()); });
+await page.goto("http://localhost:5173" + state().routeUrl); await page.waitForTimeout(2500);
+log("stops", await page.locator("text=/^Stop \\d+:/").count());
+await page.getByRole("button", { name: /^activate$/i }).click(); await page.waitForTimeout(2500);
+await s.shot("route-activate-result");
+log("dialog:", await page.locator("[role=dialog],[role=alertdialog]").count(), "status:", await page.locator("main").innerText().then(t=>t.match(/Status\n?\s*(\w+)/)?.[1]));
+log("alerts:", await page.evaluate(()=>[...document.querySelectorAll("[role=alert],[role=status],[aria-live]")].map(e=>e.innerText.slice(0,300))));
+await s.browser.close();

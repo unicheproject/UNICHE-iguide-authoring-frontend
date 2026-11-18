@@ -1,0 +1,141 @@
+## storage
+src/platform/auth.ts:141:    window.sessionStorage.setItem(REDIRECT_KEY, String(Date.now()));
+src/platform/auth.ts:221:    return Date.now() - Number(window.sessionStorage.getItem(REDIRECT_KEY) ?? 0) < REDIRECT_WINDOW_MS;
+src/views/workspace/dashboard/guideState.ts:18:    const parsed: unknown = JSON.parse(window.localStorage.getItem(KEY(projectId)) ?? "null");
+src/views/workspace/dashboard/guideState.ts:31:    window.localStorage.setItem(KEY(projectId), JSON.stringify(memory));
+src/views/workspace/media/MediaView.vue:217:    return localStorage.getItem(VIEW_KEY) === "list" ? "list" : "grid";
+src/views/workspace/media/MediaView.vue:227:    localStorage.setItem(VIEW_KEY, value);
+src/workspace/lastProject.ts:13:    const parsed: unknown = JSON.parse(window.localStorage.getItem(KEY) ?? "[]");
+src/workspace/lastProject.ts:35:    window.localStorage.setItem(KEY, JSON.stringify(next));
+src/workspace/lastProject.ts:44:    window.localStorage.setItem(KEY, JSON.stringify(read().filter((id) => id !== projectId)));
+src/workspace/useResourceEditor.ts:1071:      const raw = key ? window.localStorage.getItem(key) : null;
+src/workspace/useResourceEditor.ts:1085:      window.localStorage.setItem(key, JSON.stringify(draft));
+src/workspace/useResourceEditor.ts:1096:      if (key) window.localStorage.removeItem(key);
+## network
+src/components/map/basemap.ts:20:const STYLE_URL = "https://tiles.openfreemap.org/styles/bright";
+src/components/map/basemap.ts:22:  '<a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> · ' +
+src/components/map/basemap.ts:23:  '© <a href="https://www.openmaptiles.org/" target="_blank" rel="noopener">OpenMapTiles</a> · ' +
+src/components/map/basemap.ts:24:  '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors';
+src/components/map/basemap.ts:26:const FALLBACK_TILES = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+src/components/map/basemap.ts:27:const FALLBACK_ATTRIBUTION = '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+src/platform/api.ts:198:    const response = await fetch(`${platformConfig().apiBaseUrl}${path}`, {
+src/platform/api.ts:259:    const xhr = new XMLHttpRequest();
+src/platform/maps.ts:314:    "https://nominatim.openstreetmap.org/search?format=jsonv2&limit=6&addressdetails=0" +
+src/platform/maps.ts:319:    response = await fetch(url, { headers: { Accept: "application/json" } });
+src/platform/surfaces.ts:12:  /** WEB only: the origin where the organization hosts the web build, such as `https://guide.museum.gr`. */
+src/platform/templates.ts:114:  link.href = `https://fonts.googleapis.com/css2?${missing
+src/views/workspace/SurfacesView.vue:195:              placeholder="https://guide.museum.gr"
+src/views/workspace/SurfacesView.vue:205:              http://localhost works too. QR codes and shared links are built on it, so changing it later breaks
+src/views/workspace/events/EventEditorView.vue:716:          placeholder="https://"
+## any
+## publish
+src/components/editor/EditorShell.vue:25: * it is not sticky at 150 % and more). The height of whatever is stuck is measured and published as `--sticky-stack-h`
+src/components/editor/EditorShell.vue:302:function publishToastInset() {
+src/components/editor/EditorShell.vue:313:    sideObserver = new ResizeObserver(publishToastInset);
+src/components/editor/EditorShell.vue:316:  publishToastInset();
+src/components/editor/EditorShell.vue:318:onMounted(() => window.addEventListener("resize", publishToastInset));
+src/components/editor/EditorShell.vue:320:  window.removeEventListener("resize", publishToastInset);
+src/components/list/ListToolbar.vue:9: * It publishes `--list-toolbar-h` on its parent (the table head's `top`) and the stuck height as `--sticky-stack-h`.
+src/components/list/ListToolbar.vue:67:function publishHeight() {
+src/components/list/ListToolbar.vue:77:    resize = new ResizeObserver(publishHeight);
+src/components/list/ListToolbar.vue:79:    window.addEventListener("resize", publishHeight);
+src/components/list/ListToolbar.vue:80:    publishHeight();
+src/components/list/ListToolbar.vue:99:  window.removeEventListener("resize", publishHeight);
+src/lib/glossary.ts:3: * `ARCHIVED`, shown in sentence case); "published" is never used. The field label stays "Slug" (spec `12` §3).
+src/lib/toastOffset.ts:5:function publish(): void {
+src/lib/toastOffset.ts:14: * mounted its height is published as `--toast-offset-bottom`, which `AppToast` adds to its own bottom margin, so a toast
+src/lib/toastOffset.ts:29:          publish();
+src/lib/toastOffset.ts:33:      publish();
+src/lib/toastOffset.ts:40:    publish();
+src/workspace/useStickyStack.ts:7: * Publishes the height of the bars that are stuck to the top of `<main>` as `--sticky-stack-h` on `<html>` (D-089), so
+## detail
+src/components/ProjectSwitcher.vue:36:// The chip's skeleton shows only while the Project's detail is being read, and for 3 s at most; a failed read or an
+src/components/editor/EditorSection.vue:61:  const path = (event as CustomEvent<{ path: string }>).detail?.path ?? "";
+src/components/editor/OtherSettings.vue:33:  const path = (event as CustomEvent<{ path: string }>).detail?.path ?? "";
+src/components/editor/TranslationsPanel.vue:128:  const path = (event as CustomEvent<{ path: string }>).detail?.path ?? "";
+src/components/preview/ResourceContent.vue:3: * The detail screen of one Resource in the stand-in visitor app (DECISIONS.md D-014): hero, title, and the
+src/components/preview/PreviewApp.vue:4: * Project's main menu and footer links when it has them (`03` §13, D-055), else a default menu, Home, a list per kind, search, and the detail screens of `ResourceContent`, navigated on a
+src/components/preview/PreviewApp.vue:45:  | { kind: "detail"; target: PreviewTarget; note?: string }
+src/components/preview/PreviewApp.vue:75:    active: !!target && s.kind === "detail" && s.target.type === target.type && s.target.id === target.id,
+src/components/preview/PreviewApp.vue:76:    run: target ? () => go({ kind: "detail", target }, true) : undefined,
+src/components/preview/PreviewApp.vue:136:const open = (target: PreviewTarget, note?: string) => go({ kind: "detail", target, note });
+src/components/preview/PreviewApp.vue:159:const detail = computed(() => (screen.value.kind === "detail" ? modelFor(ctx.value, screen.value.target) : null));
+src/components/preview/PreviewApp.vue:176:  if (s.kind === "detail") return word(t.value, detail.value?.kindLabel ?? "");
+src/components/preview/PreviewApp.vue:199:  if (last.kind === "detail" && last.note) stack.value = [...stack.value.slice(0, -1), { ...last, note: undefined }];
+src/components/preview/PreviewApp.vue:203:// A detail whose Resource left the mode (Live hides drafts) falls back to Home.
+src/components/preview/PreviewApp.vue:207:    if (screen.value.kind === "detail" && !detail.value) go({ kind: "home" }, true);
+src/components/preview/PreviewApp.vue:408:      <template v-else-if="screen.kind === 'detail'">
+src/components/preview/PreviewApp.vue:410:        <ResourceContent v-if="detail" :model="detail" :wide="wide" :semantic="semantic" navigable @open="open($event)" />
+src/components/ui/alert/ProblemAlert.vue:5: * The server's `detail` is never shown. Use it in cards, dialogs and page states in place of printing `error.message`;
+src/components/ui/state-card/StateCard.vue:5: * detail collapsed in `details`. It never speaks to operators in the main text.
+src/views/SessionErrorView.vue:47:      <p>{{ error.detail }}</p>
+src/views/workspace/LanguagesView.vue:86:      detail: `${Object.values(e.fieldMessages())[0] ?? e.message}. Translate them first; the default language is what visitors see when a translation is missing.`,
+src/views/workspace/LanguagesView.vue:89:  if (e.platformUnavailable) return { title: "The UNICHE platform is not reachable", detail: "Nothing was changed." };
+src/views/workspace/LanguagesView.vue:90:  return { title: "The languages could not be saved", detail: e.details.join(" ") || e.message };
+src/views/workspace/LanguagesView.vue:127:        <p class="mt-0.5 text-[13px] text-gray-700">{{ saveErrorText.detail }}</p>
+src/views/workspace/SurfacesView.vue:109:  if (e.platformUnavailable) return { title: "The UNICHE platform is not reachable", detail: "Nothing was changed. Try again in a moment." };
+src/views/workspace/SurfacesView.vue:111:  return { title: "The surfaces were not saved", detail: named.join(" ") || e.message };
+src/views/workspace/SurfacesView.vue:161:        <p class="mt-0.5 text-[13px] text-gray-700">{{ saveErrorText.detail }}</p>
+src/views/workspace/dashboard/ReadinessGroups.vue:60:              <span class="text-muted-foreground">: {{ line.detail }}</span>
+src/views/workspace/dashboard/StatusCard.vue:110:        >: {{ line.detail }}
+src/views/workspace/media/AssetEditorView.vue:57:      "What the image shows and why it is here, in one or two sentences; don't begin with \"image of\". For an object, name it, its material, and the detail to notice.",
+## text-[Npx]
+109
+src/views/workspace/LanguagesView.vue:113:text-[13px]
+src/views/workspace/LanguagesView.vue:116:text-[11px]
+src/views/workspace/LanguagesView.vue:126:text-[13px]
+src/views/workspace/LanguagesView.vue:127:text-[13px]
+src/views/workspace/LanguagesView.vue:131:text-[13px]
+src/views/workspace/LanguagesView.vue:142:text-[13px]
+src/views/workspace/LanguagesView.vue:143:text-[11px]
+src/views/workspace/LanguagesView.vue:149:text-[10px]
+src/views/workspace/LanguagesView.vue:157:text-[10px]
+src/views/workspace/LanguagesView.vue:165:text-[10px]
+src/views/workspace/LanguagesView.vue:174:text-[11px]
+src/views/workspace/LanguagesView.vue:183:text-[11px]
+src/views/workspace/LanguagesView.vue:193:text-[13px]
+src/views/workspace/LanguagesView.vue:204:text-[11px]
+src/views/workspace/LanguagesView.vue:212:text-[11px]
+src/views/workspace/OverviewView.vue:110:text-[13px]
+src/views/workspace/OverviewView.vue:113:text-[13px]
+src/views/workspace/OverviewView.vue:126:text-[10px]
+src/views/workspace/OverviewView.vue:137:text-[10px]
+src/views/workspace/OverviewView.vue:138:text-[14px]
+## hex
+src/components/preview/DeviceFrame.vue:91:          class="absolute left-0 top-0 flex origin-top-left flex-col bg-[var(--t-bg,#fff)] text-[var(--t-text,#030712)] [font-family:var(--t-body,inherit)]"
+src/views/workspace/LanguagesView.vue:102:          <div class="mb-1.5 h-3 w-24 rounded bg-[#dcdde2]"></div>
+src/views/workspace/LanguagesView.vue:103:          <div class="h-2.5 w-40 rounded bg-[#e6e7eb]"></div>
+src/views/workspace/SurfacesView.vue:140:        <span v-if="dirty" class="text-[11px] font-semibold text-[#855400]">Unsaved changes</span>
+src/views/workspace/SurfacesView.vue:147:      <div v-for="n in 3" :key="n" class="border-b border-gray-100 px-[18px] py-4"><div class="h-3 w-40 rounded bg-[#dcdde2]"></div></div>
+src/views/workspace/SurfacesView.vue:208:            <p v-if="addressMissing" class="mt-1 text-xs font-semibold text-[#855400]">
+src/views/workspace/TranslationsView.vue:176:  state === "complete" ? "bg-primary" : state === "partial" ? "bg-[#b26be3]" : "border-2 border-gray-300 bg-white";
+src/views/workspace/TranslationsView.vue:627:          :class="aiFilter ? 'border-[#855400] bg-[#855400] font-bold text-white' : 'bg-card font-semibold text-gray-700'"
+src/views/workspace/TranslationsView.vue:646:            <div v-for="n in 5" :key="n" class="border-b border-gray-100 px-[18px] py-4"><div class="h-[13px] w-1/2 rounded bg-[#e2e3e7]"></div></div>
+src/views/workspace/TranslationsView.vue:684:                        :class="aiEntries(item, l.languageCode).some(unreviewed) ? 'bg-[rgba(154,98,0,0.1)] text-[#855400]' : 'bg-gray-100 text-gray-500'"
+src/views/workspace/TranslationsView.vue:748:                  :class="aiEntries(selected, l.languageCode).some(unreviewed) ? 'bg-[rgba(154,98,0,0.1)] text-[#855400]' : 'bg-gray-100 text-gray-500'"
+src/views/workspace/TranslationsView.vue:758:              class="rounded-lg border-l-[3px] border-l-[#855400] bg-[rgba(154,98,0,0.07)] px-3.5 py-2.5 text-[12px] text-gray-700"
+src/views/workspace/navigation/NavigationView.vue:492:                  <strong class="block text-[13px]" :class="{ 'text-[#855400]': !row.shown }">{{ row.shown || "No label" }}</strong>
+src/views/workspace/navigation/NavigationView.vue:498:                  <span v-if="row.warning" class="mt-0.5 block text-[11px] font-semibold text-[#855400]">⚠ {{ row.warning }}</span>
+src/views/workspace/navigation/NavigationView.vue:720:  border: 1px solid #e5e7eb;
+src/views/workspace/navigation/NavigationView.vue:724:  color: #374151;
+src/views/workspace/navigation/NavigationView.vue:725:  background: #fff;
+src/workspace/projectTheme.ts:39:  primary: "#4c1d8b",
+src/workspace/projectTheme.ts:40:  secondary: "#b4235a",
+src/workspace/projectTheme.ts:42:  text: "#030712",
+## z/shadow arbitrary
+## text-[Npx] in-scope per file
+src/views/workspace/SectionView.vue:2
+## hex in-scope
+src/components/preview/DeviceFrame.vue:91:          class="absolute left-0 top-0 flex origin-top-left flex-col bg-[var(--t-bg,#fff)] text-[var(--t-text,#030712)] [font-family:var(--t-body,inherit)]"
+## arbitrary px sizes other
+src/views/workspace/PreviewView.vue:1
+## error.message/.title rendered in in-scope templates
+src/views/SessionErrorView.vue:47:      <p>{{ error.detail }}</p>
+src/views/AppPreviewView.vue:204:        {{ error.message }}
+## problemText/ProblemAlert users
+9
+111-  missing.forEach((f) => loadedFonts.add(f));
+112-  const link = document.createElement("link");
+113-  link.rel = "stylesheet";
+114:  link.href = `https://fonts.googleapis.com/css2?${missing
+1186:  OpenMapTiles "OSM Bright" style, served without a key by OpenFreeMap (`https://tiles.openfreemap.org/styles/bright`)

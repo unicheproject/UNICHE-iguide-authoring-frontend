@@ -1,0 +1,24 @@
+ring {"outline":"rgb(255, 255, 255) 3px none","bg":"rgb(16, 36, 63)"}
+axe preview-1440 []
+axe preview-1024 []
+axe preview-768 []
+axe preview-zoom200 []
+empty section 1
+empty newtab 1
+axe newtab-empty []
+kb open focus 1440 div "In the appWebMobileKioskExpand the previewClose th"
+axe editor-panel-1440 []
+tab x2 button "What is a surface?"
+esc -> button "Preview in app"
+kb open focus 1024 div "In the appWebMobileKioskExpand the previewClose th"
+axe editor-panel-1024 []
+tab x2 button "What is a surface?"
+esc -> button "Preview in app"
+kb open focus 768 div "In the appWebMobileKioskExpand the previewClose th"
+axe editor-panel-768 []
+tab x2 button "What is a surface?"
+esc -> button "Preview in app"
+kb open focus zoom200 div "In the appWebMobileKioskClose the preview Skip pre"
+axe editor-panel-zoom200 []
+tab x2 button "What is a surface?"
+esc -> button "Preview in app"

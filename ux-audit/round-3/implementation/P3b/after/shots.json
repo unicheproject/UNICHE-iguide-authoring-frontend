@@ -1,0 +1,153 @@
+{
+ "axe": {
+  "guides@1440": [],
+  "events@1440": [],
+  "categories@1440": [],
+  "guides@1024": [],
+  "events@1024": [],
+  "categories@1024": []
+ },
+ "greek": {
+  "guides@1440": [
+   {
+    "len": 92,
+    "lines": 3,
+    "bad": 0,
+    "w": 422,
+    "h": 99
+   }
+  ],
+  "events@1440": [
+   {
+    "len": 92,
+    "lines": 3,
+    "bad": 0,
+    "w": 414,
+    "h": 99
+   }
+  ],
+  "categories@1440": [
+   {
+    "len": 95,
+    "lines": 3,
+    "bad": 0,
+    "w": 414,
+    "h": 118
+   }
+  ],
+  "guides@1024": [
+   {
+    "len": 92,
+    "lines": 4,
+    "bad": 0,
+    "w": 254,
+    "h": 120
+   }
+  ],
+  "events@1024": [
+   {
+    "len": 92,
+    "lines": 4,
+    "bad": 0,
+    "w": 246,
+    "h": 120
+   }
+  ],
+  "categories@1024": [
+   {
+    "len": 95,
+    "lines": 5,
+    "bad": 0,
+    "w": 246,
+    "h": 160
+   }
+  ],
+  "guides@768": [
+   {
+    "len": 92,
+    "lines": 2,
+    "bad": 0,
+    "w": 0,
+    "h": 134
+   }
+  ],
+  "events@768": [
+   {
+    "len": 92,
+    "lines": 2,
+    "bad": 0,
+    "w": 0,
+    "h": 126
+   }
+  ],
+  "categories@768": [
+   {
+    "len": 95,
+    "lines": 2,
+    "bad": 0,
+    "w": 0,
+    "h": 145
+   }
+  ]
+ },
+ "errors": {
+  "guides@1440": {
+   "active": "BODY",
+   "text": "{\"type\":\"urn:uniche:iguide:problem:SERVICE_UNAVAIL",
+   "rid": 0
+  },
+  "events@1440": {
+   "active": "BODY",
+   "text": "{\"type\":\"urn:uniche:iguide:problem:SERVICE_UNAVAIL",
+   "rid": 0
+  },
+  "categories@1440": {
+   "active": "BODY",
+   "text": "{\"type\":\"urn:uniche:iguide:problem:SERVICE_UNAVAIL",
+   "rid": 0
+  },
+  "guides@1024": {
+   "active": "BODY",
+   "text": "{\"type\":\"urn:uniche:iguide:problem:SERVICE_UNAVAIL",
+   "rid": 0
+  },
+  "events@1024": {
+   "active": "BODY",
+   "text": "{\"type\":\"urn:uniche:iguide:problem:SERVICE_UNAVAIL",
+   "rid": 0
+  },
+  "categories@1024": {
+   "active": "BODY",
+   "text": "{\"type\":\"urn:uniche:iguide:problem:SERVICE_UNAVAIL",
+   "rid": 0
+  },
+  "guides@zoom200": {
+   "active": "BODY",
+   "text": "{\"type\":\"urn:uniche:iguide:problem:SERVICE_UNAVAIL",
+   "rid": 0
+  },
+  "events@zoom200": {
+   "active": "BODY",
+   "text": "{\"type\":\"urn:uniche:iguide:problem:SERVICE_UNAVAIL",
+   "rid": 0
+  },
+  "categories@zoom200": {
+   "active": "BODY",
+   "text": "{\"type\":\"urn:uniche:iguide:problem:SERVICE_UNAVAIL",
+   "rid": 0
+  },
+  "empty-guides": {
+   "newButtons": 1
+  },
+  "empty-events": {
+   "newButtons": 1,
+   "h2": "No events yet"
+  },
+  "empty-categories": {
+   "newButtons": 1,
+   "h2": "No categories yet"
+  }
+ },
+ "keyboard": {},
+ "filters": {}
+}

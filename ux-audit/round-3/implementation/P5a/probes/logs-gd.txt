@@ -1,0 +1,10 @@
+ADD paragraph live: ["Unsaved changes"] focus: ge-field-ge-1 | Paragraph (block 1)
+ADD heading live: ["2 warnings, nothing blocks.","3 warnings, nothing blocks."] focus label: Heading (block 2)
+reference picker παρθενωνας rows 3
+PICK reference live: ["2 warnings, nothing blocks.","3 items match","Added reference UX-R3-p3 Poi Παρθενώνας test at position 3."]
+labels ["Position of paragraph 1","Paragraph (block 1)","Position of heading 2","Heading (block 2)","Position of reference UX-R3-p3 Poi Παρθενώνας test","Caption (optional)"]
+reference link rect [544,40]
+MOVE live: ["Moved heading 1 to position 1 of 3."]
+REMOVE live: ["Heading 1 removed. Press Ctrl+Z or use Undo next to the list to bring it back."]
+bar text Heading 1 removed.
+1440 axe []

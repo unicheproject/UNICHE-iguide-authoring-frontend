@@ -1,0 +1,12 @@
+import { open, go, P, shot, settle, alerts, focused, FILES } from "./lib.mjs";
+const PP = `/projects/${P}`;
+const { browser, page } = await open("curator", { viewport: "1440" });
+await go(page, `${PP}/media`); await settle(page, 2000);
+console.log("MEDIA:", (await page.locator("main").innerText()).replace(/\n+/g," | ").slice(0,300));
+await page.getByRole("button", { name: /upload/i }).first().click(); await page.waitForTimeout(800);
+const d = page.locator("[role=dialog]").first();
+console.log("UPLOAD dialog:", (await d.innerText()).replace(/\n+/g, " | ").slice(0, 900));
+console.log("focus", await focused(page));
+console.log("inputs", await d.evaluate(d => [...d.querySelectorAll("input,button")].map(e => e.tagName+":"+e.type+":"+(e.accept||"")+":"+(e.textContent||e.getAttribute("aria-label")||"").trim().slice(0,30)).join(" ; ")));
+await shot(page, "media__upload-dialog");
+await browser.close();

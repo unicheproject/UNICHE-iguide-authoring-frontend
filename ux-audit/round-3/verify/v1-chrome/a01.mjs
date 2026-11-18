@@ -1,0 +1,23 @@
+import { fresh, kcLogin, shot, text, CMS, axe, rect } from "./lib.mjs";
+const { browser, context, page } = await fresh("1440");
+await page.goto(CMS + "/"); await page.waitForTimeout(1500);
+console.log("URL1", page.url());
+console.log("SIGNIN TEXT:", JSON.stringify(await text(page)));
+await shot(page, "signin__fresh__1440");
+console.log("axe signin", await axe(page));
+const btn = page.getByRole("button", { name: /sign in/i }).first();
+await btn.focus(); await page.keyboard.press("Tab"); await btn.focus();
+console.log("btn focus", await btn.evaluate(e => { const s = getComputedStyle(e); return { outline: s.outline, offset: s.outlineOffset, shadow: s.boxShadow }; }));
+await shot(page, "signin__button-focus__1440");
+await btn.click();
+await kcLogin(page);
+await page.waitForURL((u) => !u.toString().includes("/realms/"), { timeout: 30000 });
+await page.waitForLoadState("networkidle").catch(()=>{}); await page.waitForTimeout(2500);
+console.log("after signin URL", page.url(), "hash", JSON.stringify(await page.evaluate(() => location.hash)), "search", JSON.stringify(await page.evaluate(() => location.search)));
+console.log("title", await page.title());
+await shot(page, "home__after-real-signin__1440");
+// deep link path
+await page.goto(CMS + "/projects/6958c18f-60d2-4140-a524-5a43f8a2f6b5/pois"); await page.waitForLoadState("networkidle").catch(()=>{});
+console.log("deep url", page.url());
+await context.storageState({ path: "C:/Users/mirto/IdeaProjects/iguide/uniche_iguide_frontend/ux-audit/tools/.auth/admin.json" });
+await browser.close();

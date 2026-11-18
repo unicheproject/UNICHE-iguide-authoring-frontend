@@ -1,0 +1,6 @@
+1440 {"Web":354,"Mobile":337,"Kiosk":354,"Web2":354} range 17
+1440 {"Web":354,"Mobile":337,"Kiosk":354,"Web2":354} range 17
+1280 {"Web":354,"Mobile":337,"Kiosk":354,"Web2":354} range 17
+1024 {"Web":354,"Mobile":337,"Kiosk":354,"Web2":354} range 17
+768 {"Web":364,"Mobile":337,"Kiosk":401,"Web2":364} range 64
+zoom200 {"Web":381,"Mobile":337,"Kiosk":395,"Web2":381} range 58

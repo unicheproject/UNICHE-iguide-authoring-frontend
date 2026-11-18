@@ -1,0 +1,13 @@
+import { readFileSync } from "node:fs";
+import { createRequire } from "node:module";
+import { open, go } from "../../../tools/session.mjs";
+const require = createRequire(new URL("../../../../package.json", import.meta.url));
+const { default: AxeBuilder } = require("@axe-core/playwright");
+const seed = JSON.parse(readFileSync(new URL("../../../tools/seed.json", import.meta.url), "utf8"));
+const { browser, page } = await open("curator", { viewport: "1440" });
+await go(page, `/projects/${seed.projects.populated.id}/pois?q=UX-P3a`);
+await page.waitForTimeout(3000);
+const r = await new AxeBuilder({ page }).withTags(["wcag2a","wcag21a","wcag2aa","wcag21aa"]).analyze();
+for (const v of r.violations) for (const n of v.nodes) console.log(v.id, n.html.slice(0, 250), n.failureSummary?.slice(0, 200));
+console.log((await page.locator("tbody tr").allInnerTexts()).join("\n---\n").slice(0, 600));
+await browser.close();

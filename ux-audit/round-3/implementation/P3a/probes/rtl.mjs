@@ -1,0 +1,11 @@
+import { open, go, bearer, API, P, settle, shot, save } from "./h.mjs";
+const { browser, page } = await open("admin", { viewport: "1280" });
+const auth = await bearer(page);
+const H = { authorization: auth, "content-type": "application/json" };
+const r = await fetch(`${API}/projects/${P}/pois`, { method: "POST", headers: H, body: JSON.stringify({ title: "UX-R3-P3a מוזיאון האקרופוליס (חדש)! – 2026?", slug: "ux-r3-p3a-rtl", placeId: null, code: null }) });
+console.log("create", r.status);
+await go(page, `/projects/${P}/pois?q=ux-r3-p3a`); await page.waitForSelector("[data-row-id]"); await settle(page, 800);
+const out = await page.evaluate(() => { const a = document.querySelector("[data-row-id] a"); const b = a.querySelector("bdi"); return { text: a.textContent.trim(), bdi: !!b, bdiDir: b && getComputedStyle(b).unicodeBidi, linkDir: getComputedStyle(a).direction }; });
+await shot(page, "pois-rtl-title__1280");
+save("rtl", out); console.log(JSON.stringify(out));
+await browser.close();

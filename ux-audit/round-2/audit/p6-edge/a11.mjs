@@ -1,0 +1,14 @@
+import { open, go, P, shot, settle, alerts, AP } from "./lib.mjs";
+const PP = `/projects/${P}`;
+const { browser, page } = await open("curator", { viewport: "1440" });
+await go(page, `${PP}/pois`); await settle(page, 800);
+const log = [];
+await page.route(AP, (r) => { const u = r.request().url().replace(/.*v1/, ""); if (r.request().method()==="GET" && /languages/.test(u)) { log.push("ABORT " + u); return r.abort("failed"); } log.push(u); return r.continue(); });
+await page.getByRole("link", { name: /Routes/ }).first().click(); await page.waitForTimeout(3000);
+console.log(log.slice(0, 12));
+console.log((await page.locator("main").innerText()).replace(/\n+/g," | ").slice(0,300));
+const nb = page.getByRole("button", { name: /New route/ });
+console.log("new route disabled", await nb.isDisabled(), await nb.getAttribute("aria-disabled"), await nb.getAttribute("title"), await nb.getAttribute("aria-describedby"));
+await nb.hover(); await page.waitForTimeout(600); await shot(page, "routes-list__languages-failed-hover");
+console.log("tooltip:", await page.locator("[role=tooltip]").allInnerTexts());
+await browser.close();

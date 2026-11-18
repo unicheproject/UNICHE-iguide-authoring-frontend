@@ -1,0 +1,17 @@
+after cancel: title Dashboard · UX Audit – Empty B · iGuide CMS | switcher label: null | live [{"t":3500,"role":"status","text":"Unsaved changes","why":"add"},{"t":4728,"role":"status","text":"1 of 28 projects shown","why":"add"},{"t":5762,"role":"status","text":"Dashboard loaded","why":"add"}]
+FC menu items ["Deactivate foc=false hl=false outline=solid border=1px/rgb(0, 0, 0) bg=rgba(255, 255, 255, 0) col=rgb(0, 0, 0)","Archive foc=false hl=false outline=solid border=1px/rgb(0, 0, 0) bg=rgba(255, 255, 255, 0) col=rgb(0, 0, 0)","Move up foc=false hl=false outline=solid border=1px/rgb(0, 0, 0) bg=rgba(255, 255, 255, 0) col=rgb(0, 0, 0)","Move down foc=true hl=true outline=none border=1px/rgb(0, 0, 0) bg=rgb(255, 255, 255) col=rgb(0, 0, 0)","Move to positi foc=false hl=false outline=solid border=1px/rgb(0, 0, 0) bg=rgba(255, 255, 255, 0) col=rgb(0, 0, 0)","Move to top foc=false hl=false outline=solid border=1px/rgb(0, 0, 0) bg=rgba(255, 255, 255, 0) col=rgb(0, 0, 0)","Move to bottom foc=false hl=false outline=solid border=1px/rgb(0, 0, 0) bg=rgba(255, 255, 255, 0) col=rgb(0, 0, 0)"]
+FC after ArrowDown ["Deactivate foc=false bg=rgba(255, 255, 255, 0) outline=solid2px","Archive foc=false bg=rgba(255, 255, 255, 0) outline=solid2px","Move up foc=false bg=rgba(255, 255, 255, 0) outline=solid2px","Move down foc=false bg=rgba(255, 255, 255, 0) outline=solid2px"]
+floorplan Place buttons {"n":119,"sample":["PlaceThe Horsemen of the Panathenaic Procession","PlaceMoschophoros (The Calf-Bearer)","PlaceRampin Rider"]}
+[floorplan] #1 button "Apply changesNothing to apply: there are no pending changes" -> LOWRING 1
+[floorplan] #36 button "PlacePeplos Kore" -> CLIPPED UL.mt-2 max-h-[26rem] divide-y divide-borde B3
+[floorplan] #53 button "PlaceChalkotheke" -> CLIPPED UL.mt-2 max-h-[26rem] divide-y divide-borde B3
+[floorplan] 60 stops, 3 flagged
+floorplan stops 60
+[map-editor] #1 button "Apply changesNothing to apply: there are no pending changes" -> LOWRING 1
+[map-editor] #63 button "PlaceRampin Rider" -> CLIPPED UL.mt-2 max-h-[26rem] divide-y divide-borde B3
+[map-editor] #67 button "PlaceChian Kore (Kore 675)" -> CLIPPED UL.mt-2 max-h-[26rem] divide-y divide-borde B3
+[map-editor] #74 button "PlaceMuseum Shop" -> CLIPPED UL.mt-2 max-h-[26rem] divide-y divide-borde B3
+[map-editor] #77 button "PlaceFoundations of the Old Temple of Athena" -> CLIPPED UL.mt-2 max-h-[26rem] divide-y divide-borde B3
+[map-editor] #80 button "PlaceTemple of Hephaestus" -> CLIPPED UL.mt-2 max-h-[26rem] divide-y divide-borde B3
+[map-editor] 80 stops, 6 flagged
+map-editor stops 80

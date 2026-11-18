@@ -1,0 +1,4 @@
+deactivate ref {"text":"Deactivate UX-R3-p6 POI B A-disjoint B-same? It is still used by the items below. Remove it from them first, then try again. Used in Route UX-R3-p6 Route A (opens its editor) Draft Close","focus":"h2#dialog-7xnl1jw \"Deactivate UX-R3-p6 POI B A-disjoint B-same?\"","links":["UX-R3-p6 Route A\n(opens its editor)"]}
+after esc {"focus":"button \"Deactivate\""}
+menu ["Archive"]
+archive ref {"text":"Archive UX-R3-p6 POI B A-disjoint B-same? It is still used by the items below. Remove it from them first, then try again. Used in Route UX-R3-p6 Route A (opens its editor) Draft Close","focus":"h2#dialog-6auotqt \"Archive UX-R3-p6 POI B A-disjoint B-same?\""}
